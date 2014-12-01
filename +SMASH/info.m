@@ -11,13 +11,14 @@
 % created May 15, 2014 by Daniel Dolan (Sandia National Laboratories)
 % revised November 17, 2014 by Daniel Dolan
 %     -cleaned up interface to *.git subfolder
-function varargout=SMASHinfo(varargin)
+function varargout=info(varargin)
 
 % current version number (set by developer)
 data.VersionNumber='1.0 alpha';
 
 % latest revision date
 location=mfilename('fullpath');
+[location,~]=fileparts(location);
 [location,~]=fileparts(location);
 target=fullfile(location,'*.git');
 target=dir(target);
