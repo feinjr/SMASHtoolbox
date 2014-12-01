@@ -1,0 +1,2 @@
+set CLICOLOR=``xterm-color''
+export CLICOLOR
