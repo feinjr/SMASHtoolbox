@@ -217,7 +217,7 @@ switch lower(modtype)
 end
                 
                 
-object = SMASH.EOS.Sesame(density,temperature,pressure,energy,entropy);                
+object = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);                
 object.Name='Custom Sesame';
 object.Source = 'Reference Curve';
 object.SourceFormat='sesame';

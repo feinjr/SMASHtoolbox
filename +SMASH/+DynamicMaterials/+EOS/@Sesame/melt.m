@@ -71,7 +71,7 @@ pressure = lookup(object,'Pressure',density,temperature);
 energy = lookup(object,'Energy',density,temperature);
 entropy = lookup(object,'Entropy',density,temperature); 
 
-new = SMASH.EOS.Sesame(density,temperature,pressure,energy,entropy);
+new = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);
 
 %Set some properties
 new.Name= 'Melt Curve';

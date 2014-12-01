@@ -343,7 +343,7 @@ dlg.Hidden = false;
         
         value = probe(dlg);
         neos = value{1};
-        ses = SMASH.EOS.Sesame(fullfile(eospath,neos),str2num(neos));
+        ses = SMASH.DynamicMaterials.EOS.Sesame(fullfile(eospath,neos),str2num(neos));
         
         IV = str2num(value{2});
         P0 = str2num(value{4});

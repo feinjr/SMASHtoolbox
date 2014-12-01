@@ -125,7 +125,7 @@ up = up1 + cumtrapz(density,cb./density);
 cb = cb.*density./rho0;
 end
 
-new = SMASH.EOS.Sesame(density,temperature,pressure,energy,entropy);
+new = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);
 new.Data{1}=up;
 new.Data{2}=cb;
 

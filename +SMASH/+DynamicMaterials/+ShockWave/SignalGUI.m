@@ -1137,7 +1137,7 @@ function newsig = MHDScale(n)
         s = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename),'column');
     end
    
-    [newsig,s] = align(newsig,s);
+    [newsig,s] = register(newsig,s);
     
     switch value{3}
         case choices{1}
@@ -1897,7 +1897,7 @@ function PerformCallback(varargin);
         g0 = str2num(value{3});
         L = str2num(value{4});
         cv = str2num(value{5});
-        sesobj = SMASH.EOS.Sesame('Mie-Gruneisen',value{1},x,y,rho0,g0,L,cv);
+        sesobj = SMASH.DynamicMaterials.EOS.Sesame('Mie-Gruneisen',value{1},x,y,rho0,g0,L,cv);
         [sesname,sespath] = uiputfile({'*.*','All Files';'*.ses*;*.a;*.asc','Sesame Files'},'Select Sesame File');
         
         %Table 201 paramters
