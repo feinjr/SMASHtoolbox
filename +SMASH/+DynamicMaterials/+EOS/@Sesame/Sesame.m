@@ -43,7 +43,7 @@ classdef Sesame < SMASH.General.DataClass
         Energy = [] %Dependent array
         Entropy =[] %Dependent array
     end
-    properties (SetAccess={?SMASH.General.DataClass,?SMASH.EOS.Sesame}...% superclass, class, and subclass access
+    properties (SetAccess={?SMASH.General.DataClass,?SMASH.DynamicMaterials.EOS.Sesame}...% superclass, class, and subclass access
             ,Hidden=true)
         LimitIndex='all' % Region of interest'
     end

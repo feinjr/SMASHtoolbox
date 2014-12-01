@@ -15,7 +15,6 @@
 %    MonteCarlo       - Monte Carlo routines (UNDER CONSTRUCTION)
 %    PDE              - Partial Differential Equation solvers (UNDER CONSTRUCTION)
 %    Radiometry       - radiometry analysis (UNDER CONSTRUCTION)
-%    ShockWave        - shock wave analysis (UNDER CONSTRUCTION
 %    Spectroscopy     - spectroscopy analysis (UNDER CONSTRUCTION)
 %
 % To determine the current state of the SMASH package, type:

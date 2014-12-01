@@ -131,7 +131,7 @@ Us(fix)=polyval(fit,tempx(fix));
 up = (pressure-P0)./(rho0.*Us)+up1;
 
 
-new = SMASH.EOS.Sesame(density,temperature,pressure,energy,entropy);
+new = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);
 new.Data{1}=up;
 new.Data{2}=Us;
 
