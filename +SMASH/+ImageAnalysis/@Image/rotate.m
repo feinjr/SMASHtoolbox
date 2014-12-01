@@ -31,18 +31,21 @@ end
 if isnumeric(argument)
     object.Data=twist(object.Data,argument);
 else
+    x=object.Grid1;
+    y=object.Grid2;
     switch lower(argument)
         case {'left','counter-clockwise','counterclockwise'}          
             object.Data=transpose(object.Data);
             object=flip(object,'Grid2');
+            x=x(end:-1:1);
         case {'right','clockwise'}            
             object=flip(object,'Grid2');
-            object.Data=transpose(object.Data);            
+            object.Data=transpose(object.Data);
+            y=y(end:-1:1);
         otherwise
             error('ERROR: invalid input argument for rotation');
     end
-    x=object.Grid1;
-    object.Grid1=transpose(object.Grid2);
+    object.Grid1=transpose(y);
     object.Grid2=transpose(x);
     label=object.Grid1Label;
     object.Grid1Label=object.Grid2Label;
