@@ -56,11 +56,11 @@ classdef PlotOptions < SMASH.General.Options
             
            object=add(object,'XDir','normal',{'normal', 'reverse'});
            object=describe(object,'XDir',...
-               'XDir: ''normal'' or ''reverse''','locaked');
+               'XDir: ''normal'' or ''reverse''','locked');
            
            object=add(object,'YDir','normal',{'normal', 'reverse'});
            object=describe(object,'YDir',...
-               'YDir: ''normal'' or ''reverse''','locaked');
+               'YDir: ''normal'' or ''reverse''','locked');
             
             % uipanel properties
             object=add(object,'PanelColor','w',@verifyColor);
