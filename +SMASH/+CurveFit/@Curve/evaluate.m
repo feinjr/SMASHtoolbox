@@ -1,8 +1,19 @@
+% evaluate Evaluate Curve at specified locations
+%
+% This method evaluates a Curve object at specified locations:
+%     >> y=evaluate(object,x);
+% using the current basis parameters and scaling factors.
+%
+% See also Curve, fit, summarize
+%
+
+%
+% created December 1, 2014 by Daniel Dolan (Sandia National Laboratories)
+%
 function [y,basis]=evaluate(object,x)
 
 x=x(:);
 M=numel(x);
-y=zeros(M,1);
 
 N=numel(object.Basis);
 basis=zeros(M,N);

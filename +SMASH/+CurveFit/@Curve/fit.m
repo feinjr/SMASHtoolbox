@@ -1,3 +1,23 @@
+% fit Optimize parameters to match data
+%
+% This method optimizes the parameters and non-fixed scaling factors of a
+% Curve object to best fit a data set.
+%     >> object=fit(object,data);
+% The input "data" must be a two- or three-column array.  The first two
+% columns are always x and y, respectively.  The third column is used for
+% weighting data points; if omitted, all points are treated equally.
+% 
+% Optimization options can be passed as a third input.
+%     >> object=fit(object,data,options);
+% The MATLAB function "optimset" should be used to generate the options
+% structure.
+% 
+% See also Curve, evaluate, optimset, summarize
+%
+
+%
+% created December 1, 2014 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=fit(object,data,options)
 
 % handle input
@@ -89,9 +109,10 @@ end
         fit_reduced=basis_reduced*scale_reduced;
         fit=fit_reduced+y_fixed;   
         scale(~fixed)=scale_reduced;
-        % residual calculation 
-        chi2=y-fit; % what about complex values?
-        chi2=mean(weight.*chi2.^2);
+        % residual calculation with complex function/weight support
+        chi2=weight.*(y-fit);
+        chi2=real(chi2.*conj(chi2));
+        chi2=mean(chi2);
         chi2=chi2*prod(penalty);
     end
 param=fminsearch(@residual,guess,options);

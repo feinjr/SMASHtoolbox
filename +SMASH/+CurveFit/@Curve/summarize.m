@@ -10,7 +10,7 @@
 % window.  Specific results can be assigned to outputs as shown below.
 %     >> [basis,param,bound,scale,fixed]=summarize(...);
 %
-% See also Curve
+% See also Curve, add, edit, remove
 %
 
 %
