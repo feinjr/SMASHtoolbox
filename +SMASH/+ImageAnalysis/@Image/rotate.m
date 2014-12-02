@@ -13,7 +13,8 @@
 % created July 27, 2012 by Daniel Dolan (Sandia National Laboratories)
 % revised December 28, 2012 by Daniel Dolan
 %   -added rotation by a specified angle
-% modified October 16, 2013 by Tommy Ao (Sandia National Laboratories)
+% modified December 2, 2014 by Tommy Ao (Sandia National Laboratories)
+%   -fixed Grids to match left and right rotations 
 %
 function object=rotate(object,argument)
 
@@ -33,6 +34,8 @@ if isnumeric(argument)
 else
     x=object.Grid1;
     y=object.Grid2;
+    xlabel=object.Grid1Label;
+    ylabel=object.Grid2Label;
     switch lower(argument)
         case {'left','counter-clockwise','counterclockwise'}          
             object.Data=transpose(object.Data);
@@ -47,9 +50,8 @@ else
     end
     object.Grid1=transpose(y);
     object.Grid2=transpose(x);
-    label=object.Grid1Label;
-    object.Grid1Label=object.Grid2Label;
-    object.Grid2Label=label;
+    object.Grid1Label=ylabel;
+    object.Grid2Label=xlabel;
 end
 
 object.ObjectHistory=object.ObjectHistory(1:end-1);
