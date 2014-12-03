@@ -8,7 +8,6 @@ assert(isnumeric(varargin{1}) && isnumeric(varargin{2}),...
 object.Data=varargin{2};
 numpoints=size(object.Data,1);
 object.NumberSignals=size(object.Data,2);
-object.LineColor=lines(object.NumberSignals);
 
 object.Grid=varargin{1}(:);
 if isempty(object.Grid)

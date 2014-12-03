@@ -45,10 +45,6 @@ switch data.Format
     otherwise
         error('ERROR: cannot import Image from this format');
 end
-%[~,name,ext]=fileparts(filename);  
-%object.Source=[name ext];
-%object.SourceFormat=format;
-%object.SourceRecord=record;
 
 % force scalar data with correct numerical format
 if ndims(object.Data)==3
@@ -80,5 +76,9 @@ if ndims(object.Data)==3
     object.ColorMap=gray(64);
 end
 object.Precision=object.Precision; % invoke superclass set.Precision method
+
+% customize graphic settings
+object.PlotOptions=set(object.PlotOptions,...
+    'YDir','reverse');
     
 end

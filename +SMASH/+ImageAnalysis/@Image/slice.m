@@ -92,7 +92,8 @@ switch lower(coordinate)
         Grid2=nan(size(Grid1));         
 end
 hline=line('Parent',h.axes,'XData',Grid1,'YData',Grid2,...
-    'Color',object.LineColor,'Tag','SliceGuide');
+    'Color',get(object.PlotOptions,'LineColor'),...
+    'Tag','SliceGuide');
 
 fig=ancestor(h.axes,'figure');
 set(fig,'WindowButtonMotionFcn',@MoveSliceGuide);

@@ -50,8 +50,7 @@ axes(target);
 % create line with object's properties
 [time,value]=limit(object);
 h=line(time,value);
-set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
-    'LineWidth',object.LineWidth,'Marker',object.Marker);
+apply(object.PlotOptions,h);
 
 % fill out new figure
 if new

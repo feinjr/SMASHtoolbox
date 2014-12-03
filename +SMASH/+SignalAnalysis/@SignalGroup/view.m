@@ -62,10 +62,10 @@ axes(target);
 % create line with object's properties
 [time,value]=limit(object);
 h=nan(object.NumberSignals,1);
+color=lines(object.NumberSignals);
 for n=index
     h(n)=line(time,value(:,n));
-    set(h(n),'Color',object.LineColor(n,:),'LineStyle',object.LineStyle,...
-    'LineWidth',object.LineWidth,'Marker',object.Marker);
+    set(h(n),'Color',color(n,:));
 end
 h=h(~isnan(h));
 

@@ -38,5 +38,7 @@ switch data.Format
         error('ERROR: cannot import Signal from this format');
 end
 
+object.PlotOptions=set(object.PlotOptions,...
+    'Marker','none','LineStyle','-');
 
 end

@@ -86,11 +86,6 @@ text('Parent',h.axes(2),'Units','normalized','Position',[1 1],...
 hlink=linkprop(h.axes,'CLim');
 setappdata(h.axes(1),'CLimLink',hlink);
 
-%pos1=get(h.axes(1),'Position');
-%pos2=get(h.axes(2),'Position');
-%pos2(3)=pos1(3);
-%set(h.axes(2),'Position',pos2);
-
 % final details
 hc=findobj(gcf,'Tag','Colorbar');
 delete(hc(1));

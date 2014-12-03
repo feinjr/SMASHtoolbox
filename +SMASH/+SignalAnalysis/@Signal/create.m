@@ -20,3 +20,6 @@ assert(numel(object.Grid)==numel(object.Data),...
     'ERROR: incompatible Grid/Data arrays');
 
 object.Name='Signal object';
+
+object.PlotOptions=set(object.PlotOptions,...
+    'Marker','none','LineStyle','-');

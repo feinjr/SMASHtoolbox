@@ -33,12 +33,13 @@ classdef DataClass
         Precision='double' % Data format (double or single)
     end
     properties
-        LineColor='k' % Default line color
-        LineStyle='-' % Default line style
-        LineWidth=0.5 % Default line width
-        Marker='none' % Default marker
-        MarkerSize= 5 % Default marker size
-        ColorMap=jet(64) % Default colormap
+        PlotOptions = SMASH.General.PlotOptions % Default graphic options (see SMASH.General.PlotOptions)
+        %LineColor='k' % Default line color
+        %LineStyle='-' % Default line style
+        %LineWidth=0.5 % Default line width
+        %Marker='none' % Default marker
+        %MarkerSize= 5 % Default marker size
+        %ColorMap=jet(64) % Default colormap
     end
     %% hidden methods
     methods (Hidden=true)
@@ -62,11 +63,11 @@ classdef DataClass
                 object=create(object,varargin{:});
                 object.Source='Numeric input';
             end
-            object.Precision=object.Precision; % enforce variable precicion
-            object=concealProperty(object,...
-                'ColorMap','Precision',...
-                'LineColor','LineStyle','LineWidth',...
-                'Marker','MarkerSize');
+            object.Precision=object.Precision; % enforce variable precicion            
+            %object=concealProperty(object,...
+            %    'ColorMap','Precision',...
+            %    'LineColor','LineStyle','LineWidth',...
+            %    'Marker','MarkerSize');
         end
         varargin=concealMethod(varargin);
         varargin=concealProperty(varargin);
@@ -120,48 +121,48 @@ classdef DataClass
                 end
             end
         end
-        function object=set.LineColor(object,value)
-            if isnumeric(value) && (size(value,2)==3) && ...
-                    all(value(:)<=1) && all(value(:)>=0)
-                object.LineColor=value;
-                return
-            elseif ischar(value)
-                switch lower(value)
-                    case {'r','g','b','c','m','y','k','none'}
-                        object.LineColor=value;
-                    otherwise
-                        error('ERROR: %s is an invalid LineColor setting',value);
-                end
-            else
-                error('ERROR: invalid LineColor setting');
-            end
-        end        
-        function object=set.LineStyle(object,value)
-            switch value
-                case {'-','--','-.',':','none'}
-                    object.LineStyle=value;
-                otherwise
-                    error('ERROR: %s is an invalid LineStyle setting',value);
-            end
-        end
-        function object=set.LineWidth(object,value)
-            if isnumeric(value) && (numel(value)==1) && (value>0)
-                object.LineWidth=value;
-            else
-                error('ERROR: invalid LineWidth setting');
-            end
-        end
-        function object=set.Marker(object,value)
-            switch value
-                case {'+','o','*','.','x','square','diamond'}
-                    % valid
-                case {'v','^','>','<','pentagram','hexgram','none'}
-                    % valid
-                otherwise
-                    error('ERROR: %s is an invalid Marker',value);
-            end
-            object.Marker=value;
-        end      
+%         function object=set.LineColor(object,value)
+%             if isnumeric(value) && (size(value,2)==3) && ...
+%                     all(value(:)<=1) && all(value(:)>=0)
+%                 object.LineColor=value;
+%                 return
+%             elseif ischar(value)
+%                 switch lower(value)
+%                     case {'r','g','b','c','m','y','k','none'}
+%                         object.LineColor=value;
+%                     otherwise
+%                         error('ERROR: %s is an invalid LineColor setting',value);
+%                 end
+%             else
+%                 error('ERROR: invalid LineColor setting');
+%             end
+%         end        
+%         function object=set.LineStyle(object,value)
+%             switch value
+%                 case {'-','--','-.',':','none'}
+%                     object.LineStyle=value;
+%                 otherwise
+%                     error('ERROR: %s is an invalid LineStyle setting',value);
+%             end
+%         end
+%         function object=set.LineWidth(object,value)
+%             if isnumeric(value) && (numel(value)==1) && (value>0)
+%                 object.LineWidth=value;
+%             else
+%                 error('ERROR: invalid LineWidth setting');
+%             end
+%         end
+%         function object=set.Marker(object,value)
+%             switch value
+%                 case {'+','o','*','.','x','square','diamond'}
+%                     % valid
+%                 case {'v','^','>','<','pentagram','hexgram','none'}
+%                     % valid
+%                 otherwise
+%                     error('ERROR: %s is an invalid Marker',value);
+%             end
+%             object.Marker=value;
+%         end      
     end
     %% overloaded operators
     methods (Hidden=true)

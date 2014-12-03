@@ -90,10 +90,9 @@ set(h.image,'ButtonDownFcn',@CreatePoint)
 hc=uicontextmenu;
 uimenu(hc,'Label','Remove point','Callback',@RemovePoint);
 hl=line('Parent',h.axes,'UIContextMenu',hc,...
-    'XData',[],'YData',[],'LineStyle','none',...
-    'MarkerEdgeColor',object.LineColor,...
-    'MarkerFaceColor',object.LineColor,...
-    'Marker',object.Marker,'MarkerSize',object.MarkerSize);
+    'XData',[],'YData',[]);
+apply(object.PlotOptions,hl);
+set(hl,'LineStyle','none');
 title('Select alignment points');
     function CreatePoint(varargin)
         x=get(hl,'XData');

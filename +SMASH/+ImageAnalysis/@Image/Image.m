@@ -68,8 +68,6 @@ classdef Image < SMASH.General.DataClass
         Title='Image object' % Title used by view
         DataLim='auto' % Data range used by view
         DataScale='linear' % Data scaling used by view        
-        AspectRatio = 'auto' % Aspect ratio used in view
-        YDir='reverse'; % y-axis direction ('reverse' or 'normal')
     end
     properties (Hidden=true)
         History='';
@@ -80,9 +78,7 @@ classdef Image < SMASH.General.DataClass
             object=object@SMASH.General.DataClass(varargin{:}); 
             object=concealProperty(object,...
                 'LimitIndex1','LimitIndex2');
-            object=concealMethod(object,...
-                'show','explore','detail');
-            object=verifyGrid(object);                     
+            object=verifyGrid(object);
         end
     end
     methods (Hidden=true)
@@ -91,6 +87,11 @@ classdef Image < SMASH.General.DataClass
         [object,x0,y0]=center_ellipse(object)
         [object,x0,y0]=center_points(object)
         varargout=region(varargin)
+    end
+    methods (Access=protected,Hidden=true)
+        varargout=detail(varargin);
+        varargout=explore(varargin);
+        varargout=show(varargin);
     end
     methods (Access=protected,Hidden=true)
         varargout=create(varargin)
@@ -144,26 +145,7 @@ classdef Image < SMASH.General.DataClass
                     error('ERROR: invalid DataScale');
             end
             object.DataScale=value;
-        end
-        
-        function object=set.AspectRatio(object,value)
-            switch value
-                case 'auto'
-                    object.AspectRatio='auto';
-                case {'equal','square'}
-                    object.AspectRatio='equal';
-                otherwise
-                    error('ERROR: invalid AspectRatio');
-            end
-        end
-        function object=set.YDir(object,value)
-            switch value
-                case {'normal','reverse'}
-                    object.YDir=value;
-                otherwise
-                    error('ERROR: invalid YDir setting');
-            end
-        end
+        end                
     end
     
 end

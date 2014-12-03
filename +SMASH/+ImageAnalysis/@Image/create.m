@@ -36,7 +36,8 @@ end
 assert(numel(object.Grid2)==N,...
     'ERROR: incompatible Grid2/Data arrays');
 
-object.LineColor='m';
-object.Marker='o';
+% customize graphic settings
+object.PlotOptions=set(object.PlotOptions,...
+    'YDir','reverse');
 
 end

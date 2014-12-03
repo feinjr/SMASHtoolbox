@@ -1,4 +1,4 @@
-% This class managed options for graphical display.
+% This class manages options for graphical display.
 %
 % See also General, Options
 %
@@ -63,7 +63,8 @@ classdef PlotOptions < SMASH.General.Options
                'YDir: ''normal'' or ''reverse''','locked');
             
             % uipanel properties
-            object=add(object,'PanelColor','w',@verifyColor);
+            object=add(object,'PanelColor',...
+                get(0,'DefaultUIPanelBackgroundColor'),@verifyColor);
             object=describe(object,'PanelColor',...
                 'PanelColor: RGB value or short/long name');
             
