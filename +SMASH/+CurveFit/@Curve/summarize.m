@@ -54,11 +54,15 @@ if nargout==0
         fprintf('\n');
     end
 else
-    varargout{1}=basis;
-    varargout{2}=param;
-    varargout{3}=bound;
-    varargout{4}=scale;
-    varargout{5}=fixed;
+    report=struct();
+    for k=1:N
+        report(k).Basis=basis{k};
+        report(k).Parameter=param{k};
+        report(k).Bound=bound{k};
+        report(k).Scale=scale{k};
+        report(k).ScaleFixed=fixed{k};
+    end
+    varargout{1}=report;
 end
 
 

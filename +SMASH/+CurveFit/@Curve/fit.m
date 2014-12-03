@@ -118,7 +118,7 @@ end
 param=fminsearch(@residual,guess,options);
 
 [chi2,scale]=residual(param);
-fprintf('chi2=%g\n',chi2);
+%fprintf('chi2=%g\n',chi2);
 for m=1:Ntotal
     param(m)=free2bound(param(m),lower(m),upper(m));
 end

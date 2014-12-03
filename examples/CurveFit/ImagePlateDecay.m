@@ -18,7 +18,7 @@ object=add(object,exponential,1000,'lower',100,'upper',10e3);
 %% adjust fit parameters
 object=fit(object,[x(:) y(:)]);
 summarize(object);
-[basis,param,bound,scale,fixed]=summarize(object);
+report=summarize(object);
 
 %% display results
 xfit=linspace(min(x),max(x),10e3);
@@ -26,10 +26,13 @@ xfit=linspace(min(x),max(x),10e3);
 plot(x,y,'o',xfit,evaluate(object,xfit));
 xlabel(' time (minutes)')
 ylabel(' IP fading factor')
-text=['f(x) = ',num2str(scale{1},'%5.3f'),' + ',num2str(scale{2},'%5.3f'),...
-    ' exp(-x/',num2str(param{2},'%5.3f'),')',' + ',num2str(scale{3},'%5.3f'),...
-    ' exp(-x/',num2str(param{3},'%5.3f'),')'];
-title(text)
+label='f(x) =';
+label=sprintf('%s %5.3f +',label,report(1).Scale(1));
+label=sprintf('%s + %5.3f exp(-x/%5.3f)',...
+    label,report(2).Scale(1),report(2).Parameter(1));
+label=sprintf('%s + %5.3f exp(-x/%5.3f)',...
+    label,report(3).Scale(1),report(3).Parameter(1));
+title(label)
 
 set(gca,'XScale','log');
 figure(gcf);
