@@ -24,20 +24,17 @@
 % (sigma, gamma, and Lx) must always be greater than zero. Width parameters
 % should generally be >1% of the total evaluation range.
 %
-% For Voigt peaks, extreme width differences can lead to slow or unexpected
-% results.  When gamma >> sigma, the peak is nearly Lorentzian and the
-% Voigt shape should be avoided (NaN entries may be encountered).  When
-% sigma >> gamma, the peak is nearly Gaussian and once again the Voigt
-% shape should be avoided (evaluation becomes extremely slow).  The
-% computational overhead of the Voigt shape is largely wasted if the width
-% width parameters differ by more than 2-3 orders of magnitude.
+% Extreme width differences in the Voigt peak may cause very slow function
+% evaluation!  If sigma >> gamma, the Voigt peak is nearly Gaussian but
+% takes much, much longer to compute.  
 %
 % By default, error checking (number of inputs, number of parameters, etc.)
 % is performed every time the peak function handle is called.  Error checks
 % can be bypassed to speed up repetitive function calls.
 %     >> G=makePeak(name,'bypass');
 %
-% See also CurveFit
+% See also CurveFit, makeBackground, makeStep
+%
 
 %
 % created December 2, 2014 by Daniel Dolan (Sandia National Laboratories)
@@ -45,7 +42,9 @@
 function out=makePeak(name,errtest)
 
 % handle input
-assert(nargin>=1,'ERROR: no peak name specified');
+if (nargin<1) || isempty(name)
+    name='gaussian';
+end
 assert(ischar(name),'ERROR: invalid peak name');
 
 if nargin<2
@@ -60,22 +59,22 @@ end
 % process request
 switch lower(name)
     case 'gaussian'
-        out=@gaussian;
+        out=@gaussian_function;
     case 'lorentzian'
-        out=@lorentzian;
+        out=@lorentzian_function;
     case {'pseudo-voigt','pseudo_voigt'}
-        out=@pseudo_voigt;
+        out=@pseudo_voigt_function;
     case 'square'
-        out=@square;
+        out=@square_function;
     case 'triangle'
-        out=@triangle;
+        out=@triangle_function;
     case 'voigt'              
-        out=@voigt;
+        out=@voigt_function;
     otherwise
         error('ERROR: invalid peak name');
 end
 %%
-    function y=gaussian(param,x) % [x0 sigma]
+    function y=gaussian_function(param,x) % [x0 sigma]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==2,'ERROR: invalid number of parameters');
@@ -87,7 +86,7 @@ end
     end
 
 %%
-    function y=lorentzian(param,x) % [x0 gamma]
+    function y=lorentzian_function(param,x) % [x0 gamma]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==2,'ERROR: invalid number of parameters');
@@ -100,7 +99,7 @@ end
         
     end
 %%
-    function y=pseudo_voigt(param,x) % [x0 gamma w]
+    function y=pseudo_voigt_function(param,x) % [x0 gamma w]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==3,'ERROR: invalid number of parameters');
@@ -114,7 +113,7 @@ end
         y=w*L+(1-w)*G;
     end
 %%
-    function y=square(param,x) % [x0 Lx]
+    function y=square_function(param,x) % [x0 Lx]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==2,'ERROR: invalid number of parameters');
@@ -128,7 +127,7 @@ end
         
     end
 %%
-    function y=triangle(param,x) % [x0 Lx]
+    function y=triangle_function(param,x) % [x0 Lx]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==2,'ERROR: invalid number of parameters');
@@ -145,7 +144,7 @@ end
         y(index)=1+slope*(x(index)-x0);
     end
 %% 
-    function y=voigt(param,x) % [x0 sigma gamma]
+    function y=voigt_function(param,x) % [x0 sigma gamma]
         if errtest
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(numel(param)==3,'ERROR: invalid number of parameters');
@@ -163,12 +162,13 @@ end
         sigma=sigma/L;
         gamma=gamma/L;
         % integration
+        left= -6*sigma; % more reliable than -inf for small sigma
+        right=+6*sigma; % more reliable than +inf for small sigma
         u=(x-x0)/L;
-        kernel=@(v) exp(-v.^2/(2*sigma^2))./(1+(u-v).^2/gamma^2);
-        y=integral(kernel,-inf,+inf,'ArrayValued',true);        
+        kernel=@(v) exp(-v.^2/(2*sigma^2))./(1+(u-v).^2/gamma^2);       
+        y=integral(kernel,left,right,'ArrayValued',true);
         u=0;
         kernel=@(v) exp(-v.^2/(2*sigma^2))./(1+(u-v).^2/gamma^2);
-        y=y/integral(kernel,-inf,+inf);
+        y=y/integral(kernel,left,right);
     end
-
 end

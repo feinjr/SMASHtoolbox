@@ -1,17 +1,14 @@
-% 
+% This package supports curve fitting in a (x,y) coordinate system. 
+%
 % Classes:
 %    Curve - Curve class
 %
-% Basis functions: (step, peak, other?)
-%     ConstantBackground - Uniform function y(x)=1
-%     ErrorStep          - Error function
-%     GaussianPeak       - Gaussian peak 
-%     LinearBackground   - Linear background
-%     LorentzianPeak     - Lorentzian peak
-%     SquarePeak         - Square peak
-%     SquareStep         - Square step
-%     VoigtPeak          - Exact Voigt function
+% Basis function generators:
+%    makeBackground - background functions (constant, polynomial)
+%    makePeak       - peak functions (Gaussian, Lorentzian, Voigt, ...)
+%    makeStep       - step functions (tanh, erf, square, ...)
 %
+% See also SMASH
 %
 
 % lasted updated December 2, 2014

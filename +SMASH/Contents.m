@@ -2,6 +2,7 @@
 % visualization.
 %
 % The core packages are:
+%    CurveFit         - nonlinear curve fitting and common basis functions
 %    FileAccess       - file read/write support
 %    General          - general purpose routines
 %    ImageAnalysis    - 2D data processing
