@@ -1,11 +1,17 @@
 % 
 % Classes:
-%    Curve : Curve class
+%    Curve - Curve class
 %
-% Basis packages
-%     PulseFunction
-%     StepFunction
+% Basis functions: (step, peak, other?)
+%     ConstantBackground - Uniform function y(x)=1
+%     ErrorStep          - Error function
+%     GaussianPeak       - Gaussian peak 
+%     LinearBackground   - Linear background
+%     LorentzianPeak     - Lorentzian peak
+%     SquarePeak         - Square peak
+%     SquareStep         - Square step
+%     VoigtPeak          - Exact Voigt function
 %
 %
 
-% lasted updated November 30, 2014 by Daniel Dolan 
+% lasted updated December 2, 2014

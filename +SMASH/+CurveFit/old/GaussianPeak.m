@@ -1,4 +1,4 @@
-function y=Gaussian(param,x)
+function y=GaussianPeak(param,x)
 
 % handle input
 assert(nargin==2,'ERROR: invalid number of inputs');

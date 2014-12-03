@@ -1,4 +1,4 @@
-function y=Square(param,x)
+function y=LorentzianPeak(param,x)
 
 % handle input
 assert(nargin==2,'ERROR: invalid number of inputs');
@@ -6,12 +6,13 @@ assert(nargin==2,'ERROR: invalid number of inputs');
 assert(isnumeric(param),'ERROR: invalid parameter array');
 assert(numel(param)==2,...
     'ERROR: this function requires two parameters');
-param=sort(param);
-x1=param(1);
-x2=param(2);
+x0=param(1);
+Lx=param(2);
 
-y=zeros(size(x));
-index=(x>=x1) & (x<=x2);
-y(index)=1;
+assert(isnumeric(x),'ERROR: invalid x array');
+
+% calculations
+y=(x-x0)/Lx;
+y=1./(1+y.^2);
 
 end

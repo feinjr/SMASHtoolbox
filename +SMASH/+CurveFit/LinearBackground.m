@@ -1,4 +1,4 @@
-function y=Background(order,x)
+function y=LinearBackground(slope,x)
 
 % handle input
 assert(nargin==2,'ERROR: invalid number of inputs');
