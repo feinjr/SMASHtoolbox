@@ -46,7 +46,7 @@ classdef PlotOptions < SMASH.General.Options
             object=describe(object,'Box',...
                 'Box: ''on'' or ''off''');
             
-            object=add(object,'AspectRatio','auto',{'auto','eaual'});
+            object=add(object,'AspectRatio','auto',{'auto','equal'});
             object=describe(object,'AspectRatio',...
                 'AspectRatio: ''auto'' or ''equal''');           
             
