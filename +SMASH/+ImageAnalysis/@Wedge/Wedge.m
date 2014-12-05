@@ -13,7 +13,7 @@
 % Next, apply the Wedge transfer table (object) to an Image (target):  
 %   >> target=apply(object,target);
 %
-% See also ImageAnalysis, FileAccess
+% See also ImageAnalysis, FileAccess.SupportedFormats
 %
 
 % created January 8, 2014 by Tommy Ao (Sandia National Laboratories)

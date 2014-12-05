@@ -17,7 +17,7 @@
 %    >> result=apply(object,target);
 % Refer to method-specific help for more information.
 %
-% See also ImageAnalysis, FileAccess
+% See also ImageAnalysis, FileAccess.SupportedFormats
 %
 
 %

@@ -82,7 +82,7 @@ switch format
     case {'oceanoptics','optronicslab','optronicslabdump'}
         object=SMASH.FileAccess.CustomFile(filename,format);
         data=read(object);
-    case {'agilent','lecroy','tektronix','yokogawa'}
+    case {'agilent','keysight','lecroy','tektronix','yokogawa'}
         object=SMASH.FileAccess.DigitizerFile(filename,format);
         data=read(object,record);
     case {'zdas','saturn'}
@@ -91,7 +91,7 @@ switch format
     case 'dig'
         object=SMASH.FileAccess.DIGfile(filename);
         data=read(object);
-    case {'film','plate','winspec','sbfp','optronis','graphics'}
+    case {'film','plate','winspec','sbfp','optronis','hamamatsu','graphics'}
         object=SMASH.FileAccess.ImageFile(filename,format);
         data=read(object,record);
     case 'pff'

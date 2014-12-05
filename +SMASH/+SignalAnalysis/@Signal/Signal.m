@@ -25,7 +25,7 @@
 % The file specied by "archive" must have a *.sda (Sandia Data Archive)
 % file!
 %
-% See also SignalAnalysis, FileAccess
+% See also SignalAnalysis, FileAccess.SupportedFormats
 %
 
 %

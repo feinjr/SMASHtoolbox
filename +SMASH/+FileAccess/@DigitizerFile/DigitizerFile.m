@@ -5,6 +5,7 @@
 % Supported formats include:
 %    'agilent'   - Agilent binary files (*.h5)
 %    'lecroy     - LeCroy binary files (*.trc)
+%    'keysight'  - Keysight binary files (*.h5)
 %    'nts'       - Nevada Test Site binary files (*.dig)
 %    'tektronix' - Tektronix binary files (*.wfm, *.isf)
 %    'yokogawa'  - Yokogawa binary files (*.wfm)

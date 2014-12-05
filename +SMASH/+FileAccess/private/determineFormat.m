@@ -39,6 +39,7 @@ format{end+1}='optronicslab';
 format{end+1}='optronicslabdump';
 
 format{end+1}='agilent';
+format{end+1}='keysight';
 format{end+1}='lecroy';
 format{end+1}='tektronix';
 format{end+1}='yokogawa';
@@ -48,6 +49,7 @@ format{end+1}='saturn';
 format{end+1}='film';
 format{end+1}='graphics';
 format{end+1}='optronis';
+format{end+1}='hamamatsu';
 format{end+1}='plate';
 format{end+1}='sbfp';
 format{end+1}='winspec';
@@ -120,7 +122,7 @@ switch lower(extension)
     case '.gif'
         choice={'graphics'};
     case '.h5'
-        choice={'agilent'};
+        choice={'agilent','keysight'};
     case '.hdf'
         choice={'film' 'saturn' 'zdas'};
     case '.hdr'
@@ -152,7 +154,7 @@ switch lower(extension)
         elseif exist(headerinf,'file')||exist(headerINF,'file')
             choice={'plate'};
         else
-            choice={'sbfp'};
+            choice={'hamamatsu','sbfp'};
         end
     case '.imi'
         choice={'optronis'};

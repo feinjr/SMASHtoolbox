@@ -17,7 +17,7 @@
 %    >> object=ShortTime('restore',filename,[record]);
 % Restoring a previous object requires  a *.sda (Sandia Data Archive) file!
 %
-% See also Signal, analyze, partition
+% See also Signal, FileAccess.SupportedFormats
 %
 
 %

@@ -19,7 +19,7 @@
 %    >> object=SignalGroup('restore',filename,[record]);
 % Restoring a previous object requires  a *.sda (Sandia Data Archive) file!
 %
-% See also SignalAnalysis, FileAccess
+% See also SignalAnalysis, FileAccess.SupportedFormats
 %
 
 classdef SignalGroup < SMASH.SignalAnalysis.Signal

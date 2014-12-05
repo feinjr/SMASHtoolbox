@@ -11,10 +11,14 @@
 %    -Grid2
 %    -Data
 %
+% Extra information about file is returned as a second output.
+%     >> [output,extra]=read(...);
+%
+%
 % See also ImageFile, probe, select
 %
 
-function output=read(object,~)
+function [output,extra]=read(object,~)
 
 % handle input
 %if nargin<2
@@ -29,29 +33,37 @@ assert(exist(object.FullName,'file')==2,...
 output.FileName=object.FullName;
 output.Format=object.Format;
 map=jet(64);
+extra=struct();
 switch object.Format
-    case 'winspec'
-        data=read_winspec(object.FullName);
+    case 'graphics'
+        [data,map]=imread(object.FullName);
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
+    case 'hamamatsu'
+        [data,header]=read_hamamatsu(object.FullName);
+        grid1=1:size(data,2);
+        grid2=transpose(1:size(data,1));
+        extra.Header=header;
     case 'optronis'
-        data=read_optronis(object.FullName);
+        [data,config,header]=read_optronis(object.FullName);
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
+        extra.Config=config;
+        extra.Header=header;
     case 'film'
-        [data,grid1,grid2]=read_film(object.FullName);        
+        [data,grid1,grid2]=read_film(object.FullName);
     case 'plate'
-       [data,grid1,grid2]=read_plate(object.FullName);
+        [data,grid1,grid2]=read_plate(object.FullName);
     case 'sbfp'
         data=read_sbfp(object.FullName);
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
-    case 'graphics'
-        [data,map]=imread(object.FullName);        
+    case 'winspec'
+        data=read_winspec(object.FullName);
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
-    otherwise       
-       error('ERROR: invalid format');
+    otherwise
+        error('ERROR: invalid format');
 end
 
 output.Data=data;

@@ -3,11 +3,12 @@
 % Syntax:
 %    >> object=DigitizerFile([filename],[format]);
 % Supported formats include:
-%    'graphics'  - Graphic image files (*, bmp, *.jpg, *.tif, etc.)
-%    'winspec'   - WinSpec image files (*.spe)
-%    'optronis'  - Optronics streak camera files (*.spe)
 %    'film'      - Film scans (*.img, *.hdf, *.pff)
+%    'graphics'  - Graphic image files (*, bmp, *.jpg, *.tif, etc.)
+%    'hamamatsu' - Hamamatsu streak camera files (*.img)
+%    'optronis'  - Optronics streak camera files (*.spe)
 %    'plate'     - Image plate scans (*.img)
+%    'winspec'   - WinSpec image files (*.spe)
 % When no format is specified, the class tries to determine the format
 % based on the file's extension.  Users will be prompted to select a format
 % if multiple formats are associated with this extension.

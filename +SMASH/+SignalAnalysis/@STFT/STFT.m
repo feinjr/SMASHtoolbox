@@ -5,7 +5,7 @@
 %   Properties:
 %    -
 %
-% See also Signal 
+% See also Signal, FileAccess.SupportedFormats
 %
 
 % (NF-1)*2=N2

@@ -23,7 +23,8 @@ if isempty(format)
     [~,~,ext]=fileparts(object.FileName);
     switch lower(ext)
         case '.h5'
-            format='agilent';
+            %format='agilent';
+            format=chooseH5;
         case '.hdf'
             %format='zdas';
             % format='saturn';
@@ -80,6 +81,9 @@ full={};
 short{end+1}='agilent';
 full{end+1}='Agilent binary signals (*.h5)';
 
+short{end+1}='keysight';
+full{end+1}='Keysight binary signals (*.h5)';
+
 short{end+1}='lecroy';
 full{end+1}='LeCroy binary signals (*.trc)';
 
@@ -117,5 +121,31 @@ for n=1:numel(short)
     end
 end
 assert(valid,'ERROR: invalid file format');
+
+end
+
+function format=chooseH5()
+
+choice={'Agilent digitizer','Keysight digitizer'};
+dlg=SMASH.MUI.Dialog;
+dlg.Hidden=true;
+dlg.Name='Select format';
+addblock(dlg,'listbox','Select *.h5 format',choice);
+h=addblock(dlg,'button',{'Done'});
+set(h,'Callback','delete(gcbo)');
+dlg.Hidden=false;
+waitfor(h);
+try
+    data=probe(dlg);
+    delete(dlg);
+catch
+    error('ERROR: no format selected');
+end
+switch data{1}
+    case choice{1}
+        format='agilent';
+    case choice{2}
+        format='keysight';
+end
 
 end

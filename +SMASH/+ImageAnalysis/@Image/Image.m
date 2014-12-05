@@ -30,7 +30,7 @@
 % The file specied by "archive" must have a *.sda (Sandia Data Archive)
 % file!
 %
-% See also ImageAnalysis, FileAccess
+% See also ImageAnalysis, FileAccess.SupportedFormats
 %
 
 % created November 5, 2013 by Tommy Ao (Sandia National Laboratories)

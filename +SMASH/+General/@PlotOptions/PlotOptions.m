@@ -134,7 +134,8 @@ function result=verifyColorMap(value)
 
 result=false;
 if isnumeric(value)
-    if (size(value,2)==3) && all(value>=0) && all(value<=1)
+    valid=(value>=0) & (value<=1);
+    if (size(value,2)==3) && all(valid(:))
         result=true;
     end
 elseif ischar(value)
