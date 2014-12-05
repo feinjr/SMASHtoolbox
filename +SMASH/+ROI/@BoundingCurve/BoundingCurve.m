@@ -23,7 +23,9 @@
 
 %
 % created November 18, 2014 by Daniel Dolan (Sandia National Laboratories)
-%
+% revised December 5, 2014 by Daniel Dolan
+%   -added Label property to assist multiple region selection later on
+%   -advanced options provided in select method
 classdef BoundingCurve
     %%
     properties (SetAccess=protected)        
@@ -32,6 +34,7 @@ classdef BoundingCurve
     properties
         Direction % Independent axis ('horizontal' or 'vertical')
         DefaultWidth % Default boundary width
+        Label = 'Boundary curve' % Text label
     end
     properties
         PlotOptions = SMASH.General.PlotOptions % Default graphic options (see SMASH.General.PlotOptions)
@@ -56,10 +59,23 @@ classdef BoundingCurve
     end   
     %% property setters
     methods
+        function object=set.Direction(object,value)
+            if strcmpi(value,'horizontal')
+                object.Direction='horizontal';
+            elseif strcmpi(value,'vertical')
+                object.Direction='vertical';
+            else
+                error('ERROR: invalid direction');
+            end
+        end
         function object=set.DefaultWidth(object,value)
-            assert(SMASH.General.testNumber(value,'positive'),...
+            assert(SMASH.General.testNumber(value,'positive') & (value>0),...
                 'ERROR: invalid DefaultWidth value');
             object.DefaultWidth=value;
+        end
+        function object=set.Label(object,value)
+            assert(ischar(value),'ERROR: invalid label');
+            object.Label=value;
         end
     end
 end

@@ -15,37 +15,80 @@
 % the user, and MATLAB waits until the user presses the "OK" or "Cancel"
 % button to resume normal executation.
 %
-% To implment this method as part of a graphical interface, an apply
-% function should be provided.
-%     >> dlg=select(object,target,applyFunction); % dlg is a MUI.Dialog object
-% Executation is not suspended with this call!  Instead, the function
-% handle passed to method is used whenever the "Apply" button is pressed.
-% The apply function is also called when the "OK" button is pressed before
-% the dialog box is closed.  The apply function is passed a single input:
-% the current state of the BoundingCurve object.
+% Passing an apply function function handle:
+%     >> dlg=select(object,target,'ApplyFunction',myfunc);
+% changes the method's behavior.
+%     -The dialog box has buttons "OK", "Apply", and "Close"
+%     -Program execution is not suspended
+%     -The output ("dlg") is a Dialog object.
+% Pressing the "Apply" button executes the apply function handle using the
+% current BoundCurve object as the sole input, i.e. "myfunc(object)".
+% Pressing the "Close" button closes the dialog box without executing the
+% apply function.  Pressing the "Done" button is equivalent to "Apply"
+% followed by "Close".
 %
-% See also BoundingCurve, define, insert, remove
+% By default, this method draws the curve selection (points and envelope)
+% when the dialog box is created and deletes the selection with the box is
+% closed.  To use an existing selection, the hggroup (generated with the
+% "view" method) can be passed as an additional input.
+%     >> hg=view(object):
+%     >> [...]=select(...,'GroupHandle',hg); 
+% Another option can e specified to prevent the selection from being
+% deleted.
+%    >> [...]=select(...,'DeleteOnClose',false);
+% These options are provided for graphical interface development in
+% conjunction with the apply function.
+%
+% See also BoundingCurve, define, insert, remove, view
 %
 
 %
 % created November 18, 2014 by Daniel Dolan (Sandia National Laboratories)
+% revised December 5, 2014 by Daniel Dolan
+%   -revised advanced operations for GUI development
 %
-function varargout=select(object,target,ApplyFunction)
+%%
+function varargout=select(object,target,varargin)
 
 % handle input
 if (nargin<2) || isempty(target)
     target=gca;
 end
-assert(ishandle(target),'ERROR: invalid target axes handle');
+assert(ishandle(target),'ERROR: invalid target axes');
+fig=ancestor(target,'figure');
 
-if nargin<3
-    ApplyFunction=[];
-elseif ischar(ApplyFunction)
-    ApplyFunction=str2func(ApplyFunction);
-else
-    assert(isa(ApplyFunction,'function_handle'),...
-        'ERROR: invalid Apply function');
+Narg=numel(varargin);
+assert(rem(Narg,2)==0,'ERROR: unmatch name/value pair');
+advanced=struct('ApplyFunction',[],'DeleteOnClose',true,...
+    'GroupHandle',[]);
+for n=1:2:Narg
+    name=varargin{n};
+    assert(ischar(name),'ERROR: invalid name');
+    if isfield(advanced,name)
+        advanced.(name)=varargin{n+1};
+    else
+        error('ERROR: invalid name');
+    end    
 end
+
+if ischar(advanced.ApplyFunction)
+    advanced.ApplyFunction=str2func(advanced.ApplyFunction);
+end
+assert(isempty(advanced.ApplyFunction)...
+    | isa(advanced.ApplyFunction,'function_handle'),...
+    'ERROR: invalid AppyFunction');
+ApplyFunction=advanced.ApplyFunction;
+
+assert(islogical(advanced.DeleteOnClose),...
+    'ERROR: DeleteOnClose must be logical');
+DeleteOnClose=advanced.DeleteOnClose;
+
+if isempty(advanced.GroupHandle)
+    advanced.GroupHandle=view(object,target);
+end
+child=get(advanced.GroupHandle(1),'Children');
+points=child(2);
+envelope=child(1);
 
 % create dialog
 dlg=SMASH.MUI.Dialog;
@@ -53,8 +96,6 @@ dlg.Hidden=true;
 dlg.Name='Boundary select';
 setappdata(dlg.Handle,'PreviousObject',object);
 
-fig=ancestor(target,'figure');
-[points,envelope]=view(object,target);
 if isempty(object.DefaultWidth)
     switch object.Direction
         case 'horizontal'
@@ -73,13 +114,20 @@ setappdata(dlg.Handle,'PreviousWindowButtonUpFcn',...
     get(fig,'WindowButtonUpFcn'));
 setappdata(dlg.Handle,'PreviousCloseFcn',...
     get(fig,'CloseRequestFcn'));
+setappdata(dlg.Handle,'ApplyFunction',ApplyFunction);
+setappdata(dlg.Handle,'DeleteOnClose',DeleteOnClose);
 
 addblock(dlg,'text','BoundingCurve selection');
 label=sprintf('Direction: %s',object.Direction);
 addblock(dlg,'text',label);
-addblock(dlg,'text',' ');
+%addblock(dlg,'text',' ');
 
-h=addblock(dlg,'medit','Curve table: [x y width]',45,10);
+h=addblock(dlg,'edit','Label:',20);
+setappdata(dlg.Handle,'Label',h(2));
+makeBold(h(1));
+set(h(end),'String',object.Label,'Callback',{@changeLabel,dlg.Handle});
+
+h=addblock(dlg,'medit','Data table: [x y width]',45,10);
 setappdata(dlg.Handle,'Table',h(end));
 makeBold(h(1));
 set(h(end),'FontName',get(0,'FixedWidthFontName'));
@@ -93,7 +141,6 @@ set(h(2),'Callback',{@showPlot,dlg.Handle});
 addblock(dlg,'text','Standard click on plot adds a new point');
 addblock(dlg,'text','Shift-click on plot removes nearest point');
 addblock(dlg,'text','Control-click on plot returns to this dialog');
-%addblock(dlg,'text',' ');
 
 h=addblock(dlg,'edit_button',{'Default width:','Set all to default'});
 setappdata(dlg.Handle,'DefaultWidth',h(2));
@@ -135,8 +182,7 @@ if isempty(ApplyFunction)
         % do nothing
     end
     delete(dlg);
-else
-    setappdata(dlg.Handle,'ApplyFunction',ApplyFunction);
+else    
     varargout{1}=dlg;
 end
 
@@ -144,6 +190,15 @@ end
 
 %% callbacks
 % "db" is the dialog box handle
+function changeLabel(~,~,db)
+
+object=getappdata(db,'CurrentObject');
+l=getappdata(db,'Label');
+object.Label=get(l,'String');
+setappdata(db,'CurrentObject',object);
+
+end
+
 function useMouse(~,~,db)
 
 target=getappdata(db,'TargetAxes');
@@ -247,7 +302,7 @@ end
 
 function cancelCallback(~,~,db)
 
-setappdata(db,'CurrentObject',get(db,'PreviousObject'));
+setappdata(db,'CurrentObject',getappdata(db,'PreviousObject'));
 ok=getappdata(db,'okButton');
 delete(ok);
 
@@ -262,9 +317,9 @@ end
 
 function applyCallback(~,~,db)
 
-apply=getappdata(db,'ApplyFunction');
+ApplyFunction=getappdata(db,'ApplyFunction');
 object=getappdata(db,'CurrentObject');
-feval(apply,object);
+feval(ApplyFunction,object);
 
 end
 
@@ -273,13 +328,16 @@ function closeCallback(~,~,db)
 fig=getappdata(db,'TargetFigure');
 points=getappdata(db,'Points');
 envelope=getappdata(db,'Envelope');
+DeleteOnClose=getappdata(db,'DeleteOnClose');
 try
     set(fig,'WindowButtonUpFcn',...
         getappdata(db,'PreviousWindowButtonUpFcn'));
     set(fig,'CloseRequestFcn',...
         getappdata(db,'PreviousCloseFcn'));
-    delete(points);
-    delete(envelope);
+    if DeleteOnClose
+        delete(points);
+        delete(envelope);
+    end
 catch
     % do nothing
 end
@@ -299,15 +357,17 @@ end
 
 function object2table(object,table)
 
-% x/y may be positive or negatie, width is always positive
-data=sprintf('%+15.6g %+15.6g %15.6g\n',...
-    transpose(object.Data));
-switch object.Direction
-    case 'horizontal'
-        data=sortrows(data,1);
-    case 'vertical'
-        data=sortrows(data,2);
+% x/y may be positive or negative, width is always positive
+data=object.Data;
+if isempty(data)
+    % do nothing
+elseif strcmp(object.Direction,'horizontal');
+    data=sortrows(data,1);
+elseif strcmp(object.Direction,'vertical');
+    data=sortrows(data,2);
 end
+data=sprintf('%+15.6g %+15.6g %15.6g\n',transpose(data));
+
 set(table(end),'String',data);
 
 end

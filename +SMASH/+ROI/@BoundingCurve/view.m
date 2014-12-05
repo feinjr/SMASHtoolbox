@@ -11,7 +11,8 @@
 
 %
 % created November 18, 2014 by Daniel Dolan (Sandia National Laboratories)
-%
+% revised December 5, 2014 by Daniel Dolan
+%   -Converted output to hggroup for GUI development
 function varargout=view(object,target)
 
 % handle input
@@ -21,7 +22,6 @@ if (nargin<2) || isempty(target)
 end
 assert(ishandle(target),'ERROR: invalid target axes handle');
 
-%assert(~isempty(object.Data),'ERROR: no data found');
 if isempty(object.Data)
     x=[];
     y=[];
@@ -33,7 +33,8 @@ else
 end
 
 % plot points
-points=line('Parent',target,'XData',x,'YData',y);
+parent=hggroup('Parent',target);
+points=line('Parent',parent,'XData',x,'YData',y);
 apply(object.PlotOptions,points);
 set(points,'LineStyle','-','Tag','SMASH.ROI.BoundingCurve');
 
@@ -50,14 +51,13 @@ if ~isempty(x)
     x(end+1)=x(1);
     y(end+1)=y(1);
 end
-envelope=line('Parent',target,'XData',x,'YData',y);
+envelope=line('Parent',parent,'XData',x,'YData',y);
 apply(object.PlotOptions,envelope);
 set(envelope,'LineStyle','--','Marker','none','Tag','SMASH.ROI.BoundingCurve');
 
 % handle output
 if nargout>0
-    varargout{1}=points;
-    varargout{2}=envelope;
+    varargout{1}=parent;
 end
 
 end
