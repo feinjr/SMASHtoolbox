@@ -317,8 +317,9 @@ dlg.Hidden = true;
 dlg.Name = 'Sesame Curve Addition';
 
 %Find sesame files
-eospath=mfilename('fullpath');
-[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
+%eospath=mfilename('fullpath');
+%[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
+eospath = '/remote/jlbrown/EOS/sesame';
 
 contents = dir(eospath);
 eosfiles=[];
@@ -341,7 +342,7 @@ dlg.Hidden = false;
         
         value = probe(dlg);
         neos = value{1};
-        ses = SMASH.DynamicMaterials.EOS.Sesame(fullfile(eospath,neos),str2num(neos));
+        ses = SMASH.DynamicMaterials.EOS.Sesame(str2num(neos),fullfile(eospath,neos));
         
         IV = str2num(value{2});
         P0 = str2num(value{4});

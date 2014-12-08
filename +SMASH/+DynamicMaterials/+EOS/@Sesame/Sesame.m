@@ -2,7 +2,7 @@
 % 301 tables. The most direct way of creating a Sesame object is to pass
 % the number and name of the sesame file:
 %
-%   >> object = Sesame('material.ses',neos)
+%   >> object = Sesame(neos,'material.ses')
 % 
 % If only the material number is specified:
 %

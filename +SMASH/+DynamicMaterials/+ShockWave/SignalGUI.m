@@ -1903,7 +1903,7 @@ function PerformCallback(varargin);
         export(sesobj,fullfile(sespath,sesname),9999,Z,W,rho0,K,298)
         
         %Also create binary. REQUIRES bcat on path
-        if value{8}
+        if value{9}
             [path, name, ext] = fileparts(fullfile(sespath,sesname));
             currdir = pwd;
             oldname = sprintf('%s%s',name,ext);
