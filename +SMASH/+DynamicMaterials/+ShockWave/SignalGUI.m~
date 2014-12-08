@@ -908,6 +908,7 @@ function CombineSignals(src,varargin)
     %Set some object properties
     sig(sig_tot).Name = 'Combined Signal'; 
     sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+
     clear newsig;
     %Set active to all and plot
     sig_num = [1:sig_tot];
@@ -956,7 +957,7 @@ function AverageSignals(src,varargin)
     makeGridUniform(sig(sig_tot));
     %Set some object properties
     sig(sig_tot).Name = 'Signal Average'; 
-    sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig(sig_tot).LineColor = DistinguishedLines(sig_tot); 
     clear newsig;
     %Set active to all and plot
     sig_num = [sig_num sig_tot];
@@ -1963,7 +1964,7 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',width{index,1}, ...
+            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',color{index,1}, ...
                 'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
         end
     end

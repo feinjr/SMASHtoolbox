@@ -171,6 +171,7 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
         clear sig; sig = new_sig; clear new_sig;
         sig_tot = numel(sig);
         sig_num = [1:sig_tot];
+        %for i=1:sig_tot; sig(i).LineColor = DistinguishedLines(i); end
         
         %If all signals were deleted, reset
         if new_num == 1
@@ -927,8 +928,7 @@ function StrengthIntegration(src,varargin)
 
                 str = sprintf('\\Delta\\tau=%f\n\n\\epsilon_{max}=%f\n\n\\sigma_{max}=%f\n\n\\epsilon_{trans}=%f',...
                    Y,max(strain),max(data(:,4)),emin);
-                lc = get(sig(sig_num(i)).PlotOptions,'LineColor');
-                th=text((min(strain)+max(strain))/2,(max(cb)+max(cl))/2,str,'Color',lc,'FontSize',20);
+                th=text((min(strain)+max(strain))/2,(max(cb)+max(cl))/2,str,'Color',sig(sig_num(i)).LineColor,'FontSize',20);
 
 
             end
@@ -970,8 +970,7 @@ function StrengthIntegration(src,varargin)
 
                 str = sprintf('\\Delta\\tau=%f\n\n\\epsilon_{max}=%f\n\n\\sigma_{max}=%f\n\n\\epsilon_{trans}=%f',...
                    Y,max(strain),max(data(:,4)),strain(u2));
-                lc = get(sig(sig_num(i)).PlotOptions,'LineColor');
-                th=text((max(data(:,1))+min(data(:,1)))/2,(max(cb)+max(cl))/2,str,'Color',lc,'FontSize',20);
+                th=text((max(data(:,1))+min(data(:,1)))/2,(max(cb)+max(cl))/2,str,'Color',sig(sig_num(i)).LineColor,'FontSize',20);
 
 
             end
@@ -1011,7 +1010,7 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',width{index,1}, ...
+            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',color{index,1}, ...
                 'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
         end
     end
@@ -1276,11 +1275,9 @@ function varargout = plotdata(varargin)
                 case 'new plot'
                     if i ==1; cla; end;
                     h(i)=line(x,y);
-                    lc = get(sig(sig_num(i)).PlotOptions,'LineColor');
-                    ls = get(sig(sig_num(i)).PlotOptions,'LineStyle');
-                    lw = get(sig(sig_num(i)).PlotOptions,'LineWidth');
-                    ma = get(sig(sig_num(i)).PlotOptions,'Marker');                   
-                    set(h(i),'Color',lc,'LineStyle',ls,'LineWidth',lw,'Marker',ma);
+                    
+                    set(h(i),'Color',sig(sig_num(i)).LineColor,'LineStyle',sig(sig_num(i)).LineStyle,...
+                    'LineWidth',sig(sig_num(i)).LineWidth,'Marker',sig(sig_num(i)).Marker);
                     legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
                 case 'overlay'
                     h = line(x, y,'Color',[0 0 0],'LineStyle','--','LineWidth',2);
