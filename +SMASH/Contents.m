@@ -22,8 +22,8 @@
 % Documentation can also be accessed by typing the package/class/function
 % name:
 %     >> SMASH.SignalAnalysis
-% and by pressnig the F1 key or right-clicking the command (choose "Help on
-% Selection").
+% and by first highlighting the name and then pressing the F1 key, 
+% or right-clicking the command (choose "Help on Selection").
 %
 % To determine the current state of the SMASH package, type:
 %    >> SMASH.info;
