@@ -176,7 +176,6 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
         sig_tot = numel(sig);
         sig_num = [1:sig_tot];
      
-        %for i=1:sig_tot; sig(i).LineColor = DistinguishedLines(i); end
         
         %If all signals were deleted, reset
         if new_num == 1
@@ -267,8 +266,7 @@ dlg.Hidden = false;
 
        %Set some properties
        sig(sig_tot)=SMASH.SignalAnalysis.Signal(up,P);
-       sig(sig_tot).LineWidth = 3;
-       sig(sig_tot).LineColor = DistinguishedLines(sig_tot);
+       sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig(sig_tot).Name = [MGmats{n},addstr];
        sig(sig_tot).Title = 'MieGruneisen';
        sig(sig_tot).GridLabel = 'Particle Velocity (km/s)';
@@ -319,8 +317,9 @@ dlg.Hidden = true;
 dlg.Name = 'Sesame Curve Addition';
 
 %Find sesame files
-eospath=mfilename('fullpath');
-[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
+%eospath=mfilename('fullpath');
+%[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
+eospath = '/remote/jlbrown/EOS/sesame';
 
 contents = dir(eospath);
 eosfiles=[];
@@ -343,7 +342,7 @@ dlg.Hidden = false;
         
         value = probe(dlg);
         neos = value{1};
-        ses = SMASH.DynamicMaterials.EOS.Sesame(fullfile(eospath,neos),str2num(neos));
+        ses = SMASH.DynamicMaterials.EOS.Sesame(str2num(neos),fullfile(eospath,neos));
         
         IV = str2num(value{2});
         P0 = str2num(value{4});
@@ -412,8 +411,7 @@ dlg.Hidden = false;
        [~,ia]=unique(up);    
        %Set some properties
        sig(sig_tot)=SMASH.SignalAnalysis.Signal(up(ia),P(ia));
-       sig(sig_tot).LineWidth = 3;
-       sig(sig_tot).LineColor = DistinguishedLines(sig_tot);
+       sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig(sig_tot).Name = [neos,addstr];
        sig(sig_tot).Title = 'Sesame';
        sig(sig_tot).GridLabel = 'Particle Velocity (km/s)';
@@ -467,8 +465,7 @@ dlg.Hidden = false;
 
        %Set some properties
        sig(sig_tot)=SMASH.SignalAnalysis.Signal(up,P);
-       sig(sig_tot).LineWidth = 3;
-       sig(sig_tot).LineColor = DistinguishedLines(sig_tot);
+       sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig(sig_tot).Name = 'Rayliegh Line';
        sig(sig_tot).Title = 'Rayleigh';
        sig(sig_tot).GridLabel = 'Particle Velocity (km/s)';
@@ -530,8 +527,7 @@ for i=1:numfiles
                 sig_tot = sig_tot+1;
                 sig(sig_tot) = SMASH.SignalAnalysis.Signal('import',fullfile(pathname,filename{i}),'sda',content(id(ii),1).Label);
                 %Set some object properties
-                sig(sig_tot).LineWidth = 3;
-                sig(sig_tot).LineColor = DistinguishedLines(sig_tot); 
+                sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
                 sig(sig_tot).GridLabel= 'Particle Velocity (km/s)'; 
                 sig(sig_tot).DataLabel= 'Pressure (GPa)';
                 sig(sig_tot).Name = content(id(ii),1).Label;
@@ -553,8 +549,7 @@ for i=1:numfiles
         sig(sig_tot).Name = name;
 
         %Set some object properties
-        sig(sig_tot).LineWidth = 3;
-        sig(sig_tot).LineColor = DistinguishedLines(sig_tot); 
+        sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         %sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
 
         %Loop through column numbers 2 and higher and load if there is data
@@ -568,8 +563,7 @@ for i=1:numfiles
             sig(sig_tot).Name = str;
 
             %Set some object properties
-            sig(sig_tot).LineWidth = 3;
-            sig(sig_tot).LineColor = DistinguishedLines(sig_tot); 
+            sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
             sig(sig_tot).GridLabel= 'Particle Velocity (km/s)'; 
             sig(sig_tot).DataLabel= 'Pressure (GPa)';
             sig(sig_tot).Title = 'Loaded';
@@ -680,7 +674,8 @@ for i=1:numel(sig_num)-1
    for j = i+1:numel(sig_num)
     [x,y] = intersections(sig(sig_num(i)).Grid,sig(sig_num(i)).Data,sig(sig_num(j)).Grid,sig(sig_num(j)).Data);
     if y>0
-    text(x,y,['\leftarrow ',sprintf('(%3.3f,%3.3f)',x,y)],'FontSize',14,'Color',sig(sig_num(i)).LineColor);
+    lc = get(sig(sig_num(i)).PlotOptions,'LineColor');
+    text(x,y,['\leftarrow ',sprintf('(%3.3f,%3.3f)',x,y)],'FontSize',14,'Color',lc);
     end
 
    end
@@ -720,10 +715,8 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            sig(sig_num(i)).LineColor = color{index,1};
-            sig(sig_num(i)).LineStyle = style{index,1};
-            sig(sig_num(i)).LineWidth = width{index,1};
-            sig(sig_num(i)).Marker = mark{index,1};
+            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',width{index,1}, ...
+                'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
         end
     end
 end
@@ -846,8 +839,7 @@ function PercentDifference(src,varargin)
         PercentDiff = (1-y{1}./y{i})*100;
         newsig(sig_num(i)) = SMASH.SignalAnalysis.Signal(x,PercentDiff);
         %Set some object properties
-        newsig(sig_num(i)).LineWidth = 3;
-        newsig(sig_num(i)).LineColor =  sig(sig_num(i)).LineColor;
+        sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         newsig(sig_num(i)).GridLabel= 'x'; newsig(i).DataLabel= '% from 1st signal';
         legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
     end
@@ -885,9 +877,9 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); sig(sig_num(i)).LineWidth = 1; end;
+    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); sig(sig_num(i)).LineWidth = 3; end
+    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     set(gcf,'Color','w');
@@ -901,9 +893,9 @@ function AIPFigure2(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(2);
     set(AIPFig,'name','AIP Double Column Fig');
     
-    for i=1:length(sig_num); sig(sig_num(i)).LineWidth = 1; end;
+    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); sig(sig_num(i)).LineWidth = 3; end;
+    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
