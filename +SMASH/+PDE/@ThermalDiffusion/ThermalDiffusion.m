@@ -13,7 +13,7 @@
 % An additional input "label" is required if the archive file contains more
 % than one data group.
 %
-% See also PDE
+% See also SMASH.PDE
 %
 
 %

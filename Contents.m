@@ -1,16 +1,11 @@
-% This toolbox contains the SMASH package along with related programs and
-% utilities.
-%
-%
-% Packages:
+% To learn more about the SMASH package, type "doc SMASH" in the command
+% window or click below.
 %   SMASH - SMASH packages (low level)
-% Progams: 
-%   UNDER CONSTRUCTION (subdir added to path)
-% Utilities
-%   UNDER CONSTRUCTION (functions/classes in toolbox directory)
+% You can also type "SMASH" at the command prompt and press the F1 key (or
+% right-click the command and select "Help on Selection"). 
 %
-% See also SMASH
+% Several programs and utility functions are distributed with this
+% toolbox...(UNDER CONSTRUCTION).
 %
 
-
-% last updated December 1, 2014
+% last updated December 8, 2014

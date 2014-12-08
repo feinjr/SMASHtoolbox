@@ -1,7 +1,5 @@
 % The SMASH package supports a variety of data processing and
-% visualization.
-%
-% The core packages are:
+% visualization.  The core packages are:
 %    CurveFit         - nonlinear curve fitting and common basis functions
 %    FileAccess       - file read/write support
 %    General          - general purpose routines
@@ -18,10 +16,19 @@
 %    Radiometry       - radiometry analysis (UNDER CONSTRUCTION)
 %    Spectroscopy     - spectroscopy analysis (UNDER CONSTRUCTION)
 %
+% To learn more about these package, press the links above or use the "doc"
+% command.
+%     >> doc SMASH.SignalAnalysis % package documentation
+% Documentation can also be accessed by typing the package/class/function
+% name:
+%     >> SMASH.SignalAnalysis
+% and by pressnig the F1 key or right-clicking the command (choose "Help on
+% Selection").
+%
 % To determine the current state of the SMASH package, type:
 %    >> SMASH.info;
 %
 % See also SMASHtoolbox
 %
 
-% Last updated November 21, 2014
+% Last updated December 8, 2014

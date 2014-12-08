@@ -16,16 +16,19 @@
 % button to resume normal executation.
 %
 % Passing an apply function function handle:
-%     >> dlg=select(object,target,'ApplyFunction',myfunc);
-% changes the method's behavior.
+%     >> [dlg,callback]=select(object,target,'ApplyFunction',myfunc);
+% changes the selection dilaog box.
 %     -The dialog box has buttons "OK", "Apply", and "Close"
 %     -Program execution is not suspended
-%     -The output ("dlg") is a Dialog object.
+%     -Outputs "dlg" and "callback" are returned immediately.  The first
+%     output is a MUI.Dialog object, which can be used to probe the state
+%     of the dialog box.  The second output is a structure containing
+%     callbacks that mimic "Apply" and "Close" button presses.
 % Pressing the "Apply" button executes the apply function handle using the
 % current BoundCurve object as the sole input, i.e. "myfunc(object)".
 % Pressing the "Close" button closes the dialog box without executing the
 % apply function.  Pressing the "Done" button is equivalent to "Apply"
-% followed by "Close".
+% followed by "Close". 
 %
 % By default, this method draws the curve selection (points and envelope)
 % when the dialog box is created and deletes the selection with the box is
@@ -33,13 +36,12 @@
 % "view" method) can be passed as an additional input.
 %     >> hg=view(object):
 %     >> [...]=select(...,'GroupHandle',hg); 
-% Another option can e specified to prevent the selection from being
-% deleted.
+% Another option prevents the selection from being deleted.
 %    >> [...]=select(...,'DeleteOnClose',false);
 % These options are provided for graphical interface development in
 % conjunction with the apply function.
 %
-% See also BoundingCurve, define, insert, remove, view
+% See also BoundingCurve, define, insert, remove, view, MUI.Dialog
 %
 
 %
@@ -184,6 +186,9 @@ if isempty(ApplyFunction)
     delete(dlg);
 else    
     varargout{1}=dlg;
+    callback.Apply=@() applyCallback([],[],dlg.Handle);
+    callback.Close=@() closeCallback([],[],dlg.Handle);
+    varargout{2}=callback;
 end
 
 end
