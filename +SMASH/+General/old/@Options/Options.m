@@ -17,7 +17,7 @@
 %
 classdef Options
     %%
-    properties (Access=protected)
+    properties (SetAccess=protected)
         Name = {}
         Value = {}
         Allowed = {}

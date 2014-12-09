@@ -28,8 +28,7 @@ switch data.Format
         object.Grid1=data.Grid1;
         object.Grid2=data.Grid2;
         object.Data=data.Data;
-        object.PlotOptions=set(object.PlotOptions,'ColorMap',data.ColorMap);
-        %object.ColorMap=data.ColorMap;
+        set(object.GraphicOptions,'ColorMap',data.ColorMap);
     case 'pff'
         switch data.PFFdataset
             case 'PFTUF3'
@@ -79,7 +78,6 @@ end
 object.Precision=object.Precision; % invoke superclass set.Precision method
 
 % customize graphic settings
-object.PlotOptions=set(object.PlotOptions,...
-    'YDir','reverse');
+set(object.GraphicOptions,'YDir','reverse');
     
 end

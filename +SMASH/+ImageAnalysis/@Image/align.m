@@ -91,7 +91,7 @@ hc=uicontextmenu;
 uimenu(hc,'Label','Remove point','Callback',@RemovePoint);
 hl=line('Parent',h.axes,'UIContextMenu',hc,...
     'XData',[],'YData',[]);
-apply(object.PlotOptions,hl);
+apply(object.GraphicOptions,hl);
 set(hl,'LineStyle','none');
 title('Select alignment points');
     function CreatePoint(varargin)

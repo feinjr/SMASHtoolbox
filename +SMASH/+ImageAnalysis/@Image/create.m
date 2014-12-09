@@ -37,7 +37,6 @@ assert(numel(object.Grid2)==N,...
     'ERROR: incompatible Grid2/Data arrays');
 
 % customize graphic settings
-object.PlotOptions=set(object.PlotOptions,...
-    'YDir','reverse');
+set(object.GraphicOptions,'YDir','reverse');
 
 end

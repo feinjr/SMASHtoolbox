@@ -53,6 +53,8 @@ if ischar(value)
             result=true;
         case {'k','black'}
             result=true;
+        case 'none'
+            result=true;
     end
     return
 end

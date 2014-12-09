@@ -29,10 +29,10 @@ end
 
 h.image=imagesc('Parent',h.axes,...
     'XData',x,'YData',y,'CData',z);
-apply(object.PlotOptions,h.axes);
+apply(object.GraphicOptions,h.axes);
 axis(h.axes,'tight');
 
-colormap(h.axes,get(object.PlotOptions,'ColorMap'));
+colormap(h.axes,get(object.GraphicOptions,'ColorMap'));
 xlabel(h.axes,object.Grid1Label);
 ylabel(h.axes,object.Grid2Label);
 title(h.axes,object.Title);

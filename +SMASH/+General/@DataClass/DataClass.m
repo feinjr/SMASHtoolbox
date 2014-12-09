@@ -3,13 +3,13 @@
 % directly.  The Signal and Image classes (located in SMASH.SignalAnalysis
 % and SMASH.ImageAnalysis, respectively) are based on this class.
 %
-% See also SMASH
+% See also SMASH, SMASH.General.GraphicOptions
 %
 
 %
 % created November 14, 2013 by Daniel Dolan (Sandia National Laboratories)
-%
-%classdef (Abstract) DataClass
+% revised December 9, 2014 by Daniel Dolan
+%   -converted plot options from separate properties to a single class
 classdef DataClass
     
     %% properties
@@ -33,13 +33,7 @@ classdef DataClass
         Precision='double' % Data format (double or single)
     end
     properties
-        PlotOptions = SMASH.General.PlotOptions % Default graphic options (see SMASH.General.PlotOptions)
-        %LineColor='k' % Default line color
-        %LineStyle='-' % Default line style
-        %LineWidth=0.5 % Default line width
-        %Marker='none' % Default marker
-        %MarkerSize= 5 % Default marker size
-        %ColorMap=jet(64) % Default colormap
+        GraphicOptions = SMASH.General.GraphicOptions % Default graphic options
     end
     %% hidden methods
     methods (Hidden=true)
@@ -64,10 +58,6 @@ classdef DataClass
                 object.Source='Numeric input';
             end
             object.Precision=object.Precision; % enforce variable precicion            
-            %object=concealProperty(object,...
-            %    'ColorMap','Precision',...
-            %    'LineColor','LineStyle','LineWidth',...
-            %    'Marker','MarkerSize');
         end
         varargin=concealMethod(varargin);
         varargin=concealProperty(varargin);

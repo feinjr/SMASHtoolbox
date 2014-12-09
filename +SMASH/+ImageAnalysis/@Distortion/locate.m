@@ -99,7 +99,7 @@ set(h.image(2),'UIContextMenu',hc);
         hline(2)=line('Parent',h.axes(2),...
             'XData',[],'YData',[],...
             'Tag','IsoPoints');
-        apply(object.PlotOptions,hline);
+        apply(object.GraphicOptions,hline);
         setappdata(h.axes(2),'CurrentGroup',hline(2));
         set(hline(1),'ButtonDownFcn',get(h.image(1),'ButtonDownFcn'));
         set(hline(2),'ButtonDownFcn',get(h.image(2),'ButtonDownFcn'));

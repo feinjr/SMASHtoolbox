@@ -21,5 +21,4 @@ assert(numel(object.Grid)==numel(object.Data),...
 
 object.Name='Signal object';
 
-object.PlotOptions=set(object.PlotOptions,...
-    'Marker','none','LineStyle','-');
+set(object.GraphicOptions,'Marker','none','LineStyle','-');

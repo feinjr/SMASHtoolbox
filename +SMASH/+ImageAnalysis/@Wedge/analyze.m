@@ -154,14 +154,14 @@ object.TransferTable=[ys(:) 10.^(xs(:))];
     ha(1)=subplot(3,1,1);
     %image(object,ha(1));
     imagesc(object.Grid1,object.Grid2,object.Data);
-    colormap(object.ColorMap);
+    colormap(object.GraphicOptions.ColorMap);
     xlabel(object.Grid1Label);
     ylabel(object.Grid2Label);
     temp=sprintf('Wedge regions for ''%s''',object.Title);
     title(temp);
     for n=1:size(ROI,1)
         rectangle('Position',ROI(n,:),...
-            'EdgeColor',get(object.PlotOptions,'LineColor'),'Tag','ROI');
+            'EdgeColor',get(object.GraphicOptions,'LineColor'),'Tag','ROI');
     end
     ha(2)=subplot(3,1,2);
     %plot(exposure,level,'ko');

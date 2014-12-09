@@ -54,9 +54,10 @@ while ~feof(fid)
     name=name(~drop);    
     % process the field value
     value=temp(separator+1:end);
-    %[junk,count,errmsg,next]=sscanf(value,'%g');
-    junk=sscanf(value,'%g');
-    value=junk;
+    [junk,count,~,next]=sscanf(value,'%g');
+    if (count==1) && isempty(value(next:end))
+        value=junk;    
+    end
     % store the current field in the current group
     config.(group).(name)=value;
 end

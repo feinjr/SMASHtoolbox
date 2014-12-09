@@ -50,7 +50,7 @@ axes(target);
 % create line with object's properties
 [time,value]=limit(object);
 h=line(time,value);
-apply(object.PlotOptions,h);
+apply(object.GraphicOptions,h);
 
 % fill out new figure
 if new

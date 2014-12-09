@@ -34,11 +34,11 @@ h.axes(1)=axes('Parent',h.panel,'Units','normalized','Position',[x0 y0+Ly2 Lx1 L
     'YDir','reverse');
 temp=show(object,h.axes(1));
 himage=temp.image;
-colormap(h.figure,get(object.PlotOptions,'ColorMap'));
+colormap(h.figure,get(object.GraphicOptions,'ColorMap'));
 caxis(h.axes(1),object.DataLim);
 axis(h.axes(1),'tight');
 hcrosshair=line('Parent',h.axes(1),...
-    'Color',get(object.PlotOptions,'LineColor'),...
+    'Color',get(object.GraphicOptions,'LineColor'),...
     'UserData',[],'Tag','crosshair');
 title(h.axes(1),object.Title);
 
