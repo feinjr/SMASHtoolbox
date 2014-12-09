@@ -99,7 +99,7 @@ result=analyze@SMASH.SignalAnalysis.ShortTime(object,@local_function);
 if isempty(target_function)
     result=SMASH.ImageAnalysis.Image(...
         result.Grid,transpose(frequency),transpose(result.Data));
-    result.YDir='normal';
+    %result.YDir='normal';
     result.DataScale='dB';
     result.Grid1Label='Time';
     result.Grid2Label='Frequency';

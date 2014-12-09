@@ -1,7 +1,8 @@
 % This package provides general purpose routines
 %
 % Functions:
-% testNumber - apply various tests to a number
+% testNumber - test nuemric value
+% testColor  - test color value
 %
 % Classes:
 % DataClass   - general data class (superclass to Signal, Image, ...)

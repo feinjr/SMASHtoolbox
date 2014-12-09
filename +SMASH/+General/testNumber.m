@@ -8,6 +8,8 @@
 % finite--can be requested by adding sequential inputs.
 %    >> result=testnumber(value,'positive','integer');
 %
+% See also General
+%
 
 %
 % created July 16, 2014 by Daniel Dolan (Sandia National Laboratories

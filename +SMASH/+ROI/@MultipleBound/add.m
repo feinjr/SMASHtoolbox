@@ -6,8 +6,8 @@
 function object=add(object,varargin)
 
 % handle input
-if nargin==1 % not recommended!
-    allowed=object.Allowed;
+if nargin==1 % attempt automatic add
+    allowed=object.Allowed;    
     assert(numel(allowed)==1,'ERROR: automatic add not possible here');
     name=sprintf('SMASH.ROI.%s',allowed{1});
     varargin{1}=feval(name);
