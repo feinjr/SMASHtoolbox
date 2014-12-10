@@ -64,7 +64,7 @@ for i = 1:length(temp)
         
         
     h=line(log(x),log(y));
-    set(h,'Color',object.LineColor,'LineWidth',object.LineWidth);
+    apply(object.GraphicOptions,h);
 end
 
 

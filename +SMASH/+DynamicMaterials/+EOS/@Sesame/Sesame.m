@@ -53,12 +53,7 @@ classdef Sesame < SMASH.General.DataClass
         ZLabel='Pressure' %  YLabel used by "view"
         Title='' % Title used by "view"
     end
-    properties
-        %LineColor='b' % Default line color used by "view"
-        %LineStyle='-' % Default line style used by "view"
-        %LineWidth=0.5 % Default line width used by "view"
-        %Marker='none' % Default marker used by "view"
-    end
+
     %Data class reserved names for special creation options
     properties (Access=?SMASH.General.DataClass,Hidden=true)
             ReservedNames={'Mie-Gruneisen'};

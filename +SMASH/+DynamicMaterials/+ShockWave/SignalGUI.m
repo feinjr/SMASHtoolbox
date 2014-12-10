@@ -302,7 +302,7 @@ for i=1:numfiles
         sig(sig_tot).Name = name;
 
         %Set some object properties
-        sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
 
     
@@ -317,7 +317,7 @@ for i=1:numfiles
             sig(sig_tot).Name = str;
 
             %Set some object properties
-            sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+            set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
             sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
             end
         end
@@ -408,7 +408,7 @@ function ApplyCallback(varargin)
     if length(ext) > 4; name = [name ext]; end
     pathname = pwd;
     sig(sig_tot).Name = name;
-    sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
     sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
 
     %Set active signals to all and plot
@@ -907,7 +907,7 @@ function CombineSignals(src,varargin)
     makeGridUniform(sig(sig_tot));
     %Set some object properties
     sig(sig_tot).Name = 'Combined Signal'; 
-    sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
     clear newsig;
     %Set active to all and plot
     sig_num = [1:sig_tot];
@@ -956,7 +956,7 @@ function AverageSignals(src,varargin)
     makeGridUniform(sig(sig_tot));
     %Set some object properties
     sig(sig_tot).Name = 'Signal Average'; 
-    sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
     clear newsig;
     %Set active to all and plot
     sig_num = [sig_num sig_tot];
@@ -1611,7 +1611,7 @@ function PerformCallback(varargin)
         sig(sig_tot) = SMASH.SignalAnalysis.Signal(tshock,vshock);
         sig(sig_tot).Name = 'CenteredWaveSource';
         %Set some object properties
-        sig(sig_tot).PlotOptions = set(sig(sig_tot).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         sig_num = [sig_num sig_tot];
         thickness(end+1) = 0;
     end
@@ -1963,7 +1963,7 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',width{index,1}, ...
+            set(sig(sig_num(i)).GraphicOptions,'LineWidth',width{index,1}, ...
                 'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
         end
     end
@@ -2088,7 +2088,7 @@ function PercentDifference(src,varargin)
         PercentDiff = ((y{i}-y{1})./y{1})*100;
         newsig(sig_num(i)) = SMASH.SignalAnalysis.Signal(x,PercentDiff);
         %Set some object properties
-        sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        set(sig(sig_num(i)).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         newsig(sig_num(i)).GridLabel= 'x'; newsig(i).DataLabel= '% from 1st signal';
         legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
     end
@@ -2126,9 +2126,9 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     set(gcf,'Color','w');
@@ -2142,9 +2142,9 @@ function AIPFigure2(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(2);
     set(AIPFig,'name','AIP Double Column Fig');
     
-    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
@@ -2459,7 +2459,7 @@ function plotdata(varargin)
             if ~isempty(sig_num)
                 legendentry = [];
                 for i=1:length(sig_num)
-                    %sig(sig_num(i)).PlotOptions = set(sig(sig_num(i)).PlotOptions,'LineWidth',1);
+                    %set(sig(sig_num(i)).GraphicOptions,'LineWidth',1);
                     view(sig(sig_num(i)),ha);
                     legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
                 end
