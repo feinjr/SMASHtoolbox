@@ -105,7 +105,7 @@ function SignalGUI()
 clear all; clc;
 
 % Initialize Variables
-sig = SMASH.SignalAnalysis.Signal(0,0); 
+sig = {}; 
 sig_tot = 0;
 sig_num = [];
 
@@ -156,7 +156,7 @@ ht=uipushtool('Parent',fig.ToolBar,'Separator','off',...
     'CData',icon,'ClickedCallback',@ClearCallback); 
 
 function ClearCallback(varargin)
-            sig = SMASH.SignalAnalysis.Signal(0,0);
+            sig = {};
             sig_tot = 0;
             figure(fig.Handle); cla; legend('off');
             
@@ -276,7 +276,7 @@ for i=1:numfiles
              %Advance to next record
              update(wb,(ii*i)/(numfiles*length(label)));
              sig_tot = sig_tot+1;
-             sig(sig_tot) = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'sda',label{ii});
+             sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'sda',label{ii});
         end
         
         
@@ -292,18 +292,18 @@ for i=1:numfiles
         if ncol == 1
             data = read(source); data = data.Data;
             x=[1:length(data)];
-            sig(sig_tot) = SMASH.SignalAnalysis.Signal(x,data);
+            sig{sig_tot} = SMASH.SignalAnalysis.Signal(x,data);
         else
-            sig(sig_tot) = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column');
+            sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column');
         end
         
         [~,name,ext]=fileparts(filename{i}); 
         if length(ext) > 4; name = [name ext]; end
-        sig(sig_tot).Name = name;
+        sig{sig_tot}.Name = name;
 
         %Set some object properties
-        set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
-        sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
+        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
 
     
         %Loop through column numbers 2 and higher and load if there is data
@@ -312,13 +312,13 @@ for i=1:numfiles
             if ~(all(data.Data(:,cn)==0)) %Make sure there is data in column
             %Increment total number signals, load and save to object
             sig_tot = sig_tot + 1;
-            sig(sig_tot) = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column',[1 cn]);  
+            sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column',[1 cn]);  
             str=sprintf('%s col%i',name,cn);
-            sig(sig_tot).Name = str;
+            sig{sig_tot}.Name = str;
 
             %Set some object properties
-            set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
-            sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
+            set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+            sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
             end
         end
     end
@@ -398,18 +398,18 @@ function ApplyCallback(varargin)
     sig_tot = sig_tot+1;
 
     if ~value{3}
-        sig(sig_tot) = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',cols(1:2));
+        sig{sig_tot} = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',cols(1:2));
     else
-        sig(sig_tot) = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',fliplr(cols(1:2)));
+        sig{sig_tot} = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',fliplr(cols(1:2)));
     end
 
     %Set some object properties
     [~,name,ext]=fileparts(filename); 
     if length(ext) > 4; name = [name ext]; end
     pathname = pwd;
-    sig(sig_tot).Name = name;
-    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
-    sig(sig_tot).GridLabel= 'x'; sig(sig_tot).DataLabel= 'y';
+    sig{sig_tot}.Name = name;
+    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
 
     %Set active signals to all and plot
     sig_num = [1:sig_tot];
@@ -441,7 +441,7 @@ locate(dlg,'south');
 
 %Create edit box for each signal
 for i=1:numel(sig_num)
-    h=addblock(dlg,'edit',sig(sig_num(i)).Name); set(h(2),'String', sig(sig_num(i)).Name);
+    h=addblock(dlg,'edit',sig{sig_num(i)}.Name); set(h(2),'String', sig{sig_num(i)}.Name);
 end
 h=addblock(dlg,'button',{ 'Apply Label Change', 'Cancel'});
 dlg.Hidden = false
@@ -452,7 +452,7 @@ dlg.Hidden = false
        newnames = probe(dlg);
        for i=1:numel(sig_num)
         if ~isempty(newnames{i})
-            sig(sig_num(i)).Name = newnames{i};
+            sig{sig_num(i)}.Name = newnames{i};
         end
        end
     plotdata(fig.Handle,sig,sig_num);
@@ -469,7 +469,7 @@ end %Label
 function Comment(src,varagin)
 
     for i=1:numel(sig_num)
-        sig(sig_num(i))=comment(sig(sig_num(i)));
+        sig{sig_num(i)}=comment(sig{sig_num(i)});
     end
 
 end %Comment
@@ -482,23 +482,23 @@ function SaveSignal(src,varargin)
    savenum = sig_num;
    for i = 1:numel(savenum)
        [savename, savepath] = uiputfile({'*.dat;*.txt;*.out','All ASCII Files'; '*.sda','SandiaDataArchive'; ...
-           '*.*','All Files'}, sprintf('Save Signal #%i',savenum(i)),sig(savenum(i)).Name);
+           '*.*','All Files'}, sprintf('Save Signal #%i',savenum(i)),sig{savenum(i)}.Name);
 
-       %savename = inputdlg(sig(savenum(i)).Name,'Select file to write',1,{horzcat(sig(savenum(i)).Name,'.dat')});
+       %savename = inputdlg(sig{savenum(i)}.Name,'Select file to write',1,{horzcat(sig{savenum(i)}.Name,'.dat')});
        %savename = savename{1}; savepath = pathname;
        
        %Export all objects to Sandia Data Archive if .sda extension, otherwise ASCII
        [~,~,ext]=fileparts(savename);
        if strcmp(ext,'.sda')
            for i = 1:numel(savenum)
-            %labelname = inputdlg('Enter label name for sda file','SDA Label',1,{sig(savenum(i)).Name}); labelname = labelname{1};
-            labelname = sig(savenum(i)).Name;
-            %export(sig(savenum(i)),fullfile(savepath,savename),labelname);
-            store(sig(savenum(i)),fullfile(savepath,savename),labelname);
+            %labelname = inputdlg('Enter label name for sda file','SDA Label',1,{sig{savenum(i)}.Name}); labelname = labelname{1};
+            labelname = sig{savenum(i)}.Name;
+            %export(sig{savenum(i)},fullfile(savepath,savename),labelname);
+            store(sig{savenum(i)},fullfile(savepath,savename),labelname);
            end
            return; %Only ask for sda name once
        else
-        export(sig(savenum(i)),fullfile(savepath,savename));
+        export(sig{savenum(i)},fullfile(savepath,savename));
        end  
    end
 
@@ -525,7 +525,8 @@ end
 dlg.Hidden = true;
 dlg.Name = 'Active Signal';
 
-slist = {sig.Name};
+for i =1:sig_tot; slist{i}=sig{i}.Name; end
+
 h=addblock(dlg,'listbox','Select Signal(s)',slist);
 
 %Set multiple selection option (for all in dlg)
@@ -540,7 +541,7 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
        plotdata(fig.Handle,sig,sig_num);
        
        %Update if new signal has been added
-       if (numel({sig.Name}) > numel(get(dlg_hc(1),'String')))
+       if (numel(sig) > numel(get(dlg_hc(1),'String')))
         delete(dlg); ActiveSignal(src,'ActiveDialog');
        end
     end
@@ -551,11 +552,11 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
         delete(dlg);
         
         %Renumber signals
-        new_num = 1; new_sig=SMASH.SignalAnalysis.Signal(0,0);
+        new_num = 1; new_sig={};
         check = ~ismember([1:sig_tot],sig_del);
         for i=1:sig_tot;
             if check(i)
-                new_sig(new_num)=sig(i); 
+                new_sig{new_num}=sig{i}; 
                 new_num=new_num+1;
             end
         end
@@ -567,7 +568,7 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
         
         %If all signals were deleted, reset
         if new_num == 1
-            sig = SMASH.SignalAnalysis.Signal(0,0);
+            sig = {};
             sig_tot = 0;
             figure(fig.Handle); cla; legend('off');
             return;
@@ -617,8 +618,8 @@ function fromSICallback(varargin)
     end
     
     for i=1:numel(sig_num)
-        sig(i).GridLabel = 'Time (\mus)';
-        sig(i).DataLabel = 'Velocity (km/s)';
+        sig{i}.GridLabel = 'Time (\mus)';
+        sig{i}.DataLabel = 'Velocity (km/s)';
     end
     
 end
@@ -633,8 +634,8 @@ function toSICallback(varargin)
     end
 
     for i=1:numel(sig_num)
-        sig(i).GridLabel = 'Time (s)';
-        sig(i).DataLabel = 'Velocity (m/s)';
+        sig{i}.GridLabel = 'Time (s)';
+        sig{i}.DataLabel = 'Velocity (m/s)';
     end    
     
 end
@@ -649,8 +650,8 @@ function toNSCallback(varargin)
     end
 
     for i=1:numel(sig_num)
-        sig(i).GridLabel = 'Time (ns)';
-        sig(i).DataLabel = 'Velocity (km/s)';
+        sig{i}.GridLabel = 'Time (ns)';
+        sig{i}.DataLabel = 'Velocity (km/s)';
     end    
     
 end
@@ -665,7 +666,7 @@ function newsig = applyedit(n)
     end
 
   %Apply edit to signal number n
-        newsig = scale(sig(n),editdata(1));
+        newsig = scale(sig{n},editdata(1));
         newsig = shift(newsig,editdata(2));
         if strcmpi(get(dlg_hc(hloc(3)),'String'),'root');
             newsig = newsig.^0.5;
@@ -719,7 +720,7 @@ OkApplyCancel(dlg,@applylimit,'overlay','redo');
 function newsig = applylimit(n)    
         value = probe(dlg);
         clipbounds = str2double(value);
-        newsig = limit(sig(n),clipbounds);
+        newsig = limit(sig{n},clipbounds);
 end     
 
 locate(dlg,'east');
@@ -761,16 +762,16 @@ function newsig = applysmooth(n)
     choice = value{1};
         switch choice
             case 'mean'
-                newsig = smooth(sig(n),'mean',str2double(value(2)));
+                newsig = smooth(sig{n},'mean',str2double(value(2)));
             case 'median'
-                newsig = smooth(sig(n),'median',str2double(value(2)));
+                newsig = smooth(sig{n},'median',str2double(value(2)));
             case 'kernel'
                 kernel = definekernal;
-                newsig = smooth(sig(n),'kernel',kernel);
+                newsig = smooth(sig{n},'kernel',kernel);
         end
         
     function  [kernel] = definekernal
-        [tempsigx tempsigy] = limit(sig(n)); 
+        [tempsigx tempsigy] = limit(sig{n}); 
         xfilt = str2double(value(2));
         Nsmooth=int32(length(tempsigx)./xfilt); %LowPassFilt
         kernel = ones(Nsmooth,1);
@@ -803,14 +804,14 @@ function RegridSignal(src,varargin)
     function newsig = applyregrid(n)
         value = probe(dlg);
         N = str2double(value(1));
-        [xcurr ycurr] = limit(sig(n)); 
+        [xcurr ycurr] = limit(sig{n}); 
         x1=min(xcurr);
         x2=max(xcurr);
         spacing=(x2-x1)/(N-1);
         x=x1:spacing:x2;
         x=x(:);
         if ~value{2}
-            newsig = regrid(sig(n),x);
+            newsig = regrid(sig{n},x);
         else
             y = interp1(xcurr, ycurr, x, 'pchip', 0);
             newsig = SMASH.SignalAnalysis.Signal(x,y);
@@ -824,11 +825,11 @@ end %Regrid
 %% Reset signal callback
 function ResetSignal(src,varagin)
 for i = 1:numel(sig_num)
-    previous = sig(sig_num(i))
+    previous = sig{sig_num(i)}
     previous = SMASH.SignalAnalysis.Signal('import',fullfile(pathname,previous.Source),'column',previous.SourceRecord);
     
     %Reset properties
-    sig(sig_num(i)) = reset(sig(sig_num(i)),previous); 
+    sig{sig_num(i)} = reset(sig{sig_num(i)},previous); 
     clear previous; 
     
     plotdata(fig.Handle,sig,sig_num);
@@ -844,7 +845,7 @@ end  %Reset
 %% Derivative
 function Derivative(src,varargin)
     for i=1:numel(sig_num)
-    sig(sig_num(i))=differentiate(sig(sig_num(i)));
+    sig{sig_num(i)}=differentiate(sig{sig_num(i)});
     end
     plotdata(fig.Handle,sig,sig_num);
 end %Derivative
@@ -852,7 +853,7 @@ end %Derivative
 %% Integral
 function Integral(src,varargin)
     for i=1:numel(sig_num)
-    sig(sig_num(i))=integrate(sig(sig_num(i)));
+    sig{sig_num(i)}=integrate(sig{sig_num(i)});
     end
     plotdata(fig.Handle,sig,sig_num);
 end %Integral
@@ -860,7 +861,7 @@ end %Integral
 %% Power spectrum
 function PowerSpectrum(src,varargin)
     for i=1:numel(sig_num)
-    [frequency{i}, power{i}] = fft(sig(sig_num(i)),'NumberFrequencies',[1 inf]);
+    [frequency{i}, power{i}] = fft(sig{sig_num(i)},'NumberFrequencies',[1 inf]);
     end
     
     figure; 
@@ -876,9 +877,9 @@ end %Power spectrum
 %% Locate feature (peak fitting)
 function LocateFeature(src,varargin)
     for i=1:numel(sig_num)
-    report =locate(sig(sig_num(i)));
+    report =locate(sig{sig_num(i)});
     x = report.Location; 
-    y = lookup(sig(sig_num(i)),x);
+    y = lookup(sig{sig_num(i)},x);
     line([x x],[0 y],'Color','k','LineStyle','--','LineWidth',3);
     end
 end %Locate peak
@@ -893,7 +894,7 @@ function CombineSignals(src,varargin)
     xpoint = [-inf; xpoint; inf];
     xkeep = []; ykeep =[]; 
     for i=1:numel(xpoint)-1
-        [x,y] = limit(sig(sig_num(i)));
+        [x,y] = limit(sig{sig_num(i)});
         keep = (x >= xpoint(i)) & (x <= xpoint(i+1)) ;
         xkeep = [xkeep;x(keep)]; 
         ykeep = [ykeep;y(keep)];
@@ -903,11 +904,11 @@ function CombineSignals(src,varargin)
     %Add Signal
     newsig = SMASH.SignalAnalysis.Signal(xkeep,ykeep);
     sig_tot = sig_tot + 1;
-    sig(sig_tot) = reset(sig(sig_num(1)),newsig);
-    makeGridUniform(sig(sig_tot));
+    sig{sig_tot} = reset(sig{sig_num(1)},newsig);
+    makeGridUniform(sig{sig_tot});
     %Set some object properties
-    sig(sig_tot).Name = 'Combined Signal'; 
-    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.Name = 'Combined Signal'; 
+    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
     clear newsig;
     %Set active to all and plot
     sig_num = [1:sig_tot];
@@ -924,19 +925,19 @@ function AverageSignals(src,varargin)
     %Find absolute min and max
     xmin=[]; xmax=[];
     for i=1:numel(sig_num)
-    xmin = [xmin;min(sig(sig_num(i)).Grid)];
-    xmax = [xmax;max(sig(sig_num(i)).Grid)];
+    xmin = [xmin;min(sig{sig_num(i)}.Grid)];
+    xmax = [xmax;max(sig{sig_num(i)}.Grid)];
     end
     xmin = min(xmin);
     xmax = max(xmax);
     
     %New x grid
-    tempsig = limit(sig(sig_num(1)),[xmin xmax]);
+    tempsig = limit(sig{sig_num(1)},[xmin xmax]);
     tempsig = verifyGrid(tempsig);
     [xgrid ygrid] = limit(tempsig);
     ytot = [];
    	for i=1:numel(sig_num)
-    ytot= [ytot,lookup(sig(sig_num(i)),xgrid)];
+    ytot= [ytot,lookup(sig{sig_num(i)},xgrid)];
     end
 
     yaverage = mean(ytot')';
@@ -952,11 +953,11 @@ function AverageSignals(src,varargin)
     %Add Signal
     newsig = SMASH.SignalAnalysis.Signal(xgrid,yaverage);
     sig_tot = sig_tot + 1;
-    sig(sig_tot) = reset(sig(sig_num(1)),newsig);
-    makeGridUniform(sig(sig_tot));
+    sig{sig_tot} = reset(sig{sig_num(1)},newsig);
+    makeGridUniform(sig{sig_tot});
     %Set some object properties
-    sig(sig_tot).Name = 'Signal Average'; 
-    set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.Name = 'Signal Average'; 
+    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
     clear newsig;
     %Set active to all and plot
     sig_num = [sig_num sig_tot];
@@ -996,7 +997,7 @@ end
 
 function newsig = connect(n)
         value = probe(dlg);
-        [x y] = limit(sig(n));
+        [x y] = limit(sig{n});
         porder = str2double(get(dlg_hc(10),'String'));
         %Range of data for fitting
         x1 = str2double(get(dlg_hc(7),'String'));
@@ -1064,7 +1065,7 @@ dlg.Hidden = false;
 
 function newsig = extrap(n)
     value = probe(dlg);
-    [x y] = limit(sig(n));
+    [x y] = limit(sig{n});
     xext = str2double(value{3});
     
     %Range of data for fitting
@@ -1119,7 +1120,7 @@ OkApplyCancel(dlg,@MHDScale,'overlay')
 
 function newsig = MHDScale(n)
     value = probe(dlg);
-    newsig = sig(n);
+    newsig = sig{n};
     
     if ~value{2}
         [grid,data]=limit(newsig);
@@ -1182,7 +1183,7 @@ OkApplyCancel(dlg,@CalcLoss,'overlay_all')
 function newsig = CalcLoss(n)
     value = probe(dlg)
     closs = str2double(value{1});
-    newsig = sig(n);
+    newsig = sig{n};
     
     scrsz = get(0,'ScreenSize');
     tempfig=figure('Position',[scrsz(1)*.9 scrsz(2)*.9 scrsz(3)*.9 scrsz(4)*.9])
@@ -1256,7 +1257,7 @@ function newsig = LiFCorr(n)
     value = probe(dlg);
     b1 = str2double(value{2});
     b2 = str2double(value{3});
-    [x y] = limit(sig(n));
+    [x y] = limit(sig{n});
     
     if ~value{1}
         y = y.*1.2769;
@@ -1300,7 +1301,7 @@ dlg.Hidden = false;
 
 function newsig = extrap(n)
     value = probe(dlg)
-    [x y] = limit(sig(n));
+    [x y] = limit(sig{n});
     x1 = str2double(value{1});
     x2 = str2double(value{2});
     
@@ -1350,7 +1351,7 @@ function newsig = IM(n)
     value = probe(dlg);
     [rhow c0w sw g0w, Iuw, Icw] = getHugProp(value{1});
     [rhot c0t st g0t, Iut, Ict] = getHugProp(value{2});
-    [t v] = limit(sig(n).*1e-3); %ASSUME: Start SI );
+    [t v] = limit(sig{n}.*1e-3); %ASSUME: Start SI );
     
         %Solve for shocked state is checked
         if value{3}
@@ -1438,7 +1439,7 @@ function newsig = IL(n)
     XR = str2double(value{1});
     
     %Get window velocity data
-    [up_time up_data] = limit(sig(n));
+    [up_time up_data] = limit(sig{n});
 
     %Make monotonic in up
     [~, ia]=unique(up_data);
@@ -1575,7 +1576,7 @@ dlg.Hidden = true;
 dlg.Name = 'InSitu Lagrangian Analysis';
 h=addblock(dlg,'edit','Initial density:');
 for i =1:numel(sig_num);
-    name = sprintf('%s thickness:',sig(sig_num(i)).Name);
+    name = sprintf('%s thickness:',sig{sig_num(i)}.Name);
     h = addblock(dlg,'edit',name);
 end
 
@@ -1603,15 +1604,15 @@ function PerformCallback(varargin)
     
     %If only 1 signal, create a 0 time "shock"
     if numel(sig_num) == 1
-        [time vel] = limit(sig(sig_num(1)));
+        [time vel] = limit(sig{sig_num(1)});
         dt = (min(time)+max(time))/numel(time);
         tshock = [0;dt/20;dt/10];
         vshock = [0;max(vel);0];
         sig_tot = sig_tot+1;
-        sig(sig_tot) = SMASH.SignalAnalysis.Signal(tshock,vshock);
-        sig(sig_tot).Name = 'CenteredWaveSource';
+        sig{sig_tot} = SMASH.SignalAnalysis.Signal(tshock,vshock);
+        sig{sig_tot}.Name = 'CenteredWaveSource';
         %Set some object properties
-        set(sig(sig_tot).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
         sig_num = [sig_num sig_tot];
         thickness(end+1) = 0;
     end
@@ -1624,7 +1625,7 @@ function PerformCallback(varargin)
     %Get signals
     t = []; us = [];
     for i = 1:numel(sig_num);   
-        [t{i} us{i}] = limit(sig(sig_num(i)));
+        [t{i} us{i}] = limit(sig{sig_num(i)});
         %[t{i} ia] = unique(t{i}); u{i} = u{i}(ia); 
         %Assume SI units, scale to km/s
         t{i}=t{i}.*1e6;
@@ -1784,7 +1785,7 @@ function SaveCallback(varargin)
         fid=fopen(saveas,'w');   
         fprintf(fid,'# LagrangianAnalysis of:');
         for i = 1:numel(sig_num)
-            fprintf(fid,'%s (thickness = %f),',sig(sig_num(i)).Name,thickness(i));
+            fprintf(fid,'%s (thickness = %f),',sig{sig_num(i)}.Name,thickness(i));
         end
         fprintf(fid,'\n# Initial stress: %f , Initial strain : %f',stress0,strain0);
         fprintf(fid,'\n# time\tup\tcl\tdens\tstress\n'); 
@@ -1820,7 +1821,7 @@ OkApplyCancel(dlg,@IW);
 function newsig = IW(n)
     value = probe(dlg);
     rho0 = str2double(value{1}); 
-    [u cl] = limit(sig(n));
+    [u cl] = limit(sig{n});
     %Integrate conservation equations (simple wave assumption)
     stress = rho0.*cumtrapz(u,cl);
     strain = cumtrapz(u,1./cl);
@@ -1831,7 +1832,7 @@ function newsig = IW(n)
     %If checked, write file
     if value{2}
         t = 1:length(u); t = reshape(t,size(u));
-        savepath = fullfile(pathname,horzcat(sig(n).Name,'_Integratedclup.txt'))
+        savepath = fullfile(pathname,horzcat(sig{n}.Name,'_Integratedclup.txt'))
         fid=fopen(savepath,'w');       
         fprintf(fid,'time\tup\tcl\tdens\tstress\n');
         dlmwrite(savepath, [t,u,cl,dens,stress],'-append','delimiter','\t','precision','%10.6f');
@@ -1886,7 +1887,7 @@ function PerformCallback(varargin);
         
         %Create Sesame object
         value = probe(dlg);
-        [x y] = limit(sig(sig_num(i)));
+        [x y] = limit(sig{sig_num(i)});
         rho0 = str2num(value{2});
         g0 = str2num(value{3});
         L = str2num(value{4});
@@ -1963,7 +1964,7 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            set(sig(sig_num(i)).GraphicOptions,'LineWidth',width{index,1}, ...
+            set(sig{sig_num(i)}.GraphicOptions,'LineWidth',width{index,1}, ...
                 'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
         end
     end
@@ -1985,7 +1986,7 @@ locate(dlg,'south');
 
 %Create edit box for each signal
 for i=1:numel(sig_num)
-    h=addblock(dlg,'edit',sig(sig_num(i)).Name); set(h(2),'String', num2str(i));
+    h=addblock(dlg,'edit',sig{sig_num(i)}.Name); set(h(2),'String', num2str(i));
 end
 h=addblock(dlg,'button',{ 'Apply Order Change', 'Cancel'});
 dlg.Hidden = false
@@ -2005,13 +2006,13 @@ dlg.Hidden = false
        
        newsig = SMASH.SignalAnalysis.Signal(0,0);
        for i = 2:numel(sig_num);
-           newsig(i) = SMASH.SignalAnalysis.Signal(0,0);
+           newsig{i} = SMASH.SignalAnalysis.Signal(0,0);
        end
        
        for i=1:numel(sig_num)
            newindex(i)
           sig_num(i)
-            newsig(newindex(i)) = sig(sig_num(i));
+            newsig{newindex(i)} = sig{sig_num(i)};
        end
        sig = newsig;
        clear newsig;
@@ -2039,8 +2040,8 @@ dlg.Hidden = true;
 dlg.Name = 'Axis Labels';
 
 %Create edit box for each signal
-h=addblock(dlg,'edit','Grid Axis Label'); set(h(2),'String', sig(sig_num(1)).GridLabel);
-h=addblock(dlg,'edit','Data Axis Label'); set(h(2),'String', sig(sig_num(1)).DataLabel);
+h=addblock(dlg,'edit','Grid Axis Label'); set(h(2),'String', sig{sig_num(1)}.GridLabel);
+h=addblock(dlg,'edit','Data Axis Label'); set(h(2),'String', sig{sig_num(1)}.DataLabel);
 
 h=addblock(dlg,'button',{ 'Apply Label Change', 'Cancel'});
 
@@ -2051,8 +2052,8 @@ dlg.Hidden = false;
     function ApplyCallback(varargin)
        newnames = probe(dlg);
        for i=1:numel(sig_num)
-            sig(i).GridLabel = newnames{1};
-            sig(i).DataLabel = newnames{2};
+            sig{i}.GridLabel = newnames{1};
+            sig{i}.DataLabel = newnames{2};
        end
     plotdata(fig.Handle,sig,sig_num);
     delete(dlg);
@@ -2070,15 +2071,15 @@ function PercentDifference(src,varargin)
     %Find absolute min and max
     xmin=[]; xmax=[];
     for i=1:numel(sig_num)
-        xmin = [xmin;min(sig(sig_num(i)).Grid)];
-        xmax = [xmax;max(sig(sig_num(i)).Grid)];
+        xmin = [xmin;min(sig{sig_num(i)}.Grid)];
+        xmax = [xmax;max(sig{sig_num(i)}.Grid)];
     end
     
     x=linspace(max(xmin),min(xmax),2e3)';
     
     %Find common y
     for i=1:length(sig_num)
-        y{i} = lookup(sig(sig_num(i)),x);
+        y{i} = lookup(sig{sig_num(i)},x);
     end
     newsig = sig;
     %Calculate % difference from 1st signal
@@ -2086,19 +2087,19 @@ function PercentDifference(src,varargin)
         %PercentDiff(i) = abs(2.*(y{1}-y{i})./(y{1}+y{i}))*100;
         %PercentDiff = (1-y{1}./y{i})*100;
         PercentDiff = ((y{i}-y{1})./y{1})*100;
-        newsig(sig_num(i)) = SMASH.SignalAnalysis.Signal(x,PercentDiff);
+        newsig{sig_num(i)} = SMASH.SignalAnalysis.Signal(x,PercentDiff);
         %Set some object properties
-        set(sig(sig_num(i)).GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
-        newsig(sig_num(i)).GridLabel= 'x'; newsig(i).DataLabel= '% from 1st signal';
-        legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
+        set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        newsig{sig_num(i)}.GridLabel= 'x'; newsig{i}.DataLabel= '% from 1st signal';
+        legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
     end
     
     %Create plot
     fig2=figure('units','normalized','Position',[.10,.10,0.7,0.7]); 
     movegui(fig2,'center');
     for i=1:length(sig_num)
-    h1 = subplot(2,1,1); view(sig(sig_num(i)),fig2); title('Signals'); axis tight; 
-    h2 = subplot(2,1,2); view(newsig(sig_num(i)),fig2); title('Percent Difference');
+    h1 = subplot(2,1,1); view(sig{sig_num(i)},fig2); title('Signals'); axis tight; 
+    h2 = subplot(2,1,2); view(newsig{sig_num(i)},fig2); title('Percent Difference');
     end
                         
     legend(legendentry,'Color','none'); legend('boxoff');
@@ -2116,8 +2117,8 @@ function BigPlot(src,varargin)
 
     set(gca,'FontName','times','FontAngle','normal','LineWidth',2.5,'FontSize',30);
     set(gcf,'Color','w');
-    xlabel(sig(sig_num(1)).GridLabel,'FontName','times','FontAngle','normal','FontSize',40);
-    ylabel(sig(sig_num(1)).DataLabel,'FontName','times','FontAngle','normal','FontSize',40);
+    xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',40);
+    ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',40);
     
 end %Big plot
 
@@ -2126,14 +2127,14 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     set(gcf,'Color','w');
-    xlabel(sig(sig_num(1)).GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
-    ylabel(sig(sig_num(1)).DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
+    xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
+    ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
 
 end %AIP single column
 
@@ -2142,15 +2143,15 @@ function AIPFigure2(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(2);
     set(AIPFig,'name','AIP Double Column Fig');
     
-    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); set(sig(sig_num(i)).GraphicOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3); end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
     set(gcf,'Color','w');
-    xlabel(sig(sig_num(1)).GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
-    ylabel(sig(sig_num(1)).DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
+    xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
+    ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
 end %AIP double column
 
 %% Create dual axes plot
@@ -2164,24 +2165,24 @@ function DualAxes(src,varargin)
     if ~isempty(sig_num)
         legendentry = [];
         for i=1:length(sig_num)-2
-            ph(i) = view(sig(sig_num(i)),ax1);
-            legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
+            ph(i) = view(sig{sig_num(i)},ax1);
+            legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
         end
      
      axis tight;
 
      
      %Plot last signal on right axis
-     set(ax2,'YAxisLocation','right','Color','none','YColor',sig(sig_num(i+1)).LineColor);
-     ph(i+1)=view(sig(sig_num(i+1)),ax2);
-     ph(i+2)=view(sig(sig_num(i+2)),ax2);    
-     legendentry{i+1}=strrep(sig(sig_num(i+1)).Name,'_','\_');
-     legendentry{i+2}=strrep(sig(sig_num(i+2)).Name,'_','\_');
+     set(ax2,'YAxisLocation','right','Color','none','YColor',sig{sig_num(i+1)}.LineColor);
+     ph(i+1)=view(sig{sig_num(i+1)},ax2);
+     ph(i+2)=view(sig{sig_num(i+2)},ax2);    
+     legendentry{i+1}=strrep(sig{sig_num(i+1)}.Name,'_','\_');
+     legendentry{i+2}=strrep(sig{sig_num(i+2)}.Name,'_','\_');
      legend(ph,legendentry,'Color','none','Location','Best','EdgeColor','w'); 
      
     set(ax1,'XColor','w'); 
-    xlabel(ax2,sig(sig_num(1)).GridLabel,'FontSize',40); 
-    ylabel(ax1,sig(sig_num(1)).DataLabel,'FontSize',40); ylabel(ax2,sig(sig_num(end)).DataLabel,'FontSize',40);
+    xlabel(ax2,sig{sig_num(1)}.GridLabel,'FontSize',40); 
+    ylabel(ax1,sig{sig_num(1)}.DataLabel,'FontSize',40); ylabel(ax2,sig{sig_num(end)}.DataLabel,'FontSize',40);
     set(ax1,'FontName','times','FontAngle','normal','FontSize',30);
     set(ax2,'FontName','times','FontAngle','normal','FontSize',30);
 
@@ -2233,7 +2234,7 @@ dlg.Hidden = false;
 OkApplyCancel(dlg,@FUN,'overlay');
 
 function newsig = IM(n)
-    newsig = sig(n);
+    newsig = sig{n};
 end
 
 end
@@ -2285,7 +2286,7 @@ set(h(1),'Callback',@ApplyCallback);
 function ApplyCallback(varargin)
     
     for i = 1:length(sig_num)
-    newsig(sig_num(i)) = func(sig_num(i)); 
+    newsig{sig_num(i)} = func(sig_num(i)); 
     end 
     
     if strcmp(options,'overlay')
@@ -2305,13 +2306,13 @@ set(h(2),'Callback',@OKCallback);
 function OKCallback(varargin)
     for i = 1:length(sig_num)
         if strcmp(redo,'redo')
-            sig(sig_num(i)) = func(sig_num(i)); 
+            sig{sig_num(i)} = func(sig_num(i)); 
         else
             %Don't redo the apply calculation if it's been done
-            if numel(newsig(sig_num(i)).Grid) > 1
-                sig(sig_num(i))=reset(sig(sig_num(i)),newsig(sig_num(i)));
+            if numel(newsig{sig_num(i)}.Grid) > 1
+                sig{sig_num(i)}=reset(sig{sig_num(i)},newsig{sig_num(i)});
             else
-                sig(sig_num(i))=reset(sig(sig_num(i)),func(sig_num(i)));
+                sig{sig_num(i)}=reset(sig{sig_num(i)},func(sig_num(i)));
             end
         end
     end
@@ -2365,10 +2366,10 @@ function AxisMod(src,varargin)
     dlg.Name = 'Axis Modification';
 
     h=addblock(dlg,'listbox','Select Figure',fignames);
-    h=addblock(dlg,'edit','xmin        '); set(h(2),'String',min(sig(sig_num(1)).Grid));
-    h=addblock(dlg,'edit','xmax        '); set(h(2),'String',max(sig(sig_num(1)).Grid));
-    h=addblock(dlg,'edit','ymin        '); set(h(2),'String',min(sig(sig_num(1)).Data));
-    h=addblock(dlg,'edit','ymax        '); set(h(2),'String',max(sig(sig_num(1)).Data));
+    h=addblock(dlg,'edit','xmin        '); set(h(2),'String',min(sig{sig_num(1)}.Grid));
+    h=addblock(dlg,'edit','xmax        '); set(h(2),'String',max(sig{sig_num(1)}.Grid));
+    h=addblock(dlg,'edit','ymin        '); set(h(2),'String',min(sig{sig_num(1)}.Data));
+    h=addblock(dlg,'edit','ymax        '); set(h(2),'String',max(sig{sig_num(1)}.Data));
     h=addblock(dlg,'button',{'Apply','OK','Cancel'});
    
     box_h = [];
@@ -2459,21 +2460,21 @@ function plotdata(varargin)
             if ~isempty(sig_num)
                 legendentry = [];
                 for i=1:length(sig_num)
-                    %set(sig(sig_num(i)).GraphicOptions,'LineWidth',1);
-                    view(sig(sig_num(i)),ha);
-                    legendentry{i}=strrep(sig(sig_num(i)).Name,'_','\_');
+                    %set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1);                 
+                    view(sig{sig_num(i)},ha);
+                    legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
                 end
                 lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',0);
                 %set(lh,'Box','off');
-                xlabel(sig(sig_num(1)).GridLabel);
-                ylabel(sig(sig_num(1)).DataLabel);
+                xlabel(sig{sig_num(1)}.GridLabel);
+                ylabel(sig{sig_num(1)}.DataLabel);
             end
            
             
         case 'overlay'    
             %Current signals in black
             for i=1:length(sig_num)
-            [tempsigx tempsigy] = limit(sig(sig_num(i)));
+            [tempsigx tempsigy] = limit(sig{sig_num(i)});
             line(tempsigx, tempsigy,'Color',[0 0 0],'LineStyle','--','LineWidth',2);
             end  
             
@@ -2482,7 +2483,7 @@ function plotdata(varargin)
             
             %All signals in grey
             for i=1:numel(sig)
-            [tempsigx tempsigy] = limit(sig(i));
+            [tempsigx tempsigy] = limit(sig{i});
             line(tempsigx, tempsigy,'Color',[0.75 0.75 0.75],'LineStyle','-.','LineWidth',2);
             end  
 

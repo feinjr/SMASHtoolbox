@@ -4,7 +4,7 @@ classdef GraphicOptions < hgsetget
         LineStyle = '-'
         LineColor = 'black'
         LineWidth = 0.5
-        Marker = 'o'
+        Marker = 'none'
         MarkerSize = 5
         MarkerStyle = 'open'
         Box = 'on'
