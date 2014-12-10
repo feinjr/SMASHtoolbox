@@ -33,7 +33,7 @@ classdef DataClass
         Precision='double' % Data format (double or single)
     end
     properties
-        GraphicOptions = SMASH.General.GraphicOptions % Default graphic options
+        GraphicOptions %Graphic options
     end
     %% hidden methods
     methods (Hidden=true)
@@ -56,8 +56,11 @@ classdef DataClass
             else
                 object=create(object,varargin{:});
                 object.Source='Numeric input';
-            end
+            end            
             object.Precision=object.Precision; % enforce variable precicion            
+            if isempty(object.GraphicOptions)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+            end
         end
         varargin=concealMethod(varargin);
         varargin=concealProperty(varargin);
