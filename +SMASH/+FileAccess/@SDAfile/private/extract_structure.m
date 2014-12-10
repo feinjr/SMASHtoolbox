@@ -35,9 +35,9 @@ for m=1:N
             case 'cell'
                 data(m).(name{k})=extract_cell(archive,local);
             case 'object'
-                data=extract_structure(archive,local);
+                temp=extract_structure(archive,local);
                 ObjectClass=h5readatt(archive.ArchiveFile,local,'Class');
-                data(m).(name{k})=feval(ObjectClass,data);
+                data(m).(name{k})=feval(ObjectClass,temp);
             otherwise
                 error('ERROR: invalid record type');
         end

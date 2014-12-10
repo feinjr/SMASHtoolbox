@@ -40,7 +40,7 @@ axis(h.axes(1),'tight');
 hcrosshair=line('Parent',h.axes(1),...
     'Color',get(object.GraphicOptions,'LineColor'),...
     'UserData',[],'Tag','crosshair');
-title(h.axes(1),object.Title);
+title(h.axes(1),object.GraphicOptions.Title);
 
 hc=findobj(gcf,'Tag','Colorbar');
 delete(hc);

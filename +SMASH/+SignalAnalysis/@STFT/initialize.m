@@ -1,7 +1,7 @@
 function object=initialize(object)
 
 object.Name='STFT object';
-object.Title='STFT object';
+set(object.GraphicOptions,'Title','STFT object');
 
 object.GridLabel='Time';
 object.DataLabel='Signal';

@@ -12,6 +12,7 @@ classdef GraphicOptions < hgsetget
         AxesColor = 'white'
         XDir = 'normal'
         YDir = 'normal'
+        Title = ''
         PanelColor = get(0,'DefaultUIPanelBackgroundColor')
         ColorMap = jet(64)
         FigureColor = get(0,'DefaultFigureColor')
@@ -126,6 +127,15 @@ classdef GraphicOptions < hgsetget
                 otherwise
                     error('ERROR: invalid YDir value');
             end
+        end
+        function set.Title(object,value)
+            if ischar(value)
+                object.Title=value;
+            elseif iscell(value) && all(cellfun(@ischar,value))
+                object.Title=value;
+            else
+                error('ERROR: invalid Title value');
+            end 
         end
         function set.PanelColor(object,value)
             assert(SMASH.General.testColor(value),...

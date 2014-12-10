@@ -58,7 +58,7 @@ switch lower(coordinate)
         result.GridLabel=object.Grid1Label;
 end
 result.DataLabel=object.DataLabel;
-result.Title=sprintf('%s slice of "%s"',coordinate,object.Name);
+result.GraphicOptions.Title=sprintf('%s slice of "%s"',coordinate,object.Name);
 result.Legend=label;
 
 % handle output

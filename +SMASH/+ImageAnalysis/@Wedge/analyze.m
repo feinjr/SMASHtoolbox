@@ -157,7 +157,7 @@ object.TransferTable=[ys(:) 10.^(xs(:))];
     colormap(object.GraphicOptions.ColorMap);
     xlabel(object.Grid1Label);
     ylabel(object.Grid2Label);
-    temp=sprintf('Wedge regions for ''%s''',object.Title);
+    temp=sprintf('Wedge regions for ''%s''',object.GraphicOptions.Title);
     title(temp);
     for n=1:size(ROI,1)
         rectangle('Position',ROI(n,:),...

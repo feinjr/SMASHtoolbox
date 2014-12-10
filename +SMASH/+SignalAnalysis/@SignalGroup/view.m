@@ -73,8 +73,6 @@ h=h(~isnan(h));
 if new
     xlabel(target,object.GridLabel);
     ylabel(target,object.DataLabel);
-    title(target,object.Title);
-    box(target,'on');
     if ~isempty(object.Legend)
         legend(object.Legend(index),'Location','best');
     end

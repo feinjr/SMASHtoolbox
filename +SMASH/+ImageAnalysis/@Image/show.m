@@ -35,7 +35,7 @@ axis(h.axes,'tight');
 colormap(h.axes,get(object.GraphicOptions,'ColorMap'));
 xlabel(h.axes,object.Grid1Label);
 ylabel(h.axes,object.Grid2Label);
-title(h.axes,object.Title);
+title(h.axes,object.GraphicOptions.Title);
 
 cb=SMASH.MUI.Colorbar;
 ylabel(cb.Handle,object.DataLabel);

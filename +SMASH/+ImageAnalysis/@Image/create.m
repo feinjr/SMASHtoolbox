@@ -1,7 +1,7 @@
 function object=create(object,varargin)
 
 object.Name='Image object';
-object.Title='Image object';
+object.GraphicOptions.Title='Image object';
 
 Narg=numel(varargin);
 assert(Narg==3,'ERROR: invalid number of inputs');

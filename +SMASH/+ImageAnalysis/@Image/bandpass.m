@@ -89,7 +89,7 @@ end
 F=fft2(double(object.Data),size(H,1),size(H,2));
 FdB=log(abs(F));
 figure; imagesc(fftshift(FdB)); caxis([0 max(max(FdB))]);
-title(strcat((object.Title),' - FFT power spectrum'));
+title(strcat((object.GraphicOptions.Title),' - FFT power spectrum'));
 figure; imagesc(fftshift(B));
 title(strcat('Bandpass power spectrum'));
 
@@ -97,12 +97,12 @@ title(strcat('Bandpass power spectrum'));
 BF = B.*F;
 BFdB=log(abs(BF));
 figure; imagesc(fftshift(BFdB)); caxis([0 max(max(BFdB))]);
-title(strcat((object.Title),' - bandpassed power spectrum'));
+title(strcat((object.GraphicOptions.Title),' - bandpassed power spectrum'));
 
 % inverse FFT data
 BFdata=real(ifft2(BF));
 object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
-object.Title=strcat(object.Title,'- bandpassed');
+object.GraphicOptions.Title=strcat(object.GraphicOptions.Title,'- bandpassed');
 view(object);
 
 object=updateHistory(object);

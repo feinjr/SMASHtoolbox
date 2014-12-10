@@ -58,6 +58,7 @@ switch get(target,'Type')
         set(target,'Box',object.Box);
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
+        title(target,object.Title);
         parent=get(target,'Parent');
         apply(object,parent);
     case 'uipanel'

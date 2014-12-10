@@ -32,7 +32,7 @@ classdef Streak < SMASH.ImageAnalysis.Image
                 % do nothing
             else
                 object.Name='Streak object';
-                object.Title='Streak object';
+                object.GraphicOptions.Title='Streak object';
             end
         end
     end

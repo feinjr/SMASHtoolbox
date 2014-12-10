@@ -46,9 +46,6 @@
 classdef Image < SMASH.General.DataClass
     %% properties
     properties (SetAccess={?SMASH.General.DataClass}) % core data
-        %Source = 'MATLAB array' % MATLAB array/operation, file name
-        %SourceFormat = '' % Source format (import/restore only)
-        %SourceRecord = '' % Source record (restore only)
         Grid1 = [] % Independent array 1
         Grid2 = [] % Independent array 2
         LimitIndex1='all' % Region of interest on Grid1
@@ -65,7 +62,6 @@ classdef Image < SMASH.General.DataClass
     properties % display-related settings
         Grid1Label='Grid1' % XLabel used by view
         Grid2Label='Grid2' % YLabel used by view
-        Title='Image object' % Title used by view
         DataLim='auto' % Data range used by view
         DataScale='linear' % Data scaling used by view        
     end
@@ -76,8 +72,8 @@ classdef Image < SMASH.General.DataClass
     methods (Hidden=true)
         function object=Image(varargin)
             object=object@SMASH.General.DataClass(varargin{:}); 
-            object=concealProperty(object,...
-                'LimitIndex1','LimitIndex2');
+            %object=concealProperty(object,...
+            %    'LimitIndex1','LimitIndex2');
             object=verifyGrid(object);
         end
     end
@@ -112,14 +108,7 @@ classdef Image < SMASH.General.DataClass
             else
                 error('ERROR: Grid2Label must be character array');
             end
-        end
-        function object=set.Title(object,value)
-            if ischar(value)
-                object.Title=value;
-            else
-                error('ERROR: Title must be character array');
-            end
-        end
+        end        
         function object=set.DataLim(object,value)
             if strcmpi(value,'auto')
                 % valid choice

@@ -38,26 +38,25 @@ classdef Signal < SMASH.General.DataClass
     %%
     properties (SetAccess=?SMASH.General.DataClass) % superclass, class, and subclass access
         Grid = [] % Independent array
+        LimitIndex='all' % Limited region
     end
     properties (Access=?SMASH.General.DataClass,Hidden=true)
-        ReservedNames={'fancy'};
+        ReservedNames={'fancy'};       
     end
     properties (SetAccess={?SMASH.General.DataClass},...% superclass, class, and subclass access
             Hidden=true)
-        LimitIndex='all' % Region of interest
         GridDirection % 'normal' for increasing, 'reverse' for decreasing
         GridUniform % true for uniform grid spacing
         GridSpacing % average grid spacing
     end
     properties
         GridLabel='Grid' % Default XLabel
-        Title='' % Default Title
     end
     %% hidden methods
     methods (Hidden=true) % constructor
         function object=Signal(varargin)
             object=object@SMASH.General.DataClass(varargin{:}); % call superclass constructor
-            object=concealProperty(object,'LimitIndex');
+            %object=concealProperty(object,'LimitIndex');
             object=verifyGrid(object);
         end
     end
@@ -78,15 +77,7 @@ classdef Signal < SMASH.General.DataClass
             else
                 error('ERROR: GridLabel must be character array');
             end
-        end
-        function object=set.Title(object,value)
-            if ischar(value)
-                object.Title=value;
-            else
-                error('ERROR: Title must be character array');
-            end
-        end
-        
+        end                
     end
     
 end

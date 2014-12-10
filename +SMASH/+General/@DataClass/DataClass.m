@@ -29,7 +29,7 @@ classdef DataClass
         DataLabel = 'Data' % Dependent axes label
         Name = 'DataClass object' % Object name
     end
-    properties (Hidden=true)
+    properties
         Precision='double' % Data format (double or single)
     end
     properties

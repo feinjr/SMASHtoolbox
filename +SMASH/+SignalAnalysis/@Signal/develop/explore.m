@@ -12,7 +12,7 @@
 function explore(object)
 
 %% create figure
-name=sprintf('Explore "%s"',object.Title);
+name=sprintf('Explore "%s"',object.GraphicOptions.Title);
 set(fig.Handle,'Name',name);
 
 ha(1)=axes('Parent',fig.Handle,'Tag','FullPlot',...

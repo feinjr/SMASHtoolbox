@@ -1,7 +1,7 @@
 function object=import(object,data)
 
 object.Name='Image object';
-object.Title='Image object';
+object.GraphicOptions.Title='Image object';
 
 % multiple files
 if numel(data)>1   

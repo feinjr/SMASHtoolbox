@@ -42,8 +42,7 @@ classdef Distortion < SMASH.ImageAnalysis.Image
                 object.Name='Distortion object';
                 object.Grid1Label='Grid1';
                 object.Grid2Label='Grid2';
-                object.DataLabel='Data';
-                object.Title='Distortion object';           
+                object.DataLabel='Data';      
             end       
             object=concealMethod(object,...
                 'bin');

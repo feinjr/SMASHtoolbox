@@ -56,8 +56,6 @@ apply(object.GraphicOptions,h);
 if new
     xlabel(target,object.GridLabel);
     ylabel(target,object.DataLabel);
-    title(target,object.Title);
-    box(target,'on');
 end
 
 figure(fig);

@@ -82,7 +82,7 @@ if nargout==0
     xlabel(object.Grid1Label);
     ylabel(object.Grid2Label);
     colorbar
-    temp=sprintf('Binned image of ''%s''',object.Title);
+    temp=sprintf('Binned image of ''%s''',object.GraphicOptions.Title);
     title(temp)
 end
 
