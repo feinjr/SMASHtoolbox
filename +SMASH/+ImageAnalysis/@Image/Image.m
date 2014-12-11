@@ -78,8 +78,8 @@ classdef Image < SMASH.General.DataClass
     methods (Hidden=true)
         varargin=makeGridUniform(varargin)
         varargout=verifyGrid(varargin)
-        [object,x0,y0]=center_ellipse(object)
-        [object,x0,y0]=center_points(object)
+        varargout=center_ellipse(varargin)
+        varargout=center_points(varargin)
         varargout=region(varargin)
     end
     methods (Access=protected,Hidden=true)

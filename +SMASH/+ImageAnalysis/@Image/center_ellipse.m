@@ -5,8 +5,39 @@
 % created April 8, 2013 by Daniel Dolan (Sandia National Laboratories)
 % modified October 17, 2013 by Tommy Ao (Sandia National Laboratories)
 %
-function [object,params]=center_ellipse(object)
+function [object,params]=center_ellipse(object,varargin)
 %%
+
+% manage input
+Narg=numel(varargin);
+if Narg>=1
+    radius=varargin{1};
+    if strcmpi(radius,'equal')
+        radius=lower(radius);
+    elseif isnumeric(radius)
+        assert(isnumeric(radius),'ERROR: invalid radius value');
+        if isscalar(radius)
+            radius=repmat(radius,[1 2]);
+        end
+        assert(numel(radius)==2,'ERROR: invalid radius value');
+        assert(all(radius>0),'ERROR: invalid radius value');
+    else
+        error('ERROR: invalid radius value');
+    end   
+
+else
+    radius=[];
+end
+
+if Narg>=2
+    epsilon=varargin{2};
+    assert(isnumeric(epsilon),'ERROR: invalid epsilon value');
+    assert(isscalar(epsilon),'ERROR: invalid epsilon value');
+else
+    epsilon=[];
+end
+
+% create graphics
 h=view(object,'show');
 set(h.figure,'Name','Center Image object')
 title(h.axes,'Select ellipse boundary points')
@@ -19,6 +50,7 @@ hline(2)=line('Parent',h.axes,'Tag','Ellipse',...
     'XData',[],'YData',[],'Visible','off',...
     'ButtonDownFcn',@AddPoint);
 apply(object.GraphicOptions,hline);
+set(hline(1),'LineStyle','none');
 set(hline(2),'Marker','none');
 
 hc=uicontextmenu;
@@ -89,18 +121,36 @@ object.Grid2=object.Grid2-y0;
             set(hline(2),'Visible','off');
             return
         end
+        if isempty(radius) && isempty(epsilon)           
+            params=DirectEllipseFit(x,y);
+        elseif strcmpi(radius,'equal') && (epsilon==0) 
+            params=CircleFitByPratt([x(:) y(:)]);
+            params(4)=params(3);
+            params(5)=0;
+        elseif ~isempty(radius) && ~isempty(epsilon)    
+            guess=[mean(x) mean(y) radius(1) radius(2) epsilon];
+            params=IterativeEllipseFit(x,y,guess,[0 0 1 1 1]);
+        elseif (epsilon==0) && isempty(radius)
+            % under construction
+        elseif isempty(radius)
+            % fixed epsilon
+        elseif isempty(epsilon)
+            % fixed radius
+        else % fixed radius and epsilon
+            % under construction
+        end
+        
         if ishandle(hbutton)
             set(hbutton,'Enable','on');
-        end
-        params=DirectEllipseFit(x,y);
+        end                            
         theta=linspace(0,2*pi,1000);
         x0 = params(1);
         y0 = params(2);
         Ax = params(3);
         Ay = params(4);
-        epsilon = params(5);
+        %epsilon = params(5);
         x = x0 + Ax * cos(theta);
-        y = y0 + Ay * sin(theta - epsilon);
+        y = y0 + Ay * sin(theta - params(5));
         set(hline(2),'XData',x,'YData',y,'Visible','on');
     end
 

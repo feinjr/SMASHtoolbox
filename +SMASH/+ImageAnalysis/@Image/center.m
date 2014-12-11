@@ -16,7 +16,7 @@
 % created April 8, 2013 by Daniel Dolan (Sandia National Laboratories)
 % modified October 17, 2013 by Tommy Ao (Sandia National Laboratories)
 %
-function [object,x0,y0]=center(object,mode)
+function [object,x0,y0,params]=center(object,mode,varargin)
 
 % handle input
 if (nargin<2) || isempty(mode)
@@ -26,7 +26,7 @@ end
 % call appropriate method
 switch lower(mode)
     case 'ellipse'
-        [object,params]=center_ellipse(object);        
+        [object,params]=center_ellipse(object,varargin{:});        
         x0=params(1);
         y0=params(2);
     case 'points'
