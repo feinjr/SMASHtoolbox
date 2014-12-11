@@ -32,35 +32,42 @@ classdef BoundingCurve
         Data % Boundary Data
     end
     properties
-        Direction % Independent axis ('horizontal' or 'vertical')
+        Direction = 'horizontal'; % Independent axis ('horizontal' or 'vertical')
         DefaultWidth % Default boundary width
         Label = 'Boundary curve' % Text label
-    end
-    properties
-        PlotOptions = SMASH.General.PlotOptions % Default graphic options (see SMASH.General.PlotOptions)
+        GraphicOptions % Grahpic options
     end
     %%
     methods (Hidden=true)
-        function object=BoundingCurve(direction,data)
+        function object=BoundingCurve(varargin)
+            % struction construction
+            if (nargin==1) && isstruct(varargin{1}) 
+                data=varargin{1};
+                name=fieldnames(data);
+                for n=1:numel(name)
+                    if isprop(object,name{n})
+                        object.(name{n})=data.(name{n});
+                    end
+                end
+                return
+            end
             % handle input
-            if (nargin<1) || isempty(direction) ...
-                    || strcmpi(direction,'horizontal')
-                object.Direction='horizontal';
-            elseif strcmpi(direction,'vertical')
-                object.Direction='vertical';
-            else
-                error('ERROR: invalid direction');
-            end            
-            if nargin>=3
-                object=set(object,data);
-            end                              
+            if nargin>=1
+                object.Direction=varargin{1};
+            end
+            if nargin>=2
+                object.Data=varargin{2};
+            end                         
+            if isempty(object.GraphicOptions)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+            end
         end
         varargout=disp(varargin);
     end   
     %% property setters
     methods
         function object=set.Direction(object,value)
-            if strcmpi(value,'horizontal')
+            if strcmpi(value,'horizontal') || isempty(value)
                 object.Direction='horizontal';
             elseif strcmpi(value,'vertical')
                 object.Direction='vertical';

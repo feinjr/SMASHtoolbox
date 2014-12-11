@@ -15,11 +15,9 @@
 % "time" and "signal" of the same size.
 %    >> writeFile('myfile.dig',time,signal); % 'dig' format
 %
-% The 'sda' format is used for *.sda files, which require text inputs
-% "category" and "label".
-%    >> writeFile('myfile.sda',category,label,...); % 'sda' format
-% Additional write inputs for SDA files depend on the category; refer to
-% the format documentation for more information.
+% The 'sda' format is used for *.sda files, which require at text input
+% "label" followed by the data.
+%    >> writeFile('myfile.sda',label,data); % 'sda' format
 %
 % See also FileAccess, fprintf, SDAfile
 %

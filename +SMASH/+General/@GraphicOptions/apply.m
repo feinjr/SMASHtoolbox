@@ -1,22 +1,24 @@
-% apply Apply PlotOptions to existing graphic(s)
+% apply Apply graphic options
 %
-% This method applies settings from a PlotOptions object to an existing
-% graphic object.
+% This method applies graphic objects to a target object.
 %     >> apply(object,target); 
 % The input "target" must be a graphic handle or an array of handles.
-% Settings are applied to the target and all its parent objects (axes,
-% figure, etc.).
 %
-% See also PlotOptions
+% By default, this method applies options to the target object and all of
+% its parent objects (up to the figure level).  Passing a third input:
+%     >> apply(object,target,'noparent');
+% applies options to the target only.
+%
+% See also GraphicOptions
 %
 
 %
-% created November 17, 2014 by Daniel Dolan (Sandia National Laboratory)
+% created December 10, 2014 by Daniel Dolan (Sandia National Laboratory)
 %
-function apply(object,target)
+function apply(object,target,parentmode)
 
 % handle input
-assert(nargin==2,'ERROR: invalid number of inputs');
+assert(nargin>=2,'ERROR: invalid number of inputs');
 if numel(target)>1
     for k=1:numel(target)
         apply(object,target(k));
@@ -24,9 +26,17 @@ if numel(target)>1
     return
 end
 
-assert(ishandle(target),'ERROR: invalid target handle');
+if (nargin<3) || isempty(parentmode) || strcmpi(parentmode,'parent')
+    parentmode=true;
+else
+    parentmode=false;
+end
 
-switch get(target,'Type')
+assert(ishandle(target),'ERROR: invalid target handle');
+parent=get(target,'Parent');
+
+type=get(target,'type');
+switch type
     case 'line'
         set(target,'Color',object.LineColor);
         set(target,'LineStyle',object.LineStyle);
@@ -40,8 +50,6 @@ switch get(target,'Type')
             case 'closed'
                 set(target,'MarkerFaceColor',object.LineColor);
         end
-        parent=get(target,'Parent');
-        apply(object,parent);
     case 'image'
         parent=get(target,'Parent');
         apply(object,parent);
@@ -59,16 +67,15 @@ switch get(target,'Type')
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
         title(target,object.Title);
-        parent=get(target,'Parent');
-        apply(object,parent);
     case 'uipanel'
         set(target,'BackgroundColor',object.PanelColor);
-        parent=get(target,'Parent');
-        apply(object,parent);
     case 'figure'
         set(target,'ColorMap',object.ColorMap);
         set(target,'Color',object.FigureColor);
 end
 
+if parentmode && ~strcmpi(type,'figure');
+    apply(object,parent);
+end
 
 end

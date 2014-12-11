@@ -51,8 +51,10 @@ switch numel(variable)
         ylabel(object.DataLabel{variable(2)});
         zlabel(object.DataLabel{variable(3)});
 end
-set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
-    'Marker',object.Marker,'MarkerSize',object.MarkerSize);
+%set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
+%    'Marker',object.Marker,'MarkerSize',object.MarkerSize);
+apply(object.GraphicOptions,h,'noparent');
+set(h,'LineStyle','none');
 
 % handle output
 if nargout>=1

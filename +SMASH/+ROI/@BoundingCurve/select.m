@@ -88,9 +88,8 @@ DeleteOnClose=advanced.DeleteOnClose;
 if isempty(advanced.GroupHandle)
     advanced.GroupHandle=view(object,target);
 end
-child=get(advanced.GroupHandle(1),'Children');
-points=child(2);
-envelope=child(1);
+points=getappdata(advanced.GroupHandle,'Points');
+envelope=getappdata(advanced.GroupHandle,'Envelope');
 
 % create dialog
 dlg=SMASH.MUI.Dialog;

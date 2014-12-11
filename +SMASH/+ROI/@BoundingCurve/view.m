@@ -34,9 +34,11 @@ end
 
 % plot points
 parent=hggroup('Parent',target);
-points=line('Parent',parent,'XData',x,'YData',y);
-apply(object.PlotOptions,points);
-set(points,'LineStyle','-','Tag','SMASH.ROI.BoundingCurve');
+
+points=line('Parent',parent,'XData',x,'YData',y,...
+    'Tag','SMASH.ROI.BoundingCurve');
+apply(object.GraphicOptions,points,'noparent');
+setappdata(parent,'Points',points);
 
 % plot envelope
 switch object.Direction
@@ -51,9 +53,15 @@ if ~isempty(x)
     x(end+1)=x(1);
     y(end+1)=y(1);
 end
-envelope=line('Parent',parent,'XData',x,'YData',y);
-apply(object.PlotOptions,envelope);
-set(envelope,'LineStyle','--','Marker','none','Tag','SMASH.ROI.BoundingCurve');
+%envelope=line('Parent',parent,'XData',x,'YData',y);
+envelope=SMASH.Graphics.AlternatingLine('Parent',parent,...
+    'XData',x,'YData',y);
+setappdata(parent,'Envelope',envelope);
+
+bg=get(envelope.Group,'Children');
+apply(object.GraphicOptions,bg,'noparent');
+set(bg,'Marker','none');
+complement(envelope);
 
 % handle output
 if nargout>0

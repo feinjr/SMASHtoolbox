@@ -1,9 +1,5 @@
 function object=create(object,varargin)
 
-% 
-object.Marker='.';
-object.LineStyle='none';
-
 % manual table
 Narg=numel(varargin);
 if (Narg==2) && strcmpi(varargin{2},'table')

@@ -1,21 +1,30 @@
+% This class manages graphic options in various parts of the SMASH package
+% (SignalAnalysis, ImageAnalysis, etc.).
+%
+% See also General
+% 
+
+%
+% created December 10, 2014 by Daniel Dolan (Sandia National Laboratories)
+%
 classdef GraphicOptions < hgsetget
     %%
     properties
-        LineStyle = '-'
-        LineColor = 'black'
-        LineWidth = 0.5
-        Marker = 'o'
-        MarkerSize = 5
-        MarkerStyle = 'open'
-        Box = 'on'
-        AspectRatio = 'auto'
-        AxesColor = 'white'
-        XDir = 'normal'
-        YDir = 'normal'
-        Title = ''
-        PanelColor = get(0,'DefaultUIPanelBackgroundColor')
-        ColorMap = jet(64)
-        FigureColor = get(0,'DefaultFigureColor')
+        LineStyle = '-' % Line style
+        LineColor = 'black' % Line color
+        LineWidth = 0.5 % Line width [points]
+        Marker = 'o' % Marker
+        MarkerSize = 5 % Marker size [points]
+        MarkerStyle = 'open' % Marker style ('open' or 'closed')
+        Box = 'on' % Axes box ('on' or 'off')
+        AspectRatio = 'auto' % Axes aspect ratio ('auto' or 'equal')
+        AxesColor = 'white' % Axes color
+        XDir = 'normal' % x-axis direction ('normal' or 'reverse')
+        YDir = 'normal' % y-axis direction ('normal' or 'reverse')
+        Title = '' % Axes title
+        PanelColor = get(0,'DefaultUIPanelBackgroundColor') % Uipanel color
+        ColorMap = jet(64) % Figure color map; default is jet(64)
+        FigureColor = get(0,'DefaultFigureColor') % Figure color
     end
     %% property setters
     methods (Hidden=true)
@@ -39,6 +48,18 @@ classdef GraphicOptions < hgsetget
                 object.(name)=varargin{n+1};
             end
         end
+        varargout=addlistener(varargin);
+        varargout=eq(varargin);
+        varargout=findobj(varargin);
+        varargout=findprop(varargin);
+        varargout=ge(varargin);
+        varargout=getdisp(varargin);
+        varargout=gt(varargin);
+        varargout=le(varargin);
+        varargout=lt(varargin);
+        varargout=ne(varargin);
+        varargout=notify(varargin);
+        varargout=setdisp(varargin);
     end
     methods
         function set.LineStyle(object,value)
@@ -73,7 +94,7 @@ classdef GraphicOptions < hgsetget
             assert(ischar(value),'ERROR: invalid marker style');
             value=lower(value);
             switch value
-                case 'open'
+                case {'open','closed'}
                     object.MarkerStyle=value;
                 otherwise
                     error('ERROR: invalid marker style');
