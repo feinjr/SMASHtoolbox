@@ -72,8 +72,6 @@ classdef Image < SMASH.General.DataClass
     methods (Hidden=true)
         function object=Image(varargin)
             object=object@SMASH.General.DataClass(varargin{:}); 
-            %object=concealProperty(object,...
-            %    'LimitIndex1','LimitIndex2');
             object=verifyGrid(object);
         end
     end

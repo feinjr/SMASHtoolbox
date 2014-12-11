@@ -88,10 +88,10 @@ elseif isstruct(data)
 elseif iscell(data)
     insert_cell(archive,datasetname,data,deflate);
 elseif isobject(data) % convert objects to structures
-    %data=object2structure(data);
-    temp=SMASH.General.object2structure(data);
-    insert_structure(archive,datasetname,temp,deflate);
-    h5writeatt(archive.ArchiveFile,['/' label],'Class',class(data));
+    ObjectClass=class(data);
+    data=object2structure(data);
+    insert_structure(archive,datasetname,data,deflate);
+    h5writeatt(archive.ArchiveFile,['/' label],'Class',ObjectClass);
     h5writeatt(archive.ArchiveFile,['/' label],'RecordType','object');
 end
 h5writeatt(archive.ArchiveFile,datasetname,'Description',description);

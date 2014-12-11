@@ -1,5 +1,7 @@
 function object=create(object,varargin)
 
+object.Name='SignalGroup object';
+
 Narg=numel(varargin);
 assert(Narg==2,'ERROR: invalid number of inputs');
 assert(isnumeric(varargin{1}) && isnumeric(varargin{2}),...
@@ -26,5 +28,5 @@ for k=1:object.NumberSignals
 end
 object.Legend=label;
 
-object.Name='SignalGroup object';
+
             

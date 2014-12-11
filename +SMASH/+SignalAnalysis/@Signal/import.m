@@ -1,6 +1,10 @@
 
 function object=import(object,data)
 
+object.Name='Signal object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+set(object.GraphicOptions,'Marker','none','LineStyle','-');
+
 % manage multiple imports
 if numel(data)>1
     error('ERROR: this class does not support multi-file import');
@@ -37,7 +41,5 @@ switch data.Format
     otherwise
         error('ERROR: cannot import Signal from this format');
 end
-
-set(object.GraphicOptions,'Marker','none','LineStyle','-');
 
 end

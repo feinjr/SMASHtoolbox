@@ -1,7 +1,9 @@
 function object=import(object,data)
 
 object.Name='Image object';
-object.GraphicOptions.Title='Image object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+set(object.GraphicOptions,'Title','Image object');
+set(object.GraphicOptions,'YDir','reverse');
 
 % multiple files
 if numel(data)>1   
@@ -76,8 +78,5 @@ if ndims(object.Data)==3
     object.ColorMap=gray(64);
 end
 object.Precision=object.Precision; % invoke superclass set.Precision method
-
-% customize graphic settings
-set(object.GraphicOptions,'YDir','reverse');
     
 end

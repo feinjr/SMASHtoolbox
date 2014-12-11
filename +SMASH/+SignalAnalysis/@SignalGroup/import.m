@@ -1,5 +1,7 @@
 function object=import(object,data)
 
+object.Name='SignalGroup object';
+
 % multiple files
 if numel(data)>1
     object=import(object,data(1));

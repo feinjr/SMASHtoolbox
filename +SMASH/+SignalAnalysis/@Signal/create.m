@@ -1,5 +1,9 @@
 function object=create(object,varargin)
 
+object.Name='Signal object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+set(object.GraphicOptions,'Marker','none','LineStyle','-');
+
 Narg=numel(varargin);
 assert(Narg==2,'ERROR: invalid number of inputs');
 assert(isnumeric(varargin{1}) && isnumeric(varargin{2}),...
@@ -18,7 +22,3 @@ elseif numel(object.Grid)==1
 end
 assert(numel(object.Grid)==numel(object.Data),...
     'ERROR: incompatible Grid/Data arrays');
-
-object.Name='Signal object';
-
-set(object.GraphicOptions,'Marker','none','LineStyle','-');

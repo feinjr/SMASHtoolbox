@@ -1,7 +1,9 @@
 function object=create(object,varargin)
 
 object.Name='Image object';
-object.GraphicOptions.Title='Image object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+set(object.GraphicOptions,'Title','Image object');
+set(object.GraphicOptions,'YDir','reverse');
 
 Narg=numel(varargin);
 assert(Narg==3,'ERROR: invalid number of inputs');
@@ -35,8 +37,5 @@ elseif numel(object.Grid2)==1
 end
 assert(numel(object.Grid2)==N,...
     'ERROR: incompatible Grid2/Data arrays');
-
-% customize graphic settings
-set(object.GraphicOptions,'YDir','reverse');
 
 end

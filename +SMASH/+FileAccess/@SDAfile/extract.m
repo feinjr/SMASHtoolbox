@@ -63,22 +63,7 @@ switch h5readatt(archive.ArchiveFile,setname,'RecordType');
         data=extract_cell(archive,setname);
     case 'object'
         data=extract_structure(archive,setname);
-        try % pass structure to constructor
-            temp=feval(metadata.Class,data); % 
-        catch
-            try % attempt manual transfer
-                temp=feval(metadata.Class);
-                name=fieldnames(data);
-                for n=1:numel(name)
-                    if isprop(temp,name{n})
-                        temp.(name{n})=data.(name{k});
-                    end
-                end
-            catch
-                error('ERROR: unable to extract %s object',metadata.Class);
-            end
-        end
-        data=temp;
+        data=structure2object(data,metadata.Class);        
     otherwise
 end
 

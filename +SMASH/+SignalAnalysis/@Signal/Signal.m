@@ -56,7 +56,6 @@ classdef Signal < SMASH.General.DataClass
     methods (Hidden=true) % constructor
         function object=Signal(varargin)
             object=object@SMASH.General.DataClass(varargin{:}); % call superclass constructor
-            %object=concealProperty(object,'LimitIndex');
             object=verifyGrid(object);
         end
     end

@@ -37,7 +37,7 @@ for m=1:N
             case 'object'
                 temp=extract_structure(archive,local);
                 ObjectClass=h5readatt(archive.ArchiveFile,local,'Class');
-                data(m).(name{k})=feval(ObjectClass,temp);
+                data(m).(name{k})=structure2object(temp,ObjectClass);
             otherwise
                 error('ERROR: invalid record type');
         end
