@@ -33,12 +33,16 @@ classdef CloudFitXY
         XLabel = 'x' % Horizontal coordinate label
         YLabel = 'y' % Vertical coordinate label
         WeightFunction = 'RMS' % Cloud distance weighting function
+        GraphicOptions % Graphic options
     end
     %%
     methods (Hidden=true)
         function object=CloudFitXY(varargin)
             if nargin>0
                 object=add(object,varargin{:});
+            end
+            if isempty(object.GraphicOptions)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
             end
             % implement create/restore paradigm
         end

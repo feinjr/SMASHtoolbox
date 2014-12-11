@@ -32,18 +32,18 @@ for k=1:Nactive
             y=temp.Moments(2,1);
             h(k)=line(x,y);
             apply(object.GraphicOptions,h(k),'noparent');
-            set(h(k),'LineStyle','none')
+            set(h(k),'LineStyle','none','Color',color(k,:))
         case {'cloud','clouds'}
             x=temp.Data(:,1);
             y=temp.Data(:,2);
             h(k)=line(x,y);
             apply(object.GraphicOptions,h(k),'noparent');
-            set(h(k),'LineStyle','none');
+            set(h(k),'LineStyle','none','Color',color(k,:));
         case 'ellipse'
             [x,y]=ellipse(temp);            
             h(k)=line(x,y);
             apply(object.GraphicOptions,h(k),'noparent');
-            set(h(k),'Marker','none');
+            set(h(k),'Marker','none','Color',color(k,:));
         otherwise
             error('ERROR: invalid view mode');
     end
