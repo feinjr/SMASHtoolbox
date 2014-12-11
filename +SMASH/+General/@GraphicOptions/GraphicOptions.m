@@ -28,19 +28,8 @@ classdef GraphicOptions < hgsetget
     end
     %% property setters
     methods (Hidden=true)
-        function object=GraphicOptions(varargin)
-            % handle previous objects
-            if (nargin==1) && isstruct(varargin{1})
-                previous=varargin{1};
-                name=fieldnames(previous);
-                for k=1:numel(name)
-                    if isprop(object,name{k})
-                        object.(name{k})=previous.(name{k});
-                    end
-                end
-                return
-            end
-            % handle new objects
+        function object=GraphicOptions(varargin)            
+            % handle input
             assert(rem(nargin,2)==0,'ERROR: unmatched name/value pair');
             for n=1:2:nargin
                 name=varargin{n};
@@ -51,7 +40,7 @@ classdef GraphicOptions < hgsetget
         varargout=addlistener(varargin);
         varargout=eq(varargin);
         varargout=findobj(varargin);
-        varargout=findprop(varargin);
+        %varargout=findprop(varargin);
         varargout=ge(varargin);
         varargout=getdisp(varargin);
         varargout=gt(varargin);
@@ -61,6 +50,19 @@ classdef GraphicOptions < hgsetget
         varargout=notify(varargin);
         varargout=setdisp(varargin);
     end
+%% static methods
+    methods (Static=true,Hidden=true)
+        function object=restore(data)
+            object=SMASH.General.GraphicOptions();
+            name=fieldnames(data);
+            for k=1:numel(name)
+                if isprop(object,name{k})
+                    object.(name{k})=data.(name{k});
+                end
+            end
+        end
+    end
+    %% property setters
     methods
         function set.LineStyle(object,value)
             switch value
