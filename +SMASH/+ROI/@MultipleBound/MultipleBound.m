@@ -29,4 +29,16 @@ classdef MultipleBound
             object.Allowed=allowed;
         end
     end
+    %% static methods
+    methods (Static=true,Hidden=true)
+        function object=restore(data)
+            object=SMASH.General.GraphicOptions();
+            name=fieldnames(data);
+            for k=1:numel(name)
+                if isprop(object,name{k})
+                    object.(name{k})=data.(name{k});
+                end
+            end
+        end
+    end
 end

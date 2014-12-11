@@ -39,18 +39,7 @@ classdef BoundingCurve
     end
     %%
     methods (Hidden=true)
-        function object=BoundingCurve(varargin)
-            % struction construction
-            if (nargin==1) && isstruct(varargin{1}) 
-                data=varargin{1};
-                name=fieldnames(data);
-                for n=1:numel(name)
-                    if isprop(object,name{n})
-                        object.(name{n})=data.(name{n});
-                    end
-                end
-                return
-            end
+        function object=BoundingCurve(varargin)           
             % handle input
             if nargin>=1
                 object.Direction=varargin{1};
@@ -63,7 +52,18 @@ classdef BoundingCurve
             end
         end
         varargout=disp(varargin);
-    end   
+    end
+    %%
+    methods (Static=true,Hidden=true)
+        function object=restore(data)
+            name=fieldnames(data);
+            for n=1:numel(name)
+                if isprop(object,name{n})
+                    object.(name{n})=data.(name{n});
+                end
+            end
+        end
+    end
     %% property setters
     methods
         function object=set.Direction(object,value)
