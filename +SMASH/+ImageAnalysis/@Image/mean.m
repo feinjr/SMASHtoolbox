@@ -102,7 +102,7 @@ DataLabel=object.DataLabel;
 % create Signal object to hold the results
 result=SMASH.SignalAnalysis.Signal(Grid,Data);
 result.Name=name;
-result.Title=name;
+result.GraphicOptions.Title=name;
 result.GridLabel=GridLabel;
 result.DataLabel=DataLabel;
 result.Source='Image operation';

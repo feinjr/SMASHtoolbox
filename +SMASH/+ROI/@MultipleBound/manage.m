@@ -6,7 +6,7 @@ function varargout=manage(object,target,varargin)
 
 % handle input
 if (nargin<2) || isempty(target)
-    target=[];
+    target=gca;
 end
 
 % advanced option management
@@ -96,6 +96,10 @@ object=getappdata(db,'CurrentObject');
 object=add(object);
 setappdata(db,'CurrentObject',object);
 updatePopup(db);
+
+popup=getappdata(db,'PopupMenu');
+choice=get(popup,'String');
+set(popup,'Value',numel(choice));
 
 end
 

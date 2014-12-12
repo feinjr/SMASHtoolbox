@@ -4,14 +4,18 @@
 % object=remove(object,index); manually remove region of interest
 % object=edit(object); % interactively edit regions of interest
 
+% See also ROI, General.GraphicOptions
 classdef MultipleBound
     %%
     properties (SetAccess=protected)
         Allowed = {'BoundingCurve','BoundingLines','BoundingPolygon'} % Allowed boundary types
         BoundArray = {} % Cell array of objects
-        Label = 'Multiple bound object'; % Object label (text)
     end
-    %% 
+    properties
+        Label = 'Multiple bound object' % Object label (text)
+        GraphicOptions  % Graphic options
+    end
+    %%
     methods (Hidden=true)
         function object=MultipleBound(allowed)
             % handle input
@@ -27,6 +31,9 @@ classdef MultipleBound
             end
             % finish construction
             object.Allowed=allowed;
+            if isempty(object.GraphicOptions)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+            end
         end
     end
     %% static methods
@@ -38,6 +45,22 @@ classdef MultipleBound
                 if isprop(object,name{k})
                     object.(name{k})=data.(name{k});
                 end
+            end
+        end
+    end
+    %% setter methods
+    methods
+        function object=set.Label(object,value)
+            assert(ischar(value),'ERROR: invalid label');
+            object.Label=value;
+        end
+        function object=set.GraphicOptions(object,value)
+            if isempty(value)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+            elseif isa(value,'SMASH.General.GraphicOptions')
+                object.GraphicOptions=value;
+            else
+                error('ERROR: invalid GraphicOptions value');
             end
         end
     end

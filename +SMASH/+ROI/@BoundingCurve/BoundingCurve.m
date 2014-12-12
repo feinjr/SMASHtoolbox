@@ -35,7 +35,7 @@ classdef BoundingCurve
         Direction = 'horizontal'; % Independent axis ('horizontal' or 'vertical')
         DefaultWidth % Default boundary width
         Label = 'Boundary curve' % Text label
-        GraphicOptions % Grahpic options
+        GraphicOptions % Graphic options
     end
     %%
     methods (Hidden=true)
@@ -83,6 +83,15 @@ classdef BoundingCurve
         function object=set.Label(object,value)
             assert(ischar(value),'ERROR: invalid label');
             object.Label=value;
+        end
+        function object=set.GraphicOptions(object,value)
+            if isempty(value)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+            elseif isa(value,'SMASH.General.GraphicOptions')
+                object.GraphicOptions=value;
+            else
+                error('ERROR: invalid GraphicOptions value');
+            end        
         end
     end
 end
