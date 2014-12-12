@@ -54,12 +54,10 @@ localSize=object.Partition.Points;
 local.Grid=transpose(1:localSize);
 local.Data=zeros(localSize,1);
 local=limit(local,'all');
-option=convert(local.FFToptions);
-option{end+1}='FrequencyDomain';
-option{end+1}='positive';
-option{end+1}='SpectrumType';
-option{end+1}='power';
-[~,~,option,downsample]=fft(local,option{:});
+
+option=struct(local.FFToptions);
+
+[~,~,option,downsample]=fft(local,option);
 if downsample
     warning('SMASH:FFTdownsample','Downsampling saves memory but may be slow');
 end
@@ -99,6 +97,7 @@ result=analyze@SMASH.SignalAnalysis.ShortTime(object,@local_function);
 if isempty(target_function)
     result=SMASH.ImageAnalysis.Image(...
         result.Grid,transpose(frequency),transpose(result.Data));
+    result.GraphicOptions.YDir='normal';
     %result.YDir='normal';
     result.DataScale='dB';
     result.Grid1Label='Time';

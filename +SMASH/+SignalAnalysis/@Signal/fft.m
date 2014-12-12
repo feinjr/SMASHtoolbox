@@ -72,7 +72,8 @@
 %    -merged window management into a single input
 function varargout=fft(object,varargin)
 
-%% handle input
+%% manage input
+% what about FFToptions objects?
 option=struct('Window','Hann',...
     'RemoveDC',false,'NumberFrequencies',[100 inf],...
     'SpectrumType','power','FrequencyDomain','positive');
@@ -84,7 +85,7 @@ if (numel(varargin)==1) && isstruct(varargin{1})
             option.(name{k})=varargin{1}.(name{k});
         end
     end
-    varargin={};
+    varargin={};    
 end
 
 while numel(varargin)>0

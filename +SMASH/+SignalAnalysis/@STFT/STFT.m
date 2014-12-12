@@ -13,11 +13,11 @@
 classdef STFT < SMASH.SignalAnalysis.ShortTime
     %%
     properties
-        FFToptions = SMASH.General.Options % FFT options (SMASH.General.Options object)
+        FFToptions % FFT options
         Normalization = 'global' % Power spectrum normalization ('global','local', or 'none')
     end
     properties
-        Preview % preview image (SMASH.ImageAnalysis.Image object)
+        Preview % preview Image
     end    
     properties (SetAccess=?SMASH.General.DataClass) 
         Boundary = {} % cell array of BoundingCurve objects
