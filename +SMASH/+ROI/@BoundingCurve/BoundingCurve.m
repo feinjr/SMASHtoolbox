@@ -49,6 +49,7 @@ classdef BoundingCurve
             end                         
             if isempty(object.GraphicOptions)
                 object.GraphicOptions=SMASH.General.GraphicOptions;
+                object.GraphicOptions.LineWidth=2;
             end
         end
         varargout=disp(varargin);

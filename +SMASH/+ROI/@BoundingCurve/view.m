@@ -15,7 +15,7 @@
 %   -Converted output to hggroup for GUI development
 function varargout=view(object,target)
 
-% handle input
+% manage input
 if (nargin<2) || isempty(target)
     figure;
     target=axes('Box','on');
@@ -55,7 +55,10 @@ if ~isempty(x)
 end
 %envelope=line('Parent',parent,'XData',x,'YData',y);
 envelope=SMASH.Graphics.AlternatingLine('Parent',parent,...
-    'XData',x,'YData',y);
+    'XData',x,'YData',y,...
+    'LineWidth',object.GraphicOptions.LineWidth,...
+    'ForegroundColor',object.GraphicOptions.LineColor);
+complement(envelope);
 setappdata(parent,'Envelope',envelope);
 
 bg=get(envelope.Group,'Children');

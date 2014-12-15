@@ -52,7 +52,7 @@
 %%
 function varargout=select(object,target,varargin)
 
-% handle input
+% manage input
 if (nargin<2) || isempty(target)
     target=gca;
 end
@@ -60,7 +60,7 @@ assert(ishandle(target),'ERROR: invalid target axes');
 fig=ancestor(target,'figure');
 
 Narg=numel(varargin);
-assert(rem(Narg,2)==0,'ERROR: unmatch name/value pair');
+assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 advanced=struct('ApplyFunction',[],'DeleteOnClose',true,...
     'GroupHandle',[]);
 for n=1:2:Narg
