@@ -51,7 +51,9 @@ end
 
 % perform nonlinear optimization
 fitness=@(NLparams) residual(NLparams,x,y);
+warning('off','MATLAB:rankDeficientMatrix');
 [NLparams,fval]=fminsearch(fitness,guess,options); %#ok<NASGU>
+warning('on','MATLAB:rankDeficientMatrix');
 [~,params,yfit]=residual(NLparams,x,y);
 
 % convert results to original scale

@@ -26,6 +26,10 @@ for k=1:numel(data)
             data{k}=extract_structure(archive,local);
         case 'cell'
             data{k}=extract_cell(archive,local);
+        case 'object'
+            temp=extract_structure(archive,local);
+            ObjectClass=h5readatt(archive.ArchiveFile,local,'Class');
+            data{k}=structure2object(temp,ObjectClass);
         otherwise
     end
 end

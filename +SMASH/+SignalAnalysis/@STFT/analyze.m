@@ -25,10 +25,10 @@
 %
 % created November 12, 2014 by Daniel Dolan
 %
-function [result,frequency]=analyze(object,target_function)
+function [result,frequency]=analyze(object,target_function,preview)
 
 % handle input
-if nargin<2
+if (nargin<2) || isempty(target_function)
     target_function=[];
 elseif ischar(target_function)
     target_function=str2func(target_function);
@@ -36,14 +36,22 @@ else
     assert(isa(target_function,'function_handle'),'ERROR: invalid target function');
 end
 
+if (nargin<3) || isempty(preview)
+    preview=false;
+elseif strcmp(preview,'preview')
+    preview=true;
+else
+    preview=false;
+end
+
 % check boundaries
-boundary=[];
-if ~isempty(object.Boundary)
-    if numel(object.Boundary)>1
-        fprintf('All boundaries except the first will be ignored\n');
+if isempty(object.Boundary.Children) || preview
+    boundary=[];
+else
+    boundary=object.Boundary.Children{1};
+    if numel(object.Boundary.Children)>1
+        fprintf('Using the first boundary only...\n');
     end
-    boundary=object.Boundary{1};
-    
 end
 
 % perform analysis
@@ -55,19 +63,14 @@ local.Grid=transpose(1:localSize);
 local.Data=zeros(localSize,1);
 local=limit(local,'all');
 
-option=struct(local.FFToptions);
-
-[~,~,option,downsample]=fft(local,option);
+[~,~,option,downsample]=fft(local,local.FFToptions);
 if downsample
     warning('SMASH:FFTdownsample','Downsampling saves memory but may be slow');
 end
 option.SpectrumType='power';
 option.FrequencyDomain='positive';
 
-if isempty(object.Boundary)
-    boundary=[];
-else
-    boundary=object.Boundary{1};
+if ~isempty(boundary)
     [x,~,~]=probe(boundary);
     object=limit(object,[min(x) max(x)]);
 end

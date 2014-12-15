@@ -57,6 +57,7 @@ classdef BoundingCurve
     %%
     methods (Static=true,Hidden=true)
         function object=restore(data)
+            object=SMASH.ROI.BoundingCurve;
             name=fieldnames(data);
             for n=1:numel(name)
                 if isprop(object,name{n})

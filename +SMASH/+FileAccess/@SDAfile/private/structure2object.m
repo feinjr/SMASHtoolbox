@@ -24,7 +24,7 @@ try % manually transfer structure fields to property values
         end
     end
 catch
-    error('ERROR: unable to extract %s object',metadata.Class);
+    error('ERROR: unable to extract %s object',ObjectClass);
 end
 
 end

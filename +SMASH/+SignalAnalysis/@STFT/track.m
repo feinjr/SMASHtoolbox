@@ -1,6 +1,6 @@
 % Power spectrum tracking: 
 %     >> result=track(object);
-%     >> result=track(object,'power',method);
+%     >> result=track(object,'power',[method],[threshold]);
 % Only the first defined boundary (if present) is used; all other
 % boundaries are ignored.
 %  
@@ -20,11 +20,14 @@ switch mode
         if nargin<3
            varargin{1}='';
         end
-        method=varargin{1};
-        if nargin<4
-            varargin{2}=[];
+        method='';
+        if numel(varargin)>=1
+            method=varargin{1};
         end
-        threshold=varargin{2};        
+        threshold=[];
+        if numel(varargin)>=2
+            threshold=varargin{2};
+        end                    
     case 'complex'
         % under construction
     otherwise
@@ -35,7 +38,7 @@ end
 switch mode
     case 'power'
         result=analyze(object,...
-            @(x,y) analyzePeak(x,y,method,threshold));
+            @(x,y) singlePeak(x,y,method,threshold));
     case 'complex'
         % under construction
 end

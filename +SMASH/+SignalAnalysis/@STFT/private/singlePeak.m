@@ -1,8 +1,8 @@
-% analyzePeak Single (upward) peak analysis
+% singlePeak Single (upward) peak analysis
 %
 % This function analyzes a (x,y) data set assuming that a single, upward
 % peak is present.
-%     >> result=analyzePeak(x,y,method,threshold);
+%     >> result=singlePeak(x,y,method,threshold);
 % The output "result" is a 3x1 array containing the peak position, width,
 % and y-value.  The "method" and "threshold" inputs are optional.
 %
@@ -13,7 +13,11 @@
 % 'gaussian' method applies a Gaussian fit to determine peak position,
 % width, and maximum value.
 % 
-% Thresholding restricts analysis to regions near the peak.  The leftmost 
+% Thresholding restricts analysis to regions near the peak.  Thresholds are
+% expressed as fractions of the total vertical range, e.g., 0.50 specifies
+% the top 50%.  The first location that meets the threshold is used as the
+% left boundary of the peak region; the last location that meets the
+% threshold is the right boundary.
 %
 % See also CurveFit, fitGaussian
 %
@@ -21,7 +25,7 @@
 %
 % created November 21, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function result=analyzePeak(x,y,method,threshold)
+function result=singlePeak(x,y,method,threshold)
 
 % handle input
 assert(nargin>=2,'ERROR: insufficient input');

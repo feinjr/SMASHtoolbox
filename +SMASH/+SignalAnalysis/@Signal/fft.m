@@ -72,35 +72,40 @@
 %    -merged window management into a single input
 function varargout=fft(object,varargin)
 
-%% manage input
-% what about FFToptions objects?
+%% manage option
 option=struct('Window','Hann',...
     'RemoveDC',false,'NumberFrequencies',[100 inf],...
     'SpectrumType','power','FrequencyDomain','positive');
-
-if (numel(varargin)==1) && isstruct(varargin{1})
-    name=fieldnames(varargin{1});
-    for k=1:numel(name);
-        if isfield(option,name{k})
-            option.(name{k})=varargin{1}.(name{k});
-        end
-    end
-    varargin={};    
-end
-
-while numel(varargin)>0
-    name=varargin{1};
-    try
-        value=varargin{2};
-    catch
-        error('ERROR: unmatched name/value pair');
-    end
-    if isfield(option,name) 
-        option.(name)=value;
+Narg=numel(varargin);
+if Narg==1
+    if isstruct(varargin{1})
+        name=fieldnames(varargin{1});
+        for k=1:numel(name);
+            if isfield(option,name{k})
+                option.(name{k})=varargin{1}.(name{k});
+            else
+                fprintf('Ignoring invalid option "%s\n',name{k});
+            end            
+        end                        
+    elseif isa(varargin{1},'SMASH.General.FFToptions')
+        warning('off','MATLAB:structOnObject');
+        option=struct(varargin{1});
+        warning('on','MATLAB:structOnObject');
     else
-        error('ERROR: %s is an invalid option',name);
+        error('ERROR: invalid option specification');
     end
-    varargin=varargin(3:end);
+elseif rem(Narg,2)==0
+    for n=1:2:Narg        
+        name=varargin{n};
+        assert(ischar(name),'ERROR: invalid option name');
+        if isfield(option,name)          
+            option.(name)=varargin{n+1};
+        else            
+            fprintf('Ignoring invalid option "%s\n',name);
+        end 
+    end
+else
+   error('ERROR: unmatched name/value pair');
 end
 
 %% verify uniform grid

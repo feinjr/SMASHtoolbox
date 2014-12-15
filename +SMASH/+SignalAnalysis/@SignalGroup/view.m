@@ -58,7 +58,6 @@ switch lower(get(target,'Type'))
 end
 axes(target);
 
-
 % create line with object's properties
 [time,value]=limit(object);
 h=nan(object.NumberSignals,1);
@@ -76,6 +75,7 @@ if new
     if ~isempty(object.Legend)
         legend(object.Legend(index),'Location','best');
     end
+    box on;
 end
 
 figure(fig);

@@ -42,7 +42,7 @@ classdef FFToptions < hgsetget
 %% static methods
     methods (Static=true,Hidden=true)
         function object=restore(data)
-            object=SMASH.General.GraphicOptions();
+            object=SMASH.General.FFToptions();
             name=fieldnames(data);
             for k=1:numel(name)
                 if isprop(object,name{k})
@@ -88,7 +88,7 @@ classdef FFToptions < hgsetget
             assert(numel(value)==2,...
                 'ERROR: invalid NumberFrequencies value');
             test(1)=SMASH.General.testNumber(value(1),'integer');
-            test(2)=SMASH.General.testNumber(value(2),'integer');
+            test(2)=SMASH.General.testNumber(value(2),'integer') | isinf(value(2));
             test(3)=all(value>0);
             test(4)=value(2)>value(1);
             assert(all(test),'ERROR: invalid NumberFrequencies value');

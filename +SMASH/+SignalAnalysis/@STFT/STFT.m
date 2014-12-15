@@ -20,12 +20,15 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
         Preview % Preview Image object
     end    
     properties (SetAccess=?SMASH.General.DataClass) 
-        Boundary = {} % cell array of BoundingCurve objects
+        Boundary % BoundaryCurveGroup object
     end   
     %%
     methods (Hidden=true)
         function object=STFT(varargin)
             object=object@SMASH.SignalAnalysis.ShortTime(varargin{:}); 
+            if isempty(object.Boundary)
+                object.Boundary=SMASH.ROI.BoundingCurveGroup;
+            end
         end
     end
      %% protected methods

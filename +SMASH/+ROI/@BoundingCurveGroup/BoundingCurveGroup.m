@@ -37,12 +37,12 @@ classdef BoundingCurveGroup < handle
     end
     %% static methods
     methods (Static=true,Hidden=true)
-        function object=restore(data)
-            object=SMASH.General.GraphicOptions();
-            name=fieldnames(data);
-            for k=1:numel(name)
-                if isprop(object,name{k})
-                    object.(name{k})=data.(name{k});
+        function object=restore(data)           
+            object=SMASH.ROI.BoundingCurveGroup();            
+            children=data.Children;
+            for k=1:numel(children)
+                if isa(children{k},'SMASH.ROI.BoundingCurve')
+                    add(object,children{k});
                 end
             end
         end

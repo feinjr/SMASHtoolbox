@@ -64,6 +64,8 @@ end
 assert(nargin==3,'ERROR: invalid number of inputs');
 
 % error checking
+assert(ischar(choice),'ERROR: invalid partition choice');
+
 assert(isnumeric(value),...
     'ERROR: division parameter(s) must be numeric');
 if numel(value)==1
@@ -71,13 +73,16 @@ if numel(value)==1
 end
 assert(numel(value)==2,'ERROR: invalid number of parameters');
 
-t1=object.Grid(1);
-t2=object.Grid(end);
-numpoints=numel(object.Grid);
+
+[t,~]=limit(object);
+t1=t(1);
+t2=t(end);
+numpoints=numel(t);
 dt=abs(t2-t1)/(numpoints-1);
 
 % calculate points/skip for each choice
-switch lower(choice)
+choice=lower(choice);
+switch choice
     case {'point','points'}
         if isnan(value(2))
             value(2)=value(1);
@@ -116,6 +121,7 @@ overlap=(points/skip)-1;
 
 %object.Parameter=[points skip duration advance blocks overlap];
 object.Partition=struct(...
+    'Choice',choice,...
     'Points',points,'Skip',skip,...
     'Duration',duration,'Advance',advance,...
     'Blocks',blocks,'Overlap',overlap);
