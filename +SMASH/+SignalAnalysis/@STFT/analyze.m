@@ -33,7 +33,8 @@ if (nargin<2) || isempty(target_function)
 elseif ischar(target_function)
     target_function=str2func(target_function);
 else
-    assert(isa(target_function,'function_handle'),'ERROR: invalid target function');
+    assert(isa(target_function,'function_handle'),...
+        'ERROR: invalid target function');
 end
 
 if (nargin<3) || isempty(preview)
@@ -50,7 +51,7 @@ if isempty(object.Boundary.Children) || preview
 else
     boundary=object.Boundary.Children{1};
     if numel(object.Boundary.Children)>1
-        fprintf('Using the first boundary only...\n');
+        warning('SMASH:STFT:track','Using first boundary only');
     end
 end
 

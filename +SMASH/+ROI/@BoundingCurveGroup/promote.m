@@ -11,10 +11,18 @@
 %
 % created December 15, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function promote(object,index)
+function promote(object,index,full)
 
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
+
+if (nargin<3) || isempty(full)
+    full=false;
+elseif strcmpi(full,'full')
+    full=true;
+else
+    full=false;
+end
 
 % handle multiple indices
 assert(isnumeric(index),'ERROR: invalid index');
@@ -28,11 +36,16 @@ if N>1
     return
 end
 
-% single index demotion
+% single index promotion
 verifyIndex(object,index);
 if index > 1
-    temp=object.Children{index-1};
-    object.Children{index-1}=object.Children{index};
+    if full
+        new=1;
+    else
+        new=index-1;
+    end
+    temp=object.Children{new};
+    object.Children{new}=object.Children{index};
     object.Children{index}=temp;
 end
 

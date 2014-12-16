@@ -8,7 +8,7 @@
 
 function result=track(object,mode,varargin)
 
-% handle input
+% manage input
 if (nargin<2) || isempty(mode)
     mode='power';
 end
@@ -34,13 +34,29 @@ switch mode
         error('ERROR: %s is not a valid track mode',mode);
 end
 
+% mange boundarie(s)
+boundary=object.Boundary.Children;
+if isempty(boundary)
+    table=nan(2,2);
+    table(1,:)=[object.Grid(1) inf];
+    table(2,:)=[object.Grid(end) inf];
+    boundary=SMASH.ROI.BoundingCurve('horizontal',table);
+    boundary.Children{1}.Label='Default boundary';
+end
+
 % perform tracking
-switch mode
-    case 'power'
-        result=analyze(object,...
+if strcmp(mode,'power')
+    N=numel(object.Boundary.Children);
+    result=cell(1,N);    
+    for n=1:N       
+        define(object.Boundary,boundary{n});
+        result{n}=analyze(object,...
             @(x,y) singlePeak(x,y,method,threshold));
-    case 'complex'
-        % under construction
+        remove(object.Boundary,1);
+    end
+    define(object.Boundary,boundary);
+elseif strcmp(mode,'complex')
+    % under construction
 end
 
 end
