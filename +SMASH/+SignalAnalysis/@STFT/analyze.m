@@ -13,19 +13,21 @@
 % as a column vector.  The following example shows a function that returns
 % the location and value of the largest spectral power.
 %     function out=myfunc(frequency,power)
-%     [value,index]=max(power);
-%     location=frequency(index);
-%     out=[location; value];
+%        [value,index]=max(power);
+%        location=frequency(index);
+%        out=[location; value];
 %     end
-% The "result" object still a
+% The output "result" is a SignalGroup group object.  Each signal in this
+% object corresponds to one of the post-processing function's output array.
 %
-% See also STFT, partition, preview, tract, ImageAnalysis.Image
+% See also STFT, partition, preview, track, ImageAnalysis.Image,
+% SignalAnalysis.SignalGroup
 %
 
 %
 % created November 12, 2014 by Daniel Dolan
 %
-function [result,frequency]=analyze(object,target_function,preview)
+function [result,frequency]=analyze(object,target_function,boundary)
 
 % handle input
 if (nargin<2) || isempty(target_function)
@@ -37,22 +39,17 @@ else
         'ERROR: invalid target function');
 end
 
-if (nargin<3) || isempty(preview)
-    preview=false;
-elseif strcmp(preview,'preview')
-    preview=true;
-else
-    preview=false;
-end
-
-% check boundaries
-if isempty(object.Boundary.Children) || preview
+if (nargin<3) || isempty(boundary)
     boundary=[];
-else
-    boundary=object.Boundary.Children{1};
-    if numel(object.Boundary.Children)>1
-        warning('SMASH:STFT:track','Using first boundary only');
+elseif isnumeric(boundary)       
+    try
+        boundary=object.Boundary.Children{boundary};
+    catch
+        error('ERROR: invalid boundary index');
     end
+else
+    assert(isa(boundary,'SMASH.ROI.BoundingCurve'),...
+        'ERROR: invalid boundary');
 end
 
 % perform analysis
@@ -68,8 +65,8 @@ local=limit(local,'all');
 if downsample
     warning('SMASH:FFTdownsample','Downsampling saves memory but may be slow');
 end
-option.SpectrumType='power';
-option.FrequencyDomain='positive';
+%option.SpectrumType='power';
+%option.FrequencyDomain='positive';
 
 if ~isempty(boundary)
     [x,~,~]=probe(boundary);
@@ -94,28 +91,45 @@ frequency=[];
             frequency=frequency(keep);
             output=output(keep);
             output=feval(target_function,frequency,output);
-        end                
+        end  
     end
 result=analyze@SMASH.SignalAnalysis.ShortTime(object,@local_function);
 
 if isempty(target_function)
-    result=SMASH.ImageAnalysis.Image(...
-        result.Grid,transpose(frequency),transpose(result.Data));
-    result.GraphicOptions.YDir='normal';
-    %result.YDir='normal';
-    result.DataScale='dB';
-    result.Grid1Label='Time';
-    result.Grid2Label='Frequency';
-    temp=max(result.Data(:));
-    switch object.Normalization
-        case 'none'
-            % dBm?
-        otherwise
-            result.DataLim=[-60 0];
-            result.Data=result.Data/max(temp(:));
+    if isreal(result.Data)
+        result=SMASH.ImageAnalysis.Image(...
+            result.Grid,transpose(frequency),transpose(result.Data));
+        result=setupResult(result,object);
+    else
+        temp{1}=SMASH.ImageAnalysis.Image(...
+            result.Grid,transpose(frequency),transpose(real(result.Data)));
+        temp{2}=SMASH.ImageAnalysis.Image(...
+            result.Grid,transpose(frequency),transpose(imag(result.Data)));
+        result=temp;
+        object.Normalization='none';
+        result{1}=setupResult(result{1},object);
+        result{2}=setupResult(result{2},object);
     end
-else
     
+else
+    % nothing to do--superclass method already returns a SignalGroup object
+end
+
+end
+
+function result=setupResult(result,object)
+
+result.GraphicOptions.YDir='normal';
+%result.DataScale='dB';
+result.Grid1Label='Time';
+result.Grid2Label='Frequency';
+temp=max(result.Data(:));
+switch object.Normalization
+    case 'none'
+        % do nothing
+    otherwise
+        result.DataLim=[-60 0];
+        result.Data=result.Data/max(temp(:));
 end
 
 end

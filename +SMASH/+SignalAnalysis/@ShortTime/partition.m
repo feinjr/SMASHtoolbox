@@ -1,24 +1,23 @@
 % PARTITION Manage partitioning
 %
-% This method controls how ShortTime objects are partitiond into local regions
-% for processing by the analyze method.  Fundamentally, these regions span
-% and are separated by an *integer* number of Grid points.  The object's
-% "points" and "skip" parameters can be specifed explicitly:
+% This method controls how ShortTime objects are partitiond into local
+% analysis regions.  Analysis regions *always* span an integer number of
+% Grid points, and regions are also separated by an integer number of Grid
+% points  Partition parameters "points" and "skip" can be defined
+% explicitly.
 %    >> object=partition(object,'Points',points); % skip=points
 %    >> object=partition(object,'Points',[points skip]);
-% Passing a single value automatically assigns the "skip" parameter to be
-% equal to the "points" parameter.
 %
-% To specify division parameters as a duration (relative to the Grid's
-% units) use:
+% Partitioning can also be defined in terms of "duration" and "advanced"
+% parameters, which use the same dimensions as the object's Grid property.
 %    >> object=partition(object,'Duration',duration); % advance=duration
 %    >> object=partition(object,'Duration',[duration advance]);
 % The parameters "duration"/"advance" are internally converted to
 % "points"/"skip".  Since "points" and "skip" must be integers, the actual
-% values of "duration" and "advance" may be slight different than
+% values of "duration" and "advance" may be slightly different than
 % specified.  
 %
-% Division into a fixed number of regions is also supported.
+% Division into a fixed number of analysis blocks is also supported.
 %    >> object=partition(object,'Blocks',blocks); % overlap=0
 %    >> object=partition(object,'Blocks',[blocks overlap]);
 % The spacing between region centers is determined from the "blocks"
@@ -27,15 +26,24 @@
 % distinct from its neighbors.  Fractional overlap between regions then
 % defines the number of points in each region.
 %    points=(overlap+1)*skip
-% Once again, the "points" and "skip" parameters must integers, so minor
+% Once again, the "points" and "skip" parameters must be integers, so minor
 % deviations between specified and actual "blocks"/"overlap" parameters may
 % be observed.
 %
+% NOTE: 'block' paritioning depends on the limited region of
+% the object when this method is invoked (it is automatically called at
+% object creation).  Changes to the limited region should be followed by a
+% partition update.
+%     >> object=limit(object,[left right]); % limited region change
+%     >> object=partition(object,'blocks',[blocks overlap]);
+% Updates are not needed for 'points' or 'duration' partitioning.
+%
 % To display the parameters of an object, call this method without outputs
 % or parameters.
-%    >> division(object);
-% Parameters can also be read from (but not written to) the object's
+%     >> division(object);
+% Parameters can also be read from (but not written to) the
 % Partition property.
+%     >> param=object.Partition;
 %
 % See also ShortTime, analyze
 %
@@ -46,6 +54,8 @@
 %   -Renamed method from "divide" to "partition"
 % revised November 11, 2014 by Daniel Dolan
 %   -Changed from parameter array to parameter structure
+% revised December 18, 2014 by Daniel Dolan
+%   -Clarified documentation, especially regarding the limit method
 function varargout=partition(object,choice,value)
 
 % handle input
@@ -121,7 +131,6 @@ overlap=(points/skip)-1;
 
 %object.Parameter=[points skip duration advance blocks overlap];
 object.Partition=struct(...
-    'Choice',choice,...
     'Points',points,'Skip',skip,...
     'Duration',duration,'Advance',advance,...
     'Blocks',blocks,'Overlap',overlap);

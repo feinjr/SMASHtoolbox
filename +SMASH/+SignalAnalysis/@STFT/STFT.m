@@ -36,6 +36,8 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
         varargout=create(varargin);
         varargout=import(varargin);
         varargout=initialize(varargin);
+        varargout=trackPower(varargin);
+        varargout=trackComplex(varargin);
     end
     %% property setters
     methods

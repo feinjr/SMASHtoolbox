@@ -65,7 +65,7 @@ end
 
 PreviousPartition=object.Partition;
 object=partition(object,choice,value);
-result=analyze(object,[],'preview');
+result=analyze(object);
 object.Partition=PreviousPartition;
 
 object.Preview=result;
