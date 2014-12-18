@@ -63,7 +63,7 @@ for i = 1:length(temp)
         %y(bad2) = minpressure;
         
         
-    h=line(log(x),log(y));
+    h=line(log10(x),log10(y));
     apply(object.GraphicOptions,h);
 end
 

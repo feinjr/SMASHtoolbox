@@ -672,6 +672,10 @@ function newsig = applyedit(n)
             newsig = newsig.^0.5;
         elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'square');
             newsig = newsig.^2.0;
+        elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'log10');
+            newsig = log10(newsig);
+        elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'pow10');
+            newsig = 10.^newsig;
         else
             newsig = newsig*editdata(3);
         end
@@ -1935,11 +1939,11 @@ function datninjaLaunch(src,varargin)
 end %datninja
 
 function MGrunP_uLaunch(src,varargin)
-    SMASH.ShockWave.MGrunP_u;
+    SMASH.DynamicMaterials.ShockWave.Impact;
 end %ImpedanceMatching
 
 function StrengthLaunch(src,varargin)
-    SMASH.ShockWave.StrengthGUI;
+    SMASH.DynamicMaterialsShockWave.StrengthGUI;
 end %StrengthGUI
 
 
@@ -2004,7 +2008,7 @@ dlg.Hidden = false
            return;
        end
        
-       newsig = SMASH.SignalAnalysis.Signal(0,0);
+       newsig = {};
        for i = 2:numel(sig_num);
            newsig{i} = SMASH.SignalAnalysis.Signal(0,0);
        end
@@ -2084,12 +2088,10 @@ function PercentDifference(src,varargin)
     newsig = sig;
     %Calculate % difference from 1st signal
     for i=1:length(sig_num)
-        %PercentDiff(i) = abs(2.*(y{1}-y{i})./(y{1}+y{i}))*100;
-        %PercentDiff = (1-y{1}./y{i})*100;
-        PercentDiff = ((y{i}-y{1})./y{1})*100;
-        newsig{sig_num(i)} = SMASH.SignalAnalysis.Signal(x,PercentDiff);
+        PercentDiff{i} = ((y{i}-y{1})./y{1})*100;
+        newsig{sig_num(i)} = SMASH.SignalAnalysis.Signal(x,PercentDiff{i});
         %Set some object properties
-        set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        newsig{sig_num(i)}.GraphicOptions=sig{sig_num(i)}.GraphicOptions;
         newsig{sig_num(i)}.GridLabel= 'x'; newsig{i}.DataLabel= '% from 1st signal';
         legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
     end
@@ -2103,10 +2105,10 @@ function PercentDifference(src,varargin)
     end
                         
     legend(legendentry,'Color','none'); legend('boxoff');
-    axis([x(1) x(end) -100 100]); 
     hold off;
     set(gcf,'Color','w');
     linkaxes([h1 h2],'x');
+    axis([x(1) x(end) -10*max(mean(cell2mat(PercentDiff))) 10*max(mean(cell2mat(PercentDiff)))]); 
 end %Percent difference
 
 %% Large plot 
