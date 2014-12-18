@@ -102,7 +102,6 @@ title(strcat((object.GraphicOptions.Title),' - bandpassed power spectrum'));
 % inverse FFT data
 BFdata=real(ifft2(BF));
 object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
-object.GraphicOptions.Title=strcat(object.GraphicOptions.Title,'- bandpassed');
 view(object);
 
 object=updateHistory(object);
