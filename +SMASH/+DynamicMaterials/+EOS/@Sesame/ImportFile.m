@@ -98,12 +98,6 @@ function object=ImportFile(object,filename,material)
     if ~isempty(comments)
         object.Comments = comments;
     end
-    %Set some properties
-    %[~,name,ext]=fileparts(filename);  
-    object.Name=['Sesame' num2str(material)];
-    object.Source = filename;
-    object.SourceFormat='sesame';
-    object=revealProperty(object,'SourceFormat');
 
 end
 
