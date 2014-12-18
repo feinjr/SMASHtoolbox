@@ -27,7 +27,7 @@
 % returned as a structure.
 %    >> h=view(...);
 % 
-% See also IMAGE, detail, explore, show, slice
+% See also Image, slice
 
 %
 % created November 25 2013 by Daniel Dolan (Sandia National Laboratories)

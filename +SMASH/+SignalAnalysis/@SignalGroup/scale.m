@@ -29,7 +29,7 @@ for n=1:object.NumberSignals
     new{n}=scale(new{n},value(n));
 end
 
-[new{:}]=align(new{:});
+[new{:}]=register(new{:});
 object.Grid=new{1}.Grid;
 object.Data=nan(numel(object.Grid),object.NumberSignals);
 for n=1:object.NumberSignals

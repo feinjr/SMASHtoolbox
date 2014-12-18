@@ -63,11 +63,8 @@ else
     error('ERROR: invalid input');
 end
 
-PreviousPartition=object.Partition;
-object=partition(object,choice,value);
-result=analyze(object);
-object.Partition=PreviousPartition;
-
+result=analyze(object,'Normalization','global');
+result.DataLim=[-60 0];
 object.Preview=result;
 
 if nargout>0

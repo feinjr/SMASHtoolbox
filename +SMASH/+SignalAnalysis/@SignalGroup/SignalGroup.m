@@ -24,7 +24,7 @@
 
 classdef SignalGroup < SMASH.SignalAnalysis.Signal
     properties (SetAccess=?SMASH.General.DataClass)
-        NumberSignals =0 % Number of signals
+        NumberSignals = 0 % Number of signals
     end
     properties
         Legend={};
@@ -36,7 +36,7 @@ classdef SignalGroup < SMASH.SignalAnalysis.Signal
         end
         varargout=convolve(varargin)
         varargout=fft(varargin)
-        varargout=align(varargin)
+        varargout=register(varargin)
     end
     %% protected methods
     methods (Access=protected)

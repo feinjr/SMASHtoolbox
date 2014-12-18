@@ -31,7 +31,7 @@ for n=1:nargin
 end
 
 N=numel(temp);
-[temp{:}]=align(temp{:});
+[temp{:}]=register(temp{:});
 
 Data=nan(numel(temp{1}.Data),N);
 for n=1:N

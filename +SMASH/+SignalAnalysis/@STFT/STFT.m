@@ -14,7 +14,7 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
     %%
     properties
         FFToptions % FFT options object
-        Normalization = 'global' % Power spectrum normalization ('global','local', or 'none')
+        %Normalization = 'global' % Power spectrum normalization ('global' or 'none')
     end
     properties
         Preview % Preview Image object
@@ -38,20 +38,5 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
         varargout=initialize(varargin);
         varargout=trackPower(varargin);
         varargout=trackComplex(varargin);
-    end
-    %% property setters
-    methods
-        function object=set.Normalization(object,value)
-            if isempty(value)
-                value='global';
-            end
-            assert(ischar(value),'ERROR: invalid Normalization setting');
-            switch lower(value)
-                case {'global','local','none'}
-                    object.Normalization=value;
-                otherwise
-                    error('ERROR: invalid Normalization setting');
-            end
-        end                        
-    end
+    end   
 end

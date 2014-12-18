@@ -62,8 +62,8 @@ classdef Image < SMASH.General.DataClass
     properties % display-related settings
         Grid1Label='Grid1' % XLabel used by view
         Grid2Label='Grid2' % YLabel used by view
-        DataLim='auto' % Data range used by view
-        DataScale='linear' % Data scaling used by view        
+        DataLim='auto' % Data range used by view ('auto' or [min max])
+        DataScale='linear' % Data scaling used by view ('linear', 'log', or 'dB')    
     end
     properties (Hidden=true)
         History='';

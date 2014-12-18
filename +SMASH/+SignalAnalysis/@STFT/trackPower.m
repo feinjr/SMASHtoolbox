@@ -14,7 +14,8 @@ N=numel(boundary);
 result=cell(1,N);
 for n=1:N
     result{n}=analyze(object,...
-        @(x,y) singlePeak(x,y,method,threshold),boundary{n});
+        'TargetFunction',@(x,y) singlePeak(x,y,method,threshold),...
+        'Boundary',boundary{n});
 end
 
 end
