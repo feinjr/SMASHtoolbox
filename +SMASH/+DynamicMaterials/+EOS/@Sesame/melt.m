@@ -1,14 +1,17 @@
 % MELT Calculate the melt curve
 %
 % This method returns the melt curve of the sesame object for the input 
-% array of pressures and initial guess for the melt temperature.
+% array of densities and initial guess for the melt temperature.
 %
 %   Usage:
-%    >> new=melt(object,pressure,T0);
+%    >> new=melt(object,density,temperature,nsmooth);
 %
-% An isobar for each pressure is generated using a range of temperatues
-% encompassing the melting point. The P-T discontinuity is found by
-% examining it's derivative.
+% An isochor for each density is generated using the range of temperatures. 
+% The P-T discontinuity is found by examining it's second derivative. If
+% the temperature array is not specified, the grid points are used. Nsmooth
+% relates to a bandpass filter to smooth numerical issues near the melt
+% transition. Higher values represent a higher frequency filter, and a
+% default of 15 is used if not specified.
 %
 % Note: the algorithm is extremely slow, and possibly inaccurate. Use with
 % caution.
@@ -17,53 +20,36 @@
 %
 % created April 21, 2014 by Justin Brown (Sandia National Laboratories)
 
-function new=melt(object,pressure,varargin)
+function new=melt(object,density,varargin)
 
 % Error checking
-if (nargin<2) || isempty(pressure)
+if (nargin<2) || isempty(density)
     error('Invalid input. Require (object,density);');
 end
 
-if ~isnumeric(pressure) || min(size(pressure)) > 1
+if ~isnumeric(density) || min(size(density)) > 1
     error('Invalid format. Must enter numeric row or column vector for density');
 end
 
-T0 = 2500;
+t=unique(object.Temperature);
+nsmooth = 15;
 if nargin > 2
-    T0 = varargin{1};
+    if ~isempty(varargin{1})
+        t = varargin{1};
+    end
 end
-
-
-
-%Find first melt temperature based on initial guess
-temperature = nan(size(pressure));
-dmin = stp(object); 
-dmax = dmin.Density;
-dmin = dmin.Density/2;
-if dmin < 0 | dmax <0
-    dmin = 3.4;
-    dmax = 4;
+if nargin > 3
+    nsmooth = varargin{2};
 end
-
-dens = linspace(dmin,dmax,200)';
-bar = isobar(object,dens,pressure(1));
-[temperature(1),density(1),~] = findMelt(bar);
 
 w = SMASH.MUI.Waitbar('Calculating Melt Curve');
-for i = 2:length(pressure)
-    
-    while  (lookup(object,'Pressure',dmax,pressure(i)) < pressure(i))
-        dmax = dmax*1.01;
-    end
-    
-    if (lookup(object,'Pressure',dmax,pressure(i)) > pressure(i))
-       dmax = dmax/1.02;
-    end
-    
-    dens = linspace(density(i-1)*.9, dmax,200)';
-    bar = isobar(object,dens,pressure(i));
-    [temperature(i),density(i)] = findMelt(bar);
-    update(w,i/length(pressure));
+temperature = nan(size(density));
+
+%Find first melt temperature based on step in isochor
+for i = 1:length(density)
+    chor = isochor(object,t,density(i));
+    [temperature(i),~,~] = findMelt(chor,nsmooth);
+    update(w,i/length(density));
 end
 delete(w); 
 
@@ -83,51 +69,54 @@ end
 % Find melt temperature along the isobar
 % Algorithm fits gaussian to (dT/dV)|P to find the peak of transition. The
 % FWHM/2 is subtracted to account for latent heat up to the peak
-function [tmelt, dsol, dliq] = findMelt(obj)
+function [tmelt, psol, pliq] = findMelt(obj,nsmooth)
 
-    %Find guassian fit to dT/drho
-    [~,ia] = unique(obj.Temperature);
-    sig = SMASH.SignalAnalysis.Signal(obj.Temperature(ia),obj.Energy(ia)); 
-    dsig = differentiate(sig); [x,y] = limit(dsig); y = abs(y);
+    x = obj.Temperature;
+    y = obj.Pressure;
     
-    % remove slow trend
-    p=polyfit(x,y,2);
-    y=y-polyval(p,x); y = y-y(1)+obj.Energy(1);
-    dsig = SMASH.SignalAnalysis.Signal(x,y);
+    sig = SMASH.SignalAnalysis.Signal(x,y);
+    dsig = differentiate(sig);
+    dsig = differentiate(dsig);
+    dsig=dsig.^2;
+   
+    %Smooth derivative
+    Nsmooth=int32(length(x)./nsmooth); %LowPassFilt
+    kernel = ones(Nsmooth,1);
+    kernel = kernel/sum(kernel);
+    dsig=smooth(dsig,'kernel',kernel);
     
+%     %Remove slow trend
+%     [dx,dy]=limit(dsig);
+%     trim = int32(length(dx)*.1);
+%     dx = dx(trim:end-trim); dy = dy(trim:end-trim);
+%     p=polyfit(dx,dy,1);
+%     dy = dy-polyval(p,dx);
+%     dsig = SMASH.SignalAnalysis.Signal(dx,dy);
     
-%     %Use peak of de/dp
-%     [~,im] = max(y);
-%     tmelt = x(im);
-%     tmeltsol = tmelt;
-%     tmeltliq = tmeltsol;
-    
-    
-    %Guassian fit
-    report = locate(dsig);
-     
+    %Find peak
+    report = locate(dsig,'peak');
+
     %Plot quality of guassian fit
-%     plot(dsig.Grid,dsig.Data,dsig.Grid,report.Fit)
-%     pause;
-     
+    %plot(dsig.Grid,dsig.Data,dsig.Grid,report.Fit)
+    %pause;
+    
     %Approximate solid density by subtracting half the FWHM
-    tmeltsol = report.Location - 2*sqrt(2*log(2))*report.Width/2;
-    tmeltliq = report.Location + 2*sqrt(2*log(2))*report.Width/2;
+    tmeltsol = report.Location - report.Width/2;
+    tmeltliq = report.Location + report.Width/2;
+    indexsol = find(tmeltsol<=obj.Temperature, 1);
+    indexliq = find(tmeltliq<=obj.Temperature, 1);
+    psol = obj.Pressure(indexsol);
+    pliq = obj.Pressure(indexliq);
+    tmelt=report.Location;
 
-    indexsol = find(tmeltsol>=obj.Temperature, 1,'first');
-    indexliq = find(tmeltliq>=obj.Temperature, 1,'first');
-    tmelt = report.Location;
-    dsol = obj.Density(indexsol);
-    dliq = obj.Density(indexliq);
-
-    
     %Plot calculated melt
-    plot(obj.Temperature,obj.Density);  
-    line([tmeltsol tmeltliq],[dsol dliq],'Color','r');
+    plot(obj.Temperature,obj.Pressure);  
+    line([tmeltsol tmeltliq],[psol pliq],'Color','r');
+    line([tmelt tmelt],[min(obj.Pressure) max(obj.Pressure)],'Color','m');
     xlabel('Temperature');
-    ylabel('Density');
-    legend({'isobar','melt'});
-    
+    ylabel('Pressure');
+    legend({'isochor','melt'});
+    %pause;
 end
 
 
