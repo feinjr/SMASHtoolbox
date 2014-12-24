@@ -98,14 +98,21 @@ curve.y0=y0;
 curve.Lx=Lx;
 curve.Ly=Ly;
 
-% calculate survival array
-S=nan(size(X));
-for m=1:m
-    L2=(Xnorm(m,:)-mean(Xnorm(m,:))).^2+(Ynorm(m,:)-mean(Ynorm(m,:))).^2;
-    S(m,1)=feval(object.WeightFunction,L2(:));
+% % calculate survival array
+% S=nan(size(X));
+% for m=1:m
+%     L2=(Xnorm(m,:)-mean(Xnorm(m,:))).^2+(Ynorm(m,:)-mean(Ynorm(m,:))).^2;
+%     S(m,1)=feval(object.WeightFunction,L2(:));
+% end
+% S(:,1)=min(S(:,1))./S(:,1);
+% S=repmat(S(:,1),[1 N]);
+
+% calculate weights and allowed directions
+[weights,allowed]=deal(nan(size(X)));
+for m=1:M
+    
 end
-S(:,1)=min(S(:,1))./S(:,1);
-S=repmat(S(:,1),[1 N]);
+
 
 % perform iteration, in parallel if possible
 meanXnorm=mean(Xnorm,2);

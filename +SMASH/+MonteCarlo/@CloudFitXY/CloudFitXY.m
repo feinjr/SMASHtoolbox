@@ -6,6 +6,10 @@
 %
 % Objects from this class can be created with or without data points.
 %    >> object=CloudFitXY(); % empty object
+% UNDER CONSTRUCTION...
+%
+
+
 %    >> object=CloudFitXY(....);
 % The second statement can use any input syntax supported by the add method
 % for this class.
@@ -26,6 +30,9 @@ classdef CloudFitXY
         NumberClouds = 0 % Number of Cloud objects
         ActiveClouds = logical([]) % Logical array indicating active Clouds
         Clouds = {} % Cell array of Cloud objects
+        Function % Fit function handle or file name
+        Parameter % Fit parameters
+        Bounds % Fit parameter bounds
     end
     properties
         CloudSize = 100 % Maximum number of points per cloud
@@ -39,12 +46,17 @@ classdef CloudFitXY
     methods (Hidden=true)
         function object=CloudFitXY(varargin)
             if nargin>0
-                object=add(object,varargin{:});
+                object=setup(object,varargin{:});
             end
             if isempty(object.GraphicOptions)
                 object.GraphicOptions=SMASH.General.GraphicOptions;
             end
-            % implement create/restore paradigm
+        end
+    end
+    %% 
+    methods (Static=true, Hidden=true)
+        function object=restore(data)
+            error('ERROR: restore method is not ready yet!');
         end
     end
     %% property setters
