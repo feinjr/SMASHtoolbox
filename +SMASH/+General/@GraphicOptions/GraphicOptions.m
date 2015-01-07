@@ -173,8 +173,14 @@ classdef GraphicOptions < hgsetget
                     result=true;
                 end
             elseif ischar(value)
+                result=false;
                 if exist(value,'file')
-                    result=true;
+                    try
+                        value=feval(value);
+                        result=true;
+                    catch
+                        % do nothing
+                    end
                 end
             end
             assert(result,'ERROR: invalid ColorMap value');
