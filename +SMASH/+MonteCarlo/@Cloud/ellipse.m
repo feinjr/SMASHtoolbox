@@ -71,7 +71,7 @@ sigma=fzero(@residual,[low high],options);
 % handle output
 if nargout==0
     h=plot(x,y);
-    set(h,'Color',object.LineColor);
+    set(h,'Color',object.GraphicOptions.LineColor);
     xlabel(object.DataLabel{variable(1)});
     ylabel(object.DataLabel{variable(2)});
 else    

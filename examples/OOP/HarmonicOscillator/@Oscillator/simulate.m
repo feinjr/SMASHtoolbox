@@ -1,16 +1,26 @@
-% simulate(object,tmax);
+% simulate Perform oscillator simulation
 %
-% [t,x,v]=simulate(object,tmax);
+% simulate(object,tmax); % display simulation
+% [t,x,v]=simulate(object,tmax); % return simulation results
+%
+% See also Oscillator
+%
 
-function varargout=simulate(object,tmax,options)
+function varargout=simulate(object,tmax)
 
 % manage input
 assert(nargin>=2,'ERROR: maximum time not specified');
 assert(testValue(tmax),'ERROR: invalid maximum time');
 assert(tmax>0,'ERROR: invalid maximum time');
 
-if (nargin<3) || isempty(options)
+% handle ODE options
+if isempty(object.Options)
     options=odeset();
+end
+period=2*pi*sqrt(object.Mass/object.Stiffness);
+T=period/4;
+if isempty(options.MaxStep) || (options.MaxStep>T)
+    options.MaxStep=T;
 end
 
 y0=[object.InitialPosition object.InitialVelocity];

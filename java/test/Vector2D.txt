@@ -1,0 +1,30 @@
+
+public class Vector2D
+{
+// properties
+	public double[] x,y;
+	public int NumberVectors;
+// constructor
+	public Vector2D(double[] ux, double[] uy)
+	{		
+		if (ux.length==uy.length)
+		{
+			x=ux;
+			y=uy;
+			NumberVectors=ux.length;
+		}
+		else
+		{
+			System.out.println("ERROR: incompatible component arrays");
+		}
+	}
+// cross product (z-component only)
+	public double[] cross()
+	{
+		double[] result=new double[NumberVectors];
+		for (k=0; k<NumberVectors; ++k)
+		{
+		
+		}
+	}	 
+}

@@ -1,13 +1,13 @@
 % under construction
-classdef DrivenHarmonicOscillator < SimpleHarmonicOscillator
+classdef DrivenOscillator < Oscillator
     %%
     properties       
         DriveFunction
     end
     %%
     methods (Hidden=true)
-        function object=DrivenHarmonicOscillator(varargin)
-            % nothing to do (yet)
+        function object=DrivenOscillator(varargin)
+           fprintf('DrivenOscillator object created\n');
         end
     end
     %%

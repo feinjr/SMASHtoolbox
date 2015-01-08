@@ -1,6 +1,6 @@
 %Niter=logspace(3,10,8);
-Niter=logspace(2,10,9);
-%Niter=logspace(2,7,6);
+%Niter=logspace(2,10,9);
+Niter=logspace(2,7,6);
 %Niter=logspace(3,6,4);
 
 %% Java method

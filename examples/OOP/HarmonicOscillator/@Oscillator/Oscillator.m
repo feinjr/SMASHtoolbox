@@ -1,21 +1,24 @@
-% under construction
-classdef SimpleHarmonicOscillator
+% Simple harmonic oscillator class
+classdef Oscillator
     %%
     properties 
-        InitialPosition = 0 % Initial position
-        InitialVelocity = 0 % Initial velocity
-        Mass = 1 % [kg]
-        Stiffness = 1 % [N/m]
-        Damping = 0 % 
+        InitialPosition = 0 % initial position
+        InitialVelocity = 0 % initial velocity
+        Mass = 1 % mass
+        Stiffness = 1 % spring constant 
+        Damping = 0 % damping coefficient
+    end
+    properties (Hidden=true)
+        Options % ODE options
     end
     %%
     methods (Hidden=true)
-        function object=SimpleHarmonicOscillator(varargin)
-            % nothing to do (yet)
+        function object=Oscillator(varargin)
+            fprintf('Oscillator object created\n');
         end
     end
     %%
-    methods (Access=protected)
+    methods (Access=protected,Hidden=true)
         varargout=calculateDerivatives(varargin)
     end
     %% setters
@@ -35,12 +38,12 @@ classdef SimpleHarmonicOscillator
         end
         function object=set.Stiffness(object,value)
             assert(testValue(value),'ERROR: invalid Stiffness');
-            assert(value>=0,'ERROR: invalid Mass');
+            assert(value>=0,'ERROR: invalid Stiffness');
             object.Stiffness=value;
         end
         function object=set.Damping(object,value)
             assert(testValue(value),'ERROR: invalid Damping');
-            assert(value>0,'ERROR: invalid Damping');
+            assert(value>=0,'ERROR: invalid Damping');
             object.Damping=value;
         end            
     end

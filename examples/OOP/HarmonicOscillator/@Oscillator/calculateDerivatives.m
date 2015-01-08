@@ -1,4 +1,4 @@
-%
+% derivative calculation
 
 function dydt=calculateDerivatives(object,t,y)
 
