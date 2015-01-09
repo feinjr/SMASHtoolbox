@@ -11,12 +11,9 @@ sig = {};
 sig_tot = 0;
 sig_num = [];
 
-%MGmats=[];MGd=0;MGc=0;MGs=0;MGg=0;
-
-
 % Set system defaults
-set(0,'DefaultAxesFontSize',14);
-set(0,'DefaultUIControlFontSize',14);
+%set(0,'DefaultAxesFontSize',14);
+%set(0,'DefaultUIControlFontSize',14);
 
 
 % create figure if not already running
@@ -468,7 +465,7 @@ dlg.Hidden = false;
        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up,P);
        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig{sig_tot}.Name = 'Rayliegh Line';
-       sig{sig_tot}.GraphicOptoins.Title = 'Rayleigh';
+       sig{sig_tot}.GraphicOptions.Title = 'Rayleigh';
        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
        sig{sig_tot}.DataLabel = 'Pressure (GPa)';
 

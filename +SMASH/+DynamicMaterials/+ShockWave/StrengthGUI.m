@@ -15,8 +15,8 @@ viewlist = {'Cl-u','Stress-Strain','Stress-Density','Cl-Strain','Strain-Time','S
 
 
 %% Set system defaults
-set(0,'DefaultAxesFontSize',14);
-set(0,'DefaultUIControlFontSize',14);
+%set(0,'DefaultAxesFontSize',14);
+%set(0,'DefaultUIControlFontSize',14);
 
 % create figure if not already running
 check=findobj('Name','SMASH Strength Analysis');
