@@ -31,7 +31,7 @@ Ly2=Ly-Ly1;
 
 h.axes(1)=axes('Parent',h.panel,'Units','normalized','Position',[x0 y0+Ly2 Lx1 Ly1],...
     'Tag','ImageAxes','XTickLabel','','YTickLabel','','Box','on',...
-    'YDir','reverse');
+    'YDir',get(object.GraphicOptions,'YDir'));
 temp=show(object,h.axes(1));
 himage=temp.image;
 colormap(h.figure,get(object.GraphicOptions,'ColorMap'));
@@ -48,7 +48,7 @@ delete(hc);
 h.axes(2)=axes('Parent',h.panel,'Units','normalized','Position',[x0+Lx1 y0+Ly2 Lx2 Ly1],...
     'Tag','VerticalSliceAxes','Box','on',...
     'XAxisLocation','top','YAxisLocation','right',...
-    'YDir','reverse');
+    'YDir',get(object.GraphicOptions,'YDir'));
 xlabel(h.axes(2),object.DataLabel);
 ylabel(h.axes(2),object.Grid2Label);
 hliney=line('Parent',h.axes(2),'Color','k','Tag','VerticalSliceLine');
