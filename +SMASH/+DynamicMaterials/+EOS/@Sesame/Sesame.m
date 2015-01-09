@@ -74,8 +74,7 @@ classdef Sesame < SMASH.General.DataClass
     methods (Access=protected,Hidden=true)
         varargout=create(varargin);
         varargout=ImportFile(varargin)
-        varargout=RestoreFile(varargin)
-       
+        varargout=RestoreFile(varargin)  
     end
 
     

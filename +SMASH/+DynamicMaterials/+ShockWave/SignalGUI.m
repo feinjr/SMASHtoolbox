@@ -114,8 +114,8 @@ pathname = [];
 
 
 % Set system defaults
-set(0,'DefaultAxesFontSize',14);
-set(0,'DefaultUIControlFontSize',14);
+%set(0,'DefaultAxesFontSize',14);
+%set(0,'DefaultUIControlFontSize',14);
 
 
 % create figure if not already running
@@ -666,23 +666,24 @@ function newsig = applyedit(n)
     end
 
   %Apply edit to signal number n
-        newsig = scale(sig{n},editdata(1));
+        
+        if strncmpi(get(dlg_hc(hloc(1)),'String'),'@(x)',4);
+            funchand = str2func(get(dlg_hc(hloc(1)),'String'));
+            newsig = sig{n}.map('Grid','custom',funchand);
+        else
+            newsig = scale(sig{n},editdata(1));
+        end
+        
         newsig = shift(newsig,editdata(2));
-        if strcmpi(get(dlg_hc(hloc(3)),'String'),'root');
-            newsig = newsig.^0.5;
-        elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'square');
-            newsig = newsig.^2.0;
-        elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'log10');
-            newsig = log10(newsig);
-        elseif strcmpi(get(dlg_hc(hloc(3)),'String'),'pow10');
-            newsig = 10.^newsig;
+        
+        if strncmpi(get(dlg_hc(hloc(3)),'String'),'@(x)',4);
+            funchand = str2func(get(dlg_hc(hloc(3)),'String'));
+            newsig = newsig.map('Data','custom',funchand);
         else
             newsig = newsig*editdata(3);
         end
-        newsig = newsig+editdata(4);
         
-        
-            
+        newsig = newsig+editdata(4);       
  end     
 
     
