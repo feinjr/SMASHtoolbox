@@ -1,3 +1,5 @@
+%% StrengthGUI is a GUI interface for analyzing the strength in release experiments
+
 function StrengthGUI()
 clear all; clc;
 
