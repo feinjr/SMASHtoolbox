@@ -12,6 +12,7 @@ segment=2*rand(1,4)-1;
 %segment(5,:)=[1 1.2 0.9 -1.2];
 
 % order is important!
+%theta=[0 180]; 
 theta=[45 180-45]; % degrees
 %theta=[45 -45];
 %theta=[80 100];
@@ -23,10 +24,10 @@ direction=[ux uy vx vy];
 
 %% call method
 M=size(segment,1);
-result=nan(3,M);
+result=nan(2,M);
 
 for m=1:M
-    result(:,m)=javaMethod('point2segment','CloudDistance',...
+    result(:,m)=javaMethod('intersectBound','CloudDistance',...
         point,segment(m,:),direction);
 end
 
@@ -47,11 +48,12 @@ color=lines(M);
  for m=1:M
      line(segment(m,[1 3]),segment(m,[2 4]),...
          'Color',color(m,:),'Marker','none','LineWidth',2);
-     line([point(1) result(2,m)],[point(2) result(3,m)],...
+     line([point(1) result(1,m)],[point(2) result(2,m)],...
          'Color',color(m,:));
-     line(point(1)+sqrt(result(1))*cosd(phi),point(2)+sqrt(result(1))*sind(phi),...
+     L=hypot(point(1)-result(1,m),point(2)-result(2,m));     
+     line(point(1)+L*cosd(phi),point(2)+L*sind(phi),...
          'Color',color(m,:),'LineStyle','--');
-     line(point(2)-sqrt(result(1))*cosd(phi),point(2)-sqrt(result(1))*sind(phi),...
+     line(point(2)-L*cosd(phi),point(2)-L*sind(phi),...
          'Color',color(m,:),'LineStyle','--');
  end
 

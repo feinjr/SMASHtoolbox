@@ -1,3 +1,9 @@
+% This function is depracated and will be removed shortly.  Use the
+% "loadSMASH" function instead.
+%
+% See also loadSMASH
+%
+
 % installProgram Install SMASH toolbox program(s)
 %
 % This function installs SMASH toolbox programs on the MATLAB path.
@@ -14,6 +20,10 @@
 % created December 1, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
 function installProgram(varargin)
+
+message{1}='This function is depracated and will be removed shortly. ';
+message{2}='Use the "loadSMASH" function instead".';
+warning('SMASHtoolbox:depracated','%s\n',message{:});
 
 % look at programs directory
 local=mfilename('fullpath');
