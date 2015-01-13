@@ -22,7 +22,8 @@
 %
 %% Edit
 % Choose active signal : choose which signals to plot/edit/analyze
-% Shift and scale : shift/scale grid and data arrays
+% Shift and scale : shift/scale grid and data arrays. An @(x) f(x) handle 
+%   definition will apply the function scale mapping. eg. @(x) log10(x). 
 % Limit : apply the limit method
 % Regrid : Apply the regrid method. Also supplies an option for a "pchip"
 %   interpolation regrid.

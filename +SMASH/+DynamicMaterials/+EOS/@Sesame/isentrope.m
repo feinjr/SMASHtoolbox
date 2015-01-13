@@ -137,7 +137,7 @@ new.SourceFormat='isentrope';
 end
 
 
-%Solves dt/dt|s = -T (dp/dt)|v / (de/dt)|v  
+%Solves dt/dv|s = -T (dp/dt)|v / (de/dt)|v  
 %For each density point, a fixed point iteration on T is performed using
 %the derivatives from the lookup. A maximum of 10 iterations is performed
 %before moving to the next density if 0.1% in T is  not achieved.
