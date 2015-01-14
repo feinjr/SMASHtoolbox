@@ -104,6 +104,7 @@ BFdata=real(ifft2(BF));
 object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
 view(object);
 
+object.DataLabel='Intensity (a.u.)';
 object=updateHistory(object);
 
 end

@@ -28,7 +28,6 @@ function varargout=histogram(object,varargin)
 varargout=cell(1,nargout);
 % extract data from limited region
 [~,~,data]=limit(object);
-data=data(:);
 
 [nelements,xcenters]=hist(data(:),varargin{:});
 
