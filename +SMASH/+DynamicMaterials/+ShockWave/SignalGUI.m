@@ -1143,7 +1143,7 @@ function newsig = MHDScale(n)
     
     switch value{3}
         case choices{1}
-            newsig=(2.*newsig./(4e-7*pi)).^2*s;
+            newsig=(2.*newsig./(4e-7*pi)).^0.5.*s;
         case choices{2}
             newsig=(2.*newsig.*(4e-7.*pi)).^0.5;
         case choices{3}

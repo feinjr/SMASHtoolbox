@@ -11,6 +11,7 @@
 %
 % See also Sesame, hugoniot, isentrope, isobar, isotherm
 %
+
 % created April 21, 2014 by Justin Brown (Sandia National Laboratories)
 
 function new =isochor(object,temperature,density)

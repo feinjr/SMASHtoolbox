@@ -17,6 +17,7 @@ function object=CreateSesame(object,varargin)
 %   TMIN is set to 250K. TMAX, nd, and nt are set to 10000K, 300, and 100.
 %
 % See also Sesame
+
 %
 % created April 24, 2014 by Justin Brown (Sandia National Labs)
 

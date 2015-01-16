@@ -1,11 +1,12 @@
 % evaluate Evaluate Mie-Gruneisen model's Hugoniot at specified density
 %
-%     >> [P, E, S] = evaluate(object,rho,T);
+%     >> [P, E, S] = evaluate(object,rho);
 %
-% using the model object. The pressure, free energy, and temperature are
-% returned.
+% using the MieGruneisen object. The pressure, free energy, and temperature
+% are returned.
 %
-% See also Model
+% See also MieGruneisen, calibrate, calibrateUsup, evaluate
+
 %
 % created January 9, 2014 by Justin Brown (Sandia National Laboratories)
 %

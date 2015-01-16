@@ -17,6 +17,7 @@
 %
 % See also Sesame, hugoniot, isobar, isochor, isotherm
 %
+
 % created April 21, 2014 by Justin Brown (Sandia National Laboratories)
 
 function new=isentrope(varargin)

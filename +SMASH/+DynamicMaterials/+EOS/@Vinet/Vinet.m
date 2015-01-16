@@ -1,4 +1,4 @@
-% This method generates an Vinet Model object
+% This method generates a Vinet Model object
 %
 %     >> object=Vinet(object);
 %
@@ -25,7 +25,8 @@
 %
 % where X = (rho0/rho)^(1/3), and di is the ith d coefficient.
 %
-% See also calibrate, evaluate
+% See also EOS, calibrate, evaluate
+
 %
 % created January 9, 2015 by Justin Brown (Sandia National Laboratories)
 %

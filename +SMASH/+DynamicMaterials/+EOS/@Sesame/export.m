@@ -19,7 +19,10 @@ function success = export(object,varargin)
 % The output is a logical flag indicating if the write was succesful
 % (true).
 %
+
+%
 % created April 28, 2014 by Justin Brown (Sandia National Labs)
+%
 
 numarg = nargin-1;
 %Error checking

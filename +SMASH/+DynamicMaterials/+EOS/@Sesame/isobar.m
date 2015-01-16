@@ -11,6 +11,7 @@
 %
 % See also Sesame, hugoniot, isentrope, isochor, isotherm
 %
+
 % created April 21, 2014 by Justin Brown (Sandia National Laboratories)
 
 function new = isobar(object,density,pressure)
