@@ -19,8 +19,19 @@ elseif numel(object.Grid)==1
     object.Grid(1)=0;
     object.Grid=cumsum(object.Grid);
 end
-assert(numel(object.Grid)==size(object.Data,1),...
-    'ERROR: incompatible Grid/Data arrays')                               
+
+if numel(object.Grid)==size(object.Data,1)
+    % do nothing
+elseif numel(object.Grid)==size(object.Data,2)
+    object.Data=transpose(object.Data);
+    fprintf('Transposing Data array for consistency with Grid array\n');
+else
+    error('ERROR: incompatible Grid/Data arrays') 
+end
+
+
+%assert(numel(object.Grid)==size(object.Data,1),...
+%    'ERROR: incompatible Grid/Data arrays')                               
 
 label=cell(1,object.NumberSignals);
 for k=1:object.NumberSignals

@@ -63,7 +63,7 @@ switch h5readatt(archive.ArchiveFile,setname,'RecordType');
         data=extract_cell(archive,setname);
     case 'object'
         data=extract_structure(archive,setname);
-        data=structure2object(data,metadata.Class);        
+        data=structure2object(data,metadata.ClassName);        
     otherwise
 end
 

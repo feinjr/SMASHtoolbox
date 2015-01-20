@@ -91,8 +91,8 @@ elseif isobject(data) % convert objects to structures
     ObjectClass=class(data);
     data=object2structure(data);
     insert_structure(archive,datasetname,data,deflate);
-    h5writeatt(archive.ArchiveFile,['/' label],'Class',ObjectClass);
     h5writeatt(archive.ArchiveFile,['/' label],'RecordType','object');
+    h5writeatt(archive.ArchiveFile,['/' label],'ClassName',ObjectClass);
 end
 h5writeatt(archive.ArchiveFile,datasetname,'Description',description);
 h5writeatt(archive.ArchiveFile,datasetname,'Inserted',datestr(now));

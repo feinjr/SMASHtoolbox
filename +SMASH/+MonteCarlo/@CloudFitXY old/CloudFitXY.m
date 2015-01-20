@@ -29,17 +29,13 @@ classdef CloudFitXY
     properties (SetAccess=protected)
         NumberClouds = 0 % Number of Cloud objects
         ActiveClouds = logical([]) % Logical array indicating active Clouds
-        Clouds = {} % Cell array of Cloud objects        
-    end
-    end
-    properties
+        Clouds = {} % Cell array of Cloud objects
         Function % Fit function handle or file name
         Parameter % Fit parameters
         Bounds % Fit parameter bounds
     end
     properties
         CloudSize = 100 % Maximum number of points per cloud
-        DrawSize = 1 % Cloud points drawn during each iteration
         Iterations = 100 % Monte Carlo iterations
         XLabel = 'x' % Horizontal coordinate label
         YLabel = 'y' % Vertical coordinate label

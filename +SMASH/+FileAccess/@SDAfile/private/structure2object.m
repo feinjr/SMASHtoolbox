@@ -1,30 +1,17 @@
-function object=structure2object(data,ObjectClass)
+function object=structure2object(data,ClassName)
 
 try % pass structure to (static) restore method
-    name=sprintf('%s.restore',ObjectClass);
+    name=sprintf('%s.restore',ClassName);
     object=feval(name,data);
-    return
-catch 
-    % proceed to next block
-end
-
-try % pass structure to constructor
-    object=feval(ObjectClass,data);   
-    return
+    %return
 catch
-    % proceed to next block
-end
-
-try % manually transfer structure fields to property values
-    object=feval(ObjectClass);
-    name=fieldnames(data);
-    for n=1:numel(name)
-        if isprop(object,name{n})
-            object.(name{n})=data.(name{k});
-        end
-    end
-catch
-    error('ERROR: unable to extract %s object',ObjectClass);
+    message={};
+    message{end+1}=sprintf(...
+        'ERROR: unable to convert stored structure to an object');
+    message{end+1}=sprintf(...
+        '       The %s class does not provide a "restore" method',...
+        ClassName);     
+    warning('SDA:restore','%s\n',message{:});
 end
 
 end
