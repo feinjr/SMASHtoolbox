@@ -10,6 +10,7 @@ function object=ImportFile(object,filename,material)
 % density for the material is extracted from the SESAME 201 table, which
 % should be located in the same file as the 301 table. 
 %
+
 % created April, 17 2014 by Justin Brown (Sandia National Labs)
 
     % extract reference state

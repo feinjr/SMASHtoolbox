@@ -1,4 +1,4 @@
-% This method generates an extended Mie-Gruneisen Model object
+% This method generates a Mie-Gruneisen Model object
 %
 %     >> object=MieGruneisen(object)
 %
@@ -11,9 +11,12 @@
 %       T0    : Reference temperature
 %       cv    : Constant-volume specific heat
 %
-% The reference Hugoniot specifed by rho0, c0, and s are used in the
+% The reference Hugoniot specifed by rho0, c0, and s is used in the
 % Mie-Gruneisen formulation to generate the EOS. Gamma is assumed to have
 % the form gamma*rho = gamma0*rho0
+%
+% See also EOS, calibrate, calibrateUsup, evaluate, evaluateHugoniot
+
 %
 % created January 9, 2015 by Justin Brown (Sandia National Laboratories)
 %

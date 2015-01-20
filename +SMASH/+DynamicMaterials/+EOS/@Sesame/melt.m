@@ -18,6 +18,7 @@
 %
 % See also Sesame, hugoniot, isentrope, isobar, isochor, isotherm
 %
+
 % created April 21, 2014 by Justin Brown (Sandia National Laboratories)
 
 function new=melt(object,density,varargin)

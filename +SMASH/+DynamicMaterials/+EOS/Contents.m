@@ -1,7 +1,10 @@
 % EOS package
 %
 % This toolbox contains data classes for EOS analysis
-%    Sesame      - class based on sesame tables
+%    Sesame         - class based on sesame tables
+%    MieGruneisen   - class based on the Mie-Gruneisen EOS
+%    Vinet          - class based on the extended Vinet EOS
+%    Debye          - class based on the Debye ion thermal model
 %
 % Help and documentation for each class be accessed directly once an object
 % has been created.
@@ -12,5 +15,5 @@
 % See also SMASH
 %
 
-% Last updated April 22, 2014
+% Last updated January 115, 2015
 

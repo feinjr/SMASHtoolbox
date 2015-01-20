@@ -31,27 +31,26 @@ if nargin > 3
 end
 
 % calculate Hugoniot
-[P0,E0,T0,S0]=calculateHugoniot(object,object.rho0);
 [PH,EH,TH,SH]=calculateHugoniot(object,rho);
 
 % off Hugoniot
-E = EH + cv0.*(T-TH);
-P = PH + g0.*rho0.*(E-EH);
+E0 = cv0.*(object.T0);
+E = EH + cv0.*(T-TH)+E0;
+
+P0 = g0.*rho0.*E0;
+P = PH + g0.*rho0.*(E-EH)-P0;
+
+S0 = (E0+P0./rho0)./object.T0;
+
+%Only using energy contribution matches Alegra model - not sure why!
+S=E./(T)-S0;
+%S = (E+P./rho)./T - S0;
 
 % generalized gamma
 %gamma_v = @(v) rho.*g0.*v;
 %E = EH + cv0.*(T-TH);
 %P = PH + gamma_v(1./rho).*rho.*(E-EH);
 
-%Calculate S with numerical derivatives
-S=zeros(size(E));
-for i = 1:length(E)
-    dv=1./rho(i)+1e-8;
-    [PHi,EHi,THi,SHi]=calculateHugoniot(object,rho(i));
-    de = E(i)+EHi+cv0.*(T-THi);
-    ds = (de+P(i).*dv)./T;
-    S(i)=ds;
-end
     
 
 end
