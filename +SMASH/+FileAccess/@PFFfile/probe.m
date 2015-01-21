@@ -24,7 +24,11 @@ CleanObject=onCleanup(@() fclose(fid)); % automatically close file on function e
 
 FFRAME=ReadWord(fid);
 assert(FFRAME==-4,'ERROR: non-PFF file detected');
-ReadWord(fid,15); % skip remaining file header
+ldptr=ReadLong(fid); %#ok<NASGU> % beginning of directory datasets
+frewind(fid);
+header=ReadWord(fid,16);  %#ok<NASGU>
+%DFAULT=ReadWord(fid);
+%ReadWord(fid,14); % skip remaining file header
 
 % scan through data sets
 dataset=[];
@@ -32,14 +36,23 @@ while ~feof(fid)
     % read current header
     start=ftell(fid);
     DFRAME=ReadWord(fid);
-    switch DFRAME
-        case -1
-            % everything is fine
-        case -2
-            break % main datasets are finished
-        otherwise
-            error('ERROR: dataset start not found');
+    if DFRAME == -1
+        %fprintf('Start word located\n');
+        % start word
+    elseif isempty(DFRAME) || (DFRAME == -2)
+        %continue
+        break; % stop word
+    else
+        error('ERROR: start byte not found');
     end
+    %switch DFRAME
+    %    case -1
+    %        % everything is fine
+    %    case -2
+    %        break % main datasets are finished
+    %    otherwise
+    %        error('ERROR: dataset start not found');
+    %end
     LDS=ReadLong(fid);
     TRAW=ReadWord(fid);
     VDS=ReadWord(fid);
@@ -52,7 +65,7 @@ while ~feof(fid)
         dataset=struct('Type','','TypeVersion',[],'TypeLabel','','Title','');
     else
         dataset(end+1)=dataset(end); %#ok<AGROW>
-    end
+    end;
     switch TRAW
         case 0
             dataset(end).Type='PFTDIR';
