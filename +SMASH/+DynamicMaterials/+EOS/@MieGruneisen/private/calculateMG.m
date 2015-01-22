@@ -23,6 +23,7 @@ T=T(:);
 rho0=object.rho0;
 g0=object.gamma;
 cv0=object.cv;
+T0 = object.T0;
 
 if nargin > 3
     p = varargin{1};
@@ -30,21 +31,23 @@ if nargin > 3
     s = p(2);
 end
 
+%% Reference states
+E0 = cv0.*T0;
+P0 = g0.*rho0.*E0;
+%Calculate reference entropy - might be better to use Debye here?
+integrand = @(T) cv0./T;
+S0 = integral(integrand,0,T0);
+
+
 % calculate Hugoniot
 [PH,EH,TH,SH]=calculateHugoniot(object,rho);
 
 % off Hugoniot
-E0 = cv0.*(object.T0);
-E = EH + cv0.*(T-TH)+E0;
+E = E0 + EH + cv0.*(T-TH);
+P = PH + g0.*rho0.*cv0.*(T-TH);
+xi = @(v) exp(g0*rho0*(1/rho0-v));
+S = S0 + cv0.*log(T./(T0.*xi(1./rho)));
 
-P0 = g0.*rho0.*E0;
-P = PH + g0.*rho0.*(E-EH)-P0;
-
-S0 = (E0+P0./rho0)./object.T0;
-
-%Only using energy contribution matches Alegra model - not sure why!
-S=E./(T)-S0;
-%S = (E+P./rho)./T - S0;
 
 % generalized gamma
 %gamma_v = @(v) rho.*g0.*v;

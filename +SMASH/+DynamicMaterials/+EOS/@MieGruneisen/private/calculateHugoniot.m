@@ -32,6 +32,7 @@ if nargin > 2
 end
 
 
+
 %% Hugoniot states
 v = 1./rho; v0 = 1./rho0;
 eta = 1.0-rho0./rho;
@@ -45,11 +46,17 @@ EH = PH.*eta./(2.*rho0);
 TH = repmat(0,size(v));
 SH = repmat(0,size(v));
 
-%% Davison, Fundamentals of Shock Propogation in Solids, p. 107
+
+%% Temperature and entropy are expensive - only calculate if requested
+if nargout > 2
+% Davison, Fundamentals of Shock Propogation in Solids, p. 107
 for i = 1:length(v)
     Pr=0; vr = v0; vi=v(i);
     gamma_v =@(v) g0.*rho0.*v;
-    xi = @(v) exp(-trapz(v,gamma_v(v)./v));
+    %xi = @(v) exp(-trapz(v,gamma_v(v)./v));
+    integrandxi = @(v) gamma_v(v)./v;
+    xi = @(vi) exp(-integral(integrandxi,v0,vi));
+
 
     %General form if want to use arbitrary Hugoniot
     PH_v = @(v) c0.^2.*(v0-v)./(v0-s.*(v0-v)).^2;
@@ -58,12 +65,20 @@ for i = 1:length(v)
     %"Closed" form solution
     %kappa = @(v) -2.*rho0.^3.*s.*c0.^2.*((vr-v).^2)./(1-rho0.*s.*(vr-v)).^3;
 
-    TH_v = @(v) xi(v).*(T0+0.5./cv0.*trapz(v,kappa(v)./xi(v)));
-    SH_v = @(v) 0.5.*trapz(v,kappa(v)./TH_v(v));
-
-    vspace = linspace(v0,vi,100)';
-    TH(i) = TH_v(vspace);
-    SH(i) = SH_v(vspace);
+    %TH_v = @(v) xi(vi).*(T0+0.5./cv0.*trapz(v,kappa(v)./xi(v)));
+    %SH_v = @(v) 0.5.*trapz(v,kappa(v)./TH_v(v));
+    %vspace = linspace(v0,vi,100)';
+    %TH(i) = TH_v(vspace);
+    %SH(i) = SH_v(vspace);
+    
+    integrandT = @(v) kappa(v)./xi(vi);
+    TH_v = @(x) xi(x).*(T0+0.5./cv0.*integral(integrandT,v0,x));
+    integrandS = @(v) kappa(v)./TH_v(vi);
+    SH_v = @(x) 0.5.*integral(integrandS,v0,x);
+    
+    TH(i)=TH_v(vi);
+    SH(i)=SH_v(vi);
+end
 end
 
     %Convert to Helmholtz free energy

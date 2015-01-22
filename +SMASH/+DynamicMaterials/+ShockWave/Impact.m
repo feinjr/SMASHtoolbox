@@ -73,7 +73,7 @@ end
 
 %% create Signal menu
 hm=uimenu(fig.Handle,'Label','Add Curve');
-uimenu(hm,'Label','Mie_Gruneisen','Callback',@MG);
+uimenu(hm,'Label','Hugoniot','Callback',@Hugoniot);
 uimenu(hm,'Label','Sesame','Callback',@Sesame);
 uimenu(hm,'Label','Rayleigh Line','Callback',@Rayleigh);
 uimenu(hm,'Label','Load File','Callback',@LoadSignal);
@@ -203,7 +203,7 @@ end %Choose Active Signals
 %%%%%%%%%%% Signal Callbacks %%%%%%%%%%%%%
 
 %Generate curve based on shock data: c0, s
-function MG(src,varargin)
+function Hugoniot(src,varargin)
     
 % see if dialog already exists
 dlg=FindOrCreateDlg(src,'MieGruneisen');
@@ -212,10 +212,10 @@ if ishandle(dlg)
 end
 
 dlg.Hidden = true;
-dlg.Name = 'Mie-Gruneisen Curve Addition';
+dlg.Name = 'Hugoniot Curve Addition';
 h=addblock(dlg,'popup','Select Material',MGmats);
-h=addblock(dlg,'edit_check',{'Initial Velocity (km/s)','Reverse (Impactor)'}); set(h(2),'String', 0);
-h=addblock(dlg,'edit','Initial Pressure (GPa)'); set(h(2),'String', 0);
+h=addblock(dlg,'edit_check',{'Intersect Velocity (km/s)','Reverse (Impactor)'}); set(h(2),'String', 0);
+h=addblock(dlg,'edit','Intersect Pressure (GPa)'); set(h(2),'String', 0);
 h=addblock(dlg,'edit','Max Pressure (GPa)'); set(h(2),'String', 100);
 rh=addblock(dlg,'radio','display shocked state based on pressure');
 h=addblock(dlg,'button',{ 'Apply', 'Cancel'});
@@ -266,7 +266,7 @@ dlg.Hidden = false;
        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up,P);
        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig{sig_tot}.Name = [MGmats{n},addstr];
-       sig{sig_tot}.GraphicOptions.Title = 'MieGruneisen';
+       %sig{sig_tot}.GraphicOptions.Title = 'MieGruneisen';
        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
        sig{sig_tot}.DataLabel = 'Pressure (GPa)';
 
@@ -411,7 +411,7 @@ dlg.Hidden = false;
        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up(ia),P(ia));
        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig{sig_tot}.Name = [neos,addstr];
-       sig{sig_tot}.GraphicOptions.Title = 'Sesame';
+       %sig{sig_tot}.GraphicOptions.Title = 'Sesame';
        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
        sig{sig_tot}.DataLabel = 'Pressure (GPa)';
 
@@ -465,7 +465,7 @@ dlg.Hidden = false;
        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up,P);
        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
        sig{sig_tot}.Name = 'Rayliegh Line';
-       sig{sig_tot}.GraphicOptions.Title = 'Rayleigh';
+       %sig{sig_tot}.GraphicOptions.Title = 'Rayleigh';
        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
        sig{sig_tot}.DataLabel = 'Pressure (GPa)';
 
@@ -529,7 +529,7 @@ for i=1:numfiles
                 sig{sig_tot}.GridLabel= 'Particle Velocity (km/s)'; 
                 sig{sig_tot}.DataLabel= 'Pressure (GPa)';
                 sig{sig_tot}.Name = content(id(ii),1).Label;
-                sig{sig_tot}.GraphicOptions.Title = 'Loaded';
+                %sig{sig_tot}.GraphicOptions.Title = 'Loaded';
             end
         end
         
@@ -564,7 +564,7 @@ for i=1:numfiles
             set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
             sig{sig_tot}.GridLabel= 'Particle Velocity (km/s)'; 
             sig{sig_tot}.DataLabel= 'Pressure (GPa)';
-            sig{sig_tot}.GraphicOptions.Title = 'Loaded';
+            %sig{sig_tot}.GraphicOptions.Title = 'Loaded';
             end
         end
     end
