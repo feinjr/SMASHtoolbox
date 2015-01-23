@@ -60,28 +60,30 @@ S0 = lookup(object,'Entropy',rho0,T0);
 if mean(isfinite(object.Entropy)) < 0.9
     disp('WARNING: Invalid entropy table detected, using thermodynamic integration');
    
-    %Solve up to density(1) (10 points) using initial conditions
-    if rho0 < density(1)        
-        dinitial = linspace(rho0,density(1),10)';
-        Tinitial = IntPVT(object,dinitial,T0);
-        T1 = Tinitial(end);
-    else
-        T1 = T0;
-    end
+%     %Solve up to density(1) (10 points) using initial conditions
+%     if rho0 < density(1)        
+%         dinitial = linspace(rho0,density(1),10)';
+%         Tinitial = IntPVT(object,dinitial,T0);
+%         T1 = Tinitial(end);
+%         T0 = T1;
+%     end
     
     %Solve for isentrope from initial conditions
-    temperature = IntPVT(object,density,T1);
-      
+    temperature = IntPVT(object,density,rho0,T0);      
     pressure = lookup(object,'Pressure',density,temperature);
     energy = lookup(object,'Energy',density,temperature);
     entropy = zeros(size(density));   
 else
 
-    %Find temperatures along isentrope through reverse lookup. If there is a problem, use the PVT integration.   
-    temperature = reverselookup(object,'Entropy',repmat(S0,size(density)),density);
-    pressure = lookup(object,'Pressure',density,temperature);
-    energy = lookup(object,'Energy',density,temperature);
-    entropy = lookup(object,'Entropy',density,temperature);
+    %Find temperatures along isentrope through reverse lookup. If there is a problem, use the PVT integration. 
+    try
+        temperature = reverselookup(object,'Entropy',repmat(S0,size(density)),density);
+    catch
+        temperature = T0.*ones(size(density));
+    end
+        pressure = lookup(object,'Pressure',density,temperature);
+        energy = lookup(object,'Energy',density,temperature);
+        entropy = lookup(object,'Entropy',density,temperature);
 
     % Check thermodynamic consistency: E = PdV
     if numel(density) > 1
@@ -90,18 +92,8 @@ else
             disp('WARNING: thermodynamic inconsistency detected in reverse lookup, using integration instead');
             %figure; plot(density,energy,density,-cumtrapz(1./density,pressure)+energy(1))
 
-            %Solve up to density(1) (10 points) using initial conditions
-            if rho0 < density(1)        
-                dinitial = linspace(rho0,density(1),10)';
-                Tinitial = IntPVT(object,dinitial,T0);
-                T1 = Tinitial(end);
-            else
-                T1 = T0;
-            end
-
             %Solve for isentrope
-            temperature = IntPVT(object,density,T1);
-
+            temperature = IntPVT(object,density,rho0,T0);
             pressure = lookup(object,'Pressure',density,temperature);
             energy = lookup(object,'Energy',density,temperature);
             entropy = lookup(object,'Entropy',density,temperature); 
@@ -142,7 +134,12 @@ end
 %For each density point, a fixed point iteration on T is performed using
 %the derivatives from the lookup. A maximum of 10 iterations is performed
 %before moving to the next density if 0.1% in T is  not achieved.
-function temperature = IntPVT(object,density,T0)
+function temperature = IntPVT(object,density,rho0,T0)
+    dsize = size(density);
+    
+    %Use a flipud, so set to a column vector. Reshape back later.
+    density = density(:);
+    tol = 1e-4;
     %t = repmat(T0,size(density));
     Tend = density(end)./density(1).*T0;
     temperature = density.*(Tend-T0)./(density(end)-density(1));
@@ -151,16 +148,24 @@ function temperature = IntPVT(object,density,T0)
         t = temperature;
         dpdt = zeros(size(t));
         dedt = zeros(size(t));
-
-        for i = 1:length(density)
-            [~,~,dt] = lookup(object,'Pressure',density(i),temperature(i));
-            [~,~,de] = lookup(object,'Energy',density(i),temperature(i));
-            dpdt(i) = dt;
-            dedt(i) = de;            
-        end
-        temperature = cumtrapz(1./density,-t.*dpdt./dedt)+T0;
+        
+        % Lookup derivatives
+        [~,~,dpdt] = lookup(object,'Pressure',density,temperature);
+        [~,~,dedt] = lookup(object,'Energy',density,temperature);
+        
+        % Fixed point iteration on temperature
+        %temperature = cumtrapz(1./density,-t.*dpdt./dedt)+T0;
+        
+        %Split density to integrate up or down 
+        Lower= find(density <= rho0); 
+        Upper= find(density > rho0); 
+        
+        tLower = cumtrapz(1./flipud(density(Lower)),-flipud(t(Lower)).*flipud(dpdt(Lower))./flipud(dedt(Lower)))+T0;
+        tUpper = cumtrapz(1./density(Upper),-t(Upper).*dpdt(Upper)./dedt(Upper))+T0;
+        temperature(Lower)=flipud(tLower); temperature(Upper)=tUpper;
+        
         check = sqrt(sum((temperature-t).^2))/length(temperature);
-        if check < .001
+        if check < tol
             break
         end
         
@@ -170,6 +175,9 @@ function temperature = IntPVT(object,density,T0)
             %update(w,count/10);
         end
     end
+    
+
+    temperature=reshape(temperature,dsize);
     if count == 10
         disp(sprintf('WARNING: Integration did not converge, LSE = %e',check))
     %elseif exist('w'); delete(w); 

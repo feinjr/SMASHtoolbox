@@ -53,7 +53,11 @@ if ~isnumeric(density) || min(size(density)) > 1
 end
 
 %Lookup initial temperature and energy
-T0 = reverselookup(object,'Pressure',P0,rho0);
+if P0 < 1e-3
+    T0 = 298.0;
+else
+    T0 = reverselookup(object,'Pressure',P0,rho0);
+end
 T0 = fzero(@(x) lookup(object,'Pressure',rho0,x)-P0,T0);
 E0 = lookup(object,'Energy',rho0,T0);
 
@@ -63,17 +67,18 @@ temperature = nan(size(density));
 
 
 % % Solve Rankine-Hugoniot jump conditions using fzero
-temperature(1) = fzero(@(x) lookup(object,'Energy',density(1),x)-E0 ...
-     -0.5.*(lookup(object,'Pressure',density(1),x)+P0).*(1/rho0-1/density(1)),T0);
-
+% options = optimset('TolX',1e-4);
+% temperature(1) = fzero(@(x) lookup(object,'Energy',density(1),x)-E0 ...
+%      -0.5.*(lookup(object,'Pressure',density(1),x)+P0).*(1/rho0-1/density(1)),T0,options);
+% 
 % for i = 2:length(density);
 %     temperature(i) = fzero(@(x) lookup(object,'Energy',density(i),x)-E0 ...
-%      -0.5.*(lookup(object,'Pressure',density(i),x)+P0).*(1/rho0-1/density(i)),temperature(i-1));
+%      -0.5.*(lookup(object,'Pressure',density(i),x)+P0).*(1/rho0-1/density(i)),temperature(i-1),options);
 %     %update(w,i/length(density));
 % end
 
 
-%Newton-Raphson solution to Hugoniot jump conditions
+%% Newton-Raphson solution to Hugoniot jump conditions
 for v = 1:length(density)
     d = density(v);
     
@@ -84,7 +89,7 @@ for v = 1:length(density)
         t = T0;
     end    
     
-    tol=1e-6; mult = 1; iternum=20;
+    tol=1e-4; mult = 1.0; iternum=20;
     
     [e,dedd,dedt] = lookup(object,'Energy',d,t);
     [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
@@ -98,7 +103,7 @@ for v = 1:length(density)
         while (tnew > max(object.Temperature))
             tnew = tnew*.9;
         end
-        t = tnew; check_old = check;
+        t = tnew;
         [e,dedd,dedt] = lookup(object,'Energy',d,t);
         [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
         
@@ -110,8 +115,8 @@ for v = 1:length(density)
         tnew = t-mult.*(check./(dedt-0.5.*dpdt.*(1/rho0-1/d)));
     end
 
-    if abs(check) > tol; 
-        warning('Warning: convergence not achieved, tol = %f',check);
+    if abs(check) > tol;
+        warning('Warning: convergence not achieved for density = %f, energy tol = %f',d,check);
     end
     temperature(v) = t;
 end

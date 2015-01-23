@@ -15,6 +15,11 @@ function [P,E,T,S] = evaluateHugoniot(object,rho)
 
 rho=rho(:);
 
-[P,E,T,S] = calculateHugoniot(object,rho);
+%Avoid costly temperature and entropy calculations if not required
+if nargout < 3
+    [P,E] = calculateHugoniot(object,rho);
+    T=0; E=0;
+else
+    [P,E,T,S] = calculateHugoniot(object,rho);
 
 end
