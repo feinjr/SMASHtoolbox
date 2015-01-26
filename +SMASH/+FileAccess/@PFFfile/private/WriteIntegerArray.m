@@ -1,8 +1,6 @@
-function result=WriteIntegerArray(fid)
+function WriteIntegerArray(fid,array)
 
-
-
-%LENGTH=ReadLong(fid);
-%result=ReadWord(fid,LENGTH);
+WriteLong(fid,numel(array));
+WriteWord(fid,array);
 
 end

@@ -27,8 +27,6 @@ assert(FFRAME==-4,'ERROR: non-PFF file detected');
 ldptr=ReadLong(fid); %#ok<NASGU> % beginning of directory datasets
 frewind(fid);
 header=ReadWord(fid,16);  %#ok<NASGU>
-%DFAULT=ReadWord(fid);
-%ReadWord(fid,14); % skip remaining file header
 
 % scan through data sets
 dataset=[];
@@ -37,7 +35,6 @@ while ~feof(fid)
     start=ftell(fid);
     DFRAME=ReadWord(fid);
     if DFRAME == -1
-        %fprintf('Start word located\n');
         % start word
     elseif isempty(DFRAME) || (DFRAME == -2)
         %continue
@@ -45,14 +42,6 @@ while ~feof(fid)
     else
         error('ERROR: start byte not found');
     end
-    %switch DFRAME
-    %    case -1
-    %        % everything is fine
-    %    case -2
-    %        break % main datasets are finished
-    %    otherwise
-    %        error('ERROR: dataset start not found');
-    %end
     LDS=ReadLong(fid);
     TRAW=ReadWord(fid);
     VDS=ReadWord(fid);
