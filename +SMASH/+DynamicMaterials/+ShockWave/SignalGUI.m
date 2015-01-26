@@ -354,7 +354,7 @@ direct = dir('*.*');
 for i = 3:length(direct);
     filelist{i-2} = direct(i).name;
 end
-h1=addblock(dlg,'listbox','Select Signal(s)',filelist);
+h1=addblock(dlg,'popup','Select Signal(s)',filelist);
 cols = {'Column 1', 'Column2','','','','',''}; 
 h2=addblock(dlg,'listbox','Select Column',cols);
 h=addblock(dlg,'check','Flip Column Order');   
@@ -399,9 +399,9 @@ function ApplyCallback(varargin)
     sig_tot = sig_tot+1;
 
     if ~value{3}
-        sig{sig_tot} = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',cols(1:2));
+        sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',cols(1:2));
     else
-        sig{sig_tot} = SMASH.SignalAnalysis.Signal('import',fullfile(filename),'column',fliplr(cols(1:2)));
+        sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',fliplr(cols(1:2)));
     end
 
     %Set some object properties
