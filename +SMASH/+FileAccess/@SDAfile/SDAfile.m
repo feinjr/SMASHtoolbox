@@ -47,7 +47,7 @@ classdef SDAfile
             % handle input
             assert(nargin>=1,'ERROR: no archive file specified');
             if (nargin<2) || isempty(mode)
-                mode='append';
+                mode='create';
             end
             if (nargin<3) || isempty(verbose)
                 verbose='quiet';
@@ -73,6 +73,8 @@ classdef SDAfile
             object.ArchiveFile=filename;
             if exist(filename,'file') 
                 switch mode
+                    case 'create'
+                        error('ERROR: file cannot be created because it already exists');
                     case 'overwrite'
                         delete(filename)
                         if verbose

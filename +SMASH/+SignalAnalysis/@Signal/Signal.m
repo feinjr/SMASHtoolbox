@@ -21,8 +21,8 @@
 %
 % Signals can be restored from previous objects saved by the "store"
 % method.
-%    >> object=Signal(archive,rcord);
-% The file specied by "archive" must have a *.sda (Sandia Data Archive)
+%    >> object=Signal(archive,record);
+% The file specifed by "archive" must have a *.sda (Sandia Data Archive)
 % file!
 %
 % See also SignalAnalysis, FileAccess.SupportedFormats

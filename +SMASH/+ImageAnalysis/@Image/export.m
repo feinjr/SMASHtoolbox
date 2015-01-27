@@ -17,15 +17,22 @@
 
 % created October 7, 2013 by Daniel Dolan (Sandia National Laboratories)
 % modified October 18, 2013 by Tommy Ao (Sandia National Laboratories)
-%
-function export(object,filename,label)
+% modified January 27, 2015 by Daniel Dolan
+%   -added PFF support
+function export(object,filename,mode,label)
 
-% handle input
-if nargin<2
-    filename='';
+% manage input
+assert(nargin>=2,'ERROR: insufficient input');
+assert(ischar(filename),'ERROR: invalid file name');
+assert(~isempty(filename),'ERROR: invalid file name');
+[~,fname,extension]=fileparts(filename);
+extension=lower(extension);
+
+if (nargin<3) || isempty(mode)   
+    mode='create';
 end
 
-if nargin<3
+if nargin<4
     label='';
 end
 
@@ -35,20 +42,31 @@ y=object.Grid2;
 z=object.Data;
 
 % place data into file
-[~,fname,ext]=fileparts(filename);
-imtype = strrep(ext,'.','');
-switch imtype
-    case 'sda'
+switch extension
+    case '.sda'
         if isempty(label)
             error('ERROR: label needed to place data into SDA');
         end
-        header=sprintf('%s %s %s',object.Grid1Label,object.Grid2Label,object.DataLabel);
-        archive=SMASH.FileAccessSDA(filename);
+        %header=sprintf('%s %s %s',object.Grid1Label,object.Grid2Label,object.DataLabel);
+        archive=SMASH.FileAccessSDA(filename,mode);
         archive.Precision='single';
-        archive.Deflate=9;
-        insert(archive,'array2D',label,x,y,z);
-        comment(archive,label,header);
-    case {'bmp','jpg','jpeg','png','tif','tiff'}
+        archive.Deflate=2;
+        data.X=x;
+        data.Y=y;
+        data.Z=Z;
+        insert(archive,label,data); % this may need some work
+        describe(archive,label,header);
+    case '.pff'
+        data=struct();
+        data.Grid={object.Grid1 object.Grid2};
+        data.GridLabel={object.Grid1Label object.Grid2Label};
+        data.Vector={object.Data};
+        data.VectorLabel={object.DataLabel};
+        data.Type='SMASH-generated PTFNGD dataset';
+        data.Title=object.Name;
+        archive=SMASH.FileAccess.PFFfile(filename);
+        write(archive,data,mode);
+    case {'.bmp','.jpg','.jpeg','.png','.tif','.tiff'}
         xheader=sprintf('%s ',object.Grid1Label);        
         yheader=sprintf('%s ',object.Grid2Label);        
         xfilename=strcat(fname,'Grid1.txt');

@@ -16,37 +16,52 @@
 
 %
 % created November 15, 2013 by Daniel Dolan (Sandia National Laboratories) 
-%
-function export(object,filename,label)
+% revised January January 27, 2015 by Daniel Dolan
+%   -added PFF support
+function export(object,filename,mode,label)
 
-% handle input
-if nargin<2
-    filename='';
+% manage input
+assert(nargin>=2,'ERROR: insufficient input');
+assert(ischar(filename),'ERROR: invalid file name');
+assert(~isempty(filename),'ERROR: invalid file name');
+[~,~,extension]=fileparts(filename);
+extension=lower(extension);
+
+if (nargin<3) || isempty(mode)   
+    mode='create';
 end
 
-if nargin<3
+if nargin<4
     label='';
 end
 
-% get data from object
-[x,y]=limit(object);
-header=sprintf('%s %s',object.GridLabel,object.DataLabel);
-
 % place data into file
-[~,~,ext]=fileparts(filename);
-if strcmpi(ext,'.sda')
+[x,y]=limit(object);
+if strcmp(extension,'.sda')
     if isempty(label)
         error('ERROR: label needed to place data into SDA');
-    end
-    archive=SMASH.FileAccess.SDAfile(filename);
+    end    
+    archive=SMASH.FileAccess.SDAfile(filename,mode);
     archive.Precision=object.Precision;
-    archive.Deflate=9;
-    insert(archive,'array1D',label,x,y);
-    comment(archive,label,header);
-elseif strcmpi(ext,'.pff')
-    
+    archive.Deflate=2;
+    data=struct();
+    data.X=x;
+    data.Y=y;
+    insert(archive,label,data); % this may need work!
+    describe(archive,label,object.Name);
+elseif strcmp(extension,'.pff')
+    data=struct();
+    data.Grid={object.Grid};
+    data.GridLabel={object.GridLabel};
+    data.Vector={object.Data};
+    data.VectorLabel={object.DataLabel};   
+    data.Type='SMASH-generated PTFNGD dataset';
+    data.Title=object.Name;
+    archive=SMASH.FileAccess.PFFfile(filename);
+    write(archive,data,mode);
 else
     data=[x(:) y(:)];  
+    header=sprintf('%s %s',object.GridLabel,object.DataLabel);
     SMASH.FileAccess.writeFile(filename,data,'%#+e\t%#+e\n',header);
 end
 
