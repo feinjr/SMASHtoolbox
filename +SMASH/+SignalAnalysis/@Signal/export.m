@@ -8,6 +8,8 @@
 % exported to a record inside a Sandia Data Archive and a label is
 % required.
 %    >> export(object,filename,label); % *.sda file extension
+% Signal objects can also be exported to PFF files.
+%    >> export(object,filename); % %
 %
 % See also Signal, store
 %
@@ -41,6 +43,8 @@ if strcmpi(ext,'.sda')
     archive.Deflate=9;
     insert(archive,'array1D',label,x,y);
     comment(archive,label,header);
+elseif strcmpi(ext,'.pff')
+    
 else
     data=[x(:) y(:)];  
     SMASH.FileAccess.writeFile(filename,data,'%#+e\t%#+e\n',header);
