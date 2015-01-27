@@ -1,14 +1,16 @@
-% READ Read dataset from a PFF object
+% read Read PFF dataset
 %
-% Syntax:
+% This method reads a dataset from a PFF file.
 %    >> output=read(object,[dataset]);
-% % The optional input (integer) specifies which dataset will read; if
-% omitted, the first dataset is read.  The output is a structure that
-% depend on the dataset type.
+% The optional input "dataset" is an integer specifying which dataset will
+% read (default is 1). The output is a structure that depends on the
+% dataset type.
 %
-% See also PFF, probe, select
+% See also PFFfile, probe, select, write
 %
 
+%
+% created January 27, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function data=read(object,dataset)
 

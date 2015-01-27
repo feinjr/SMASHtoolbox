@@ -19,7 +19,7 @@
 % was created.  Similar types of information may be found in different
 % formats, so user oversight may be needed to interpret files correctly.
 % Specialized classes (such as Signal and Image) in the SMASH toolbox
-% provide easier access to PFF files than this class.
+% provide easier access to PFF files.
 %
 % Syntax:
 %    >> object=PFFfile([filename]);

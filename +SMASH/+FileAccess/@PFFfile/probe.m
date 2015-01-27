@@ -1,14 +1,16 @@
-% Probe Reveal datasets inside a PFF object
+% probe Reveal PFF datasets 
 %
-% This method determines the datasets inside a PFF object.  The results can
+% This method determines the datasets inside a PFF file.  The results can
 % be returned at the command line:
 %    >> probe(object)
 % or in a graphical window.
 %    >> probe(object,'gui');
 % Calling the function with an output returns the contents as a structure.
-%    >> dataset=probe(object);
+%    >> dataset=probe(object); % structure array of file contents
+%    >> dlg=probe(object,'gui'); % Dialog box handle
 %
-% See also PFF, read, select
+% See also PFFfile, read, select, write
+%
 
 % created October 17, 2013 by Daniel Dolan (Sandia National Laboratories)
 function varargout=probe(object,choice)

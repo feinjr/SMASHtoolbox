@@ -1,19 +1,36 @@
-% write Write data to a PFF object
+% write Write PFF data
 %
-% UNDER CONSTRUCTION!
+% This method writes data to a PFF file as a PFTNGD dataset.
+%     >> write(object,data);
+% The input "data" must be a MATLAB structure with the following fields.
+%     "Grid"        : cell array of M 1-D arrays (required)
+%     "Vector"      : cell array of N M-D arrays (required)
+%     "GridLabel"   : cell array of M strings (optional)
+%     "VectorLabel" : cell array of N strings (optional)
+%     "Type"        : string (optional)
+%     "Title"       : string (optional)
+% Multiple blocks are *not* supported in PFTNGD datasets,  so "data" must
+% be a single-element structure.
 %
-% See also PFFfile
+% By default, this method generates an error if the PFF file already
+% exists.  Alternate write modes can be specified.
+%     >> write(object,data,mode);
+% The default mode is 'create'.  The 'overwrite' mode erases existing files
+% prior to writing the dataset. The 'append' mode adds the dataset after
+% preexisting datasets.
+%
+% See also PFFfile, read, probe, select
 %
 
 %
-% 
+% created January 27, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function write(object,data,mode)
 
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
 assert(isstruct(data) && (numel(data)==1),...
-    'ERROR: data must be passed in an individual structure');
+    'ERROR: data must be passed as a structure');
 
 dataset=struct(...
     'Type','(PFTNGD dataset)','Title','(Default title)');
