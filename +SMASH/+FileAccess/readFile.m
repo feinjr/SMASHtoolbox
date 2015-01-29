@@ -75,7 +75,6 @@ switch format
         end
         try
             data.Data=data.Data(:,record); 
-            %data=data(:,record);
         catch
             error('ERROR: invalid column request');
         end

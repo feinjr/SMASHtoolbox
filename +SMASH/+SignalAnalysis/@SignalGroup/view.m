@@ -73,7 +73,7 @@ if new
     xlabel(target,object.GridLabel);
     ylabel(target,object.DataLabel);
     if ~isempty(object.Legend)
-        legend(object.Legend(index),'Location','best');
+        legend(object.Legend(index),'Location','best');       
     end
     box on;
 end

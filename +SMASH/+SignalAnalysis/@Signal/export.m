@@ -55,7 +55,7 @@ elseif strcmp(extension,'.pff')
     data.GridLabel={object.GridLabel};
     data.Vector={object.Data};
     data.VectorLabel={object.DataLabel};   
-    data.Type='SMASH-generated PTFNGD dataset';
+    data.Type='Signal export';
     data.Title=object.Name;
     archive=SMASH.FileAccess.PFFfile(filename);
     write(archive,data,mode);

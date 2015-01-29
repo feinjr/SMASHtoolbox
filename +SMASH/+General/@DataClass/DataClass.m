@@ -37,9 +37,9 @@ classdef DataClass
     end
     %% hidden methods
     methods (Hidden=true)
-        function [object,data]=DataClass(varargin)
+        function [object,data]=DataClass(varargin)                        
             if (nargin==0) || isFileName(object,varargin{1})
-                data=SMASH.FileAccess.readFile(varargin{:});
+                data=SMASH.FileAccess.readFile(varargin{:});                                
                 if isstruct(data)
                     object=import(object,data);
                     object.Source='File import';

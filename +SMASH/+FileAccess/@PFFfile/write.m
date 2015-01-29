@@ -107,16 +107,23 @@ CleanObject=onCleanup(@() fclose(fid)); % automatically close on exit
 DEFAULT=-3;
 resetFile(fid);
 WriteWord(fid,-4); % FFRAME
-WriteWord(fid,repmat(DEFAULT,[1 15]));
+WriteWord(fid,repmat(DEFAULT,[1 15])); % fix directory dataset location later
 
 % skip existing datasets in append mode
+directory=[];
 if strcmp(mode,'append')
     resetFile(fid);
     while true
         start=ftell(fid);
         DFRAME=ReadWord(fid);
         if DFRAME == -1 % start word
-            LDS=ReadLong(fid);
+            directory(end+1).LOCDIR=start; %#ok<AGROW>
+            LDS=ReadLong(fid);            
+            directory(end).LENDIR=LDS;
+            directory(end).TRAW=ReadWord(fid); 
+            ReadWord(fid,12); % skip VDS, TAPP, and RFU
+            directory(end).TYPE=ReadString(fid);
+            directory(end).TITLE=ReadString(fid);
             fseek(fid,start+2*LDS,'bof'); % move to next dataset
         elseif DFRAME == -2 % stop word
             fseek(fid,-2,'cof'); % move back one word
@@ -131,15 +138,19 @@ end
 % create dataset header
 resetFile(fid);
 start=ftell(fid);
+directory(end+1).LOCDIR=start;
 WriteWord(fid,-1); % DFRAME (start word)
 WriteLong(fid,0); % LDS placeholder
 WriteWord(fid,7); % TRAW (PFTNGD)
+directory(end).TRAW=7;
 WriteWord(fid,DEFAULT); % VDS
 WriteWord(fid,3); % TAPP
 WriteWord(fid,1); % RFU
 WriteWord(fid,repmat(DEFAULT,[1 9])); % RFU
 WriteString(fid,dataset.Type);
+directory(end).TYPE=dataset.Type;
 WriteString(fid,dataset.Title);
+directory(end).TITLE=dataset.Title;
 
 % create dataset
 WriteWord(fid,M); % space dimensionality
@@ -164,11 +175,38 @@ end
 % finish dataset and revise the header
 stop=ftell(fid);
 WriteWord(fid,-2); % stop word
-ftell(fid);
 fseek(fid,start+2,'bof'); % move to LDS location
-LDS=stop-start;
-%fprintf('LDS=%g bytes, %g words\n',LDS,LDS/2);
-WriteLong(fid,LDS/2); % LDS (words)
-% leave file header "broken"
+LDS=(stop-start)/2; % words
+WriteLong(fid,LDS); 
+directory(end).LENDIR=LDS;
+
+% add directory datasets
+start=stop+2;
+fseek(fid,2,'bof');
+WriteLong(fid,start); % update file header
+fseek(fid,start,'bof');
+
+for k=1:numel(directory)
+    start=ftell(fid);
+    WriteWord(fid,-1); % start word
+    WriteLong(fid,0); % LDS placeholder
+    WriteWord(fid,0); % TRAW (PFTDIR)
+    WriteWord(fid,DEFAULT); % VDS
+    WriteWord(fid,3); % TAPP
+    WriteWord(fid,1); % RFU
+    WriteWord(fid,repmat(DEFAULT,[1 9])); % RFU
+    WriteString(fid,directory(k).TYPE);
+    WriteString(fid,directory(k).TITLE);
+    WriteWord(fid,directory(k).TRAW);
+    WriteLong(fid,directory(k).LENDIR);
+    WriteLong(fid,directory(k).LOCDIR);       
+    stop=ftell(fid);
+    fseek(fid,start+2,'bof'); % move to LDS location
+    LDS=(stop-start)/2; % words
+    WriteLong(fid,LDS);
+    fseek(fid,stop,'bof'); % move bac
+end
+WriteWord(fid,-2); % stop word
+
 
 end

@@ -14,7 +14,7 @@ end
 switch data.Format
     case 'column'
         data=data.Data;
-        if size(data,1)==1
+        if size(data,2)==1
             object.Data=data(:,1);
             object.Grid=transpose(1:size(data,1));
         else

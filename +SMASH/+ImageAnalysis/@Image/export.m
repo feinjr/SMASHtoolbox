@@ -62,7 +62,7 @@ switch extension
         data.GridLabel={object.Grid1Label object.Grid2Label};
         data.Vector={object.Data};
         data.VectorLabel={object.DataLabel};
-        data.Type='SMASH-generated PTFNGD dataset';
+        data.Type='Image export';
         data.Title=object.Name;
         archive=SMASH.FileAccess.PFFfile(filename);
         write(archive,data,mode);

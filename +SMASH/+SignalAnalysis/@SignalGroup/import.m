@@ -2,20 +2,32 @@ function object=import(object,data)
 
 object.Name='SignalGroup object';
 
-% multiple files
-if numel(data)>1
+if numel(data)==1 % single file (needs testing!)
+    object=import@SMASH.SignalAnalysis.Signal(object,data);
+    if strcmp(data.Format,'column')
+        while size(data.Data,2)>2
+            data.Data=data.Data(:,[1 3:end]);
+            temp=import@SMASH.SignalAnalysis.Signal(object,data);            
+            temp.Legend={};
+            temp.Legend=cell(1,size(object.Data,2));
+            object.Legend={};
+            object.Legend=cell(1,size(object.Data,2));            
+            object=gather(object,temp);
+        end
+    end
+else % multiple files
     object=import(object,data(1));
     for k=2:numel(data)
         temp=import@SMASH.SignalAnalysis.Signal(object,data(k));
         object=gather(object,temp);
-        object.Legend{k}=sprintf('signal %d',k);
     end
-    object.NumberSignals=numel(data);
-    return
 end
 
-object=import@SMASH.SignalAnalysis.Signal(object,data);
-object.NumberSignals=1;
-object.Legend={'signal 1'};
+% finishing details
+object.NumberSignals=size(object.Data,2);
+object.Legend=cell(1,object.NumberSignals);
+for k=1:object.NumberSignals
+    object.Legend{k}=sprintf('Signal %d',k);
+end
 
 end
