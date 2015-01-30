@@ -180,6 +180,13 @@ LDS=(stop-start)/2; % words
 WriteLong(fid,LDS); 
 directory(end).LENDIR=LDS;
 
+% terminate the file with stop words
+fseek(fid,stop+2,'bof');
+%WriteWord(fid,repmat(-2,[1 10])); 
+WriteWord(fid,repmat(-2,[1 1024])); 
+%WriteWord(fid,repmat(-2,[1 2048])); 
+return
+
 % add directory datasets
 start=stop+2;
 fseek(fid,2,'bof');
@@ -207,6 +214,6 @@ for k=1:numel(directory)
     fseek(fid,stop,'bof'); % move bac
 end
 WriteWord(fid,-2); % stop word
-
+WriteWord(fid,repmat(-2,[1 10])); % extra stop words
 
 end
