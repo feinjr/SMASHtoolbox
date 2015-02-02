@@ -32,15 +32,24 @@ switch data.Format
         object.Data=data.Data;
         set(object.GraphicOptions,'ColorMap',data.ColorMap);
     case 'pff'
+        errmsg{1}='ERROR: cannot import this dataset into a Signal object';
         switch data.PFFdataset
-            case 'PFTUF3'
+            case {'PFTUF3','PFTNF3','PFTNG3','PFTNI3'}                        
                 object.Grid1=data.X;
                 object.Grid2=data.Y;
                 object.Data=data.Data;
             case 'PFTNGD'
+                if (numel(data.X) ~= 2)
+                    errmsg{2}='     Grid is not two-dimensional';
+                    error('%s\n',errmsg{:});
+                end
                 object.Grid1=data.X{1};
                 object.Grid2=data.X{2};
-                object.Data=data.Data{1};
+                if (numel(data.Data) ~= 1)
+                    errmsg{2}='     Data is not one-dimensional';
+                    error('%s\n',errmsg{:});
+                end
+                object.Data=data.Data{1};                                               
             otherwise
                 error('ERROR: cannot import Image from this PFF dataset');
         end
@@ -77,6 +86,7 @@ if ndims(object.Data)==3
     object.Data=grayscale;
     object.ColorMap=gray(64);
 end
+assert(ismatrix(object.Data),'ERROR: this class supports scalar data only');
 object.Precision=object.Precision; % invoke superclass set.Precision method
     
 end
