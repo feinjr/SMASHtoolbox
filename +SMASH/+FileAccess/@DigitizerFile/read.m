@@ -27,6 +27,19 @@ function output=read(object,record)
 % handle input
 if nargin<2
     record=[];
+elseif strcmp(record,'all')
+    switch object.Format
+        case {'agilent','keysight'}
+            % do nothing
+        otherwise
+            error('ERROR: ''all'' option not supported by this format');
+    end
+    report=probe(object);
+    for k=1:numel(report.Name)
+        temp=read(object,k);
+        output(k)=temp; %#ok<AGROW>
+    end
+    return
 end
 
 % error checking
@@ -55,7 +68,7 @@ switch object.Format
             end
         elseif ~any(record==(1:report.NumberSignals))
             error('ERROR: invalid record number ');
-        end        
+        end
         output.FileOption=record;
         [signal,time]=read_agilent(object.FullName,record);
     case 'keysight'
@@ -75,9 +88,9 @@ switch object.Format
             end
         elseif ~any(record==(1:report.NumberSignals))
             error('ERROR: invalid record number ');
-        end        
+        end
         output.FileOption=record;
-        [signal,time]=read_keysight(object.FullName,record);        
+        [signal,time]=read_keysight(object.FullName,record);
     case 'lecroy'
         [signal,time]=read_lecroy(object.FullName);
     case 'tektronix'

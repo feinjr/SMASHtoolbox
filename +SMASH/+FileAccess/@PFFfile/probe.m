@@ -101,7 +101,7 @@ elseif strcmpi(choice,'gui')
     fig.Hidden=true;
     fig.Name='PFF datsets';
     label=sprintf('Datasets in %s',name);
-    h=addblock(fig,'listbox',label,report);
+    h=addblock(fig,'listbox',label,report,[],20);
     set(h(end),'FontName',...
         get(0,'FixedWidthFontName'));
     locate(fig,'center');

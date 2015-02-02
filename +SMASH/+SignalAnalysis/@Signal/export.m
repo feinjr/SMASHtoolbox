@@ -9,7 +9,7 @@
 % required.
 %    >> export(object,filename,label); % *.sda file extension
 % Signal objects can also be exported to PFF files.
-%    >> export(object,filename); % %
+%    >> export(object,filename); %
 %
 % See also Signal, store
 %

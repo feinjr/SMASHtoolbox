@@ -12,7 +12,7 @@
 %
 % created December 4, 2013 by Daniel Dolan (Sandia National Laboratories)
 %
-function probeFile(filename,format)
+function varargout=probeFile(filename,format,varargin)
 
 % handle file name
 if (nargin<1) || isempty(filename)
@@ -49,9 +49,16 @@ switch lower(ext)
 end
 
 try
-    probe(object)
+    if nargout==0
+        probe(object,varargin{:});
+    else
+        varargout=cell(1,nargout);
+        [varargout{:}]=probe(object,varargin{:});
+    end
 catch
     error('ERROR: unable to probe file');
 end
+
+
 
 end

@@ -3,30 +3,33 @@
 % the "Data" property; the independent variable is stored in the "Grid"
 % property.
 %
-% The most direct way of creating a Signal object is to pass two numerical
-% arrays.
+% Signal objects may be constructed from two numerical inputs.
 %    >> object=Signal(x,y);
 % The first input is the grid (independent) array, while the second input
 % is the data (dependent) array.  Typically, inputs "x" and "y" have the
 % same number of elements.  Input "x" can be empty, in which case the
 % object's Grid property is assigned to set of ascending integers (starting
-% at 1).  Input "x" can also be assigned to a single number, which is used
-% as the step size for the object's Grid property (which starts at 0).
+% at 1).  Input "x" can also be a scaler, which is interpreted
+% as the step size for the object's Grid property (starting from 0).
 %
-% Signal objects can be created by importing information from a file.
+% Signal objects can also be created from a file.
 %    >> object=Signal(); % interactive file selection
 %    >> object=Signal(filename,[format],[record]);
-% The inputs "format" and "record" may be optional depending on the file's
-% format and contents.
+% File arguments ("format" and "record") are passed to the
+% FileAccess.readFile function.  These inputs should be used when the
+% file's extension corresponds to multiple formats or the file contains
+% multiple records.
 %
+% See also SignalAnalysis, FileAccess.readFile, FileAccess.SupportedFormats
+%
+
+% is this necessary anymore?
 % Signals can be restored from previous objects saved by the "store"
 % method.
 %    >> object=Signal(archive,record);
 % The file specifed by "archive" must have a *.sda (Sandia Data Archive)
 % file!
-%
-% See also SignalAnalysis, FileAccess.SupportedFormats
-%
+
 
 %
 % created November 14, 2013 by Daniel Dolan (Sandia National Laboraties)
@@ -34,6 +37,8 @@
 %    -removed the 'import' argument requirement
 % revised November 2, 2014 by Daniel Dolan
 %    -simplified creator by using new DataClass paradigm
+% revised January 30 by Daniel Dolan
+%    -expanded PFF support
 classdef Signal < SMASH.General.DataClass
     %%
     properties (SetAccess=?SMASH.General.DataClass) % superclass, class, and subclass access
