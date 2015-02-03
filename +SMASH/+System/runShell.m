@@ -3,7 +3,7 @@
 % This function passes commands to an operating system shell: 
 %    Windows   : DOS
 %    Macintosh : bash (typically)
-%    Linuex    : bash/csh/tcsh (depending on configuration)
+%    Linux    : bash/csh/tcsh (depending on configuration)
 % The function can be used on any operating system, but caution
 % is needed when moving between between operating systems.  Command
 % validity is not tested prior to execution in the shell!

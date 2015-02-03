@@ -5,7 +5,7 @@
 % be time, position, wavelength, energy, etc. The z-axis of the image is
 % could be related to intensity or number of counts.
 %
-% The most direct way of creating a Image object is to pass three input
+% The direct way of creating a Image object is to pass three input
 % arrays:
 %    >> object=Image(x,y,z);
 % The first and second inputs define the independent arrays, which are
@@ -21,14 +21,8 @@
 %    >> object=Image(filename,[format],[record]);
 % The inputs "format" and "record" may be optional depending on the file's
 % format and contents.  If the file name contains a wild card ('*.sda')
-% that matches more than one file, the object is contructed by summing the
-% individual files (consistent sizing required).
-%
-% Images can be restored from previous objects saved by the "store"
-% method.
-%    >> object=Image(archive,record);
-% The file specied by "archive" must have a *.sda (Sandia Data Archive)
-% file!
+% that matches more than one file, the object is contructed from the sum of
+% the individual files (consistent size required).
 %
 % See also ImageAnalysis, FileAccess.SupportedFormats
 %

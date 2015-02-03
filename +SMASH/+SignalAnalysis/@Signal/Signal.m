@@ -12,7 +12,7 @@
 % at 1).  Input "x" can also be a scaler, which is interpreted
 % as the step size for the object's Grid property (starting from 0).
 %
-% Signal objects can also be created from a file.
+% Signal objects can also be created by importing file data.
 %    >> object=Signal(); % interactive file selection
 %    >> object=Signal(filename,[format],[record]);
 % File arguments ("format" and "record") are passed to the
@@ -22,14 +22,6 @@
 %
 % See also SignalAnalysis, FileAccess.readFile, FileAccess.SupportedFormats
 %
-
-% is this necessary anymore?
-% Signals can be restored from previous objects saved by the "store"
-% method.
-%    >> object=Signal(archive,record);
-% The file specifed by "archive" must have a *.sda (Sandia Data Archive)
-% file!
-
 
 %
 % created November 14, 2013 by Daniel Dolan (Sandia National Laboraties)

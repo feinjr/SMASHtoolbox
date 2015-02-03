@@ -14,14 +14,12 @@
 % file must have the same format.  Multiple signals are automatially
 % extracted from 'column' and 'sda' format files.
 %
-% Signals can be restored from previous objects saved by the "store"
-% method.
-%    >> object=SignalGroup('restore',filename,[record]);
-% Restoring a previous object requires  a *.sda (Sandia Data Archive) file!
-%
 % See also SignalAnalysis, FileAccess.SupportedFormats
 %
 
+%
+%
+%
 classdef SignalGroup < SMASH.SignalAnalysis.Signal
     properties (SetAccess=?SMASH.General.DataClass)
         NumberSignals = 0 % Number of signals
