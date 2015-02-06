@@ -74,7 +74,7 @@ classdef SDAfile
             if exist(filename,'file') 
                 switch mode
                     case 'create'
-                        error('ERROR: file cannot be created because it already exists');
+                        %error('ERROR: file cannot be created because it already exists');
                     case 'overwrite'
                         delete(filename)
                         if verbose

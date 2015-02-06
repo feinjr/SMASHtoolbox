@@ -84,10 +84,20 @@ elseif isa(data,'function_handle')
     h5writeatt(archive.ArchiveFile,datasetname,'RecordType','function');
         h5writeatt(archive.ArchiveFile,datasetname,'Empty','false');
 elseif isstruct(data)
+    errmsg{1}    ='ERROR: structure arrays are not supported:';
+    errmsg{end+1}='Suggestions:';
+    errmsg{end+1}='   -Convert to a cell array of individual structures';
+    errmsg{end+1}='   -Store individual structures as separate records';
+    assert(numel(data)==1,'%s\n',errmsg{:});
     insert_structure(archive,datasetname,data,deflate);
 elseif iscell(data)
     insert_cell(archive,datasetname,data,deflate);
 elseif isobject(data) % convert objects to structures
+    errmsg{1}    ='ERROR: object arrays are not supported:';
+    errmsg{end+1}='Suggestions:';
+    errmsg{end+1}='   -Convert to a cell array of individual objects';
+    errmsg{end+1}='   -Store individual objects as separate records';
+    assert(numel(data)==1,'%s\n',errmsg{:});
     ObjectClass=class(data);
     data=object2structure(data);
     insert_structure(archive,datasetname,data,deflate);
@@ -95,7 +105,7 @@ elseif isobject(data) % convert objects to structures
     h5writeatt(archive.ArchiveFile,['/' label],'ClassName',ObjectClass);
 end
 h5writeatt(archive.ArchiveFile,datasetname,'Description',description);
-h5writeatt(archive.ArchiveFile,datasetname,'Inserted',datestr(now));
+%h5writeatt(archive.ArchiveFile,datasetname,'Inserted',datestr(now));
 h5writeatt(archive.ArchiveFile,datasetname,'Deflate',deflate);
 
 h5writeatt(archive.ArchiveFile,'/','Updated',datestr(now));
