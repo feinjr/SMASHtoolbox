@@ -39,9 +39,9 @@ switch data.Format
                 object.Grid2=data.Y;
                 object.Data=data.Data;
             case 'PFTNGD'
-                if (numel(data.X) ~= 2)
+                if (numel(data.X) < 2)
                     errmsg{2}='     Grid is not two-dimensional';
-                    error('%s\n',errmsg{:});
+                    error('%s\n',errmsg{:});               
                 end
                 object.Grid1=data.X{1};
                 object.Grid2=data.X{2};
