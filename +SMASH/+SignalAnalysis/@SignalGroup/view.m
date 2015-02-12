@@ -36,8 +36,11 @@ end
 
 new=false;
 if (nargin<3) || isempty(target);
-    target=figure;   
-    new=true;
+    %target=figure;   
+    target=SMASH.MUI.Figure;
+    target=target.Handle;
+    set(target,'NumberTitle','on','Name','SignalGroup view');
+    new=true; 
 elseif ~ishandle(target)
     error('ERROR: invalid target handle');
 end
@@ -75,7 +78,7 @@ if new
     if ~isempty(object.Legend)
         legend(object.Legend(index),'Location','best');       
     end
-    box on;
+    box on;    
 end
 
 figure(fig);

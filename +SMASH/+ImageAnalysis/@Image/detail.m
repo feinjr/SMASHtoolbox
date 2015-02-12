@@ -31,24 +31,25 @@ end
 
 % create graphical interface
 h=basic_figure(target,orientation);
+
 h.uimenu=uimenu(h.figure,'Label','Help');
 uimenu(h.uimenu,'Label','About detail view','Callback',@DetailHelp);
 
 % % tweak the figure menu
- hb=findall(h.figure,'Type','uitoolbar');
- hb=findall(hb);
- hb=hb(2:end);
- drop=true(size(hb));
-for n=1:numel(hb)
-     tag=lower(get(hb(n),'Tag'));
-     if strfind(tag,'cursor')
-         drop(n)=false;
-     elseif strfind(tag,'save')
-         drop(n)=false;
-     end
-end
-set(hb(drop),'Visible','off');
-set(hb,'Separator','off');
+%  hb=findall(h.figure,'Type','uitoolbar');
+%  hb=findall(hb);
+%  hb=hb(2:end);
+%  drop=true(size(hb));
+% for n=1:numel(hb)
+%      tag=lower(get(hb(n),'Tag'));
+%      if strfind(tag,'cursor')
+%          drop(n)=false;
+%      elseif strfind(tag,'save')
+%          drop(n)=false;
+%      end
+% end
+% set(hb(drop),'Visible','off');
+% set(hb,'Separator','off');
 
 
 % create overview plot
@@ -260,7 +261,7 @@ end
 
 message={};
 message{end+1}='This is a tool for viewing local details within the context of the full image.';
-message{end+1}='The upper plot shows the entire image, while the lower plot is a detailed view of that image.';
+message{end+1}='The left plot shows the entire image, while the right plot is a detailed view of that image.';
 message{end+1}='The location and size of the the detail view is displayed as a rectangle on the full image.';
 message{end+1}='Use the array keys or click the upper image to move the detail region.';
 message{end+1}='Hold down the shift button and an arrow key to change the size of the detail region.';

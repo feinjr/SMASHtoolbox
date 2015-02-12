@@ -32,15 +32,20 @@ end
 
 % create graphic objects
 if isempty(target)
-    h.figure=figure;
+    object=SMASH.MUI.Figure;
+    h.figure=object.Handle;
+    set(h.figure,'NumberTitle','on','Name','Image view');
+    %h.figure=figure;
 else
     h.figure=target;
     clf(target);
 end
-set(h.figure,'DockControls','off',...
-    'ToolBar','figure','MenuBar','none',...
-    'Units','pixels','Position',figpos,...
+set(h.figure,'Units','pixels','Position',figpos,...
     'Visible','off');
+%set(h.figure,'DockControls','off',...
+%    'ToolBar','figure','MenuBar','none',...
+%    'Units','pixels','Position',figpos,...
+%    'Visible','off');
 movegui(h.figure,'northeast');
 color=get(h.figure,'Color');
 
@@ -49,23 +54,23 @@ h.panel=uipanel('Parent',h.figure,'Tag','GraphicPanel',...
     'Units','normalized','Position',[0 0 1 1]);  
 
 % tweak the figure menu
-hb=findall(h.figure,'Type','uitoolbar');
-hb=findall(hb);
-hb=hb(2:end);
-drop=true(size(hb));
-for n=1:numel(hb)
-    tag=lower(get(hb(n),'Tag'));
-    if strfind(tag,'zoom')
-        drop(n)=false;
-    elseif strfind(tag,'pan')
-        drop(n)=false;
-    elseif strfind(tag,'cursor')
-        drop(n)=false;
-    elseif strfind(tag,'save')
-        drop(n)=false;
-    end
-end
-set(hb(drop),'Visible','off');
-set(hb,'Separator','off');
+%hb=findall(h.figure,'Type','uitoolbar');
+%hb=findall(hb);
+%hb=hb(2:end);
+%drop=true(size(hb));
+%for n=1:numel(hb)
+%    tag=lower(get(hb(n),'Tag'));
+%    if strfind(tag,'zoom')
+%        drop(n)=false;
+%    elseif strfind(tag,'pan')
+%        drop(n)=false;
+%    elseif strfind(tag,'cursor')
+%        drop(n)=false;
+%    elseif strfind(tag,'save')
+%        drop(n)=false;
+%    end
+%end
+%set(hb(drop),'Visible','off');
+%set(hb,'Separator','off');
 
 end

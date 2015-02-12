@@ -26,7 +26,10 @@ function varargout=view(object,target)
 % handle input
 new=false;
 if (nargin<2) || isempty(target);
-    target=figure;   
+    %target=figure;   
+    target=SMASH.MUI.Figure;
+    target=target.Handle;
+    set(target,'NumberTitle','on','Name','Signal view');
     new=true;
 elseif ~ishandle(target)
     error('ERROR: invalid target handle');
