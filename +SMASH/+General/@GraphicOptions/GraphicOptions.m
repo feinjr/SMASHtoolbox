@@ -51,7 +51,7 @@ classdef GraphicOptions < hgsetget
         varargout=setdisp(varargin);
     end
 %% static methods
-    methods (Static=true,Hidden=true)
+    methods (Static=true, Hidden=true)
         function object=restore(data)
             object=SMASH.General.GraphicOptions();
             name=fieldnames(data);

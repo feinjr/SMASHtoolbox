@@ -1,8 +1,8 @@
-% restore Restore DataClass object from an archive
+% restore Restore object from an archive
 
 function object=restore(data)
 
-object=SMASH.General.DataClass(NaN);
+object=SMASH.SignalAnalysis.Signal([],[],NaN);
 
 name=fieldnames(data);
 for n=1:numel(name)

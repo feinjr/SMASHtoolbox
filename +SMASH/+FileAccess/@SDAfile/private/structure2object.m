@@ -12,6 +12,7 @@ catch
         '       The %s class does not provide a "restore" method',...
         ClassName);     
     warning('SDA:restore','%s\n',message{:});
+    object=data;
 end
 
 end

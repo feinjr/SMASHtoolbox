@@ -85,6 +85,9 @@ classdef Image < SMASH.General.DataClass
         varargout=create(varargin)
         varargout=import(varargin) 
     end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
     %% property setters
     methods
         function object=set.Grid1Label(object,value)

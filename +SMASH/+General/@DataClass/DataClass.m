@@ -42,7 +42,7 @@ classdef DataClass
                 data=SMASH.FileAccess.readFile(varargin{:});                                
                 if isstruct(data)
                     object=import(object,data);
-                    object.Source='File import';
+                    object.Source='File import';                
                 elseif strcmp(class(object),class(data))
                     object=data;
                     object.Source='Restored object';
@@ -74,7 +74,9 @@ classdef DataClass
     %% protected methods
     methods (Access=protected, Hidden=true)
         varargout=create(varargin);
-        varargout=import(varargin);
+        varargout=import(varargin);        
+    end
+    methods (Static=true, Hidden=true)
         varargout=restore(varargin);
     end
     %% property setters

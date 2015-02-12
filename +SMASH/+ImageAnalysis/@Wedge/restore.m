@@ -1,8 +1,8 @@
-% restore Restore DataClass object from an archive
+% restore Restore Image object from an archive
 
 function object=restore(data)
 
-object=SMASH.General.DataClass(NaN);
+object=SMASH.ImageAnalysis.Wedge([],[],NaN);
 
 name=fieldnames(data);
 for n=1:numel(name)
