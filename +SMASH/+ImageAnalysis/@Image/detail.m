@@ -53,7 +53,7 @@ set(hb,'Separator','off');
 
 % create overview plot
 h.axes(1)=axes('Parent',h.panel,'OuterPosition',axespos{1},...
-    'Tag','OverviewAxes'); %,'XTickLabel','','YTickLabel','');
+    'Tag','OverviewAxes','YDir',get(object.GraphicOptions,'YDir')); %,'XTickLabel','','YTickLabel','');
 temp=show(object,h.axes(1));
 h.image(1)=temp.image;
 
@@ -70,7 +70,7 @@ ROI=rectangle2('Parent',h.axes(1),'Position',[x0 y0 Lx Ly],...
 
 % create detail plot
 h.axes(2)=axes('Parent',h.panel,'OuterPosition',axespos{2},...
-    'Tag','DetailAxes');
+    'Tag','DetailAxes','YDir',get(object.GraphicOptions,'YDir'));
 temp=show(object,h.axes(2));
 daspect(h.axes(2),'auto');
 pbaspect(h.axes(2),'auto');
@@ -89,7 +89,7 @@ setappdata(h.axes(1),'CLimLink',hlink);
 % final details
 hc=findobj(gcf,'Tag','Colorbar');
 delete(hc(1));
-set(h.axes,'YDir','reverse');
+set(h.axes,'YDir',get(object.GraphicOptions,'YDir'));
 
 %% callbacks
 set(h.figure,'WindowButtonMotionFcn',@MotionFcn);
