@@ -65,6 +65,12 @@ set(button(1),'Callback',@okCallback);
                 device='-djpeg100';
             case 'PDF'
                 device='-dpdf';
+                Units=get(fig.Handle,'Units');
+                PaperUnits=get(fig.Handle,'PaperUnits');
+                set(fig.Handle,'Units','inches','PaperUnits','inches');
+                position=get(fig.Handle,'Position');
+                set(fig.Handle,'PaperSize',position(3:4));
+                set(fig.Handle,'Units',Units,'PaperUnits',PaperUnits);
             case 'PNG'
                 device='-dpng';
             case 'TIFF'
