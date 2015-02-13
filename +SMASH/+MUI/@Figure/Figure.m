@@ -69,20 +69,30 @@ classdef Figure < handle
             if rem(nargin,2)==1
                 error('ERROR: unmatched name/value pair');
             end
+            option=struct('Toolbar','none','MenuBar','none',...
+                'DockControls','off','Units','pixels','Resize','on');                    
             for n=1:2:nargin
-                name=varargin{n};
+                name=varargin{n};               
                 value=varargin{n+1};
                 try
-                    object.(name)=value;
-                catch %#ok<CTCH>
-                    fprintf('Ignoring unrecogized name ''%s''\n',name);
+                    option=SMASH.General.matchStructure(option,name,value);
+                catch
+                    option.(name)=value;
                 end
             end
+            name=fieldnames(option);
+            N=numel(name);
+            temp=cell(1,2*N);
+            for n=1:N
+                temp{2*n-1}=name{n};
+                temp{2*n}=option.(name{n});
+            end
+            fig=figure(temp{:});            
             % create figure and toolbar
-            fig=figure('Toolbar','none','MenuBar','none',...
-                'NumberTitle','off',...
-                'DockControls','off',...
-                'Name',object.Name,'Units','pixels','Resize','on');
+            %fig=figure('Toolbar','none','MenuBar','none',...
+            %    'NumberTitle','off',...
+            %    'DockControls','off',...
+            %    'Name',object.Name,'Units','pixels','Resize','on');
             object.Handle=fig;
             object.ToolBar=uitoolbar('Parent',fig);
             object.Pointer=get(fig,'Pointer');            
