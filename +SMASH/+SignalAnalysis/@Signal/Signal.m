@@ -29,7 +29,7 @@
 %    -removed the 'import' argument requirement
 % revised November 2, 2014 by Daniel Dolan
 %    -simplified creator by using new DataClass paradigm
-% revised January 30 by Daniel Dolan
+% revised January 30, 2014 by Daniel Dolan
 %    -expanded PFF support
 classdef Signal < SMASH.General.DataClass
     %%
@@ -64,6 +64,9 @@ classdef Signal < SMASH.General.DataClass
     methods (Access=protected,Hidden=true)
         varargout=create(varargin);
         varargout=import(varargin);
+    end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
     end
     %% property setters
     methods

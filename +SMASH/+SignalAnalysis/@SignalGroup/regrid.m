@@ -23,7 +23,7 @@ x1=min(object.Grid);
 x2=max(object.Grid);
 spacing=(x2-x1)/(N-1);
 
-% handle input
+% manage input
 if (nargin<2) || isempty(x)  
     x=x1:spacing:x2;
 else
@@ -34,11 +34,23 @@ else
     end
 end
 
-object.Grid=x;
+% manage limit index
+if isnumeric(object.LimitIndex)
+    [xb,~]=limit(object);
+    xb=sort(xb([1 end]));
+    k=(x>=xb(1)) & (x<=xb(2));
+    k=[find(k,1,'first') find(k,1,'last')];
+    object.LimitIndex=k(1):k(2);    
+end
+
+% interpolate data and update object
+table=nan(numel(x),object.NumberSignals);
 for n=1:object.NumberSignals
     y=interp1(object.Grid,object.Data(:,n),x,'linear');
-    object.Data(:,n)=y;
+    table(:,n)=y(:);
 end
+object.Grid=x;
+object.Data=table;
 
 object=updateHistory(object);
 

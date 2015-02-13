@@ -32,7 +32,7 @@ if isnumeric(bound)
     bound=bound([1 end]);    
 end
 
-% handle input
+% manage input
 if (nargin<2) || isempty(x)  
     x=x1:spacing:x2;
 elseif numel(x)==1
@@ -50,6 +50,15 @@ x=x(:);
              warning('WARNING: using a coarser grid may cause aliasing');
         end
     end
+
+% manage limit index
+if isnumeric(object.LimitIndex)
+    [xb,~]=limit(object);
+    xb=sort(xb([1 end]));
+    k=(x>=xb(1)) & (x<=xb(2));
+    k=[find(k,1,'first') find(k,1,'last')];
+    object.LimitIndex=k(1):k(2);    
+end
 
 % interpolate data and update object
 y=interp1(object.Grid,object.Data,x,'linear');

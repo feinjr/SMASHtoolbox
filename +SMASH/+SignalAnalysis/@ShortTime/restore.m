@@ -2,7 +2,7 @@
 
 function object=restore(data)
 
-object=SMASH.SignalAnalysis.Signal([],NaN);
+object=SMASH.SignalAnalysis.ShortTime([],NaN);
 
 name=fieldnames(data);
 for n=1:numel(name)

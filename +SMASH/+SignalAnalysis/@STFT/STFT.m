@@ -39,4 +39,7 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
         varargout=trackPower(varargin);
         varargout=trackComplex(varargin);
     end   
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
 end

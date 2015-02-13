@@ -30,7 +30,7 @@ y2=max(object.Grid2);
 spacing2=(y2-y1)/(N-1);
 ydir=sign(diff(object.Grid2([1 end])));
 
-% handle input
+% manage input
 if (nargin<2) || isempty(x)  
     %x=x1:spacing1:x2;
     x=object.Grid1(1):(xdir*spacing1):object.Grid1(end);
@@ -53,6 +53,24 @@ else
     end
 end
 
+% manage limit indices
+if isnumeric(object.LimitIndex1)
+    [xb,~,~]=limit(object);
+    xb=sort(xb([1 end]));
+    k=(x>=xb(1)) & (x<=xb(2));
+    k=[find(k,1,'first') find(k,1,'last')];
+    object.LimitIndex1=k(1):k(2);    
+end
+
+if isnumeric(object.LimitIndex2)
+    [~,yb,~]=limit(object);
+    yb=sort(yb([1 end]));
+    k=(y>=yb(1)) & (y<=yb(2));
+    k=[find(k,1,'first') find(k,1,'last')];
+    object.LimitIndex2=k(1):k(2);    
+end
+
+% interpolate onto new grid
 z=interp2(object.Grid1,object.Grid2,object.Data,x,y(:),'linear');
 object.Grid1=x;
 object.Grid2=y;

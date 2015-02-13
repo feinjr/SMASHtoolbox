@@ -57,7 +57,7 @@ classdef DataClass
                 object=create(object,varargin{:});
                 object.Source='Numeric input';
             end
-            object.Precision=object.Precision; % enforce variable precicion
+            object.Precision=object.Precision; % enforce variable precision
             if isempty(object.GraphicOptions)
                 object.GraphicOptions=SMASH.General.GraphicOptions;
             end

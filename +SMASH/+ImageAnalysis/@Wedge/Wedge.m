@@ -35,4 +35,7 @@ classdef Wedge < SMASH.ImageAnalysis.Image
         varargout=create(varargin);
         varargout=import(varargin);
     end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
 end

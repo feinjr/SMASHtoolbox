@@ -2,7 +2,8 @@
 
 function object=restore(data)
 
-object=SMASH.SignalAnalysis.Signal([],NaN);
+object=SMASH.SignalAnalysis.SignalGroup([],NaN);
+object.Legend={};
 
 name=fieldnames(data);
 for n=1:numel(name)

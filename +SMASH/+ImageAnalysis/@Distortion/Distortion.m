@@ -53,6 +53,9 @@ classdef Distortion < SMASH.ImageAnalysis.Image
         varargout=create(varargin);
         varargout=import(varargin);
     end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
     methods (Access=protected, Hidden=true)
         varargout=mesh(varargin)
         varargout=remesh(varargin)

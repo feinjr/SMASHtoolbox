@@ -14,6 +14,11 @@
 %    >> result=mean(object,'Region',[xmin xmax],[ymin ymax]);
 % These calls override the object's limited region settings.
 %
+% WARNING: NaN values in an Image can cause unexpected results!  These
+% values are often used as placeholders after certain image operations,
+% such as rotation.  NaN values need to be removed/excluded for this
+% method to function correctly.
+%
 % See also Image, slice, SignalAnalysis.Signal
 %
 

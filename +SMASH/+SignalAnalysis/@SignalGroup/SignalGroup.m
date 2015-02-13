@@ -41,6 +41,9 @@ classdef SignalGroup < SMASH.SignalAnalysis.Signal
         varargout=create(varargin);
         varargout=import(varargin);
     end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
     %% set methods
     methods
         function object=set.Legend(object,value)
