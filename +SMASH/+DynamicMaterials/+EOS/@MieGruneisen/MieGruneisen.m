@@ -15,7 +15,8 @@
 % Mie-Gruneisen formulation to generate the EOS. Gamma is assumed to have
 % the form gamma*rho = gamma0*rho0
 %
-% See also EOS, calibrate, calibrateUsup, evaluate, evaluateHugoniot
+% See also EOS, calibrate, calibrateUsup, evaluate, evaluateHugoniot,
+% mixHugoniot
 
 %
 % created January 9, 2015 by Justin Brown (Sandia National Laboratories)

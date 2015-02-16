@@ -294,7 +294,7 @@ for i=1:numfiles
         [~,name,ext]=fileparts(filename{i});
         if length(ext) > 4; name = [name ext]; end
         sig{sig_tot}.Name = name;
-        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'Marker','none','LineColor', DistinguishedLines(sig_tot));
         fit{sig_tot} = SMASH.SignalAnalysis.SignalGroup(0,[0 0 0 0]);
         
         %update waitbar and exit if it doesn't exist

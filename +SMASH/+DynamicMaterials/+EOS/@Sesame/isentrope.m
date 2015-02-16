@@ -59,14 +59,6 @@ S0 = lookup(object,'Entropy',rho0,T0);
 %If there is no entropy table then integrate PVT
 if mean(isfinite(object.Entropy)) < 0.9
     disp('WARNING: Invalid entropy table detected, using thermodynamic integration');
-   
-%     %Solve up to density(1) (10 points) using initial conditions
-%     if rho0 < density(1)        
-%         dinitial = linspace(rho0,density(1),10)';
-%         Tinitial = IntPVT(object,dinitial,T0);
-%         T1 = Tinitial(end);
-%         T0 = T1;
-%     end
     
     %Solve for isentrope from initial conditions
     temperature = IntPVT(object,density,rho0,T0);      
