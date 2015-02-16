@@ -201,8 +201,9 @@ uimenu(hm,'Label','Differentiate','Callback',@Derivative);
 uimenu(hm,'Label','Integrate','Callback',@Integral);
 uimenu(hm,'Label','Calculate power spectrum','Callback',@PowerSpectrum);
 uimenu(hm,'Label','Locate feature','Callback',@LocateFeature);
-uimenu(hm,'Label','Combine Selected Signals','Callback',@CombineSignals);
+uimenu(hm,'Label','Combine selected signals','Callback',@CombineSignals);
 uimenu(hm,'Label','Average Selected Signals','Callback',@AverageSignals);
+uimenu(hm,'Label','Combine Data into new signal','Callback',@CombineData);
 uimenu(hm,'Label','Polyfit between 2 points','Callback',@PolyPoints);
 uimenu(hm,'Label','Extrapolate','Callback',@Extrapolate);
 uimenu(hm,'Label','MHD Scaling','Callback',@MHDScaling);
@@ -266,6 +267,8 @@ wb=SMASH.MUI.Waitbar('Loading Signals');
 %Loop through and load
 for i=1:numfiles
      
+    try
+    
     %Load .sda record
     [~,~,ext]=fileparts(filename{i});
     if strcmp(ext,'.sda')
@@ -295,7 +298,15 @@ for i=1:numfiles
             x=[1:length(data)];
             sig{sig_tot} = SMASH.SignalAnalysis.Signal(x,data);
         else
-            sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column');
+            %If grid is not monotonically increasing use unique
+            try
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'column');
+            catch
+                data = read(source); data = data.Data;
+                [~,index] = unique(data(:,1));
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(data(index,1),data(index,2));
+            end
+
         end
         
         [~,name,ext]=fileparts(filename{i}); 
@@ -324,6 +335,13 @@ for i=1:numfiles
         end
     end
     
+    %Reset if any errors during load process
+    catch
+        sig_tot = numel(sig);
+        warning('Invalid file selected, try another one');
+    end
+        
+    
     %update waitbar and exit if it doesn't exist
     if ~ishandle(wb.Handle); return; end;
     update(wb,i/numfiles);   
@@ -348,7 +366,7 @@ end
 
 dlg.Hidden = true;
 dlg.Name = 'LoadDialog';
-locate(dlg,'south')
+locate(dlg,'center')
 
 direct = dir('*.*');
 for i = 3:length(direct);
@@ -394,27 +412,52 @@ set(h(1),'Callback',@ApplyCallback);
 function ApplyCallback(varargin)
     value = probe(dlg);
     filename = value{1};
+    source=SMASH.FileAccess.ColumnFile(filename);
    
     cols=get(dlg_hc(4),'Value');
-    sig_tot = sig_tot+1;
+   
+    try
+        sig_tot = sig_tot+1;
+        if ~value{3}
+                      
+            %If grid is not monotonically increasing use unique
+            try
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',cols(1:2));
+            catch
+                data = read(source); data = data.Data;
+                [~,index] = unique(data(:,cols(1)));
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(data(index,cols(1)),data(index,cols(2)));
+            end
+            
+        else
+            %If grid is not monotonically increasing use unique
+            try
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',fliplr(cols(1:2)));
+            catch
+                data = read(source); data = data.Data;
+                [~,index] = unique(data(:,cols(2)));
+                sig{sig_tot} = SMASH.SignalAnalysis.Signal(data(index,cols(2)),data(index,cols(1)));
+            end
+            
+        end
 
-    if ~value{3}
-        sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',cols(1:2));
-    else
-        sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(filename),'column',fliplr(cols(1:2)));
+        %Set some object properties
+        [~,name,ext]=fileparts(filename); 
+        if length(ext) > 4; name = [name ext]; end
+        pathname = pwd;
+        sig{sig_tot}.Name = name;
+        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
+
+        %Set active signals to all and plot
+        sig_num = [1:sig_tot];
+        plotdata(fig.Handle,sig,sig_num);
+    
+    %Reset if any errors during the load process
+    catch
+        sig_tot = numel(sig);
+        warning('Invalid load options, try selecting two valid columns');
     end
-
-    %Set some object properties
-    [~,name,ext]=fileparts(filename); 
-    if length(ext) > 4; name = [name ext]; end
-    pathname = pwd;
-    sig{sig_tot}.Name = name;
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
-    sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
-
-    %Set active signals to all and plot
-    sig_num = [1:sig_tot];
-    plotdata(fig.Handle,sig,sig_num);
 
 end
 set(h(2),'Callback',@CancelCallback);
@@ -969,6 +1012,30 @@ function AverageSignals(src,varargin)
     sig_num = [sig_num sig_tot];
     plotdata(fig.Handle,sig,sig_num);
 end %Average
+
+
+%% Combine data to form new signal
+function CombineData(src,varargin)
+    if (numel(sig_num)~=2)
+        error('Requires 2 signals');
+    end
+    [x1 y1] = limit(sig{sig_num(1)});
+    [x2 y2] = limit(sig{sig_num(2)});
+    %Add Signal
+    [~,ia]=unique(y1);
+    newsig = SMASH.SignalAnalysis.Signal(y1(ia),y2(ia));
+    sig_tot = sig_tot + 1;
+    sig{sig_tot} = reset(sig{sig_num(1)},newsig);
+    makeGridUniform(sig{sig_tot});
+    %Set some object properties
+    sig{sig_tot}.Name = 'Combined Signal'; 
+    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    clear newsig;
+    %Set active to all and plot
+    sig_num = [1:sig_tot];
+    plotdata(fig.Handle,sig,sig_num);
+end %Combine
+
 
 %% Polynomial fit between 2 points
 function PolyPoints(src,varargin)
@@ -1710,9 +1777,12 @@ function PerformCallback(varargin)
     stress = stress0+rho0.*cumtrapz(u,cl);
     strain = strain0+cumtrapz(u,1./cl);
     rho = rho0./(1-strain);
+    
+    %figure; plot(u,cl)
 
     %Compile result and grid uniformly
-    LA_result = SMASH.SignalAnalysis.SignalGroup(t_tot{index},[u,cl,rho,stress]);
+    [~,ia]=unique(t_tot{index});
+    LA_result = SMASH.SignalAnalysis.SignalGroup(t_tot{index}(ia),[u(ia),cl(ia),rho(ia),stress(ia)]);
     LA_result = regrid(LA_result);
     [time LA_array] = limit(LA_result);
 
@@ -2166,23 +2236,30 @@ function DualAxes(src,varargin)
     linkaxes([ax1 ax2],'x');
     
     %Plot all signals except last
+    axes(ax1);
     if ~isempty(sig_num)
         legendentry = [];
-        for i=1:length(sig_num)-2
-            ph(i) = view(sig{sig_num(i)},ax1);
+        for i=1:length(sig_num)-1
+            ph(i) = view(sig{sig_num(i)},AIPFig);
             legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
         end
      
      axis tight;
 
-     
+    
      %Plot last signal on right axis
-     set(ax2,'YAxisLocation','right','Color','none','YColor',sig{sig_num(i+1)}.LineColor);
-     ph(i+1)=view(sig{sig_num(i+1)},ax2);
-     ph(i+2)=view(sig{sig_num(i+2)},ax2);    
+     set(ax2,'YAxisLocation','right','Color','none','YColor',sig{sig_num(i+1)}.GraphicOptions.LineColor);
+     axes(ax2);
+     ph(i+1) = line(sig{sig_num(i+1)}.Grid,sig{sig_num(i+1)}.Data);
+     %apply(sig{sig_num(i+1)}.GraphicOptions,ph(i+1));
+     set(ph(i+1),'Color',sig{sig_num(i+1)}.GraphicOptions.LineColor,'LineWidth',sig{sig_num(i+1)}.GraphicOptions.LineWidth, ...
+         'LineStyle',sig{sig_num(i+1)}.GraphicOptions.LineStyle);
+     %ph(i+1)=view(sig{sig_num(i+1)},AIPFig);
+     %ph(i+2)=view(sig{sig_num(i+2)},ax2);    
      legendentry{i+1}=strrep(sig{sig_num(i+1)}.Name,'_','\_');
-     legendentry{i+2}=strrep(sig{sig_num(i+2)}.Name,'_','\_');
-     legend(ph,legendentry,'Color','none','Location','Best','EdgeColor','w'); 
+     %legendentry{i+2}=strrep(sig{sig_num(i+2)}.Name,'_','\_');
+     legend(ph,legendentry,'Color','none','Location','Best','EdgeColor','w');
+     
      
     set(ax1,'XColor','w'); 
     xlabel(ax2,sig{sig_num(1)}.GridLabel,'FontSize',40); 
@@ -2192,8 +2269,6 @@ function DualAxes(src,varargin)
 
     set(gcf,'Color','w');
 
-     
-     
     end
 
 end %Dual axes

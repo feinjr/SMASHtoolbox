@@ -13,7 +13,8 @@
 % 
 % where p_l is a vector corresponding to [C0_l, s_l].
 %
-% See also MieGruneisen, calibrateUsup, evaluateHugoniot, evaluate
+% See also MieGruneisen, calibrateUsup, evaluateHugoniot, evaluate,
+% mixHugoniot
 
 %
 % created January 9, 2014 by Justin Brown (Sandia National Laboratories)
@@ -43,7 +44,7 @@ fitfun=@(p,x) calculateHugoniot(object,x,p);
 fitobj = add(fitobj,fitfun,pIC,'lower',p_lower,'upper',p_upper,'FixScale',false);
 
 %Fit CurveFit object and evaluate least squares error
-fitobj = fit(fitobj,[rhoData(:) pData(:)],options)
+fitobj = fit(fitobj,[rhoData(:) pData(:)],options);
 pFit = evaluate(fitobj,rhoData);
 fp = fitobj.Parameter{:};
 fs = fitobj.Scale{:};

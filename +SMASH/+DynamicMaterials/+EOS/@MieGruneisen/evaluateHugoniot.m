@@ -6,7 +6,8 @@
 % using the MieGruneisen object. The pressure, free energy, and temperature
 % are returned.
 %
-% See also MieGruneisen, calibrate, calibrateUsup, evaluate, evaluateIsentrope
+% See also MieGruneisen, calibrate, calibrateUsup, evaluate,
+% evaluateIsentrope, mixHugoniot
 
 %
 % created January 9, 2014 by Justin Brown (Sandia National Laboratories)

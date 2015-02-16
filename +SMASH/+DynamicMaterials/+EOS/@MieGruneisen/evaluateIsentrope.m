@@ -6,7 +6,8 @@
 % using the model object. The pressure, Helmholtz free energy, and entropy
 % are returned.
 %
-% See also MieGruneisen, calibrate, calibrateUsup, evaluateHugoniot
+% See also MieGruneisen, calibrate, calibrateUsup, evaluateHugoniot,
+% mixHugoniot
 
 %
 % created January 9, 2014 by Justin Brown (Sandia National Laboratories)
