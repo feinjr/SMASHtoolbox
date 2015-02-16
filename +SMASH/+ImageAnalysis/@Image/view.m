@@ -42,20 +42,40 @@ object=makeGridUniform(object);
 if (nargin<2) || isempty(mode)
     mode='show';
 end
+assert(ischar(mode),'ERROR: invalid mode');
+mode=lower(mode);
+switch mode
+    case {'show','explore','detail'}
+        % do nothing
+    otherwise
+        error('ERROR: invalid view mode');
+end
 
 if nargin<3
     target=[];
 end
 
 % call the appropriate method
-switch lower(mode)
-    case 'show'
+if ~isreal(object.Data)
+    assert(strcmp(mode,'show'),'ERROR: %s mode requires real Data',mode);
+    object.DataScale='linear';
+    object.DataLim='auto';
+    data=object.Data;
+    h=basic_figure;
+    set(h.figure,'Name','Complex Image view');
+    ha(1)=subplot(1,2,1);
+    object.Data=real(data);
+    show(object,ha(1));
+    ha(2)=subplot(1,2,2);
+    object.Data=imag(data);
+    show(object,ha(2));   
+    linkaxes(ha,'xy');
+elseif strcmp(mode,'show')
         h=show(object,target);
-    case {'explore'}
+elseif strcmp(mode,'explore')
         h=explore(object,target);
-    case {'detail'}
-        h=detail(object,target);
-    otherwise
+elseif strcmp(mode,'detail')
+        h=detail(object,target);    
 end
 
 % handle output

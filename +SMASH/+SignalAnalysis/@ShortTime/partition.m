@@ -56,7 +56,7 @@
 %   -Changed from parameter array to parameter structure
 % revised December 18, 2014 by Daniel Dolan
 %   -Clarified documentation, especially regarding the limit method
-function varargout=partition(object,choice,value)
+function varargout=partition(object,varargin)
 
 % handle input
 if nargin==1
@@ -70,8 +70,16 @@ if nargin==1
     fprintf('\tBlocks   = %#13.0d\tOverlap = %#13.6g\n',...
         param.Blocks,param.Overlap);
     return
+elseif (nargin==2) && isstruct(varargin{1})
+    object.Partition=varargin{1};
+    varargout{1}=object;
+    return
+elseif nargin==3
+    choice=varargin{1};
+    value=varargin{2};
+else
+    error('ERROR: invalid number of inputs');
 end
-assert(nargin==3,'ERROR: invalid number of inputs');
 
 % error checking
 assert(ischar(choice),'ERROR: invalid partition choice');
@@ -115,9 +123,10 @@ switch choice
             value(2)=0;
         end
         value(1)=round(value(1));
-        assert(value(1)>1,'ERROR: Blocks value must be greater than 1');        
-        assert(value(2)>=0,'EROR: Overlap value must be greater than or equal to 0');                       
-        skip=floor(numpoints/value(1));      
+        assert(value(1)>1,'ERROR: blocks value must be greater than 1');        
+        assert(value(2)>=0,'ERROR: Overlap value must be greater than or equal to 0');                       
+        skip=floor(numpoints/value(1));        
+        assert(skip>0,'ERROR: blocks exceed the number of grid points');
         points=(value(2)+1)*skip;        
     otherwise        
         error('ERROR: invalid division choice');

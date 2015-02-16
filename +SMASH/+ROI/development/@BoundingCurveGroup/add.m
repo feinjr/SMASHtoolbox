@@ -4,7 +4,7 @@
 %     >> add(group,bound);
 %     >> add(group,bound1,bound2,...);
 % An empty boundary is added when no existing bounary is specified.
-%     >> add(gropu);
+%     >> add(group);
 %
 % See also BoundingCurveGroup, remove
 %
@@ -12,7 +12,7 @@
 %
 % created December 15, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function add(object,varargin)
+function object=add(object,varargin)
 
 % manage input
 if nargin==1

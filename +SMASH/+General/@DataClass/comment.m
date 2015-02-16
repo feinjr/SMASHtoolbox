@@ -1,9 +1,9 @@
-% COMMENT Edit comments associated with an object
+% comment Edit comments associated with an object
 %
-% This method edits the "Comments" property of an object.  When invoked:
+% This method edits the "Comemnts" property of an object.  When invoked:
 %    >> object=comment(object);
-% a graphical window is created to show existing comments and allow changes
-% to be made.
+% a graphical window shows the existing description and allow changes to be
+% made.
 %
 % See also DataClass
 %
@@ -13,9 +13,9 @@
 %
 function object=comment(object)
 
-label=sprintf('Comment for ''%s''',object.Name);
+label=sprintf('Comments for ''%s''',object.Name);
 default={strtrim(object.Comments)};
-answer=inputdlg(label,'Image comment',[10 80],default);
+answer=inputdlg(label,'Object comments:',[10 80],default);
 if isempty(answer)
     return
 else

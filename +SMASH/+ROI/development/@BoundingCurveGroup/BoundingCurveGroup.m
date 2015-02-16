@@ -10,7 +10,7 @@
 %
 % created December 15, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef BoundingCurveGroup < handle
+classdef BoundingCurveGroup %< handle
     %%
     properties (SetAccess=protected)
         Children = {} % Cell array of BoundingCurve objects
@@ -22,18 +22,18 @@ classdef BoundingCurveGroup < handle
                 add(object,varargin{:});
             end
         end
-        varargout=addlistener(varargin);
-        varargout=eq(varargin);
-        varargout=findobj(varargin);
-        %varargout=findprop(varargin);
-        varargout=ge(varargin);
-        varargout=getdisp(varargin);
-        varargout=gt(varargin);
-        varargout=le(varargin);
-        varargout=lt(varargin);
-        varargout=ne(varargin);
-        varargout=notify(varargin);
-        varargout=setdisp(varargin);
+%         varargout=addlistener(varargin);
+%         varargout=eq(varargin);
+%         varargout=findobj(varargin);
+%         %varargout=findprop(varargin);
+%         varargout=ge(varargin);
+%         varargout=getdisp(varargin);
+%         varargout=gt(varargin);
+%         varargout=le(varargin);
+%         varargout=lt(varargin);
+%         varargout=ne(varargin);
+%         varargout=notify(varargin);
+%         varargout=setdisp(varargin);
     end
     %% static methods
     methods (Static=true,Hidden=true)

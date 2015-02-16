@@ -1,0 +1,14 @@
+SDA compatibility notes
+February 13, 2015
+
+The Sandia Data Archive (SDA) format can store *almost* any MATLAB variable.  Structure arrays and object arrays are not currently supported, but a similar behavior can be implemented with cell array of structures/objects.  Cell arrays, structures, and objects can be arbitrarily nested within each other.
+
+Objects can always be stored in an archive, whereas restoring an archived object requires some assistance.  Restoration can be managed explicitly in the constructor, i.e. accepting the archive file name and record label as inputs during object creation.  
+    >> object=classname(archive,label);
+This approach requires the end user to know the original class name.
+
+Classes can also provide a static "restore" method to recreate archived objects.  The readFile function (FileAccess package) looks for this method when the requested record is an object.
+     >> object=readFile(archive,'sda',label);
+This approach does not require the end user to know the original class name.  
+
+Core SMASH classes (Signal, Image, etc.) support both approaches described above.  Other classes, particularly those outside of the toolbox, may or may explicitly support SDA restoration.  If the "restore" method is not provided, an object read from an archive will be returned as a structure.  This structure contains all of the stored information, although the absence of class methods may lead to unexpected behavior, warnings, and errors.

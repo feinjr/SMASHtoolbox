@@ -9,8 +9,8 @@ Narg=numel(varargin);
 assert(Narg==3,'ERROR: invalid number of inputs');
 assert(isnumeric(varargin{1}) & isnumeric(varargin{2}) & isnumeric(varargin{3}), ...
     'ERROR: invalid input');
-assert(isreal(varargin{1}) & isreal(varargin{2}) & isreal(varargin{3}), ...
-    'ERROR: complex numbers are not supported');
+assert(isreal(varargin{1}) & isreal(varargin{2}), ...
+    'ERROR: complex grids are not supported');
 
 object.Data=varargin{3};
 assert(ismatrix(object.Data),'ERROR: invalid Data');
