@@ -1,4 +1,4 @@
-% 
+%
 %     >> object=PDV(time,signal); % numeric input
 %     >> object=PDV(filename,format,record); % load from file
 %     >> object=PDV(source); % load source (Signal/STFT) object
@@ -7,11 +7,13 @@ classdef PDV
     properties
         Measurement % STFT object
         ReferenceFrequency % Reference frequency
+        Bandwidth % Electrical bandwidth
+        NoiseFraction % Noise fraction table [time sigma]
     end
     properties (SetAccess=protected)
         Preview % Preview Image object
         Boundary = {} %  BoundaryCurveGroup object
-    end  
+    end
     %%
     methods (Hidden=true)
         function object=PDV(varargin)
@@ -23,13 +25,13 @@ classdef PDV
                 temp=SMASH.FileAccess.readFile(varargin{:});
                 switch class(temp)
                     case 'SMASH.Velocimetry.PDV'
-                        object=temp;                                                
+                        object=temp;
                     otherwise
                         object.Measurement=SMASH.SignalAnalysis.STFT(varargin{:});
-                end                   
-            else               
+                end
+            else
                 object.Measurement=SMASH.SignalAnalysis.STFT(varargin{:});
-            end       
+            end
         end
     end
     %%
@@ -43,6 +45,15 @@ classdef PDV
                 'ERROR: invalid Measurement setting')
             object.Measurement=value;
         end
-        % set.ReferenceState
+        function object=set.ReferenceFrequency(object,value)
+            assert(isnumeric(value) && isscalar(value),...
+                'ERROR: invalid ReferenceFrequency setting');
+            object.ReferenceFrequency=value;
+        end
+        function object=set.Bandwidth(object,value)
+            assert(isnumeric(value) && isscalar(value),...
+                'ERROR: invalid ReferenceFrequency setting');
+            object.Bandwidth=value;
+        end
     end
 end
