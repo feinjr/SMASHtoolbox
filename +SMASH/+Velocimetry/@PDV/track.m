@@ -42,6 +42,19 @@ if isempty(boundary)
 end
 Nboundary=numel(boundary);
 
+[x,~]=limit(object.Measurement);
+x=sort([x(1) x(end)]);
+for n=1:Nboundary
+    table=boundary{n}.Data;
+    if isempty(table)
+        continue
+    end
+    table=table(:,1);
+    x(1)=min(x(1),min(table));
+    x(2)=max(x(2),max(table));
+end
+object.Measurement=limit(object.Measurement,x);
+
 % centroid analysis
     function out=centroid(f,y,t,~)
         tmid=(t(end)+t(1))/2;

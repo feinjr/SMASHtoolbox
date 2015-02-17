@@ -22,9 +22,9 @@ if N==1    % new toggle--store current state for later use
     object.Pointer=get(fig,'Pointer');
     object.PointerShapeCData=get(fig,'PointerShapeCData');
     object.WindowButtonDownFcn=get(fig,'WindowButtonDownFcn');
-    object.WindowButtonMotionFcn=set(fig,'WindowButtonMotionFcn');
-    object.WindowButtonUpFcn=set(fig,'WindowButtonUpFcn');
-    object.ButtonDownFcn=set(fig,'ButtonDownFcn');
+    object.WindowButtonMotionFcn=get(fig,'WindowButtonMotionFcn');
+    object.WindowButtonUpFcn=get(fig,'WindowButtonUpFcn');
+    object.ButtonDownFcn=get(fig,'ButtonDownFcn');
 else
     set(fig,'Pointer',object.Pointer);
     set(fig,'PointerShapeCData',object.PointerShapeCData);

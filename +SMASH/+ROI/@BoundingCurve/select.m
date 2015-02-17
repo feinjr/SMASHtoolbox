@@ -205,6 +205,7 @@ end
 
 function useMouse(~,~,db)
 
+%disp('Button up');
 target=getappdata(db,'TargetAxes');
 fig=getappdata(db,'TargetFigure');
 object=getappdata(db,'CurrentObject');

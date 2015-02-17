@@ -6,7 +6,7 @@
 %
 % created December 12, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef FFToptions < hgsetget
+classdef FFToptions %< hgsetget
     %%
     properties
         Window = 'gaussian' % Digital window function (name, name/parameter, or array)
@@ -26,18 +26,18 @@ classdef FFToptions < hgsetget
                 object.(name)=varargin{n+1};
             end
         end
-        varargout=addlistener(varargin);
-        varargout=eq(varargin);
-        varargout=findobj(varargin);
-        %varargout=findprop(varargin);
-        varargout=ge(varargin);
-        varargout=getdisp(varargin);
-        varargout=gt(varargin);
-        varargout=le(varargin);
-        varargout=lt(varargin);
-        varargout=ne(varargin);
-        varargout=notify(varargin);
-        varargout=setdisp(varargin);
+%         varargout=addlistener(varargin);
+%         varargout=eq(varargin);
+%         varargout=findobj(varargin);
+%         %varargout=findprop(varargin);
+%         varargout=ge(varargin);
+%         varargout=getdisp(varargin);
+%         varargout=gt(varargin);
+%         varargout=le(varargin);
+%         varargout=lt(varargin);
+%         varargout=ne(varargin);
+%         varargout=notify(varargin);
+%         varargout=setdisp(varargin);
     end
 %% static methods
     methods (Static=true,Hidden=true)
@@ -53,7 +53,7 @@ classdef FFToptions < hgsetget
     end
     %% property setters
     methods
-        function set.Window(object,value)
+        function object=set.Window(object,value)
             if isempty(value)
                 value='gaussian';
             end
@@ -76,7 +76,7 @@ classdef FFToptions < hgsetget
                 error('ERROR: invalid Window setting');
             end
         end
-        function set.NumberFrequencies(object,value)
+        function object=set.NumberFrequencies(object,value)
             if isempty(value)
                 value=1000;
             end
@@ -94,14 +94,14 @@ classdef FFToptions < hgsetget
             assert(all(test),'ERROR: invalid NumberFrequencies value');
             object.NumberFrequencies=value;
         end
-        function set.RemoveDC(object,value)
+        function object=set.RemoveDC(object,value)
             if isempty(value)
                 value=true;
             end
             assert(islogical(value),'ERROR: invalid RemoveDC value');
             object.RemoveDC=value;
         end        
-        function set.FrequencyDomain(object,value)
+        function object=set.FrequencyDomain(object,value)
             assert(ischar(value),'ERROR: invalid FrequencyDomain value');
             value=lower(value);
             switch value
@@ -111,7 +111,7 @@ classdef FFToptions < hgsetget
                     error('ERROR: invalid FrequencyDomain value');
             end
         end
-        function set.SpectrumType(object,value)
+        function object=set.SpectrumType(object,value)
             assert(ischar(value),'ERROR: invalid SpectrumType value');
             value=lower(value);
             switch value

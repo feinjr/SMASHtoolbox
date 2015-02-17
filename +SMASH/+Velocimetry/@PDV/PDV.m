@@ -6,6 +6,7 @@ classdef PDV
     %%
     properties
         Measurement % STFT object
+        ReferenceFrequency % Reference frequency
     end
     properties (SetAccess=protected)
         Preview % Preview Image object
@@ -42,5 +43,6 @@ classdef PDV
                 'ERROR: invalid Measurement setting')
             object.Measurement=value;
         end
+        % set.ReferenceState
     end
 end

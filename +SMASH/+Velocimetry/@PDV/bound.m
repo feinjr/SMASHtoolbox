@@ -103,11 +103,11 @@ switch lower(operation)
             N=numel(object.Boundary);
             if Narg==0
                 list=1:N;
-                fprintf('%d defined boundaries\n',N);
+                fprintf('There %d defined boundaries\n',N);
             elseif Narg==1
                 list=varargin{1};
                 verifyIndex(list);
-                fprintf('%d defined boundaries (%d shown)\n',N,numel(list));
+                fprintf('There %d defined boundaries (%d shown)\n',N,numel(list));
             else
                 error('ERROR: too many inputs');
             end           

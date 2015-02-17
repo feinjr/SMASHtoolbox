@@ -38,15 +38,20 @@ end
 location=location(:);
 
 % interpolate dynamic boundaries
-switch object.Direction
-    case 'horizontal'
-        center=interp1(object.Data(:,1),object.Data(:,2),location);
-        width=interp1(object.Data(:,1),object.Data(:,3),location);
-    case 'vertical'
-        center=interp1(object.Data(:,2),object.Data(:,1),location);
-        width=interp1(object.Data(:,2),object.Data(:,3),location);
+if isempty(object.Data)
+    varargout{1}=NaN;
+    varargout{2}=NaN;
+else
+    switch object.Direction
+        case 'horizontal'
+            center=interp1(object.Data(:,1),object.Data(:,2),location);
+            width=interp1(object.Data(:,1),object.Data(:,3),location);
+        case 'vertical'
+            center=interp1(object.Data(:,2),object.Data(:,1),location);
+            width=interp1(object.Data(:,2),object.Data(:,3),location);
+    end
+    varargout{1}=center-width;
+    varargout{2}=center+width;
 end
-varargout{1}=center-width;
-varargout{2}=center+width;
 
 end
