@@ -56,7 +56,13 @@ function varargout=select(object,target,varargin)
 if (nargin<2) || isempty(target)
     target=gca;
 end
-assert(ishandle(target),'ERROR: invalid target axes');
+assert(ishandle(target(1)),'ERROR: invalid target axes');
+if numel(target)>1
+    SourceFigure=target(2);
+    target=target(1);
+else
+    SourceFigure=[];
+end
 fig=ancestor(target,'figure');
 
 Narg=numel(varargin);
@@ -86,7 +92,7 @@ assert(islogical(advanced.DeleteOnClose),...
 DeleteOnClose=advanced.DeleteOnClose;
 
 if isempty(advanced.GroupHandle)
-    advanced.GroupHandle=view(object,target);
+    advanced.GroupHandle=view(object,target(1));
 end
 points=getappdata(advanced.GroupHandle,'Points');
 envelope=getappdata(advanced.GroupHandle,'Envelope');
@@ -188,6 +194,10 @@ else
     callback.Apply=@() applyCallback([],[],dlg.Handle);
     callback.Close=@() closeCallback([],[],dlg.Handle);
     varargout{2}=callback;
+end
+
+if ishandle(SourceFigure)
+    figure(SourceFigure);
 end
 
 end

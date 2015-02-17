@@ -22,7 +22,10 @@
 function varargout=bound(object,operation,varargin)
 
 % manage input
-assert(nargin>=2,'ERROR: insufficient input');
+%assert(nargin>=2,'ERROR: insufficient input');
+if nargin<2
+    operation='manage';
+end
 assert(ischar(operation),'ERROR: invalid operation');
 
 if nargin<3
@@ -128,6 +131,13 @@ switch lower(operation)
             end
         end
         object.Boundary=object.Boundary(keep);
+    case 'manage'
+        if isempty(object.Preview)
+            object=preview(object);
+        end
+        preview(object);
+        target=gca;
+        object.Boundary=manage(object.Boundary,target);
     otherwise
         error('ERROR: invalid operation requested');
 end
@@ -136,5 +146,129 @@ end
 if nargout>0
     varargout{1}=object;
 end
+
+end
+
+% interactive boundary management
+function object=manage(object,target)
+
+% local variables
+fig=ancestor(target,'figure');
+set(fig,'CloseRequestFcn','');
+local=object;
+current=1;
+
+% create dialog
+dlg=SMASH.MUI.Dialog;
+dlg.Hidden=true;
+dlg.Name='Manage boundaries';
+
+choose=addblock(dlg,'popup','Current boundary:',{''});
+set(choose(2),'Callback',@chooseBoundary);
+    function chooseBoundary(varargin)
+        N=numel(local);
+        if N<1
+            return
+        end
+        current=get(choose(2),'Value');
+        set(name(2),'String',local{current}.Label);
+    end
+
+name=addblock(dlg,'edit_button',{'Name:','Save'},20);
+set(name(end),'Callback',@updateName)
+    function updateName(varargin)
+        local{current}.Label=get(name(2),'String');
+    end
+
+h=addblock(dlg,'button',{'Select','Promote','Demote'});
+set(h(1),'Callback',@selectBoundary)
+    function selectBoundary(varargin)
+        local{current}=select(local{current},[target dlg.Handle]);
+    end
+
+set(h(2),'Callback',@promoteBoundary)
+    function promoteBoundary(varargin)
+        if isempty(local)
+            return
+        end
+        if current>1
+            index=1:numel(local);
+            index(current-1)=current;
+            index(current)=current-1;
+            local=local(index);
+            current=current-1;
+            updateList;
+        end        
+    end
+set(h(3),'Callback',@demoteBoundary)
+    function demoteBoundary(varargin)
+        if isempty(local)
+            return
+        end
+        if current<numel(local)
+            index=1:numel(local);
+            index(current+1)=current;
+            index(current)=current+1;
+            local=local(index);
+            current=current+1;
+            updateList;
+        end        
+    end
+
+new=addblock(dlg,'button','Remove current',15);
+set(new,'Callback',@removeBoundary);
+    function removeBoundary(varargin)
+        if isempty(local)
+            return
+        end
+        local=local([1:(current-1) (current+1):end]);
+        current=current-1;
+        if current==0
+            current=1;
+        end
+        updateList;
+    end
+
+new=addblock(dlg,'button','New boundary',15);
+set(new,'Callback',@newBoundary);
+    function newBoundary(varargin)        
+        local{end+1}=SMASH.ROI.BoundingCurve('horizontal');
+        current=numel(local);
+        updateList;        
+    end
+
+h=addblock(dlg,'button',{'OK','Cancel'});
+set(h(1),'Callback',@done);
+    function done(varargin)
+        object=local;
+        delete(dlg);
+    end
+set(h(2),'Callback',@cancel);
+    function cancel(varargin)
+        delete(dlg);
+    end
+
+updateList;
+dlg.Hidden=false;
+%dlg.Modal=true;
+
+% wait for user
+uiwait(dlg.Handle);
+delete(fig);
+
+% helper function
+    function updateList()
+        if isempty(local)
+            set(choose(2),'String',{'(none)'})
+            set(name(2),'String','');
+            return
+        end
+        label=cell(size(local));
+        for k=1:numel(label)
+            label{k}=sprintf('Boundary #%d',k);
+        end
+        set(choose(2),'String',label,'Value',current);        
+        set(name(2),'String',local{current}.Label);
+    end
 
 end
