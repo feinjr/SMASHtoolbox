@@ -1,24 +1,46 @@
-% bound Control object boundaries
+% bound Control analysis boundaries
 %
-%     >> object=bound(object,'add',[name]);
+% This method controls the boundaries used to guide history analysis.
+% Boundaries are stored in the Boundary property of a PDV object.  This
+% property cannot be modified directly, but can be revised as shown below.
+%     >> object=bound(object); % default mode is "mangage"
+%     >> object=bound(object,'manage'); % interactive boundary management
+% Interactive boundary management generates shows a preview of the object
+% and generates a dialog box where boundaries can be added, edited, and
+% removed.  Pressing the "OK" button saves object revisions, while pressing
+% the "Cancel" button preserves the original boundary settings.
+%
+% Various other modes provide advanced boundary control.  New boundaries
+% are generated with 'add' mode.
+%     >> object=bound(object,'add'); % default name is "Boundary curve"
+%     >> object=bound(object,'add',name); % specify name at creation
+% New boundaries are added at the end of the current boundary list.
+% Exisiting boundaries are accessed by numeric index, which are revealed in
+% 'summarize' mode.
+%     >> bound(object,'summarize'); % list printed in command window
+%
+% The name associated with a boundary can be changed in 'rename' mode.
 %     >> object=bound(object,'rename',index,name);
-%
-%     >> object=bound(object,'define',index,table);
-%     >> object=bound(object,'select',index,[target]);
-%
+% The data in a boundary can be manually defined or selected interactively.
+%     >> object=bound(object,'define',index,table); % Nx3 table
+%     >> object=bound(object,'select',index); % select points in current axes
+%     >> object=bound(object,'select',index,[target]); % select points in target axes
+% An existing boundary can be copied as a new boundary (at the end of the
+% list).
+%     >> object=bound(object,'copy',index);
+% Boundaries can be removed with a single index or an array of indices.
+%     >> object=bound(object,'remove',1); % remove first boundary
+%     >> object=bound(object,'remove',array);
+% Boundary order can be revised by passing an array of index values in the
+% desired order (all valid indices must be listed).
 %     >> object=bound(object,'order',array);
 %
-%     >> bound(object,'summarize');
-%
-%     >> object=bound(object,'copy',index);
-%
-%     >> object=bound(object,'remove',array);
-%
+% See also PDV, track
 %
 
 %
+% created February 18, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-
 function varargout=bound(object,operation,varargin)
 
 % manage input
@@ -172,6 +194,7 @@ set(choose(2),'Callback',@chooseBoundary);
         end
         current=get(choose(2),'Value');
         set(name(2),'String',local{current}.Label);
+        updateBoundary;
     end
 
 name=addblock(dlg,'edit_button',{'Name:','Save'},20);
@@ -183,7 +206,12 @@ set(name(end),'Callback',@updateName)
 h=addblock(dlg,'button',{'Select','Promote','Demote'});
 set(h(1),'Callback',@selectBoundary)
     function selectBoundary(varargin)
+        hline=findobj(target,'Tag','CurrentBoundaryDisplay');
+        if ishandle(hline)
+            delete(hline);
+        end
         local{current}=select(local{current},[target dlg.Handle]);
+        updateBoundary;
     end
 
 set(h(2),'Callback',@promoteBoundary)
@@ -258,6 +286,7 @@ delete(fig);
 
 % helper function
     function updateList()
+
         if isempty(local)
             set(choose(2),'String',{'(none)'})
             set(name(2),'String','');
@@ -269,6 +298,15 @@ delete(fig);
         end
         set(choose(2),'String',label,'Value',current);        
         set(name(2),'String',local{current}.Label);
+        updateBoundary;
+    end
+    function updateBoundary()
+        hline=findobj(target,'Tag','CurrentBoundaryDisplay');
+        if ishandle(hline)
+            delete(hline);
+        end
+        hline=view(local{current},target);
+        set(hline,'Tag','CurrentBoundaryDisplay');
     end
 
 end

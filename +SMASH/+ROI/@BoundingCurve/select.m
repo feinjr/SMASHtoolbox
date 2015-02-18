@@ -403,7 +403,7 @@ switch object.Direction
             y(end+1)=y(1);
         end
     case 'vertical'
-        
+        % UNDER CONSTRUCTION        
 end
 set(envelope,'XData',x,'YData',y);
 

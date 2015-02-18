@@ -1,9 +1,12 @@
 %
+%     >> object=characterize(object,'ReferenceFrequency');
 %     >> object=characterize(object,'ReferenceFrequency',tbound);
 %     >> object=characterize(object,'ReferenceFrequency',tbound,fbound);
 %
-%     >> object=characterize(object,'noise');
-%     >> object=characterize(object,'noise',{type param}); % partition control
+%     >> object=characterize(object,'Bandwidth');
+%     >> object=characterize(object,'Bandwidth',tbound);
+%
+%     >> object=characterize(object,'NoiseFloor',tbound,fbound);
 function object=characterize(object,mode,varargin)
 
 % manage input
@@ -15,7 +18,11 @@ Narg=numel(varargin);
 
 % perform characterization
 switch mode
-    case {'reference','ReferenceFrequency'}
+    case 'bandwidth'
+        
+    case 'noisefloor'
+        
+    case 'referencefrequency'
         % determine bounds
         tbound=[-inf +inf];
         fbound=[-inf +inf];
@@ -44,8 +51,8 @@ switch mode
         f=f(keep);
         P=P(keep);
         [~,index]=max(P);
-        object.ReferenceFrequency=f(index);
-    case {'noise','NoiseTable'}
+        object.Parameter.ReferenceFrequency=f(index);
+
         
     otherwise
         error('ERROR: invalid mode request');
