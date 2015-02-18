@@ -1,4 +1,6 @@
-% show beat frequency with uncertainty
+% UNDER CONSTRUCTION
+%
+% show velocity with uncertainty
 function varargout=view(object,target)
 
 end

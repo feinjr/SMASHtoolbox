@@ -1,16 +1,14 @@
-% track Track histories using specified bounds
-%
 % UNDER CONSTRUCTION...
 %
 % Power spectrum tracking:
-%     >> result=track(object,'centroid');
-%     >> result=track(object,'fit');
+%     >> object=analyze(object,'centroid');
+%     >> object=analyze(object,'fit');
 %
 
 
-function result=track(object,mode,varargin)
+function object=analyze(object,mode,varargin)
 
-% manage input
+%% manage input
 if (nargin<2) || isempty(mode)
     mode='centroid';
 end
@@ -28,7 +26,7 @@ else
 end
 object.Measurement=partition(object.Measurement,type,param);
 
-% manage boundaries
+%% manage boundaries
 boundary=object.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
@@ -55,7 +53,7 @@ for n=1:Nboundary
 end
 object.Measurement=limit(object.Measurement,x);
 
-% centroid analysis
+%% perform analysis
     function out=centroid(f,y,t,~)
         tmid=(t(end)+t(1))/2;
         out=nan(Nboundary,3);
@@ -76,7 +74,6 @@ object.Measurement=limit(object.Measurement,x);
         out=out(:);
     end
 
-% power fit analysis
     function out=powerFit(f,y,t,~)
         tmid=(t(end)+t(1))/2;
         out=nan(Nboundary,3);
@@ -91,7 +88,6 @@ object.Measurement=limit(object.Measurement,x);
     end
 
 % DO THESE REALLY NEED TO BE DISTICT?
-% complex fit analysis
     function out=complexFit(f,y,t,~)
         
     end
@@ -101,16 +97,29 @@ switch lower(mode)
         temp=object.Measurement.FFToptions.SpectrumType;
         assert(strcmpi(temp,'power'),...
             'ERROR: SpectrumType must be ''power'' for centroid tracking');
-        result=analyze(object.Measurement,@centroid);
+        object.History=analyze(object.Measurement,@centroid);
     case 'fit'
         temp=object.Measurement.FFToptions.SpectrumType;
         if strcmpi(temp,'power')
-            result=analyze(object.Measurement,@powerFit);
+            %result=analyze(object.Measurement,@powerFit);
         elseif strcmpi(temp,'complex')
-            result=analyze(object.Measurement,@complexFit);
+            %result=analyze(object.Measurement,@complexFit);
         end
     otherwise
         error('ERROR: %s is not a valid track mode',mode);
+end
+
+%% frequency to velocity conversion
+lambda=object.Parameter.Wavelength;
+f0=object.Parameter.ReferenceFrequency;
+    function velocity=standardConvert(frequency)
+        velocity=(lambda/2)*(frequency-f0);
+    end
+
+if isempty(object.ConvertFunction)
+    % use standardConvert
+else
+    % use ConverFunction
 end
 
 end

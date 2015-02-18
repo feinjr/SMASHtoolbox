@@ -1,3 +1,4 @@
+% UNDER CONSTRUCTION
 %
 %     >> object=characterize(object,'ReferenceFrequency');
 %     >> object=characterize(object,'ReferenceFrequency',tbound);

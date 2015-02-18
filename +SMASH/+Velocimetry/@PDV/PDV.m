@@ -5,41 +5,69 @@
 %     >> object=PDV(time,signal); % time/signal are 1D arrays
 % or by loading data from a file.
 %     >> object=PDV(filename,format,record); % inputs passed to "readFile" 
-% The PDV signal is stored as a STFT sub-object as the Measurement
-% property.  Properties and methods of the subobject can be accessed at any
-% time.
-%     >> object.Measurement.FFToptions.Window='boxcar';
-%     >> view(object.Measurement);
-% The Measurement property can be replaced with another STFT sub-object;
-% dependent properties, such as Preview, are *not* updated automatically.
+% The PDV signal is stored as a STFT sub-object in the Measurement
+% property.  Measurement methods can be accessed, and Measurement
+% properties can be accessed/modified.
+%     >> time=object.Measurement.Grid; % access time grid
+%     >> object.Measurement.FFToptions.Window='boxcar'; % change FFT Window
+%     >> view(object.Measurement); % Signal display
 %
-% Preview
+% A preview spectrogram can be associated with a PDV object for
+% visualization.
+%     >> object=preview(object); % generate preview
+%     >> preview(object); % display preview
+% The spectrogram is stored as an Image sub-object in the Preview property.
+%  Preview properties and methods can be accessed:
+%     >> frequency=object.Preview.Grid2; % access frequency grid
+%     >> view(object.Preview); % Image display
+% but the Preview properties cannot be modified directly.
 %
-% Bound
+% History analysis tracks the strongest feature(s) in the measurement. 
+%     >> object=analyze(object);
+% The default analysis trackes a single feature over the entire frequency
+% range, but several independent features (each with dynamic frequency
+% bounds) can be selected.
+%     >> object=bound(object); % interactive boundary selection
+%     >> object=analyze(object);
+% Tracked frequency results are stored in the History property.
 %
-% Track
+% Frequencies are converted to velocity immediately after analysis.  By
+% default, this conversion uses the wavelength and reference frequency
+% parameters.
+%       velocity = (wavelength/2) * (frequency-ReferenceFrequency);
+% This conversion can be replaced with a custom function *prior* to analysis.
+%     >> object.ConvertFunction=@myfunc;
+% The function handle "myfunc" must accept a single input and return a
+% single output, e.g. "function velocity=myfunc(frequency)".  
+
+
 %
-% Convert
+% To convert beat frequency to velocity:
+%     >> object=convert(object); % standard conversion
+%     >> object=convert(object,@myfunc); % custom conversion
+% Wavelength and reference frequency settings specified in the Parameters
+% property.  For graphical display:
+%     >> view(
 %
 % See also Velocimetry, FileAccess.readFile, SignalAnalysis.STFT,
 % SignalAnalysis.SignalGroup, ImageAnalysis.Image
 
 %
-% created ?
+% created February 18, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef PDV
     %%
     properties
-        Parameter % System parameter structure
-        %NoiseFraction % Noise fraction table [time sigma]
-        Measurement % STFT object
+        Measurement % PDV measurement (STFT object)
+        Parameter % System parameters (structure)
+        MapFrequency % Frequency mapper (function handle)
+        ConvertFunction % Frequency to velocity conversion (function handle)
     end
     properties (SetAccess=protected)
-        Preview % Preview Image object
-        Boundary = {} %  BoundaryCurveGroup object
-        History % History SignalGroup object
-        BeatFrequency % SignalGroup object
-        Uncertainty % SignalGroup object        
+        Preview % preview spectrogram (Image object)
+        Boundary = {} % Track boundaries (cell array of BoundaryCurveGroup objects)
+        History % Peak histories (SignalGroup object)
+        Velocity % Velocity results (cell array of SignalGroup objects)
     end
     %%
     methods (Hidden=true)
@@ -89,6 +117,11 @@ classdef PDV
             assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
                 'ERROR: invalid Measurement setting')
             object.Measurement=value;
+        end
+        function object=set.ConvertFunction(object,value)
+            assert(isa(value,'function_handle'),...
+                'ERROR: invalid ConvertFunction value');
+            object.ConvertFunction=value;
         end
     end
 end

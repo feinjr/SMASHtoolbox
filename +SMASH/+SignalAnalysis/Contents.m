@@ -1,6 +1,6 @@
 % SignalAnalysis package
 %
-% This toolbox contains data classes for signal analysis.
+% This package contains data classes for signal analysis.
 %    Signal      - base signal class
 %    SignalGroup - class for multiple signals on a common grid
 %    ShortTime   - 
