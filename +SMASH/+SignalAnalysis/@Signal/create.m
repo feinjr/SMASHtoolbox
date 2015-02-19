@@ -2,7 +2,8 @@ function object=create(object,varargin)
 
 object.Name='Signal object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Marker','none','LineStyle','-');
+object.GraphicOptions.Marker='none';
+object.GraphicOptions.LineStyle='-';
 
 Narg=numel(varargin);
 assert(Narg==2,'ERROR: invalid number of inputs');

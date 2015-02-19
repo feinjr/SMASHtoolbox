@@ -2,8 +2,8 @@ function object=import(object,data)
 
 object.Name='Image object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Title','Image object');
-set(object.GraphicOptions,'YDir','reverse');
+object.GraphicOptions.Title='Image object';
+object.GraphicOptions.YDir='reverse';
 
 % multiple files
 if numel(data)>1   
@@ -30,7 +30,7 @@ switch data.Format
         object.Grid1=data.Grid1;
         object.Grid2=data.Grid2;
         object.Data=data.Data;
-        set(object.GraphicOptions,'ColorMap',data.ColorMap);
+        object.GraphicOptions.ColorMap=data.ColorMap;
     case 'pff'
         errmsg{1}='ERROR: cannot import this dataset into a Signal object';
         switch data.PFFdataset

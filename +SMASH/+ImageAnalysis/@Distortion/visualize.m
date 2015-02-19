@@ -44,7 +44,7 @@ switch lower(mode)
             x=[x; object.IsoMesh1(:,n); NaN]; %#ok<AGROW>
             y=[y; object.IsoMesh2(:,n); NaN]; %#ok<AGROW>
         end
-        h=line(x,y,'Color',get(object.GraphicOptions,'LineColor'));
+        h=line(x,y,'Color',object.GraphicOptions.LineColor);
         if newaxes
             label=sprintf('Isomesh for "%s"',object.Name);
             title(label);
@@ -60,7 +60,7 @@ switch lower(mode)
             x=[x; object.ArcMesh1(:,n); NaN]; %#ok<AGROW>
             y=[y; object.ArcMesh2(:,n); NaN]; %#ok<AGROW>
         end
-        h=line(x,y,'Color',get(object.GraphicOptions,'LineColor'));
+        h=line(x,y,'Color',object.GraphicOptions.LineColor);
         if newaxes
             label=sprintf('Arcmesh for "%s"',object.Name);
             title(label);
@@ -74,8 +74,8 @@ switch lower(mode)
         end
         h=quiver(...
             object.IsoMesh1,object.IsoMesh2,shift1,shift2,0,...
-            'Color',get(object.GraphicOptions,'LineColor'),...
-            'Marker',get(object.GraphicOptions,'Marker'));
+            'Color',object.GraphicOptions.LineColor,...
+            'Marker',object.GraphicOptions.Marker);
         if newaxes
             label=sprintf('Isopoints for "%s"',object.Name);
             title(label);

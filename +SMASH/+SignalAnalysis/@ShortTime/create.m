@@ -3,7 +3,7 @@ function object=create(object,varargin)
 object=create@SMASH.SignalAnalysis.Signal(object,varargin{:});
 
 object.Name='ShortTime object';
-set(object.GraphicOptions,'Title','ShortTime object');
+object.GraphicOptions.Title='ShortTime object';
 object.GridLabel='Time';
 object.DataLabel='Signal';
 

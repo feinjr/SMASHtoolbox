@@ -7,7 +7,7 @@
 %
 % created December 10, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef GraphicOptions < hgsetget
+classdef GraphicOptions %< hgsetget
     %%
     properties
         LineStyle = '-' % Line style
@@ -37,18 +37,18 @@ classdef GraphicOptions < hgsetget
                 object.(name)=varargin{n+1};
             end
         end
-        varargout=addlistener(varargin);
-        varargout=eq(varargin);
-        varargout=findobj(varargin);
-        %varargout=findprop(varargin);
-        varargout=ge(varargin);
-        varargout=getdisp(varargin);
-        varargout=gt(varargin);
-        varargout=le(varargin);
-        varargout=lt(varargin);
-        varargout=ne(varargin);
-        varargout=notify(varargin);
-        varargout=setdisp(varargin);
+%         varargout=addlistener(varargin);
+%         varargout=eq(varargin);
+%         varargout=findobj(varargin);
+%         %varargout=findprop(varargin);
+%         varargout=ge(varargin);
+%         varargout=getdisp(varargin);
+%         varargout=gt(varargin);
+%         varargout=le(varargin);
+%         varargout=lt(varargin);
+%         varargout=ne(varargin);
+%         varargout=notify(varargin);
+%         varargout=setdisp(varargin);
     end
 %% static methods
     methods (Static=true, Hidden=true)
@@ -64,7 +64,7 @@ classdef GraphicOptions < hgsetget
     end
     %% property setters
     methods
-        function set.LineStyle(object,value)
+        function object=set.LineStyle(object,value)
             switch value
                 case {'-','--','-.',':','none'}
                     object.LineStyle=value;
@@ -72,16 +72,16 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid line style');
             end
         end
-        function set.LineColor(object,value)
+        function object=set.LineColor(object,value)
             assert(SMASH.General.testColor(value),'ERROR: invalid color');
             object.LineColor=value;
         end
-        function set.LineWidth(object,value)
+        function object=set.LineWidth(object,value)
             assert(isnumeric(value) & isscalar(value) & value>0,...
                 'ERROR: invalid line width');
             object.LineWidth=value;
         end
-        function set.Marker(object,value)
+        function object=set.Marker(object,value)
             switch value
                 case {...
                         '+','o','*','.','x','s','square','d','diamond',...
@@ -92,7 +92,7 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid marker');
             end
         end
-        function set.MarkerStyle(object,value)
+        function object=set.MarkerStyle(object,value)
             assert(ischar(value),'ERROR: invalid marker style');
             value=lower(value);
             switch value
@@ -102,12 +102,12 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid marker style');
             end
         end
-        function set.MarkerSize(object,value)
+        function object=set.MarkerSize(object,value)
             assert(isnumeric(value) & isscalar(value) & value>0,...
                 'ERROR: invalid marker size');
             object.MarkerSize=value;
         end
-        function set.Box(object,value)
+        function object=set.Box(object,value)
             assert(ischar(value),'ERROR: invalid box value');
             value=lower(value);
             switch value
@@ -117,7 +117,7 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid Box value');
             end
         end
-        function set.AspectRatio(object,value)
+        function object=set.AspectRatio(object,value)
             assert(ischar(value),'ERROR: invalid AspectRatio value');
             value=lower(value);
             switch value
@@ -127,11 +127,11 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid AspectRatio value');
             end
         end
-        function set.AxesColor(object,value)
+        function object=set.AxesColor(object,value)
             assert(SMASH.General.testColor(value),'ERROR: invalid AxesColor value');
             object.AxesColor=value;
         end
-        function set.XDir(object,value)
+        function object=set.XDir(object,value)
             assert(ischar(value),'ERROR: invalid XDir value');
             value=lower(value);
             switch value
@@ -141,7 +141,7 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid XDir value');
             end
         end
-        function set.YDir(object,value)
+        function object=set.YDir(object,value)
             assert(ischar(value),'ERROR: invalid YDir value');
             value=lower(value);
             switch value
@@ -151,7 +151,7 @@ classdef GraphicOptions < hgsetget
                     error('ERROR: invalid YDir value');
             end
         end
-        function set.Title(object,value)
+        function object=set.Title(object,value)
             if ischar(value)
                 object.Title=value;
             elseif iscell(value) && all(cellfun(@ischar,value))
@@ -160,12 +160,12 @@ classdef GraphicOptions < hgsetget
                 error('ERROR: invalid Title value');
             end 
         end
-        function set.PanelColor(object,value)
+        function object=set.PanelColor(object,value)
             assert(SMASH.General.testColor(value),...
                 'ERROR: invalid PanelColor value');
             object.PanelColor=value;
         end
-        function set.ColorMap(object,value)
+        function object=set.ColorMap(object,value)
             result=false;
             if isnumeric(value)
                 valid=(value>=0) & (value<=1);
@@ -186,7 +186,7 @@ classdef GraphicOptions < hgsetget
             assert(result,'ERROR: invalid ColorMap value');
             object.ColorMap=value;
         end
-        function set.FigureColor(object,value)
+        function object=set.FigureColor(object,value)
             assert(SMASH.General.testColor(value),...
                 'ERROR: invalid FigureColor value');
             object.FigureColor=value;

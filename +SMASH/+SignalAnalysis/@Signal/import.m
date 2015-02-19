@@ -3,7 +3,8 @@ function object=import(object,data)
 
 object.Name='Signal object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Marker','none','LineStyle','-');
+object.GraphicOptions.Marker='none';
+object.GraphicOptions.LineStyle='-';
 
 % manage multiple imports
 assert(numel(data)==1,...

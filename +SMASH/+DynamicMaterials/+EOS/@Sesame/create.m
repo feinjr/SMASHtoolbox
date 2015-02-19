@@ -3,7 +3,8 @@ function object=create(object,varargin)
 
 object.Name='Sesame object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Marker','none','LineStyle','-');
+object.GraphicOptions.Marker='none';
+object.GraphicOptions.LineStyle='-';
 
 
 Narg=numel(varargin);

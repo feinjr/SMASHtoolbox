@@ -161,7 +161,7 @@ object.TransferTable=[ys(:) 10.^(xs(:))];
     title(temp);
     for n=1:size(ROI,1)
         rectangle('Position',ROI(n,:),...
-            'EdgeColor',get(object.GraphicOptions,'LineColor'),'Tag','ROI');
+            'EdgeColor',object.GraphicOptions.LineColor,'Tag','ROI');
     end
     ha(2)=subplot(3,1,2);
     %plot(exposure,level,'ko');

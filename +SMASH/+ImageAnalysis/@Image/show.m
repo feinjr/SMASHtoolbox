@@ -32,7 +32,7 @@ h.image=imagesc('Parent',h.axes,...
 apply(object.GraphicOptions,h.axes);
 axis(h.axes,'tight');
 
-colormap(h.axes,get(object.GraphicOptions,'ColorMap'));
+colormap(h.axes,object.GraphicOptions.ColorMap);
 xlabel(h.axes,object.Grid1Label);
 ylabel(h.axes,object.Grid2Label);
 title(h.axes,object.GraphicOptions.Title);

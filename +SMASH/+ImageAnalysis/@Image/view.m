@@ -60,14 +60,17 @@ if ~isreal(object.Data)
     assert(strcmp(mode,'show'),'ERROR: %s mode requires real Data',mode);
     object.DataScale='linear';
     object.DataLim='auto';
+    name=object.GraphicOptions.Title;
     data=object.Data;
     h=basic_figure;
     set(h.figure,'Name','Complex Image view');
     ha(1)=subplot(1,2,1);
-    object.Data=real(data);
+    object.Data=real(data);   
+    object.GraphicOptions.Title=sprintf('Real part of "%s"',name);
     show(object,ha(1));
     ha(2)=subplot(1,2,2);
     object.Data=imag(data);
+    object.GraphicOptions.Title=sprintf('Imaginary part of "%s"',name);
     show(object,ha(2));   
     linkaxes(ha,'xy');
 elseif strcmp(mode,'show')

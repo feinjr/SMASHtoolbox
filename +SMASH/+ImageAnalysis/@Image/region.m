@@ -47,7 +47,7 @@ h=view(object,'show');
 title('Use mouse to select region of interest')
 
 boundary=line('Parent',h.axes,'XData',[],'YData',[]);
-set(boundary,'Color',get(object.GraphicOptions,'LineColor'),...
+set(boundary,'Color',object.GraphicOptions.LineColor,...
     'LineStyle','--','Marker','o');
 setappdata(boundary,'NearestPoint',1);
 

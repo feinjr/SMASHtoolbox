@@ -2,7 +2,8 @@ function object=import(object,data)
 
 object.Name='SignalGroup object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Marker','none','LineStyle','-');
+object.GraphicOptions.Marker='none';
+object.GraphicOptions.LineStyle='-';
 
 % manage multiple imports
 if numel(data)>1 

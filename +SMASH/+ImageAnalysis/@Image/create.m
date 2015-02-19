@@ -2,8 +2,8 @@ function object=create(object,varargin)
 
 object.Name='Image object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-set(object.GraphicOptions,'Title','Image object');
-set(object.GraphicOptions,'YDir','reverse');
+object.GraphicOptions.Title='Image object';
+object.GraphicOptions.YDir='reverse';
 
 Narg=numel(varargin);
 assert(Narg==3,'ERROR: invalid number of inputs');
