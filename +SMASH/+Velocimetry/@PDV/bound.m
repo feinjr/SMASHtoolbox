@@ -55,10 +55,10 @@ if nargin<3
 end
 
 % verify index
-IndexList=1:numel(object.Boundary);
+IndexList=1:numel(object.Settings.Boundary);
     function verifyIndex(array)
         for k=1:numel(array)
-            assert(any(index(k)==IndexList),'ERROR: invalid index request');
+            assert(any(array(k)==IndexList),'ERROR: invalid index request');
         end
     end
 
@@ -66,11 +66,11 @@ IndexList=1:numel(object.Boundary);
 Narg=numel(varargin);
 switch lower(operation)
     case 'add'
-       object.Boundary{end+1}=SMASH.ROI.BoundingCurve('horizontal');
+       object.Settings.Boundary{end+1}=SMASH.ROI.BoundingCurve('horizontal');
        if (Narg>=1) 
            name=varargin{1};
            assert(ischar(name),'ERROR: invalid name');
-           object.Boundary{end}.Label=name;
+           object.Settings.Boundary{end}.Label=name;
        end
     case 'rename'
         assert(Narg==2,'ERROR: invalid number of inputs');
@@ -79,14 +79,14 @@ switch lower(operation)
         assert(isscalar(index),'ERROR: invalid index');
         name=varargin{2};
         assert(ischar(name),'ERROR: invalid name');
-        object.Boundary{index}.Label=name;
+        object.Settings.Boundary{index}.Label=name;
     case 'define'
         assert(Narg>1,'ERROR: invalid number of inputs');
         index=varargin{1};
         verifyIndex(index);
         assert(isscalar(index),'ERROR: invalid index');
         varargin=varargin(2:end);
-        object.Boundary{index}=define(object.Boundary{index},varargin{:});
+        object.Settings.Boundary{index}=define(object.Settings.Boundary{index},varargin{:});
     case 'select'
         if Narg==0
             % under construction
@@ -101,15 +101,15 @@ switch lower(operation)
             preview(object);
             target=gca;
         end
-        object.Boundary{index}=select(object.Boundary{index},target);
+        object.Settings.Boundary{index}=select(object.Settings.Boundary{index},target);
     case 'copy'
         assert(Narg>1,'ERROR: invalid number of inputs');
         index=varargin{1};
         verifyIndex(index);
         assert(isscalar(index),'ERROR: invalid index');
-        object.Boundary{end+1}=object.Boundary{index};
-        name=sprintf('Copy of %s',object.Boundary{index}.Label);
-        object.Boundary{end}.Label=name;
+        object.Settings.Boundary{end+1}=object.Settings.Boundary{index};
+        name=sprintf('Copy of %s',object.Settings.Boundary{index}.Label);
+        object.Settings.Boundary{end}.Label=name;
     case 'order'    
         assert(Narg>1,'ERROR: invalid number of inputs');
         array=varargin{1};
@@ -120,12 +120,12 @@ switch lower(operation)
         catch
             error('ERROR: invalid order array');
         end        
-        object.Boundary=object.Boundary(index);
+        object.Settings.Boundary=object.Settings.Boundary(index);
     case 'summarize'
-        if isempty(object.Boundary)
+        if isempty(object.Settings.Boundary)
             fprintf('No defined boundaries \n');
         else            
-            N=numel(object.Boundary);
+            N=numel(object.Settings.Boundary);
             if Narg==0
                 list=1:N;
                 fprintf('There %d defined boundaries\n',N);
@@ -137,7 +137,7 @@ switch lower(operation)
                 error('ERROR: too many inputs');
             end           
             for n=list
-                fprintf('%3d : %s\n',n,object.Boundary{n}.Label);
+                fprintf('%3d : %s\n',n,object.Settings.Boundary{n}.Label);
             end
         end
     case 'remove'
@@ -145,21 +145,21 @@ switch lower(operation)
         array=varargin{1};
         verifyIndex(array);
         array=unique(array);       
-        N=numel(object.Boundary); 
+        N=numel(object.Settings.Boundary); 
         keep=true(1,N);
         for n=1:N
             if any(n==array)
                 keep(n)=false;
             end
         end
-        object.Boundary=object.Boundary(keep);
+        object.Settings.Boundary=object.Settings.Boundary(keep);
     case 'manage'
         if isempty(object.Preview)
             object=preview(object);
         end
         preview(object);
         target=gca;
-        object.Boundary=manage(object.Boundary,target);
+        object.Settings.Boundary=manage(object.Settings.Boundary,target);
     otherwise
         error('ERROR: invalid operation requested');
 end
@@ -185,7 +185,10 @@ dlg=SMASH.MUI.Dialog;
 dlg.Hidden=true;
 dlg.Name='Manage boundaries';
 
-choose=addblock(dlg,'popup','Current boundary:',{''});
+h=addblock(dlg,'text','Boundary curve management');
+set(h,'FontWeight','bold');
+
+choose=addblock(dlg,'popup_button',{'Boundary curve list:' ' New '},{''},30);
 set(choose(2),'Callback',@chooseBoundary);
     function chooseBoundary(varargin)
         N=numel(local);
@@ -193,28 +196,34 @@ set(choose(2),'Callback',@chooseBoundary);
             return
         end
         current=get(choose(2),'Value');
-        set(name(2),'String',local{current}.Label);
+        %set(name(2),'String',local{current}.Label);
         updateBoundary;
     end
-
-name=addblock(dlg,'edit_button',{'Name:','Save'},20);
-set(name(end),'Callback',@updateName)
-    function updateName(varargin)
-        local{current}.Label=get(name(2),'String');
+set(choose(3),'Callback',@newBoundary,'ToolTipString','Add new boundary curve');
+    function newBoundary(varargin)        
+        local{end+1}=SMASH.ROI.BoundingCurve('horizontal');
+        current=numel(local);
+        updateList;        
     end
 
-h=addblock(dlg,'button',{'Select','Promote','Demote'});
-set(h(1),'Callback',@selectBoundary)
+h=addblock(dlg,'button',{'Select','Promote','Demote','Remove'});
+set(h(1),'Callback',@selectBoundary,...
+    'ToolTipString','Select curve points on the preview image')
     function selectBoundary(varargin)
         hline=findobj(target,'Tag','CurrentBoundaryDisplay');
         if ishandle(hline)
             delete(hline);
         end
+        if isempty(local)
+            return
+        end
         local{current}=select(local{current},[target dlg.Handle]);
         updateBoundary;
+        updateList;
     end
 
-set(h(2),'Callback',@promoteBoundary)
+set(h(2),'Callback',@promoteBoundary,...
+    'ToolTipString','Move boundary curve up the list')
     function promoteBoundary(varargin)
         if isempty(local)
             return
@@ -228,7 +237,8 @@ set(h(2),'Callback',@promoteBoundary)
             updateList;
         end        
     end
-set(h(3),'Callback',@demoteBoundary)
+set(h(3),'Callback',@demoteBoundary,...
+    'ToolTipString','Move boundary curve down the list')
     function demoteBoundary(varargin)
         if isempty(local)
             return
@@ -243,10 +253,14 @@ set(h(3),'Callback',@demoteBoundary)
         end        
     end
 
-new=addblock(dlg,'button','Remove current',15);
-set(new,'Callback',@removeBoundary);
+set(h(4),'Callback',@removeBoundary,...
+    'ToolTipString','Remove boundary curve from the list');
     function removeBoundary(varargin)
         if isempty(local)
+            return
+        end
+        answer=questdlg('Remove current boundary?','Remove boundary','Yes','No','No');
+        if strcmpi(answer,'No')
             return
         end
         local=local([1:(current-1) (current+1):end]);
@@ -255,14 +269,6 @@ set(new,'Callback',@removeBoundary);
             current=1;
         end
         updateList;
-    end
-
-new=addblock(dlg,'button','New boundary',15);
-set(new,'Callback',@newBoundary);
-    function newBoundary(varargin)        
-        local{end+1}=SMASH.ROI.BoundingCurve('horizontal');
-        current=numel(local);
-        updateList;        
     end
 
 h=addblock(dlg,'button',{'OK','Cancel'});
@@ -277,6 +283,7 @@ set(h(2),'Callback',@cancel);
     end
 
 updateList;
+locate(dlg,'Center',fig);
 dlg.Hidden=false;
 %dlg.Modal=true;
 
@@ -286,18 +293,18 @@ delete(fig);
 
 % helper function
     function updateList()
-
         if isempty(local)
-            set(choose(2),'String',{'(none)'})
-            set(name(2),'String','');
+            set(choose(2),'String',{'(none defined)'})
+            %set(name(2),'String','');
             return
         end
         label=cell(size(local));
         for k=1:numel(label)
-            label{k}=sprintf('Boundary #%d',k);
+            %label{k}=sprintf('Boundary #%d',k);
+            label{k}=sprintf('%2d: %s',k,local{k}.Label);
         end
         set(choose(2),'String',label,'Value',current);        
-        set(name(2),'String',local{current}.Label);
+        %set(name(2),'String',local{current}.Label);
         updateBoundary;
     end
     function updateBoundary()

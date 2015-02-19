@@ -58,27 +58,30 @@
 classdef PDV
     %%
     properties
-        Measurement % PDV measurement (STFT object)
-        Parameter % System parameters (structure)
-        MapFrequency % Frequency mapper (function handle)
-        ConvertFunction % Frequency to velocity conversion (function handle)
+        Measurement % PDV measurement (STFT object)        
     end
     properties (SetAccess=protected)
-        Preview % preview spectrogram (Image object)
-        Boundary = {} % Track boundaries (cell array of BoundaryCurveGroup objects)
-        History % Peak histories (SignalGroup object)
-        Velocity % Velocity results (cell array of SignalGroup objects)
+        Settings % Analysis settings (structure)
+        Preview % Preview spectrogram (Image object)
+        Results % Analysis results (structure)        
+        %Boundary = {} % Track boundaries (cell array of BoundaryCurveGroup objects)
+        %History % Peak histories (SignalGroup object)
+        %Velocity % Velocity results (cell array of SignalGroup objects)
     end
     %%
     methods (Hidden=true)
         function object=PDV(varargin)
-            % default parameters     
-            parameter.Wavelength=1550e-9;
-            parameter.ReferenceFrequency=0;
-            parameter.Bandwidth=[];
-            parameter.NoiseFloor=0;
-            parameter.BasisTolerance=1e-3; 
-            object.Parameter=parameter;
+            % default settings
+            p=struct();
+            p.Wavelength=1550e-9;
+            p.ReferenceFrequency=0;
+            p.Bandwidth=[];
+            p.NoiseRegion=[]; % [tmin tmax fmin fmax]  
+            p.UniqueTolerance=1e-3; 
+            p.Boundary={}; 
+            p.ConvertFunction=[];
+            p.HarmonicFunction=[];
+            object.Settings=p;
             % manage input
             if (nargin==1) && isobject(varargin{1})
                 varargin{1}=SMASH.SignalAnalysis.STFT(varargin{1});
@@ -102,26 +105,27 @@ classdef PDV
     end
     %% setters
     methods
-        function object=set.Parameter(object,value)
-            assert(isstruct(value),'ERROR: invalid Parameter setting');
-            if ~isempty(object.Parameter)
-                name=fieldnames(value);
-                for k=1:numel(name)
-                    assert(isfield(object.Parameter,name{k}),...
-                        'ERROR: "%s" is not a valid Parameter',name{k});
-                end
-            end
-            object.Parameter=value;
-        end
-        function object=set.Measurement(object,value)
-            assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
-                'ERROR: invalid Measurement setting')
-            object.Measurement=value;
-        end
-        function object=set.ConvertFunction(object,value)
-            assert(isa(value,'function_handle'),...
-                'ERROR: invalid ConvertFunction value');
-            object.ConvertFunction=value;
-        end
+        % 
+%         function object=set.Parameter(object,value)
+%             assert(isstruct(value),'ERROR: invalid Parameter setting');
+%             if ~isempty(object.Parameter)
+%                 name=fieldnames(value);
+%                 for k=1:numel(name)
+%                     assert(isfield(object.Parameter,name{k}),...
+%                         'ERROR: "%s" is not a valid Parameter',name{k});
+%                 end
+%             end
+%             object.Parameter=value;
+%         end
+%         function object=set.Measurement(object,value)
+%             assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
+%                 'ERROR: invalid Measurement setting')
+%             object.Measurement=value;
+%         end
+%         function object=set.ConvertFunction(object,value)
+%             assert(isa(value,'function_handle'),...
+%                 'ERROR: invalid ConvertFunction value');
+%             object.ConvertFunction=value;
+%         end
     end
 end

@@ -56,13 +56,20 @@
 % {'A' 'B' 'C'}.  Like all other blocks, a minimum width can be specified
 % as the final input.
 %
-% Two composite blocks are provided for more complex situations.
+% Composite blocks are provided for more situations requiring an edit box
+% adjacent to a button.
 %    >> addblock(object,'edit_button',label,[minwidth]);
 %    >> h=addblock(object,'edit_check',label,[minwidth]);
 % These blocks contain a text label, an empty edit box below the label, and
 % a button or check box to the right of the edit box.  The "label" input
 % should be a cell array with two text entries: the first appears above the
 % edit box and the second appears to the right of the edit box.
+%
+% A composite block is also provided for a popup next to a push button
+% control.
+%     >> h=addblock(object,'popup_button',label,choices,[minwidth]);
+% In this case, the label should be a two-element cell array; the first
+% element is the text label and the second element is the button label.
 %
 % See also Dialog, frame, probe
 %
@@ -105,6 +112,8 @@ switch lower(style)
         h=edit_button(object,varargin{:});
     case 'edit_check'
         h=edit_check(object,varargin{:});
+    case 'popup_button'
+        h=popup_button(object,varargin{:});
     case 'table'
         h=table(object,varargin{:}); % under construction
     otherwise

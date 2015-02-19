@@ -27,7 +27,7 @@ end
 object.Measurement=partition(object.Measurement,type,param);
 
 %% manage boundaries
-boundary=object.Boundary;
+boundary=object.Settings.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
     x=object.Measurement.Grid;
@@ -97,29 +97,52 @@ switch lower(mode)
         temp=object.Measurement.FFToptions.SpectrumType;
         assert(strcmpi(temp,'power'),...
             'ERROR: SpectrumType must be ''power'' for centroid tracking');
-        object.History=analyze(object.Measurement,@centroid);
+        temp=analyze(object.Measurement,@centroid);
+        result=struct();
+        index=1:numel(boundary);
+        result.Location=...
+            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
+        result.Location.GridLabel='Time';
+        result.Location.DataLabel='Frequency location';
+        index=index+numel(boundary);
+        result.Width=...
+            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
+        result.Width.GridLabel='Time';
+        result.Width.DataLabel='Frequency width';
+        index=index+numel(boundary);
+        result.Amplitude=...
+            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
+        result.Amplitude.GridLabel='Time';
+        result.Amplitude.DataLabel='Magnitude';
+        object.Results=result;        
     case 'fit'
-        temp=object.Measurement.FFToptions.SpectrumType;
-        if strcmpi(temp,'power')
-            %result=analyze(object.Measurement,@powerFit);
-        elseif strcmpi(temp,'complex')
-            %result=analyze(object.Measurement,@complexFit);
-        end
+        %temp=object.Measurement.FFToptions.SpectrumType;
+        %if strcmpi(temp,'power')
+        %    %result=analyze(object.Measurement,@powerFit);
+        %elseif strcmpi(temp,'complex')
+        %    %result=analyze(object.Measurement,@complexFit);
+        %end
     otherwise
         error('ERROR: %s is not a valid track mode',mode);
 end
 
 %% frequency to velocity conversion
-lambda=object.Parameter.Wavelength;
-f0=object.Parameter.ReferenceFrequency;
-    function velocity=standardConvert(frequency)
+lambda=object.Settings.Wavelength;
+f0=object.Settings.ReferenceFrequency;
+    function velocity=standardConvert(~,frequency)
         velocity=(lambda/2)*(frequency-f0);
     end
 
-if isempty(object.ConvertFunction)
-    % use standardConvert
+location=object.Results.Location;
+if isempty(object.Settings.ConvertFunction)
+    v=standardConvert(location.Grid,location.Data);    
 else
-    % use ConverFunction
+   v=feval(object.Settings.ConvertFunction,location.Grid,location.Data);
 end
+object.Results.Velocity=SMASH.SignalAnalysis.SignalGroup(location.Grid,v);
+object.Results.Velocity.GridLabel='Time';
+object.Results.Velocity.DataLabel='Velocity';
+
+%% uncertainty analysis
 
 end
