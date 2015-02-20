@@ -542,7 +542,16 @@ function SaveSignal(src,varargin)
            end
            return; %Only ask for sda name once
        else
-        export(sig{savenum(i)},fullfile(savepath,savename));
+           
+        % Modify nature of the default export
+        [x y] = limit(sig{savenum(i)});
+        table=[x(:) y(:)];        
+        format='%#+.6e %#+.6e \n';
+        header{1}=sprintf('# Signal export on %s',datestr(now));
+        header{2}=sprintf('# column format: %s %s',sig{savenum(i)}.GridLabel,sig{savenum(i)}.DataLabel);
+        SMASH.FileAccess.writeFile(fullfile(savepath,savename),table,format,header);         
+           
+        %export(sig{savenum(i)},fullfile(savepath,savename));
        end  
    end
 
@@ -1022,6 +1031,8 @@ function CombineData(src,varargin)
     [x1 y1] = limit(sig{sig_num(1)});
     [x2 y2] = limit(sig{sig_num(2)});
     %Add Signal
+    %Interpolate sig 2 to same time base
+    y2 = interp1(x2,y2,x1,'pchip',0)
     [~,ia]=unique(y1);
     newsig = SMASH.SignalAnalysis.Signal(y1(ia),y2(ia));
     sig_tot = sig_tot + 1;
@@ -1771,12 +1782,19 @@ function PerformCallback(varargin)
         p{i} = polyfit(tarray(:,i),xarray(:,i),1);
         cl(i,1) = p{i}(1);
     end
-
+    
     
     %Integrate conservation equations
     stress = stress0+rho0.*cumtrapz(u,cl);
     strain = strain0+cumtrapz(u,1./cl);
     rho = rho0./(1-strain);
+    
+%     %Convert to true strain
+%     truestrain = log(1+strain);
+%     
+%     %Convert to 2nd Piola Kirchoff stress
+%     stretch = 1+strain;
+%     PKstress=stress./stretch;
     
     %figure; plot(u,cl)
 
@@ -1819,7 +1837,7 @@ function PerformCallback(varargin)
         plot(LA_array(:,1),LA_array(:,2),'LineWidth',3);
         title('Wavespeed Response'); xlabel('Particle Velocity'); ylabel('Wavespeed');
         
-        hin = axes('Position',[.62 .7 .2 .2]); plot(strain,LA_array(:,4),'LineWidth',3);
+        hin = axes('Position',[.62 .7 .2 .2]); plot(strain,stress,'LineWidth',3);
          xlabel('Strain'); ylabel('Stress');
         
         %x-t diagram

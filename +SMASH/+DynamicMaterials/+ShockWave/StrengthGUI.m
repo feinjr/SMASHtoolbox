@@ -1,7 +1,6 @@
 %% StrengthGUI is a GUI interface for analyzing the strength in release experiments
 
 function StrengthGUI()
-clear all; clc;
 
 %% Initialize Variables
 
@@ -513,7 +512,7 @@ function [varargout] = selectpoints(varargin)
     set(dlg_hc(2),'String',num2str(max(xpick)));
 end
 
-hpoly=1;
+hpoly='notahandle';
 h=addblock(dlg,'check','Enter Poly Coefficients');
 set(h(1),'Callback',@editpoly);
 function [varargout] = editpoly(varargin)
@@ -523,7 +522,7 @@ function [varargout] = editpoly(varargin)
         %Calculate coefficients for current fit
         value = probe(dlg);
         porder = str2double(value{1});
-        [time,data] = limit(fit(sig_num(1)));
+        [time,data] = limit(fit{sig_num(1)});
         pfit = polyfit(data(:,1), data(:,2), porder);
         
         for i = 1:str2num(value{1})+1
@@ -543,7 +542,7 @@ function ApplyCallback(varargin)
      porder = str2double(value{1});
      umin = str2double(value{3});
      umax = str2double(value{4});
-     get(dlg_hc,'String')
+     get(dlg_hc,'String');
  
     for i = 1:numel(sig_num)
         [time data] = limit(sig{sig_num(i)});
@@ -609,8 +608,8 @@ function Average(src,varagin)
         maxu_tot(i) = maxu;
         minu_tot(i) = minu;
     end
-        minu = min(minu_tot)
-        maxu = max(maxu_tot)
+        minu = min(minu_tot);
+        maxu = max(maxu_tot);
         u = linspace(minu,maxu,2e3)';
         
     %Average using available signal (0 if out of range)
@@ -637,17 +636,30 @@ function Average(src,varagin)
     figure; plot(u,cl_std./cl_avg*100); xlabel('u'); ylabel('Standard Deviation (%)');
    
     rho0 = mean(rho0);
-    ans = inputdlg('Enter initial density','Wavespeed Integration',1,{num2str(rho0)});
+    options.Resize='on';
+    ans = inputdlg({'Ambient Density','Starting Strain','Starting Stress'},'Wavespeed Integration',1,{num2str(rho0),num2str(rho0),'0'},options);
     rho0 = str2num(ans{1});
-    [dens stress] = integrateClu(rho0,u,cl_avg);
-    t = (1:numel(u))';
+    strain0 = str2num(ans{2});
+    stress0 = str2num(ans{3});
+    
+    %If starting stress is > 0 then unloading
+    if stress0 > 1e-3
+        u=flipud(u);
+        cl_avg = flipud(cl_avg);
+        t=(1+numel(u):2*numel(u))';
+    else
+        t = (1:numel(u))';
+    end
+    
+    [dens stress] = integrateClu(rho0,u,cl_avg,strain0,stress0); 
+    
     
     %Create new averaged signal
     sig_tot = sig_tot+1;
     sig{sig_tot} = SMASH.SignalAnalysis.SignalGroup(t,[u,cl_avg,dens,stress]);
     %Set some object properties
     sig{sig_tot}.Name = 'Averaged Wavespeed';
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot),'Marker','none');
     fit{sig_tot} = SMASH.SignalAnalysis.SignalGroup(0,[0 0 0 0]);
     
     %Set active signals to all and plot
@@ -1079,7 +1091,7 @@ function BigPlot(src,varargin)
     set(AIPFig,'name','AIP Large Fig');
     
     plotdata(AIPFig,sig,sig_num,view);
-    plotdata(AIPFig,fit,sig_num,view,'overlay');
+    %plotdata(AIPFig,fit,sig_num,view,'overlay');
 
     set(gca,'FontName','times','FontAngle','normal','LineWidth',2.5,'FontSize',30);
     set(gcf,'Color','w');
@@ -1253,13 +1265,13 @@ function varargout = plotdata(varargin)
                     %Strain rate
                     obj = regrid(obj); obj = differentiate(obj); 
 
-                    %Smooth
-                    xfilt = 200; Nsmooth=int32(length(x)./xfilt); %LowPassFilt
-                    kernel = ones(Nsmooth,1);kernel = kernel/sum(kernel);
-                    obj = smooth(obj,'kernel',kernel);
+%                     %Smooth
+%                     xfilt = 200; Nsmooth=int32(length(x)./xfilt); %LowPassFilt
+%                     kernel = ones(Nsmooth,1);kernel = kernel/sum(kernel);
+%                     obj = smooth(obj,'kernel',kernel);
                     [x y] = limit(obj);
-                    sig{sig_num(i)}.GridLabel = 'Time';
-                    sig{sig_num(i)}.DataLabel = 'Strain Rate';
+%                     sig{sig_num(i)}.GridLabel = 'Time';
+%                     sig{sig_num(i)}.DataLabel = 'Strain Rate';
                     
                     %x = 1-data(1,3)./data(:,3);
                 end
@@ -1284,6 +1296,7 @@ function varargout = plotdata(varargin)
                     ma = get(sig{sig_num(i)}.GraphicOptions,'Marker');                   
                     set(h(i),'Color',lc,'LineStyle',ls,'LineWidth',lw,'Marker',ma);
                     legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
+                    box on;
                 case 'overlay'
                     h = line(x, y,'Color',[0 0 0],'LineStyle','--','LineWidth',2);
                 case 'overlay2'
@@ -1300,9 +1313,18 @@ function varargout = plotdata(varargin)
 end
 
 %% Integrate conservation equations
-function [dens stress] = integrateClu(rho0,u,cl)
-    stress = rho0.*cumtrapz(u,cl);
-    strain = cumtrapz(u,1./cl);
+function [dens stress] = integrateClu(rho0,u,cl,varargin)
+    strain0 = 0;
+    stress0 = 0;
+    if nargin > 3
+        strain0 = varargin{1}
+    end
+    if nargin > 4; 
+        stress0 = varargin{2};
+    end
+    
+    stress = rho0.*cumtrapz(u,cl)+stress0;
+    strain = cumtrapz(u,1./cl)+strain0;
     dens = rho0./(1-strain);
 end
 
