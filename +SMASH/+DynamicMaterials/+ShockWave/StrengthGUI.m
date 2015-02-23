@@ -293,7 +293,9 @@ for i=1:numfiles
         [~,name,ext]=fileparts(filename{i});
         if length(ext) > 4; name = [name ext]; end
         sig{sig_tot}.Name = name;
-        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'Marker','none','LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GraphicOptions.LineWidth=3;
+        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
+
         fit{sig_tot} = SMASH.SignalAnalysis.SignalGroup(0,[0 0 0 0]);
         
         %update waitbar and exit if it doesn't exist
@@ -659,7 +661,8 @@ function Average(src,varagin)
     sig{sig_tot} = SMASH.SignalAnalysis.SignalGroup(t,[u,cl_avg,dens,stress]);
     %Set some object properties
     sig{sig_tot}.Name = 'Averaged Wavespeed';
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot),'Marker','none');
+    sig{sig_tot}.GraphicOptions.LineWidth=3;
+    sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
     fit{sig_tot} = SMASH.SignalAnalysis.SignalGroup(0,[0 0 0 0]);
     
     %Set active signals to all and plot
@@ -818,7 +821,7 @@ function HydroOffset(src,varargin)
                 strainfit = 1-bfit(1,3)./bfit(:,3);
                 pressure = interp1(strainfit,bfit(:,4),strain);
                 Y= (data(:,4)-pressure)*3/2;
-                lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
+                lc = sig{sig_num(i)}.GraphicOptions.LineColor;
                 line(strain,Y,'LineWidth',3,'Color',lc);
                 
                 
@@ -837,7 +840,7 @@ function HydroOffset(src,varargin)
                 strain = 1-data(1,3)./data(:,3);
                 [maxe,im] = max(strain);
                 Y = 3/4*(interp1(strain(1:im),data(1:im,4),strain(im:end))-data(im:end,4));    
-                lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
+                lc = sig{sig_num(i)}.GraphicOptions.LineColor;
                 line(strain(im:end),Y,'LineWidth',3,'Color',lc);
                 save{i} = [strain(im:end) Y];
             end
@@ -941,7 +944,7 @@ function StrengthIntegration(src,varargin)
 
                 str = sprintf('\\Delta\\tau=%f\n\n\\epsilon_{max}=%f\n\n\\sigma_{max}=%f\n\n\\epsilon_{trans}=%f',...
                    Y,max(strain),max(data(:,4)),emin);
-                lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
+                lc = sig{sig_num(i)}.GraphicOptions.LineColor;
                 th=text((min(strain)+max(strain))/2,(max(cb)+max(cl))/2,str,'Color',lc,'FontSize',20);
 
 
@@ -984,7 +987,7 @@ function StrengthIntegration(src,varargin)
 
                 str = sprintf('\\Delta\\tau=%f\n\n\\epsilon_{max}=%f\n\n\\sigma_{max}=%f\n\n\\epsilon_{trans}=%f',...
                    Y,max(strain),max(data(:,4)),strain(u2));
-                lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
+                lc = sig{sig_num(i)}.GraphicOptions.LineColor;
                 th=text((max(data(:,1))+min(data(:,1)))/2,(max(cb)+max(cl))/2,str,'Color',lc,'FontSize',20);
 
 
@@ -1025,8 +1028,10 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            set(sig{sig_num(i)}.GraphicOptions,'LineWidth',width{index,1}, ...
-                'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
+            sig{sig_num(i)}.GraphicOptions.LineWidth=width{index,1};
+            sig{sig_num(i)}.GraphicOptions.LineColor=color{index,1};
+            sig{sig_num(i)}.GraphicOptions.LineStyle=style{index,1};
+            sig{sig_num(i)}.GraphicOptions.Marker=mark{index,1};
         end
     end
 end
@@ -1104,10 +1109,10 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=1; end;
     plotdata(AIPFig,sig,sig_num,view);
     plotdata(AIPFig,fit,sig_num,view,'overlay');
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=3; end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     set(gcf,'Color','w');
@@ -1121,10 +1126,10 @@ function AIPFigure2(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(2);
     set(AIPFig,'name','AIP Double Column Fig');
     
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=1; end;
     plotdata(AIPFig,sig,sig_num,view);
     plotdata(AIPFig,fit,sig_num,view,'overlay');
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=1; end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
@@ -1290,11 +1295,11 @@ function varargout = plotdata(varargin)
                 case 'new plot'
                     if i ==1; cla; end;
                     h(i)=line(x,y);
-                    lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
-                    ls = get(sig{sig_num(i)}.GraphicOptions,'LineStyle');
-                    lw = get(sig{sig_num(i)}.GraphicOptions,'LineWidth');
-                    ma = get(sig{sig_num(i)}.GraphicOptions,'Marker');                   
-                    set(h(i),'Color',lc,'LineStyle',ls,'LineWidth',lw,'Marker',ma);
+                    lc = sig{sig_num(i)}.GraphicOptions.LineColor;
+                    ls = sig{sig_num(i)}.GraphicOptions.LineStyle;
+                    lw = sig{sig_num(i)}.GraphicOptions.LineWidth;
+                    %ma = sig{sig_num(i)}.GraphicOptions.Marker             
+                    set(h(i),'Color',lc,'LineStyle',ls,'LineWidth',lw);
                     legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
                     box on;
                 case 'overlay'
