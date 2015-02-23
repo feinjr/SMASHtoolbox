@@ -17,24 +17,22 @@ end
 assert(ischar(mode),'ERROR: invalid mode');
 mode=lower(mode);
 
-%% manage boundaries
+%% manage boundaries and limits
+[xb,~]=limit(object.Measurement);
+xb=sort([xb(1) xb(end)]);
+previous.Bound=xb;
+
 boundary=object.Settings.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
-    x=object.Measurement.Grid;
-    x=sort([x(1) x(end)]);
-    table(1,:)=[x(1) 0 inf];
-    table(2,:)=[x(2) 0 inf];
+    table(1,:)=[xb(1) 0 inf];
+    table(2,:)=[xb(2) 0 inf];
     boundary=SMASH.ROI.BoundingCurve('horizontal',table);
     boundary.Label='Default boundary';
     boundary={boundary};
 end
 Nboundary=numel(boundary);
 
-%% revise limits to match boundaries
-[xb,~]=limit(object.Measurement);
-xb=sort([xb(1) xb(end)]);
-previous.Bound=xb;
 for n=1:Nboundary
     table=boundary{n}.Data;
     if isempty(table)
@@ -68,8 +66,6 @@ object.Measurement=limit(object.Measurement,xb);
         out=out(:);
     end
 
-FitOptions=struct('UniqueTolerance',object.Settings.UniqueTolerance);
-% determine tau?
     function out=fit(f,y,t,~)               
         tmid=(t(end)+t(1))/2;
         [fA,fB]=deal(nan(Nboundary,1));
@@ -85,9 +81,20 @@ switch lower(mode)
     case 'centroid'
         object.Measurement.FFToptions.SpectrumType='power';    
         history=analyze(object.Measurement,@centroid);       
-    case 'fit'
-        
-        object.Measurement.FFToptions.SpectrumType='complex';        
+    case 'fit'        
+        object.Measurement.FFToptions.SpectrumType='complex';     
+        Window={'gaussian' 3};
+        temp=object.Measurement.FFToptions.Window;
+        if iscell(temp)
+            if strcmpi(temp{1},'gaussian') || strcmpi(temp{1},'gauss')
+                Window=temp;
+            end
+        end
+        object.Measurement.FFToptions.Window=Window;
+        FitOptions=struct();
+        FitOptions.UniqueTolerance=object.Settings.UniqueTolerance;
+        FitOptions.Tau=object.Measurement.Partition.Duration;
+        FitOptions.Tau=FitOptions.Tau/(2*Window{2});
         history=analyze(object.Measurement,@fit);
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);

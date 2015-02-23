@@ -1,4 +1,4 @@
-function param=fitComplexGaussian()
+function param=fitComplexGaussian(f,y,fA,fB,options)
 
 
 
