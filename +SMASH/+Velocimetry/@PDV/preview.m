@@ -1,29 +1,34 @@
 % preview Generate/display preview spectrogram
 %
-% This method generats and displays preview spectrograms for PDV objects.
+% This method generates and displays preview spectrograms for PDV objects.
 % The standard process for doing this is:
 %     >> object=preview(object); % generate spectrogram
 %     >> preview(object); % display spectrogram in a new figure
 %     >> preview(object,target); % display spectrogram in target axes
 % The spectrogram is stored as an Image sub-object in the Preview property.
-%  This preview is *not* automatically regenerated when the object is
-%  modified.
 %
-% By default, spectrograms are generated using 1000 non-overlapping blocks.
-%  Alternate partitioning can also be specified.
+% The standard preview is a spectrograms with 1000 non-overlapping blocks.
+% Alternate partitioning can also be specified.
 %     >> object=preview(object,{'duration' [duration advance]});
 %     >> object=preview(object,{'points' [points skip]});
 %     >> object=preview(object,{'blocks' [number overlap]});
-% See the "partition" method of the STFT class for more information.
+% See the STFT class for more information about partition types and and
+% settings.  
 %
-% All FFT options (Window, NumberFrequencies, etc.) for the preview
-% are taken from the STFT sub-object stored in the Measurement property.
-% Changes to the sub-object are used during the next preview generation.
-%     >> object.Measurement.FFToptions.NumberFrequencies=2000; % generate at least 2000 frequency points
-%     >> object=preview(object,...); % update preview
-% See that FFToptions class for more information.
+% Previews are usually power spectrograms, but the real and imaginary
+% components of the Fourier transform can be preserved.
+%     >> object=preview(object,partition,'complex'); % complex spectra
+%     >> object=preview(object,partition,'power');   % power spectra (default)
+% Power spectra contain less information that power spectra but are easier
+% to visualize.
 %
-% See also PDV, SignalAnalysis.STFT, General.FFToptions
+% WARNIGN: previews are not automatically regenerated when an object is
+% changed!  The following is a conceptual workflow.
+%     >> object=preview(object); % original preview
+%     >> object=modify(object,...); % change object settings
+%     >> object=preview(object); % update preview
+%
+% See also PDV, configure, SignalAnalysis.STFT.partition
 %
 
 %
@@ -46,21 +51,29 @@ if nargout==0
 end
 
 % generate preview
-if (nargin<2) || isempty(varargin{1})
-    [x,~]=limit(object.Measurement);
-    points=ceil(numel(x)/1000);
-    type='points';
-    param=points;
+Narg=numel(varargin);
+if (Narg<1) || isempty(varargin{1})
+    type='blocks';
+    param=[1000 0];
 else
     type=varargin{1}{1};
     param=varargin{1}{2};
 end
 
-previous=object.Measurement.Partition;
-object.Measurement=partition(object.Measurement,type,param);
-object.Preview=analyze(object.Measurement);
-object.Measurement=partition(object.Measurement,previous);
+if (Narg<2) || isempty(varargin{2})
+    SpectrumType='power';
+else
+    SpectrumType=varargin{2};
+end
+previous.SpectrumType=object.Measurement.FFToptions.SpectrumType;
 
+previous.Partition=object.Measurement.Partition;
+object.Measurement=partition(object.Measurement,type,param);
+object.Measurement.FFToptions.SpectrumType=SpectrumType;
+object.Preview=analyze(object.Measurement);
+
+object.Measurement=partition(object.Measurement,previous.Partition);
+object.Measurement.FFToptions.SpectrumType=previous.SpectrumType;
 varargout{1}=object;
 
 end

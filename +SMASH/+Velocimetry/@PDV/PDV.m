@@ -63,10 +63,7 @@ classdef PDV
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
         Preview % Preview spectrogram (Image object)
-        Results % Analysis results (structure)        
-        %Boundary = {} % Track boundaries (cell array of BoundaryCurveGroup objects)
-        %History % Peak histories (SignalGroup object)
-        %Velocity % Velocity results (cell array of SignalGroup objects)
+        Results % Analysis results (structure)           
     end
     %%
     methods (Hidden=true)
@@ -102,30 +99,5 @@ classdef PDV
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
-    end
-    %% setters
-    methods
-        % 
-%         function object=set.Parameter(object,value)
-%             assert(isstruct(value),'ERROR: invalid Parameter setting');
-%             if ~isempty(object.Parameter)
-%                 name=fieldnames(value);
-%                 for k=1:numel(name)
-%                     assert(isfield(object.Parameter,name{k}),...
-%                         'ERROR: "%s" is not a valid Parameter',name{k});
-%                 end
-%             end
-%             object.Parameter=value;
-%         end
-%         function object=set.Measurement(object,value)
-%             assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
-%                 'ERROR: invalid Measurement setting')
-%             object.Measurement=value;
-%         end
-%         function object=set.ConvertFunction(object,value)
-%             assert(isa(value,'function_handle'),...
-%                 'ERROR: invalid ConvertFunction value');
-%             object.ConvertFunction=value;
-%         end
-    end
+    end    
 end
