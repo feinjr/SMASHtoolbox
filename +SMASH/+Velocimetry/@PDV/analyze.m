@@ -32,9 +32,9 @@ end
 Nboundary=numel(boundary);
 
 %% revise limits to match boundaries
-previous.LimitIndex=object.Measurement.LimitIndex;
 [xb,~]=limit(object.Measurement);
 xb=sort([xb(1) xb(end)]);
+previous.Bound=xb;
 for n=1:Nboundary
     table=boundary{n}.Data;
     if isempty(table)
@@ -72,11 +72,11 @@ FitOptions=struct('UniqueTolerance',object.Settings.UniqueTolerance);
 % determine tau?
     function out=fit(f,y,t,~)               
         tmid=(t(end)+t(1))/2;
-        [lower,upper]=deal(nan(Nboundary,1));
+        [fA,fB]=deal(nan(Nboundary,1));
         for k=1:Nboundary
-            [lower(k),upper(k)]=probe(boundary{k},tmid);                        
+            [fA(k),fB(k)]=probe(boundary{k},tmid);                        
         end
-        out=fitComplexGaussians(f,y,lower,upper,FitOptions);
+        out=fitComplexGaussians(f,y,fA,fB,FitOptions);
         out=out(:);
     end
 
@@ -115,7 +115,7 @@ object.Results=result;
 object=convert(object);
 
 %% restore previous state
-object.Measurement.LimitIndex=previous.LimitIndex;
+object=limit(object,previous.Bound);
 object.Measurement.FFToptions=previous.FFToptions;
 
 end

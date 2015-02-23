@@ -99,5 +99,13 @@ classdef PDV
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
-    end    
+    end   
+    %% setters
+    methods
+        function object=set.Measurement(object,value)
+            assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
+                'ERROR: Measurement property must be a STFT object');
+            object.Measurement=value;
+        end
+    end
 end

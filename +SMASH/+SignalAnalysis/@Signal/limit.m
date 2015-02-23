@@ -42,7 +42,18 @@ end
 % apply limit bound
 if strcmpi(bound,'all')
     object.LimitIndex='all';
-elseif isnumeric(bound) && (numel(bound)==2)    
+elseif strcmp(bound,'manual')
+    view(object);
+    title(gca,'Use zoom/pan to select limit region');   
+    hc=uicontrol('Parent',gcf,...
+        'Style','pushbutton','String',' Done ',...
+        'Callback','delete(gcbo)');
+    waitfor(hc);
+    bound=xlim;    
+    close(gcf);
+    object=limit(object,bound);    
+elseif isnumeric(bound) && (numel(bound)==2)  
+    bound=sort(bound);
     len=numel(object.Grid);
     switch lower(units)
         case 'grid'
