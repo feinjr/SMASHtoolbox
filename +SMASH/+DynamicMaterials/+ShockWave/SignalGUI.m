@@ -314,7 +314,8 @@ for i=1:numfiles
         sig{sig_tot}.Name = name;
 
         %Set some object properties
-        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GraphicOptions.LineWidth=3;
+        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
         sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
 
     
@@ -329,7 +330,8 @@ for i=1:numfiles
             sig{sig_tot}.Name = str;
 
             %Set some object properties
-            set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+            sig{sig_tot}.GraphicOptions.LineWidth=3;
+            sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
             sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
             end
         end
@@ -446,7 +448,8 @@ function ApplyCallback(varargin)
         if length(ext) > 4; name = [name ext]; end
         pathname = pwd;
         sig{sig_tot}.Name = name;
-        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GraphicOptions.LineWidth=3;
+        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
         sig{sig_tot}.GridLabel= 'x'; sig{sig_tot}.DataLabel= 'y';
 
         %Set active signals to all and plot
@@ -798,7 +801,7 @@ end
 dlg.Hidden = true;
 dlg.Name = 'Smooth Signal';
 
-h=addblock(dlg,'listbox','Smooth Method',{'mean','median','kernel'}); 
+h=addblock(dlg,'listbox','Smooth Method',{'mean','kernel'}); 
 h=addblock(dlg,'edit','Smooth Value');
 
 OkApplyCancel(dlg,@applysmooth,'overlay')
@@ -821,8 +824,6 @@ function newsig = applysmooth(n)
         switch choice
             case 'mean'
                 newsig = smooth(sig{n},'mean',str2double(value(2)));
-            case 'median'
-                newsig = smooth(sig{n},'median',str2double(value(2)));
             case 'kernel'
                 kernel = definekernal;
                 newsig = smooth(sig{n},'kernel',kernel);
@@ -966,7 +967,8 @@ function CombineSignals(src,varargin)
     makeGridUniform(sig{sig_tot});
     %Set some object properties
     sig{sig_tot}.Name = 'Combined Signal'; 
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.GraphicOptions.LineWidth=3;
+    sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
     clear newsig;
     %Set active to all and plot
     sig_num = [1:sig_tot];
@@ -1014,8 +1016,9 @@ function AverageSignals(src,varargin)
     sig{sig_tot} = reset(sig{sig_num(1)},newsig);
     makeGridUniform(sig{sig_tot});
     %Set some object properties
-    sig{sig_tot}.Name = 'Signal Average'; 
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.Name = 'Signal Average';
+    sig{sig_tot}.GraphicOptions.LineWidth=3;
+    sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
     clear newsig;
     %Set active to all and plot
     sig_num = [sig_num sig_tot];
@@ -1040,7 +1043,8 @@ function CombineData(src,varargin)
     makeGridUniform(sig{sig_tot});
     %Set some object properties
     sig{sig_tot}.Name = 'Combined Signal'; 
-    set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+    sig{sig_tot}.GraphicOptions.LineWidth=3;
+    sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
     clear newsig;
     %Set active to all and plot
     sig_num = [1:sig_tot];
@@ -1696,7 +1700,8 @@ function PerformCallback(varargin)
         sig{sig_tot} = SMASH.SignalAnalysis.Signal(tshock,vshock);
         sig{sig_tot}.Name = 'CenteredWaveSource';
         %Set some object properties
-        set(sig{sig_tot}.GraphicOptions,'LineWidth',3,'LineColor', DistinguishedLines(sig_tot));
+        sig{sig_tot}.GraphicOptions.LineWidth=3;
+        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
         sig_num = [sig_num sig_tot];
         thickness(end+1) = 0;
     end
@@ -2058,8 +2063,10 @@ if ~isempty(lh)
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
             index = numel(color)+1-i;
-            set(sig{sig_num(i)}.GraphicOptions,'LineWidth',width{index,1}, ...
-                'LineColor', color{index,1},'LineStyle',style{index,1},'Marker',mark{index,1});
+            sig{sig_num(i)}.GraphicOptions.LineWidth=width{index,1};
+            sig{sig_num(i)}.GraphicOptions.LineColor=color{index,1};
+            sig{sig_num(i)}.GraphicOptions.LineStyle=style{index,1};
+            sig{sig_num(i)}.GraphicOptions.Marker=mark{index,1};
         end
     end
 end
@@ -2219,9 +2226,9 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions,LineWidth=1; end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=3; end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     set(gcf,'Color','w');
@@ -2235,9 +2242,9 @@ function AIPFigure2(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(2);
     set(AIPFig,'name','AIP Double Column Fig');
     
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',1); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=1; end;
     plotdata(AIPFig,sig,sig_num)
-    for i=1:length(sig_num); set(sig{sig_num(i)}.GraphicOptions,'LineWidth',3); end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=3; end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
