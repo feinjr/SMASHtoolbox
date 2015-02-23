@@ -338,6 +338,9 @@ dlg.Hidden = false;
     set(h(1),'Callback',@ApplyCallback);
     function ApplyCallback(varargin)
         
+        %Number of points to use for table interpolation
+        numpoints = 1e2;
+        
         value = probe(dlg);
         neos = value{1};
         ses = SMASH.DynamicMaterials.EOS.Sesame(str2num(neos),fullfile(eospath,neos));
@@ -353,7 +356,7 @@ dlg.Hidden = false;
         
         %If not principal, assume on initial Hugoniot
         if P0>0
-            dens = linspace(rho0,rho0*2,100)';
+            dens = linspace(rho0,rho0*2,numpoints)';
             hug = hugoniot(ses,dens,0,rho0,0);
             
             while max(hug.Pressure) < P0
@@ -374,11 +377,12 @@ dlg.Hidden = false;
         end           
         
         
-        Poff = 1e-3; %Offset to help numerics
+        Poff = 0; %Offset to help numerics
         %Isentrope
         if Pend < P0
-            dens = sort(linspace(stap.Density/1.5,rho0,100)','descend');
-            path = isentrope(ses,dens,P0,rho0,up0);            
+            dens = sort(linspace(stap.Density*0.95,rho0,numpoints)','descend')
+            path = isentrope(ses,dens,P0,rho0,up0);     
+            
         %Hugoniot
         else
             dens = linspace(rho0,rho0*2,100)';
@@ -668,17 +672,31 @@ end %Save
 
 function FindIntersections(src,varargin)
 plotdata(fig.Handle,sig,sig_num);
+x=[]; y=[]; count = 1;
 for i=1:numel(sig_num)-1
-   for j = i+1:numel(sig_num)
-    [x,y] = intersections(sig{sig_num(i)}.Grid,sig{sig_num(i)}.Data,sig{sig_num(j)}.Grid,sig{sig_num(j)}.Data);
-    if y>0
-    lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
-    text(x,y,['\leftarrow ',sprintf('(%3.3f,%3.3f)',x,y)],'FontSize',14,'Color',lc);
+    
+    %Find all intersections 
+    for j = i+1:numel(sig_num)
+        [x,y] = intersections(sig{sig_num(i)}.Grid,sig{sig_num(i)}.Data,sig{sig_num(j)}.Grid,sig{sig_num(j)}.Data); 
+        lc = get(sig{sig_num(i)}.GraphicOptions,'LineColor');
+        
+        %Plot only "unique" intersections
+        xtrack(1)=0; ytrack(1)=0;
+        if y > 0 & numel(x) == 1
+            count = count+1;
+            xsave(count)=x;
+            ysave(count)=y;
+            
+            xsave(1:count-1)
+            if abs(x-xsave(1:count-1))>0.1    
+                abs(x-xsave(1:count-1));
+                text(x,y,[' \leftarrow',sprintf('(%3.3f, %3.3f)',x,y)],'FontSize',16,'Color',lc);
+            end
+        end
     end
-
-   end
-
 end
+
+
 
 
 end
