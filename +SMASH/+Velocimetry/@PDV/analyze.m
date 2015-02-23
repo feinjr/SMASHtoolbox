@@ -39,8 +39,9 @@ for n=1:Nboundary
         continue
     end
     table=table(:,1);
-    xb(1)=min(xb(1),min(table));
-    xb(2)=max(xb(2),max(table));
+    table=[min(table) max(table)];
+    xb(1)=max(xb(1),table(1));
+    xb(2)=min(xb(2),table(2));
 end
 object.Measurement=limit(object.Measurement,xb);
 
