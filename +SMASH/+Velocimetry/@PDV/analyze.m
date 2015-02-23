@@ -1,12 +1,14 @@
 % UNDER CONSTRUCTION...
 %
-% Power spectrum tracking:
+
+%     >> object=analyze(object);
 %     >> object=analyze(object,'centroid');
+
 %     >> object=analyze(object,'fit');
 %
 
 
-function object=analyze(object,mode,varargin)
+function object=analyze(object,mode)
 
 %% manage input
 if (nargin<2) || isempty(mode)
@@ -14,17 +16,6 @@ if (nargin<2) || isempty(mode)
 end
 assert(ischar(mode),'ERROR: invalid mode');
 mode=lower(mode);
-
-if (nargin<3) || isempty(varargin{1})
-    [x,~]=limit(object.Measurement);
-    points=ceil(numel(x)/1000);
-    type='points';
-    param=points;
-else
-    type=varargin{1}{1};
-    param=varargin{1}{2};
-end
-object.Measurement=partition(object.Measurement,type,param);
 
 %% manage boundaries
 boundary=object.Settings.Boundary;
@@ -40,21 +31,24 @@ if isempty(boundary)
 end
 Nboundary=numel(boundary);
 
-[x,~]=limit(object.Measurement);
-x=sort([x(1) x(end)]);
+%% revise limits to match boundaries
+previous.LimitIndex=object.Measurement.LimitIndex;
+[xb,~]=limit(object.Measurement);
+xb=sort([xb(1) xb(end)]);
 for n=1:Nboundary
     table=boundary{n}.Data;
     if isempty(table)
         continue
     end
     table=table(:,1);
-    x(1)=min(x(1),min(table));
-    x(2)=max(x(2),max(table));
+    xb(1)=min(xb(1),min(table));
+    xb(2)=max(xb(2),max(table));
 end
-object.Measurement=limit(object.Measurement,x);
+object.Measurement=limit(object.Measurement,xb);
 
-%% perform analysis
-    function out=centroid(f,y,t,~)
+
+%% perform analysis    
+    function out=centroid(f,y,t,~)    
         tmid=(t(end)+t(1))/2;
         out=nan(Nboundary,3);
         for k=1:Nboundary            
@@ -74,75 +68,54 @@ object.Measurement=limit(object.Measurement,x);
         out=out(:);
     end
 
-    function out=powerFit(f,y,t,~)
+FitOptions=struct('UniqueTolerance',object.Settings.UniqueTolerance);
+% determine tau?
+    function out=fit(f,y,t,~)               
         tmid=(t(end)+t(1))/2;
-        out=nan(Nboundary,3);
+        [lower,upper]=deal(nan(Nboundary,1));
         for k=1:Nboundary
-            [fA,fB]=probe(boundary{k},tmid);
-            index=(f>=fA)&(f<=fB);
-            fb=f(index);
-            w=y(index);
-            % under construction
+            [lower(k),upper(k)]=probe(boundary{k},tmid);                        
         end
+        out=fitComplexGaussians(f,y,lower,upper,FitOptions);
         out=out(:);
     end
 
-% DO THESE REALLY NEED TO BE DISTICT?
-    function out=complexFit(f,y,t,~)
-        
-    end
-
+previous.FFToptions=object.Measurement.FFToptions;
 switch lower(mode)
     case 'centroid'
-        temp=object.Measurement.FFToptions.SpectrumType;
-        assert(strcmpi(temp,'power'),...
-            'ERROR: SpectrumType must be ''power'' for centroid tracking');
-        temp=analyze(object.Measurement,@centroid);
-        result=struct();
-        index=1:numel(boundary);
-        result.Location=...
-            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
-        result.Location.GridLabel='Time';
-        result.Location.DataLabel='Frequency location';
-        index=index+numel(boundary);
-        result.Width=...
-            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
-        result.Width.GridLabel='Time';
-        result.Width.DataLabel='Frequency width';
-        index=index+numel(boundary);
-        result.Amplitude=...
-            SMASH.SignalAnalysis.SignalGroup(temp.Grid,temp.Data(:,index));
-        result.Amplitude.GridLabel='Time';
-        result.Amplitude.DataLabel='Magnitude';
-        object.Results=result;        
+        object.Measurement.FFToptions.SpectrumType='power';    
+        history=analyze(object.Measurement,@centroid);       
     case 'fit'
-        %temp=object.Measurement.FFToptions.SpectrumType;
-        %if strcmpi(temp,'power')
-        %    %result=analyze(object.Measurement,@powerFit);
-        %elseif strcmpi(temp,'complex')
-        %    %result=analyze(object.Measurement,@complexFit);
-        %end
+        
+        object.Measurement.FFToptions.SpectrumType='complex';        
+        history=analyze(object.Measurement,@fit);
     otherwise
-        error('ERROR: %s is not a valid track mode',mode);
+        error('ERROR: %s is not a valid analysis mode',mode);
 end
 
-%% frequency to velocity conversion
-lambda=object.Settings.Wavelength;
-f0=object.Settings.ReferenceFrequency;
-    function velocity=standardConvert(~,frequency)
-        velocity=(lambda/2)*(frequency-f0);
-    end
+%% separate and convert results
+result=struct();
+index=1:numel(boundary);
+result.Location=...
+    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
+result.Location.GridLabel='Time';
+result.Location.DataLabel='Frequency location';
+index=index+numel(boundary);
+result.Width=...
+    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
+result.Width.GridLabel='Time';
+result.Width.DataLabel='Frequency width';
+index=index+numel(boundary);
+result.Amplitude=...
+    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
+result.Amplitude.GridLabel='Time';
+result.Amplitude.DataLabel='Power';
+object.Results=result;
 
-location=object.Results.Location;
-if isempty(object.Settings.ConvertFunction)
-    v=standardConvert(location.Grid,location.Data);    
-else
-   v=feval(object.Settings.ConvertFunction,location.Grid,location.Data);
-end
-object.Results.Velocity=SMASH.SignalAnalysis.SignalGroup(location.Grid,v);
-object.Results.Velocity.GridLabel='Time';
-object.Results.Velocity.DataLabel='Velocity';
+object=convert(object);
 
-%% uncertainty analysis
+%% restore previous state
+object.Measurement.LimitIndex=previous.LimitIndex;
+object.Measurement.FFToptions=previous.FFToptions;
 
 end

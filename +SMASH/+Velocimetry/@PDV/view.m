@@ -9,17 +9,22 @@ if (nargin<2) || isempty(mode)
 end
 assert(ischar(mode),'ERROR: invalid mode');
 
-%if isempty(object.Results)
-%    error('ERROR: no Results available');
-%end
+if isempty(object.Results)
+    error('ERROR: no analysis results yet');
+end
 
 switch lower(mode)
     case 'location'
-        view(object.Results.Location,varargin{:});
+        h=view(object.Results.Location,varargin{:});
     case 'velocity'
-        view(object.Results.Velocity,varargin{:});
+        h=view(object.Results.Velocity,varargin{:});
     otherwise
         error('ERROR: invalid view mode');
+end
+
+% manage output
+if nargout>0
+    varargout{1}=h;
 end
 
 end
