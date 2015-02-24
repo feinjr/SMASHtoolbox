@@ -27,7 +27,7 @@ assert(nargin>1,'ERROR: at least two objects needed')
 for n=1:nargin  
     assert(isa(varargin{n},'SMASH.SignalAnalysis.Signal'),...
         'ERROR: non-Signal input detected')
-    if ~object.GridUniform(varargin{n})
+    if ~varargin{n}.GridUniform
         varargin{n}=regrid(varargin{n});
     end
     temp=varargin{n}.Grid;
