@@ -21,7 +21,6 @@ Nbound=numel(MasterIndex);
         % array allocation
         [P,Q]=deal(nan(Npoints,numel(MasterIndex))); % real/imaginary basis 
         full=nan(Nbound,3); % [location width amplitude] parameters
-        % !!! apply beat frequency limit !!!!
         % calculate basis functions
         for m=1:Nbound
             %b=parameter(m,1); % beat frequency
@@ -39,7 +38,7 @@ Nbound=numel(MasterIndex);
         % enforce uniqueness tolerance
         keep=true(1,Nbound);
         for m=2:Nbound
-            for n=(m+1):Nbound
+            for n=1:(m-1)
                 Im=trapz(f,P(:,m));
                 In=trapz(f,P(:,n));
                 Imn=trapz(f,(P(:,m)-P(:,n)).^2);

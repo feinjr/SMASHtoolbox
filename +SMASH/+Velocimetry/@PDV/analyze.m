@@ -18,21 +18,25 @@ assert(ischar(mode),'ERROR: invalid mode');
 mode=lower(mode);
 
 %% manage boundaries and limits
-[xb,~]=limit(object.Measurement);
-xb=sort([xb(1) xb(end)]);
-previous.Bound=xb;
+[xlimit,~]=limit(object.Measurement);
+M=numel(xlimit);
+xlimit=sort([xlimit(1) xlimit(end)]);
+SampleTime=diff(xlimit)/(M-1);
+NyquistFrequency=1/(2*SampleTime);
+previous.Bound=xlimit;
 
 boundary=object.Settings.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
-    table(1,:)=[xb(1) 0 inf];
-    table(2,:)=[xb(2) 0 inf];
+    table(1,:)=[xlimit(1) 0 NyquistFrequency];
+    table(2,:)=[xlimit(2) 0 NyquistFrequency];
     boundary=SMASH.ROI.BoundingCurve('horizontal',table);
     boundary.Label='Default boundary';
     boundary={boundary};
 end
 Nboundary=numel(boundary);
 
+xbound=[+inf -inf];
 for n=1:Nboundary
     table=boundary{n}.Data;
     if isempty(table)
@@ -40,11 +44,12 @@ for n=1:Nboundary
     end
     table=table(:,1);
     table=[min(table) max(table)];
-    xb(1)=max(xb(1),table(1));
-    xb(2)=min(xb(2),table(2));
+    xbound(1)=min(xbound(1),table(1));
+    xbound(2)=max(xbound(2),table(2));
 end
-object.Measurement=limit(object.Measurement,xb);
-
+xbound(1)=max(xbound(1),xlimit(1));
+xbound(2)=min(xbound(2),xlimit(2));
+object.Measurement=limit(object.Measurement,xbound);
 
 %% perform analysis    
     function out=centroid(f,y,t,~)    
@@ -78,6 +83,7 @@ object.Measurement=limit(object.Measurement,xb);
     end
 
 previous.FFToptions=object.Measurement.FFToptions;
+object.Measurement.FFToptions.FrequencyDomain='positive';
 switch lower(mode)
     case 'centroid'
         object.Measurement.FFToptions.SpectrumType='power';    
