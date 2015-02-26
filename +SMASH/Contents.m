@@ -15,6 +15,7 @@
 %    PDE              - Partial Differential Equation solvers (UNDER CONSTRUCTION)
 %    Radiometry       - radiometry analysis (UNDER CONSTRUCTION)
 %    Spectroscopy     - spectroscopy analysis (UNDER CONSTRUCTION)
+%    Velocimetry      - velocimetry analysis (UNDER CONSTRUCTION)
 %
 % To learn more about these package, press the links above or use the "doc"
 % command.
