@@ -4,6 +4,8 @@
 % exposure to linearized intensity level using a default optical density
 % OD setting:   
 %   >> object=analyze(object);
+% UNDER CONSTRUCTION
+
 % or with an input exposure optical density (OD) setting:
 %   >> object=analyze(object,opticalDensity); % specifiy 2 x 21 OD array
 %
@@ -19,7 +21,7 @@
 %    the SmoothDerivative function
 %
 %%
-function varargout=analyze(object,opticalDensity)
+function varargout=analyze(object)
 
 % handle input
 if (nargin<2) || isempty(opticalDensity)
@@ -32,6 +34,16 @@ if (nargin<2) || isempty(opticalDensity)
     offset=2.13; % gives better overlap
     OD=[OD; OD+offset];  
 end
+
+% generate exposure table
+N=numel(object.StepOffset);
+OD=object.StepLevels;
+OD=OD(end:-1:1);
+OD=repmat(OD,[N 1]);
+for n=1:N
+    OD(n,:)=OD(n,:)+object.StepOffset(n);
+end
+
 exposure=10.^(-OD);
 exposure=exposure/exposure(2,end); % normalize by midpoint
 %exposure=transpose(exposure);

@@ -22,12 +22,18 @@
 classdef Wedge < SMASH.ImageAnalysis.Image
     %%
     properties (SetAccess={?SMASH.General.DataClass})
-        TransferTable
+        TransferTable % transfer table (Mx2 array)
+    end
+    properties
+        StepLevels = [0.08 0.20 0.35 0.51 0.64 0.78 0.94 ...
+            1.12 1.25 1.39 1.54 1.67 1.82 1.98 ...
+            2.15 2.29 2.43 2.59 2.76 2.91 3.02];% step wedge levels
+        StepOffset = [0 2.13]; % step wedge offset (levels repeated)
     end
     %% constructor
     methods (Hidden=true)
         function object=Wedge(varargin)
-            object=object@SMASH.ImageAnalysis.Image(varargin{:});
+            object=object@SMASH.ImageAnalysis.Image(varargin{:});            
         end
     end
     %%
@@ -37,5 +43,28 @@ classdef Wedge < SMASH.ImageAnalysis.Image
     end
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
+    end
+    %% setters
+    methods
+        function object=set.StepLevels(object,value)
+            assert(isnumeric(value) & numel(value)>1 & all(value>0),...
+                'ERROR: invalid StepLevels value');            
+            if numel(value) ~= numel(object.StepLevels)
+                warning('SMASH:Wedge','Number of step levels was changed');
+            end
+            value=reshape(value,[1 numel(value)]);
+            value=sort(value);
+            object.StepLevels=value;            
+        end
+        function object=set.StepOffset(object,value)
+            assert(isnumeric(value) & numel(value)>0 & all(value>=0),...
+                'ERROR: invalid StepOffset value');
+            if numel(value) ~= numel(object.StepOffset)
+                warning('SMASH:Wedge','Number of step offsets was changed');
+            end
+            value=reshape(value,[1 numel(value)]);
+            value=sort(value);
+            object.StepOffset=value;
+        end
     end
 end
