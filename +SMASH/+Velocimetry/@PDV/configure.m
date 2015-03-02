@@ -24,7 +24,7 @@ if nargout==0
     if Narg>0
         warning('SMASH:PDV','Configuration changes ignored in reveal mode');
     end
-    % determine label format    
+    % determine label format
     name=fieldnames(object.Settings);
     L=max(cellfun(@numel,name));
     name=fieldnames(object.Settings);
@@ -41,7 +41,7 @@ if nargout==0
         printValue(object.Measurement.FFToptions.(name{k}));
         fprintf('\n');
     end
-     % print partition setttings
+    % print partition setttings
     fprintf('** Partition settings **\n');
     name=fieldnames(object.Measurement.Partition);
     for k=1:numel(name);
@@ -51,12 +51,12 @@ if nargout==0
     end
     % print PDV settings
     fprintf('** Analysis settings **\n');
-    name=fieldnames(object.Settings);    
+    name=fieldnames(object.Settings);
     for k=1:numel(name);
         fprintf(format,name{k});
         printValue(object.Settings.(name{k}));
         fprintf('\n');
-    end   
+    end
     fprintf('\n');
     return
 end
@@ -121,6 +121,8 @@ for n=1:2:Narg
             object.Measurement.FFToptions.SpectrumType=value;
         % partition configuration
         case 'partition'
+            warning('SMASH:PDV',...
+                'Use the "partition" method for partition settings');
             try
                 object.Measurement=...
                     partition(object.Measurement,value{1},value{2});
@@ -128,7 +130,7 @@ for n=1:2:Narg
                 error('ERROR: invalid partition value');
             end
         otherwise
-            error('ERROR: "%s" is an invalid setting');            
+            error('ERROR: "%s" is an invalid setting');
     end
 end
 varargout{1}=object;

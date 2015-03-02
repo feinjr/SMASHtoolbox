@@ -1,13 +1,23 @@
-% UNDER CONSTRUCTION...
+% analyze Perform history analysis
 %
-
+% This method performs PDV history analysis and stores the output in the
+% object's Results property.  The number of histories generated during the
+% analysis depends on the number of specified boundaries; if no boundaries
+% are defined, a single history with no frequency bounds is generated.
+%
+% The default analysis calculates centroids for each boundary region.
 %     >> object=analyze(object);
-%     >> object=analyze(object,'centroid');
-
+%     >> object=analyze(object,'centroid'); % same as above
+% Complex spectral fit analysis can also be requested.
 %     >> object=analyze(object,'fit');
+% Details of the latter approach are currently being revised
+%
+% See also PDV, bound, configure, convert, partition
 %
 
-
+%
+% created march 2, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=analyze(object,mode)
 
 %% manage input

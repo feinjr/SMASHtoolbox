@@ -1,13 +1,33 @@
-% UNDER CONSTRUCTION
+% characterize Determine settings from measurement
 %
-%     >> object=characterize(object,'ReferenceFrequency');
-%     >> object=characterize(object,'ReferenceFrequency',tbound);
-%     >> object=characterize(object,'ReferenceFrequency',tbound,fbound);
+% This method determines certain settings in a PDV object from the
+% meausured signal.  User guidance is an important part of the process.
+%
+% To determine the reference frequency:
+%     >> object=characterize(object,'ReferenceFrequency',[t1 t2]);
+%     >> object=characterize(object,'ReferenceFrequency',[t1 t2],[f1 f2]);
+% Both expressions use a power spectrum generated from the specified time
+% bound.  The reference frequency is associated with the peak location in
+% this spectrum.  The first expression searches the entire power spectrum,
+% while the second expression limits the search to specified frequency
+% range.
+%
+% See also PDV, configure
+%
+
+%%% UNDER CONSTRUCTION
+% The first expression uses the entire power spectra from a specified
+% time bound.  The
 %
 %     >> object=characterize(object,'Bandwidth');
 %     >> object=characterize(object,'Bandwidth',tbound);
 %
 %     >> object=characterize(object,'NoiseFloor',tbound,fbound);
+%%%
+
+%
+% created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=characterize(object,mode,varargin)
 
 % manage input
@@ -52,9 +72,7 @@ switch mode
         f=f(keep);
         P=P(keep);
         [~,index]=max(P);
-        object.Parameter.ReferenceFrequency=f(index);
-
-        
+        object.Parameter.ReferenceFrequency=f(index);        
     otherwise
         error('ERROR: invalid mode request');
 end
