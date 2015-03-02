@@ -13,13 +13,16 @@ end
 
 % create graphic objects
 if isempty(target)
-    h.figure=figure;
+    %h.figure=figure;
+    object=SMASH.MUI.Figure;
+    h.figure=object.Handle;
+    set(h.figure,'NumberTitle','on','Name','Image view');
 else
     h.figure=target;
     clf(target);
 end
-set(h.figure,'DockControls','off',...
-    'ToolBar','figure','MenuBar','none');
+%set(h.figure,'DockControls','off',...
+%    'ToolBar','figure','MenuBar','none');
 color=get(h.figure,'Color');
 
 h.panel=uipanel('Parent',h.figure,'Tag','GraphicPanel',...
@@ -27,23 +30,23 @@ h.panel=uipanel('Parent',h.figure,'Tag','GraphicPanel',...
     'Units','normalized','Position',[0 0 1 1]);  
 
 % tweak the figure menu
-hb=findall(h.figure,'Type','uitoolbar');
-hb=findall(hb);
-hb=hb(2:end);
-drop=true(size(hb));
-for n=1:numel(hb)
-    tag=lower(get(hb(n),'Tag'));
-    if strfind(tag,'zoom')
-        drop(n)=false;
-    elseif strfind(tag,'pan')
-        drop(n)=false;
-    elseif strfind(tag,'cursor')
-        drop(n)=false;
-    elseif strfind(tag,'save')
-        drop(n)=false;
-    end
-end
-set(hb(drop),'Visible','off');
-set(hb,'Separator','off');
+% hb=findall(h.figure,'Type','uitoolbar');
+% hb=findall(hb);
+% hb=hb(2:end);
+% drop=true(size(hb));
+% for n=1:numel(hb)
+%     tag=lower(get(hb(n),'Tag'));
+%     if strfind(tag,'zoom')
+%         drop(n)=false;
+%     elseif strfind(tag,'pan')
+%         drop(n)=false;
+%     elseif strfind(tag,'cursor')
+%         drop(n)=false;
+%     elseif strfind(tag,'save')
+%         drop(n)=false;
+%     end
+% end
+% set(hb(drop),'Visible','off');
+% set(hb,'Separator','off');
 
 end

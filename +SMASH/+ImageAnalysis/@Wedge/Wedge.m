@@ -17,7 +17,9 @@
 %
 
 % created January 8, 2014 by Tommy Ao (Sandia National Laboratories)
-%
+% revised March 2, 2015 by Daniel Dolan
+%   -added StepLevels, StepOffets, and Calibration properties to provide
+%   control of the analysis method
 %%
 classdef Wedge < SMASH.ImageAnalysis.Image
     %%
@@ -28,7 +30,8 @@ classdef Wedge < SMASH.ImageAnalysis.Image
         StepLevels = [0.08 0.20 0.35 0.51 0.64 0.78 0.94 ...
             1.12 1.25 1.39 1.54 1.67 1.82 1.98 ...
             2.15 2.29 2.43 2.59 2.76 2.91 3.02];% step wedge levels
-        StepOffset = [0 2.13]; % step wedge offset (levels repeated)
+        StepOffsets = [0 2]; % step wedge offset (levels repeated)
+        CalibrationRange=[0.025 0.975]; % allowed calibration range
     end
     %% constructor
     methods (Hidden=true)
@@ -56,15 +59,22 @@ classdef Wedge < SMASH.ImageAnalysis.Image
             value=sort(value);
             object.StepLevels=value;            
         end
-        function object=set.StepOffset(object,value)
+        function object=set.StepOffsets(object,value)
             assert(isnumeric(value) & numel(value)>0 & all(value>=0),...
-                'ERROR: invalid StepOffset value');
-            if numel(value) ~= numel(object.StepOffset)
+                'ERROR: invalid StepOffsets value');
+            if numel(value) ~= numel(object.StepOffsets)
                 warning('SMASH:Wedge','Number of step offsets was changed');
             end
             value=reshape(value,[1 numel(value)]);
             value=sort(value);
-            object.StepOffset=value;
+            object.StepOffsets=value;
+        end
+        function object=set.CalibrationRange(object,value)
+            assert(isnumeric(value) & numel(value(2)==2) ...
+                & all(value>0) & all(value<1),...
+                'ERROR: invalid CalibrationRange value');
+            value=sort(value);
+            object.CalibrationRange=value;
         end
     end
 end
