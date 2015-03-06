@@ -1,7 +1,7 @@
 % evaluate Evaluate Mie-Gruneisen model's principal Hugoniot at specified 
 % density
 %
-%     >> [P, E, S] = evaluate(object,rho);
+%     >> [P, E, T, S] = evaluateHugoniot(object,rho);
 %
 % using the MieGruneisen object. The pressure, free energy, and temperature
 % are returned.

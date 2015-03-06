@@ -27,6 +27,7 @@ elseif (Narg==2) && ischar(varargin{2}) && isnumeric(varargin{1}) % filename, ne
     filename = varargin{2};
     material = varargin{1};
     object=ImportFile(object,filename,material);
+    object.SourceFormat='sesame';
 
 elseif (Narg==5) && isnumeric(varargin{1}) && isnumeric(varargin{2})    %Input tabular points directly
         %Define EOS table points

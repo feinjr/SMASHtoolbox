@@ -1200,7 +1200,7 @@ dlg.Name = 'MHD Scaling';
 dlg.Hidden = true;   
 
 h=addblock(dlg,'edit_check',{'S(0)','Select S(t)'}); 
-choices = {'P to I','P to B','I to P','I to B', 'B to I','B to P','Direct Scale','I to V (S is L)'};
+choices = {'P to I','P to B','I to P','I to B', 'B to I','B to P','Direct Scale sig*s','Direct Scale sig/s','I to V (S is L)'};
 h=addblock(dlg,'popup','Scaling Type',choices);
 
 
@@ -1237,8 +1237,10 @@ function newsig = MHDScale(n)
         case choices{6}
             newsig= (newsig.^2)./(8e-7*pi);        
         case choices{7}
-            newsig = newsig.*s;             
+            newsig = newsig.*s;
         case choices{8}
+            newsig = newsig./s;
+        case choices{9}
             didt = differentiate(newsig);
             dldt = differentiate(s);
             newsig = didt.*s+dldt.*newsig;           

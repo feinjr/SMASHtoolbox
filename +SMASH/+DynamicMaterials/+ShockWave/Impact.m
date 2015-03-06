@@ -74,6 +74,7 @@ end
 %% create Signal menu
 hm=uimenu(fig.Handle,'Label','Add Curve');
 uimenu(hm,'Label','Hugoniot','Callback',@Hugoniot);
+%uimenu(hm,'Label','MieGruneisen','Callback',@MieGruneisen);
 uimenu(hm,'Label','Sesame','Callback',@Sesame);
 uimenu(hm,'Label','Rayleigh Line','Callback',@Rayleigh);
 uimenu(hm,'Label','Load File','Callback',@LoadSignal);
@@ -206,7 +207,7 @@ end %Choose Active Signals
 function Hugoniot(src,varargin)
     
 % see if dialog already exists
-dlg=FindOrCreateDlg(src,'MieGruneisen');
+dlg=FindOrCreateDlg(src,'Hugoniot');
 if ishandle(dlg)
     return
 end
@@ -301,6 +302,101 @@ dlg.Hidden = false;
 
    
 end
+ 
+% %Generate curve based MieGruneisen EOS
+% function MieGruneisen(src,varargin)
+%     
+% % see if dialog already exists
+% dlg=FindOrCreateDlg(src,'MieGruneisen');
+% if ishandle(dlg)
+%     return
+% end
+% 
+% dlg.Hidden = true;
+% dlg.Name = 'Hugoniot Curve Addition';
+% h=addblock(dlg,'popup','Select Material',MGmats);
+% h=addblock(dlg,'edit_check',{'Impact Velocity (km/s)','Reverse (Impactor)'}); set(h(2),'String', 0);
+% h=addblock(dlg,'edit','Initial Principal Pressure (GPa)'); set(h(2),'String', 0);
+% h=addblock(dlg,'edit','Ending Pressure (GPa)'); set(h(2),'String', 100);
+% h=addblock(dlg,'button',{ 'Apply', 'Cancel'});
+% 
+% dlg.Hidden = false;
+% 
+% 
+% 
+% %Define button callbacks
+%     set(h(1),'Callback',@ApplyCallback);
+%     function ApplyCallback(varargin)
+%         
+%         %Number of points to use for curves
+%         numpoints = 1e3;
+%         
+%         value = probe(dlg);
+%         n = find(strcmpi(value{1},MGmats),1,'First');
+%         
+%         %Define MG object
+%         mg = SMASH.DynamicMaterials.EOS.MieGruneisen();
+%         mg.rho0 = MGd(n);
+%         mg.c0 = MGc(n);
+%         mg.s = MGs(n);
+%         mg.gamma = MGg(n);
+%         
+% 
+%         %Find maximum particle velocity
+%         %upmax = fzero(@(u) MGd(n).*u.*(MGc(n)+MGs(n).*u)-Pmax,1);
+%         %up = linspace(0,upmax,1e3)';
+%         %P = MGd(n).*up.*(MGc(n)+MGs(n).*up);
+%         
+%         
+%         IV = str2num(value{2});
+%         P0 = str2num(value{4});
+%         Pend = str2num(value{5});
+%         
+%         
+%         
+%         %If not principal, assume on initial Hugoniot
+%         if P0>0
+%             dh = fzero(@(x) evaluateHugoniot(mg,x)-P0,mg.rho0);
+%             [ph,eh,th,sh] = evaluateHugoniot(mg,dh);
+%             uh = mg.c0*(1-mg.rho0./dh)./(1-mg.s.*(1-mg.rho0./dh))
+%             
+%         else
+%             up0=IV;
+%         end           
+% 
+% 
+%         if Pend < P0
+%             dens = linspace(dh,mg.rho0,numpoints)';
+%             pressure = evaluateIsentrope(mg,dens,P0);
+%         else
+%             %dh = fzero(@(x) evaluateHugoniot(mg,x)-Pend,mg.rho0);
+%             %dens = linspace(mg.rho0,dh,numpoints)'
+%             %pressure = evaluateHugoniot(mg,dens);
+%         end
+% 
+%         %STRUGGLING WITH SECOND SHOCK AND UP CALCS --- Come back to this
+%         %later
+%  
+%        %Set some properties
+%        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up,P);
+%        sig{sig_tot}.GraphicOptions.LineWidth=3;
+%        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
+%        sig{sig_tot}.Name = [MGmats{n},addstr];
+%        %sig{sig_tot}.GraphicOptions.Title = 'MieGruneisen';
+%        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
+%        sig{sig_tot}.DataLabel = 'Pressure (GPa)';
+% 
+%        plotdata(fig.Handle,sig,sig_num);
+%     end
+%     
+%     set(h(2),'Callback',@CancelCallback);
+%     function CancelCallback(varargin)
+%         delete(dlg);      
+%     end
+%     
+%    
+%    
+% end
 
 
 %Generate curve based on sesame table
@@ -679,6 +775,10 @@ end %Save
 function FindIntersections(src,varargin)
 plotdata(fig.Handle,sig,sig_num);
 x=[]; y=[]; count = 1;
+
+%Plot only "unique" intersections
+xtrack(1)=0; ytrack(1)=0;
+
 for i=1:numel(sig_num)-1
     
     %Find all intersections 
@@ -686,23 +786,19 @@ for i=1:numel(sig_num)-1
         [x,y] = intersections(sig{sig_num(i)}.Grid,sig{sig_num(i)}.Data,sig{sig_num(j)}.Grid,sig{sig_num(j)}.Data); 
         lc = sig{sig_num(i)}.GraphicOptions.LineColor;
         
-        %Plot only "unique" intersections
-        xtrack(1)=0; ytrack(1)=0;
-        if y > 0 & numel(x) == 1
-            count = count+1;
-            xsave(count)=x;
-            ysave(count)=y;
-            
-            xsave(1:count-1)
-            if abs(x-xsave(1:count-1))>0.1    
-                abs(x-xsave(1:count-1));
-                text(x,y,[' \leftarrow',sprintf('(%3.3f, %3.3f)',x,y)],'FontSize',16,'Color',lc);
-            end
+        if numel(x) == 1 & y > 0
+            text(x,y,[' \leftarrow',sprintf('(%3.3f, %3.3f)',x,y)],'FontSize',16,'Color',lc);
         end
+        
+        
+        %for k = 1:numel(x)
+        %    if all(abs((x(k)-xtrack)./xtrack) > 0.1)
+        %        xtrack = [xtrack x(k)]
+        %        text(x(k),y(k),[' \leftarrow',sprintf('(%3.3f, %3.3f)',x(k),y(k))],'FontSize',16,'Color',lc);
+        %    end
+        %end
     end
 end
-
-
 
 
 end
