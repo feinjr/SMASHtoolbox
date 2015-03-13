@@ -29,10 +29,10 @@ switch lower(mode)
     case 'measurement'
         h=view(object.Measurement,varargin{:});
     case 'location'
-        assert(~isempty.Results,'ERROR: no analysis results yet');
+        assert(~isempty(object.Results),'ERROR: no analysis results yet');
         h=view(object.Results.Location,varargin{:});
     case 'velocity'
-        assert(~isempty.Results,'ERROR: no analysis results yet');
+        assert(~isempty(object.Results),'ERROR: no analysis results yet');
         h=view(object.Results.Velocity,varargin{:});
     otherwise
         error('ERROR: invalid view mode');
