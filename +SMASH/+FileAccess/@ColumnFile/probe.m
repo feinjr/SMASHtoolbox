@@ -34,7 +34,8 @@ skip=0;
 while true
     numcol=0;
     format='';
-    in=strtrim(fgets(fid));
+    temp=fgets(fid);
+    in=strtrim(temp);
     while numel(in)>0
         in=strtrim(in); % remove extraneous whitespace       
         % try to read a number

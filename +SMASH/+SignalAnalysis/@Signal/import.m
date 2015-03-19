@@ -59,6 +59,9 @@ switch data.Format
                 errmsg{2}='     Unsupported dataset type';
                 error('%s\n',errmsg{:});
         end
+    case 'zdas'
+        object.Grid=data.Time;
+        object.Data=data.Signal;
     otherwise
         error('ERROR: cannot import Signal from this format');
 end
