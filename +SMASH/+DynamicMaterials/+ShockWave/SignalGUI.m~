@@ -828,6 +828,7 @@ function newsig = applysmooth(n)
                 kernel = definekernal;
                 newsig = smooth(sig{n},'kernel',kernel);
             case 'butterworth'
+                
                 [b,a]=butter(1,str2double(value(2)));
                 [x y] = limit(sig{n});
                 y = filtfilt(b,a,y);
@@ -2575,8 +2576,7 @@ function plotdata(varargin)
                     view(sig{sig_num(i)},ha);
                     legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
                 end
-                lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',1);
-                %legend('boxoff');
+                lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',0);
                 %set(lh,'Box','off');
                 xlabel(sig{sig_num(1)}.GridLabel);
                 ylabel(sig{sig_num(1)}.DataLabel);
