@@ -1,15 +1,16 @@
-% CalibrateScreen : calibrate MATLAB's screen resolution
+% calibrateScreen : calibrate MATLAB's screen resolution
 %
 % MATLAB defaults to a system dependent DPI (dots per inch) setting that
-% typically has relationship with the display resolution. This function
+% typically has no relation to the actual display resolution. This function
 % displays a resizeable figure and asks the user to specify the actual
 % width (in inches or centimeters). Using this information, the actual DPI
 % setting is calculated and applied to the current MATLAB session.  The
 % setting is also stored in a log file in the same location as this
 % function.
+%
 
 % created by February 23, 2013 by Daniel Dolan (Sandia National Laboratories)
-function varargout=CalibrateScreen(varargin)
+function varargout=calibrateScreen(varargin)
 
 % handle input
 if nargin==0
@@ -56,8 +57,9 @@ apply=local_uicontrol('Style','pushbutton','String','Apply',...
             DPI=position(3)/(value/2.54);
         end       
         set(0,'ScreenPixelsPerInch',DPI);
+        fprintf('Calibrated DPI value is %.1f\n',DPI);        
         update_width;
-        storeDPI(DPI);
+        storeDPI(DPI);        
     end
 locate(apply);
 close=local_uicontrol('Style','pushbutton','String','Close',...

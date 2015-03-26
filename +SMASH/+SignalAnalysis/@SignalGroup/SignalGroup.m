@@ -8,11 +8,11 @@
 % information directly.
 %    >> object=SignalGroup(Grid,Data);
 % Information can also be imported from a data file.
-%    >> object=SignalGroup('import',filename,format);
-% The input "filename" can either be a character array (single file) or
-% cell array of character arrays (multiple files); in the latter case, each
-% file must have the same format.  Multiple signals are automatially
-% extracted from 'column' and 'sda' format files.
+%    >> object=SignalGroup(filename,[format],[record]);
+% The inputs "format" and "record" may be optional depending on the file's
+% format and contents.  If the file name contains a wild card ('*.sda')
+% that matches more than one file, the object is contructed from the sum of
+% the individual files (consistent size required).
 %
 % See also SignalAnalysis, FileAccess.SupportedFormats
 %
@@ -48,11 +48,11 @@ classdef SignalGroup < SMASH.SignalAnalysis.Signal
     methods
         function object=set.Legend(object,value)
             assert(iscell(value),'ERROR: invalid Legend');
-            if isempty(object.Legend) || isempty(value) || (numel(value)==numel(object.Legend))
+            %if isempty(object.Legend) || isempty(value) || (numel(value)==numel(object.Legend))
                 object.Legend=value;
-            else
-                error('ERROR: invalid Legend');
-            end
+            %else
+            %    error('ERROR: invalid Legend');
+            %end
         end
     end
    

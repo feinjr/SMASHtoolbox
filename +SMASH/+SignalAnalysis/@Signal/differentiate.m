@@ -6,8 +6,18 @@
 % By default, a centered difference approximation is used to calculate the
 % derivative.  Polynomial smoothing (Savitzky-Golay method) of order k can
 % be specified over N points as follows.
-%    >> new=differentiate(object,[k N]); % Sa
+%    >> new=differentiate(object,[k N]); 
 % The number of points should be an odd number equal to or larger than k.
+%
+% The default derivative level is 1.  Higher derivatives can be requested
+% with a third input argument.
+%     >> new=differentiate(object,[k N],m); % calculate m-th derivative
+% Remember that m cannot exceed k!
+% 
+% By default, edge derivatives are handled by linearly extrapolation.  Edge
+% management can be controlled with a fourth input argument.
+%     >> new=differentiate(object,[k N],m,edge);
+% Three edge options are supported: 'zero', 'nan', and 'extrapolate'.
 %
 % See also Signal, integrate
 %
@@ -32,7 +42,7 @@ if (nargin<3) || isempty(level)
     level=1;
 end
 
-if (nargin<4) || isemtpy(edge)
+if (nargin<4) || isempty(edge)
     edge='extrapolate';
 end
 
