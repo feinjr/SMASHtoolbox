@@ -38,7 +38,7 @@
 
 %%
 function Impact()
-clear all; clc;
+close all; clear all; clc;
 
 % Initialize Variables
 sig = {}; 
@@ -51,7 +51,7 @@ sig_num = [];
 
 
 % create figure if not already running
-check=findobj('Name','Impact GUI');
+check=findobj('Name','Impact');
 if ishandle(check) % program is already running
     disp('GUI already running!');
     figure(check);
@@ -59,7 +59,7 @@ if ishandle(check) % program is already running
 end
 
 fig = SMASH.MUI.Figure; fig.Hidden = true;
-fig.Name = 'Impact GUI';
+fig.Name = 'Impact';
 set(fig.Handle,'Tag','Impact');
 set(fig.Handle,'Units','normalized');
 set(fig.Handle,'Position',[0.05 0.05 .75 .8]);
@@ -326,7 +326,7 @@ dlg.Hidden = false;
             %Find principal Hugoniot state associated with P0
             n = find(strcmpi(value{1},MGmats),1,'First');
             Ph = str2double(value{4});
-            uph = fzero(@(u) MGd(n).*u.*(MGc(n)+MGs(n).*u)-Ph,1)
+            uph = fzero(@(u) MGd(n).*u.*(MGc(n)+MGs(n).*u)-Ph,1);
             Ush = MGc(n)+MGs(n)*uph;
             eh=uph/Ush;
             dh=MGd(n)/(1-eh);
@@ -853,25 +853,26 @@ dlg.Hidden = true;
 dlg.Name = 'ImpactCalculator';
 target_h=addblock(dlg,'popup','Target',MGmats);
 impactor_h=addblock(dlg,'popup','Impactor',MGmats);
-iv_h=addblock(dlg,'edit','Impact Velocity (km/s)        '); set(iv_h(2),'String', 0);
-p_h= addblock(dlg,'edit','Pressure (GPa)                '); set(p_h(2),'String', 0);
-up_h=addblock(dlg,'edit','Particle Velocity (km/s)      '); set(up_h(2),'String', 0);
-ts_h=addblock(dlg,'edit','Target Shock Velocity (km/s)  '); set(ts_h(2),'String', 0);
-td_h=addblock(dlg,'edit','Target Shock Density (km/s)   '); set(td_h(2),'String', 0);
+iv_h=addblock(dlg,'edit','Impact Velocity (km/s)'); set(iv_h(2),'String', 0);
+p_h=addblock(dlg,'edit','Pressure (GPa)'); set(p_h(2),'String', 0);
+up_h=addblock(dlg,'edit','Particle Velocity (km/s)'); set(up_h(2),'String', 0);
+ts_h=addblock(dlg,'edit','Target Shock Velocity (km/s)'); set(ts_h(2),'String', 0);
+td_h=addblock(dlg,'edit','Target Shock Density (km/s)'); set(td_h(2),'String', 0);
 is_h=addblock(dlg,'edit','Impactor Shock Velocity (km/s)'); set(is_h(2),'String', 0);
-id_h=addblock(dlg,'edit','Impactor Shock Density (km/s) '); set(id_h(2),'String', 0);
+id_h=addblock(dlg,'edit','Impactor Shock Density (km/s)'); set(id_h(2),'String', 0);
 frame(dlg,[ts_h,td_h,is_h,id_h])
 dlg.Hidden = false;
 
 set(target_h,'Callback',@ApplyCallback);
 set(impactor_h,'Callback',@ApplyCallback);
 set(iv_h,'Callback',@ApplyCallback);
-set(p_h,'Callback',@ApplyCallback);
-set(up_h,'Callback',@ApplyCallback);
 
 function ApplyCallback(varargin)
     
-    value = probe(dlg);
+    
+    hcheck=get(iv_h(2),'Position')
+    whichh=get(varargin{1},'Position')
+    value = probe(dlg)
     
     nt = find(strcmpi(value{1},MGmats),1,'First');
     ni = find(strcmpi(value{2},MGmats),1,'First');
@@ -885,30 +886,21 @@ function ApplyCallback(varargin)
     hp=get(p_h(2),'Position');
     hup=get(up_h(2),'Position');
     
-
-    if all(whichh==hp)
-        p = str2double(value{4});
-        f=@(up) p-(dt.*(ct+st.*up).*up);
-        up=fzero(f,1)
-        f=@(iv) (dt.*(ct+st.*up).*up)-(di.*(ci+si.*(iv-up)).*(iv-up));
-        iv=fzero(f,up*2)       
-    elseif all(whichh==hup)
-        up = str2double(value{5});
-        p = (dt.*(ct+st.*up).*up);
-        f=@(iv) (dt.*(ct+st.*up).*up)-(di.*(ci+si.*(iv-up)).*(iv-up));
-        iv=fzero(f,up*2);
-    else
+    if all(whichh==hiv)
         iv = str2double(value{3});
         f=@(up) (dt.*(ct+st.*up).*up)-(di.*(ci+si.*(iv-up)).*(iv-up));
         up=fzero(f,iv/2);
-        p = (dt.*(ct+st.*up).*up);   
-    end
+        p = (dt.*(ct+st.*up).*up);
+    else if all(whichh==hp)
+        p = str2double(value{4});
+        f=@(up) (dt.*(ct+st.*up).*up))
+        p = (dt.*(ct+st.*up).*up);
     
     ts = ct+st.*up;
-    td = dt./(1-up./ts);
+    td = p./((ct+st.*up).*up);
     
-    is = ci+si.*(iv-up);
-    id = di./(1-(iv-up)./is);
+    is = ci+si.*up;
+    id = p./((ci+si.*up).*up);
     
     set(iv_h(2),'String',num2str(iv));
     set(p_h(2),'String',num2str(p));
@@ -918,6 +910,9 @@ function ApplyCallback(varargin)
     set(is_h(2),'String',num2str(is));
     set(id_h(2),'String',num2str(id));
     
+    valueupdate = probe(dlg)
+    
+    strcmp(value,valueupdate)
     
 end
 
@@ -1420,7 +1415,7 @@ function plotdata(varargin)
                     view(sig{sig_num(i)},ha);
                     legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
                 end
-                lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',1);
+                lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',0);
                 %set(lh,'Box','off');
                 xlabel(sig{sig_num(1)}.GridLabel);
                 ylabel(sig{sig_num(1)}.DataLabel);

@@ -1310,7 +1310,7 @@ function varargout = plotdata(varargin)
             end
     end
     if strcmp(lower(options),'new plot');
-        lh = legend(h,legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',0);
+        lh = legend(h,legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',1);
     end
     h=h(~isnan(h));
     xlabel(sig{sig_num(1)}.GridLabel); ylabel(sig{sig_num(1)}.DataLabel);
