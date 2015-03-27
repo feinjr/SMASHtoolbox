@@ -115,9 +115,8 @@ classdef Figure < handle
             slice(object,'create');
             help(object,'create');
             
-            % link object and dialog box
-            addlistener(object,'ObjectBeingDestroyed',@destroy);
-            uicontrol('Parent',object.Handle,'Visible','off',... 
+            % link figure to dialog boxes generated from it
+            uicontrol('Parent',object.Handle,'Visible','off',...
                 'Tag','FigureObjectLink',...
                 'UserData',object,'DeleteFcn',@destroy); % this handles figure delete and close!
         end
