@@ -18,6 +18,7 @@ function data=read(object,dataset)
 if (nargin<2) || isempty(dataset)
     dataset=1;
 end
+assert(isnumeric(dataset),'ERROR: pff dataset are accessed by number');
 
 % error checking
 table=probe(object);
