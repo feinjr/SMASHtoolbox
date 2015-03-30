@@ -461,7 +461,7 @@ function TabularFit(src,varargin)
     if isempty(dens)
             ans = inputdlg('Enter initial density','Wavespeed Integration',1);
             rho0 = str2num(ans{1});
-            [dens stress] = integrateClu(rho0,u,cl);
+            [dens stress] = integrateClu(rho0,u,c);
     end
     
     % Tabular adiabats often only have Eulerian wavespeed
@@ -506,6 +506,7 @@ h=addblock(dlg,'edit','x max       '); set(h(2),'String', 0);
 h=addblock(dlg,'button','SelectPoints');
 set(h(1),'Callback',@selectpoints);
 dlg_hc = get(dlg.Handle,'Children');
+
 function [varargout] = selectpoints(varargin)
     figure(fig.Handle); 
     [xpick ypick] = ginput(2);
@@ -1259,7 +1260,7 @@ function varargout = plotdata(varargin)
                 sig{sig_num(i)}.GridLabel = 'Time';
                 sig{sig_num(i)}.DataLabel = 'Strain'; 
             case('StrainRate-Time')
-                x = time;
+                x = time;Lagrangian
                 y = 1-data(1,3)./data(:,3);
                 
                 if x == 0;
@@ -1312,7 +1313,7 @@ function varargout = plotdata(varargin)
     if strcmp(lower(options),'new plot');
         lh = legend(h,legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',1);
     end
-    h=h(~isnan(h));
+    %h=h(~isnan(h));
     xlabel(sig{sig_num(1)}.GridLabel); ylabel(sig{sig_num(1)}.DataLabel);
     varargout{1} = sig;
 end

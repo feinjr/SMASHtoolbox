@@ -861,6 +861,8 @@ td_h=addblock(dlg,'edit','Target Shock Density (km/s)   '); set(td_h(2),'String'
 is_h=addblock(dlg,'edit','Impactor Shock Velocity (km/s)'); set(is_h(2),'String', 0);
 id_h=addblock(dlg,'edit','Impactor Shock Density (km/s) '); set(id_h(2),'String', 0);
 frame(dlg,[ts_h,td_h,is_h,id_h])
+
+locate(dlg,'center');
 dlg.Hidden = false;
 
 set(target_h,'Callback',@ApplyCallback);
@@ -920,14 +922,6 @@ function ApplyCallback(varargin)
     
     
 end
-
-
-
-
-
-
-
-   
 end %Impact Calculator
 
 
@@ -1158,8 +1152,6 @@ AxisMod(0,@inset);
         h = SMASH.Graphics.AxesInset('xlim',limits(1:2),'ylim',limits(3:4));
     end
     
-
-    
 end %Inset
 
 %% Define axis limits
@@ -1300,7 +1292,7 @@ function AxisMod(src,varargin)
     if ~iscell(fignames); fignames = {fignames}; end;
     for i=1:numel(fignames);
         switch fignames{i}
-            case 'SMASH Signal GUI'
+            case 'Impact GUI'
             case 'AIP Large Fig'
             case 'AIP Single Column Fig'
             case 'AIP Double Column Fig'
