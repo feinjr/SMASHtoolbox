@@ -83,6 +83,15 @@ function SelectTimes(src,varargin)
     InsituTimes=[InsituTimes; xi];
     
     PlotVelocities('overlay');
+    
+    %Plot preview of analysis
+    temp=object;
+    temp.Settings.WindowTimes=WindowTimes;
+    temp.Settings.InsituTimes=InsituTimes;
+    temp=analyze(temp);
+    [x y]=limit(temp.Results);
+    h=line(x,y);
+    set(h,'Color',[0 0 1]);
 
 end
 
@@ -120,19 +129,14 @@ function PlotVelocities(mode)
     h=line(x,y);
     set(h,'Color',[.6 .6 .6]);
     
-    %Plot any existing Window Times
+    %Plot any existing InSitu Times
     if ~isempty(WindowTimes);
         for i=1:length(WindowTimes);
             h=line([WindowTimes(i) WindowTimes(i)],[0 maxw]);
-            set(h,'Color',[1 0 0],'LineStyle','--');
+            set(h,'Color',[0 0.6 0],'LineStyle','--');
         end
     end
-     
     
-    if strcmpi(mode,'tight')
-        axis tight;
-    end
-
     %Plot insitu velocities
     axes(ax2); cla;
     [time,value]=limit(object.SimulatedInsitu);
@@ -149,15 +153,28 @@ function PlotVelocities(mode)
     set(h,'Color',[.6 .6 .6]);
     
     %Plot any existing InSitu Times
-    if ~isempty(InsituTimes);
+    if ~isempty(InsituTimes)
         for i=1:length(InsituTimes);
             h=line([InsituTimes(i) InsituTimes(i)],[0 maxi]);
-            set(h,'Color',[1 0 0],'LineStyle','--');
+            set(h,'Color',[0 0.6 0],'LineStyle','--');
         end
     end    
     
+    %Plot preview of analysis
+    if ~isempty(InsituTimes) & length(WindowTimes)==length(InsituTimes) 
+        temp=object;
+        temp.Settings.WindowTimes=WindowTimes;
+        temp.Settings.InsituTimes=InsituTimes;
+        temp=analyze(temp);
+        [x y]=limit(temp.Results);
+        h=line(x,y);
+        set(h,'Color',[0.1 0.1 0.1]);
+    end
+    
+    
     if strcmpi(mode,'tight')
-        axis tight;
+        axes(ax1); axis tight;
+        axes(ax2); axis tight;
     end
 end
 

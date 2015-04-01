@@ -449,7 +449,8 @@ dlg.Name = 'Sesame Curve Addition';
 %Find sesame files
 %eospath=mfilename('fullpath');
 %[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
-eospath = '/remote/jlbrown/EOS/sesame';
+%eospath = '/remote/jlbrown/EOS/sesame';
+eospath = 'N:\EOS\sesame';
 
 contents = dir(eospath);
 eosfiles=[];
@@ -602,7 +603,7 @@ dlg.Hidden = false;
        sig{sig_tot}=SMASH.SignalAnalysis.Signal(up,P);
        sig{sig_tot}.GraphicOptions.LineWidth=3;
        sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
-       sig{sig_tot}.Name = 'Rayliegh Line';
+       sig{sig_tot}.Name = 'Rayleigh Line';
        %sig{sig_tot}.GraphicOptions.Title = 'Rayleigh';
        sig{sig_tot}.GridLabel = 'Particle Velocity (km/s)';
        sig{sig_tot}.DataLabel = 'Pressure (GPa)';

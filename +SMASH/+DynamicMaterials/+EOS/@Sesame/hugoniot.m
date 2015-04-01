@@ -67,6 +67,7 @@ temperature = nan(size(density));
 
 
 %% Solve Rankine-Hugoniot jump conditions using fzero
+try
  options = optimset('TolX',1e-4);
  temperature(1) = fzero(@(x) lookup(object,'Energy',density(1),x)-E0 ...
       -0.5.*(lookup(object,'Pressure',density(1),x)+P0).*(1/rho0-1/density(1)),T0,options);
@@ -77,49 +78,50 @@ temperature = nan(size(density));
      %update(w,i/length(density));
  end
 
+catch
+% Newton-Raphson solution to Hugoniot jump conditions
+for v = 1:length(density)
+    d = density(v);
+    
+    % Guess temperature
+    if v > 1
+        t = temperature(v-1);
+    else
+        t = T0;
+    end    
+    
+    tol=1e-4; mult = 1.0; iternum=20;
+    
+    [e,dedd,dedt] = lookup(object,'Energy',d,t);
+    [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
+    check = e-E0 - 0.5.*(p-P0).*(1/rho0-1/d);
+    tnew = t;
+    
+    for iter=1:iternum
+        if (tnew < 0)
+            tnew = t*3/2;
+        end
+        while (tnew > max(object.Temperature))
+            tnew = tnew*.9;
+        end
+        t = tnew;
+        [e,dedd,dedt] = lookup(object,'Energy',d,t);
+        [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
+        
+        %Check new temperature
+        check = e-E0 - 0.5.*(p-P0).*(1/rho0-1/d);
+        if abs(check)<tol; break; end;
+    
+        %Newton-Raphson update if it hasn't converged
+        tnew = t-mult.*(check./(dedt-0.5.*dpdt.*(1/rho0-1/d)));
+    end
 
-%% Newton-Raphson solution to Hugoniot jump conditions
-% for v = 1:length(density)
-%     d = density(v);
-%     
-%     % Guess temperature
-%     if v > 1
-%         t = temperature(v-1);
-%     else
-%         t = T0;
-%     end    
-%     
-%     tol=1e-4; mult = 1.0; iternum=20;
-%     
-%     [e,dedd,dedt] = lookup(object,'Energy',d,t);
-%     [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
-%     check = e-E0 - 0.5.*(p-P0).*(1/rho0-1/d);
-%     tnew = t;
-%     
-%     for iter=1:iternum
-%         if (tnew < 0)
-%             tnew = t*3/2;
-%         end
-%         while (tnew > max(object.Temperature))
-%             tnew = tnew*.9;
-%         end
-%         t = tnew;
-%         [e,dedd,dedt] = lookup(object,'Energy',d,t);
-%         [p,dpdd,dpdt] = lookup(object,'Pressure',d,t);
-%         
-%         %Check new temperature
-%         check = e-E0 - 0.5.*(p-P0).*(1/rho0-1/d);
-%         if abs(check)<tol; break; end;
-%     
-%         %Newton-Raphson update if it hasn't converged
-%         tnew = t-mult.*(check./(dedt-0.5.*dpdt.*(1/rho0-1/d)));
-%     end
-% 
-%     if abs(check) > tol;
-%         warning('Warning: convergence not achieved for density = %f, energy tol = %f',d,check);
-%     end
-%     temperature(v) = t;
-% end
+    if abs(check) > tol;
+        warning('Warning: convergence not achieved for density = %f, energy tol = %f',d,check);
+    end
+    temperature(v) = t;
+end
+end
 
 
 pressure = lookup(object,'Pressure',density,temperature);

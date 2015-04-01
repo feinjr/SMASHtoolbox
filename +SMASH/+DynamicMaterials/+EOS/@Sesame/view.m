@@ -70,8 +70,11 @@ if strcmpi(plottype,'isotherms')
             bad = y <= minpressure;
             y(bad) = minpressure;
 
-        h=line(log10(x),log10(y));
+        %h=line(log10(x),log10(y));
+        set(target,'xscale','log','yscale','log');
+        h=line(x,y);
         apply(object.GraphicOptions,h);
+        axis tight;
     end
 end
 
@@ -89,22 +92,21 @@ if strcmpi(plottype,'isochors')
             bad = x <= minpressure;
             x(bad) = minpressure;
             
-        h=line(log10(x),log10(y));
+        set(target,'xscale','log','yscale','log');
+        h=line(x,y);
         apply(object.GraphicOptions,h);
+        axis tight;
     end
 end
-
-%set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
-%    'LineWidth',object.LineWidth,'Marker',object.Marker);
 
 % fill out new figure
 if new
     if strcmpi(plottype,'isochors')
-        xlabel(['log ',object.ZLabel]);
-        ylabel(['log ',object.YLabel]);
+        xlabel([object.ZLabel]);
+        ylabel([object.YLabel]);
     else
-        xlabel(['log ',object.XLabel]);
-        ylabel(['log ',object.ZLabel]);
+        xlabel([object.XLabel]);
+        ylabel([object.ZLabel]);
     end
     title(target,object.Title);
     box(target,'on');
