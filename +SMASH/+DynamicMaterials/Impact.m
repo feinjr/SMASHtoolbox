@@ -644,33 +644,13 @@ for i=1:numfiles
     if strcmp(ext,'.sda')
         %Probe file
         SDAobj =  SMASH.FileAccess.SDAfile(fullfile(pathname,filename{i}));
-        [content,summary] = probe(SDAobj)
+        [label,type,description,status] = probe(SDAobj);
         
-        %Load in by date added
-        for ii = 1:length(content)
-            d(ii) = datenum(content(ii,1).Added,'dd-mmm-yyyy HH:MM:SS');
-            [sortd id] = sort(d,'ascend');
-        end
-        
-        for ii = 1:length(id);
-            if strcmp(content(id(ii),1).Category,'SMASH.SignalAnalysis.Signal')
-                %Advance to next record
-                update(wb,(ii*i)/(numfiles*length(id)));
-                sig_tot = sig_tot+1;
-                sig{sig_tot} = SMASH.SignalAnalysis.Signal('restore',fullfile(pathname,filename{i}),content(id(ii),1).Label);
-                
-            elseif strcmp(content(id(ii),1).Category,'array1D')
-                %Advance to next record
-                sig_tot = sig_tot+1;
-                sig{sig_tot} = SMASH.SignalAnalysis.Signal('import',fullfile(pathname,filename{i}),'sda',content(id(ii),1).Label);
-                %Set some object properties
-                sig{sig_tot}.GraphicOptions.LineWidth=3;
-                sig{sig_tot}.GraphicOptions.LineColor=DistinguishedLines(sig_tot);
-                sig{sig_tot}.GridLabel= 'Particle Velocity (km/s)'; 
-                sig{sig_tot}.DataLabel= 'Pressure (GPa)';
-                sig{sig_tot}.Name = content(id(ii),1).Label;
-                %sig{sig_tot}.GraphicOptions.Title = 'Loaded';
-            end
+        for ii = 1:length(label)
+            %Advance to next record
+            update(wb,(ii*i)/(numfiles*length(label)));
+            sig_tot = sig_tot+1;
+            sig{sig_tot} = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename{i}),'sda',label{ii});
         end
         
     %Load ascii file    
@@ -790,7 +770,7 @@ function SaveSignal(src,varargin)
        if strcmp(ext,'.sda')
            for i = 1:numel(savenum)
             %labelname = inputdlg('Enter label name for sda file','SDA Label',1,{sig{savenum(i)}.Name}); labelname = labelname{1};
-            labelname = sig{savenum(i)}.Name;
+            labelname = regexprep(sig{savenum(i)}.Name,'\W','')
             %export(sig{savenum(i)},fullfile(savepath,savename),labelname);
             store(sig{savenum(i)},fullfile(savepath,savename),labelname);
            end
