@@ -8,12 +8,15 @@
 %    >> new =isentrope(object,density)
 %    >> new =isentrope(object,density,P0,rho0,up1)
 %
-% The initial conditions are used to interpolate for the initial entropy,
-% and then interploation of the density and (fixed) entropy grids are used to
-% determine the other thermodynamic variables. The LAGRANGIAN soundspeed is
-% determined by numerically differentiating the pressure and density and the
-% particle velocity is determined by integrating along the isentrope from
-% up1. If P0, rho0, and up1 are not specified they are set to SATP conditions. 
+% Care should be taken with the density array and initial pressure. The
+% first value of density and this pressure defines the initial state. If
+% this is a shocked state, then density(1), P0 should correspond to that
+% Hugoniot state. The path is then integrated along the density : a
+% compression should be an increasing density array while a release should
+% be decreasing. The step size for the integration is the step between
+% densities so this dictates the accuracy. Rho0 and up1 are only used to
+% convert between Eulerian and Lagrangian soundspeeds, and to define the
+% initial particle velocity, respectively.
 %
 % See also Sesame, hugoniot, isobar, isochor, isotherm
 %
@@ -31,8 +34,9 @@ end
 object = varargin{1};
 density = varargin{2};
 
-%Assume STP
-rho0 = stp(object,density(1)); P0 = rho0.Pressure; rho0 = rho0.Density;
+%Assume STP for rho0
+rho0 = stp(object,density(1)); rho0 = rho0.Density;
+P0=0;
 up1 = 0;
 
 if nargin > 2
@@ -50,21 +54,22 @@ if ~isnumeric(density) || min(size(density)) > 1
 end
 
 %Lookup initial state
-T0 = reverselookup(object,'Pressure',P0,rho0);
-T0 = fzero(@(x) lookup(object,'Pressure',rho0,x)-P0,T0);
-S0 = lookup(object,'Entropy',rho0,T0);
-%E0 = lookup(object,'Density','Temperature','Energy',rho0,T0);
+T0 = reverselookup(object,'Pressure',P0,density(1));
+T0 = fzero(@(x) lookup(object,'Pressure',density(1),x)-P0,T0);
+S0 = lookup(object,'Entropy',density(1),T0);
+E0 = lookup(object,'Energy',density(1),T0);
 
-
+%%
 %If there is no entropy table then integrate PVT
+
 if mean(isfinite(object.Entropy)) < 0.9
     disp('WARNING: Invalid entropy table detected, using thermodynamic integration');
     
     %Solve for isentrope from initial conditions
-    temperature = IntPVT(object,density,rho0,T0);      
+    temperature = IntPVT(object,density,T0);      
     pressure = lookup(object,'Pressure',density,temperature);
     energy = lookup(object,'Energy',density,temperature);
-    entropy = zeros(size(density));   
+    entropy = lookup(object,'Entropy',density,temperature);   
 else
 
     %Find temperatures along isentrope through reverse lookup. If there is a problem, use the PVT integration. 
@@ -85,7 +90,7 @@ else
             %figure; plot(density,energy,density,-cumtrapz(1./density,pressure)+energy(1))
 
             %Solve for isentrope
-            temperature = IntPVT(object,density,rho0,T0);
+            temperature = IntPVT(object,density,T0);
             pressure = lookup(object,'Pressure',density,temperature);
             energy = lookup(object,'Energy',density,temperature);
             entropy = lookup(object,'Entropy',density,temperature); 
@@ -94,21 +99,36 @@ else
 
 end
         
+% %Calculate soundspeed
+% cb = zeros(size(density)); up = cb;
+% 
+% if numel(density) > 1
+%     %cb = diff(pressure)./diff(density); cb(end+1)=cb(end); cb = sqrt(cb); 
+%     cb = quaddiff(density,pressure); 
+%     cb = sqrt(abs(cb));
+% end
 
 %Calculate soundspeed
-cb = zeros(size(density)); up = cb;
+[e,dedr,dedt] = lookup(object,'Energy',density,temperature);
+[p,dpdr,dpdt] = lookup(object,'Pressure',density,temperature);
 
-if numel(density) > 1
-%cb = diff(pressure)./diff(density); cb(end+1)=cb(end); cb = sqrt(cb); 
-cb = quaddiff(density,pressure); 
-cb = sqrt(abs(cb));
+if dpdr < 0
+    temp = dpdr<0;
+    warning('dP/dR reset to 0 as per Kerley EOS')
+    dpdr(temp) = 0;
+end
+
+cb = sqrt(dpdr + (dpdt.*dpdt)./(density.*density)./dedt.*temperature);
 
 %Compute particle velocities
-up = up1 + cumtrapz(density,cb./density);
+if length(density)==1
+    up = up1;
+else
+    up = up1 + cumtrapz(density,cb./density);
+end
 
 %Convert from Eulerian to Lagrangian
 cb = cb.*density./rho0;
-end
 
 new = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);
 new.Data{1}=up;
@@ -119,6 +139,8 @@ new.Name='Isentrope';
 new.Source = 'Calculated';
 new.SourceFormat='isentrope';
 
+
+
 end
 
 
@@ -126,16 +148,21 @@ end
 %For each density point, a fixed point iteration on T is performed using
 %the derivatives from the lookup. A maximum of 10 iterations is performed
 %before moving to the next density if 0.1% in T is  not achieved.
-function temperature = IntPVT(object,density,rho0,T0)
+function temperature = IntPVT(object,density,T0)
     dsize = size(density);
     
-    %Use a flipud, so set to a column vector. Reshape back later.
     density = density(:);
     tol = 1e-4;
     %t = repmat(T0,size(density));
     Tend = density(end)./density(1).*T0;
     temperature = density.*(Tend-T0)./(density(end)-density(1));
-
+    
+    if density(end) > density(1);
+        compression=1;
+    else
+        compression = 0;
+    end
+    
     for count = 1:10
         t = temperature;
         dpdt = zeros(size(t));
@@ -149,13 +176,15 @@ function temperature = IntPVT(object,density,rho0,T0)
         %temperature = cumtrapz(1./density,-t.*dpdt./dedt)+T0;
         
         %Split density to integrate up or down 
-        Lower= find(density <= rho0); 
-        Upper= find(density > rho0); 
+%         Lower= find(density < rho0) ;
+%         Upper= find(density >= rho0);
+%         tLower = cumtrapz(1./flipud(density(Lower)),-flipud(t(Lower)).*flipud(dpdt(Lower))./flipud(dedt(Lower)))+T0;
+%         tUpper = cumtrapz(1./density(Upper),-t(Upper).*dpdt(Upper)./dedt(Upper))+T0;
+%         temperature(Lower)=flipud(tLower); temperature(Upper)=tUpper;
         
-        tLower = cumtrapz(1./flipud(density(Lower)),-flipud(t(Lower)).*flipud(dpdt(Lower))./flipud(dedt(Lower)))+T0;
-        tUpper = cumtrapz(1./density(Upper),-t(Upper).*dpdt(Upper)./dedt(Upper))+T0;
-        temperature(Lower)=flipud(tLower); temperature(Upper)=tUpper;
-        
+
+        temperature = cumtrapz(1./density,-t.*dpdt./dedt)+T0;
+             
         check = sqrt(sum((temperature-t).^2))/length(temperature);
         if check < tol
             break
@@ -195,5 +224,81 @@ function df = quaddiff(x,f)
 
 end
 
+
+
+
+%%
+% K. Cochran's compression_isentrope.pro
+% Rold=density(1);
+% T0 = reverselookup(object,'Pressure',P0,Rold);
+% T0 = fzero(@(x) lookup(object,'Pressure',Rold,x)-P0,T0);
+% Told=T0;
+% 
+% Pold = P0;
+% 
+% P=zeros(size(density));
+% T=P;
+% cb=P;
+% 
+% P(1)=P0;
+% T(1)=Told;
+% 
+% for i = 2:length(density);
+%     Rnew = density(i);
+% 
+%     %Calculate soundspeed
+%     [e,dedr,dedt] = lookup(object,'Energy',Rold,Told);
+%     [p,dpdr,dpdt] = lookup(object,'Pressure',Rold,Told);
+% 
+%     if dpdr < 0
+%         warning('dP/dR reset to 0 as per Kerley EOS')
+%         dpdr = 0;
+%     end
+% 
+%     Cs2 = dpdr + (dpdt*dpdt)/(Rold*Rold)/dedt*Told;
+% 
+%     %Updates
+%     Pnew = Cs2*(Rnew-Rold)+Pold;
+% 
+%     Told = reverselookup(object,'Pressure',Pnew,Rnew);
+% 
+%     if Told > 0
+%         T(i)=Told;
+%         P(i)=Pnew;
+%         cb(i-1)=sqrt(Cs2);
+%     end
+% 
+%     Pold = Pnew;
+%     Rold = Rnew;
+% 
+% 
+% end
+% 
+% [e,dedr,dedt] = lookup(object,'Energy',Rold,Told);
+% [p,dpdr,dpdt] = lookup(object,'Pressure',Rold,Told);
+% cb(i) = sqrt(dpdr + (dpdt*dpdt)/(Rold*Rold)/dedt);
+% 
+% 
+% pressure = P;
+% temperature = T;
+% energy = lookup(object,'Energy',density,temperature);
+% entropy = lookup(object,'Entropy',density,temperature);
+% 
+% %Compute particle velocities
+% up = up1 + cumtrapz(density,cb./density);
+% 
+% %Convert from Eulerian to Lagrangian
+% cb = cb.*density./rho0;
+% 
+% 
+% new = SMASH.DynamicMaterials.EOS.Sesame(density,temperature,pressure,energy,entropy);
+% new.Data{1}=up;
+% new.Data{2}=cb;
+% 
+% %Set some properties
+% new.Name='Isentrope';
+% new.Source = 'Calculated';
+% new.SourceFormat='isentrope';
+%%
 
 
