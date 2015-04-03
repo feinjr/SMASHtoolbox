@@ -34,7 +34,8 @@ for n=1:N
 end
 
 exposure=10.^(-OD);
-exposure=exposure/exposure(2,end); % normalize by midpoint
+%exposure=exposure/exposure(2,end); % normalize by midpoint
+exposure=exposure/median(exposure(:)); % normaliz my median
 %exposure=transpose(exposure);
 exposure=exposure(:);
 Nexposure=numel(exposure);
@@ -137,25 +138,22 @@ layer=layer(index);
 % create transfer curve
 x=log10(exposure);
 y=level;
-%y1=min(y)+0.025*range(y);
-%y2=min(y)+0.975*range(y);
 y1=min(y)+object.CalibrationRange(1)*range(y);
 y2=min(y)+object.CalibrationRange(2)*range(y);
 keep=(y>=y1)&(y<=y2);
 p=polyfit(x(keep),y(keep),6);
 xs=linspace(min(x(keep)),max(x(keep)),100);
 ys=polyval(p,xs);
-xs=[xs(1) xs xs(end)];
+%xs=[xs(1) xs xs(end)];
 %ys=[0 ys max(y)];
-ys=[0 ys max(ys)*1.50];
+%ys=[0 ys max(ys)*1.50];
+%ys=[-inf ys +inf];
 
 object.TransferTable=[ys(:) 10.^(xs(:))];
 
 % handle output
-%if nargout==0
-h=basic_figure;
+basic_figure;
 ha(1)=subplot(3,1,1);
-%image(object,ha(1));
 imagesc(object.Grid1,object.Grid2,object.Data);
 colormap(object.GraphicOptions.ColorMap);
 xlabel(object.Grid1Label);
@@ -166,6 +164,7 @@ for n=1:size(ROI,1)
     rectangle('Position',ROI(n,:),...
         'EdgeColor',object.GraphicOptions.LineColor,'Tag','ROI');
 end
+
 ha(2)=subplot(3,1,2);
 box on;
 marker={'o' 'x'};
@@ -174,20 +173,17 @@ for k=1:2
     line(exposure(keep),level(keep),...
         'LineStyle','none','Color','k','Marker',marker{k});
 end
-%plot(exposure,level,'ko');
-%hold on
-%errorbar(exposure,level,Dlevel,'k.');
 line(object.TransferTable(:,2),object.TransferTable(:,1));
-xlabel('Exposure');
-%hold off
-ylabel('Level');
+xlabel('Relative exposure');
+
+ylabel('Density');
 set(gca,'XScale','log');
-ha(3)=subplot(3,1,3);
+
+ha(3)=subplot(3,1,3); %#ok<NASGU>
 plot(object.TransferTable(:,1),object.TransferTable(:,2),'k');
-xlabel('Level');
-ylabel('Exposure');
+xlabel('Density');
+ylabel('Relative exposure');
 set(gca,'YScale','log');
-%end
 
 if nargout>=1
     varargout{1}=object;
