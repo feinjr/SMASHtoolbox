@@ -9,7 +9,7 @@
 %    SignalAnalysis   - 1D data data processing
 %    System           - system tools
 % More specific packages are also provided.
-%    DynamicMaterials - UNDER CONSTRUCTION
+%    DynamicMaterials - DMP routines (UNDER CONSTRUCTION)
 %    Graphics         - special plotting routines
 %    MonteCarlo       - Monte Carlo routines (UNDER CONSTRUCTION)
 %    PDE              - Partial Differential Equation solvers (UNDER CONSTRUCTION)

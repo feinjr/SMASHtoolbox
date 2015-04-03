@@ -19,7 +19,7 @@
 
 % created April 18, 2014 by Justin Brown (Sandia National Laboratories)
 
-function varargout=reverselookup(object,zt,z,x)
+function varargout=reverselookup(object,ZT,z,x)
 
 % Error checking
 assert(strcmpi(object.SourceFormat,'sesame'),'ERROR: method only applies to sesame tables. A curve was detected.');
@@ -28,7 +28,7 @@ if (nargin<2) || isempty(x)
     error('ERROR: no grid location(s) specified');
 end
 
-if  ~ischar(zt)
+if  ~ischar(ZT)
     error('Must enter strings specifying data array. Valid options include: Pressure, Energy, and Entropy');
 end
 
@@ -37,7 +37,7 @@ if ~isnumeric(z) || ~isnumeric(x) || numel(z) ~= numel(x) || min(size(z)) > 1
 end
 
 
-switch lower(zt)
+switch lower(ZT)
     case 'pressure'
         zt = object.Pressure;
     case 'energy'
@@ -70,9 +70,17 @@ for v = 1:length(x)
     %Make sure requested values are within range of table
     asstr = sprintf('%f >= %f >= %f: Value not within range of the table',max(xt),xv,min(xt));
     assert(xv <= max(xt) && xv >= min(xt),asstr);
-    %if (xv >= max(xt) && xv <= min(xt)); warning(asstr); end;
     
-    y(v) = reverse_2D(xt,yt,zg,zv,xv);
+    try
+        y(v) = reverse_2D(xt,yt,zg,zv,xv);
+    catch
+        warning('reverse lookup failure, using fzero')
+        if v>1
+            y(v) = fzero(@(x) lookup(object,ZT,xv,x)-zv,y(v-1));
+        else
+            y(v) = fzero(@(x) lookup(object,ZT,xv,x)-zv,300);
+        end
+    end
     
     varargout{1} = y;
 end

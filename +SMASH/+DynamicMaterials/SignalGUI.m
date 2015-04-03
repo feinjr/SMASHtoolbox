@@ -222,6 +222,7 @@ uimenu(hm,'Label','Create Sesame','Callback',@CreateSesame);
 %% Create Programs menu / launcher
 hm=uimenu(fig.Handle,'Label','Programs');
 uimenu(hm,'Label','Point VISAR','Callback',@PointVISARLaunch);
+uimenu(hm,'Label','SIRHEN','Callback',@SIRHENLaunch);
 uimenu(hm,'Label','Dat Ninja','Callback',@datninjaLaunch);
 uimenu(hm,'Label','Impedance Matching','Callback',@MGrunP_uLaunch);
 uimenu(hm,'Label','Dakota Unfold Setup','Callback',@DakotaUnfoldSetup);
@@ -1519,11 +1520,11 @@ end
 dlg.Hidden = true;
 dlg.Name = 'Inverse Lagrangian Analysis (SI units)';
 h=addblock(dlg,'edit','Sample Thickness (mm)'); set(h(2),'String', '1');
-h=addblock(dlg,'edit','Sample Density (g/cc)'); set(h(2),'String', '1.85');
-h=addblock(dlg,'edit','Velocity Spacing (m/s)'); set(h(2),'String', '5');
+h=addblock(dlg,'edit','Sample Density (g/cc)'); set(h(2),'String', '6.505');
+h=addblock(dlg,'edit','Velocity Spacing (m/s)'); set(h(2),'String', '10');
 h=addblock(dlg,'edit','Sample Response Path           '); set(h(2),'String', 'clu.dat');
-%h=addblock(dlg,'edit','Window Response Path           '); set(h(2),'String', '/remote/jlbrown/EOS/lif7271v3_Isentrope.dat');
-h=addblock(dlg,'edit','Window Response Path           '); set(h(2),'String', '/remote/jlbrown/EOS/FreeSurface.dat');
+h=addblock(dlg,'edit','Window Response Path           '); set(h(2),'String', '/remote/jlbrown/EOS/lif7271v3_Isentrope.dat');
+%h=addblock(dlg,'edit','Window Response Path           '); set(h(2),'String', '/remote/jlbrown/EOS/FreeSurface.dat');
 
 OkApplyCancel(dlg,@IL,'overlay');
 
@@ -2036,16 +2037,20 @@ function PointVISARLaunch(src,varargin)
     PointVISAR('-gui');
 end %PointVISAR
 
+function SIRHENLaunch(src,varargin)    
+    SIRHEN;
+end %SIHREN
+
 function datninjaLaunch(src,varargin)        
     datninja;
 end %datninja
 
 function MGrunP_uLaunch(src,varargin)
-    SMASH.DynamicMaterials.ShockWave.Impact;
+    SMASH.DynamicMaterials.Impact;
 end %ImpedanceMatching
 
 function StrengthLaunch(src,varargin)
-    SMASH.DynamicMaterialsShockWave.StrengthGUI;
+    SMASH.DynamicMaterials.StrengthGUI;
 end %StrengthGUI
 
 
@@ -2291,6 +2296,7 @@ function DualAxes(src,varargin)
      legendentry{i+1}=strrep(sig{sig_num(i+1)}.Name,'_','\_');
      %legendentry{i+2}=strrep(sig{sig_num(i+2)}.Name,'_','\_');
      legend(ph,legendentry,'Color','none','Location','Best','EdgeColor','w');
+     legend('boxoff');
      
      
     set(ax1,'XColor','w'); 
@@ -2576,7 +2582,7 @@ function plotdata(varargin)
                     legendentry{i}=strrep(sig{sig_num(i)}.Name,'_','\_');
                 end
                 lh = legend(legendentry,'Color','none','Location','Best','EdgeColor','w','LineWidth',1);
-                %legend('boxoff');
+                legend('boxoff');
                 %set(lh,'Box','off');
                 xlabel(sig{sig_num(1)}.GridLabel);
                 ylabel(sig{sig_num(1)}.DataLabel);
@@ -2651,7 +2657,8 @@ switch material
         s = 1;
         g0 = 1; 
         material = {'Aluminum','Beryllium','Copper','Gold', ...
-            'LiF','Molybdenum','Stainless Steel','Tantalum','Rhenium'};
+            'LiF','Molybdenum','Stainless Steel','Tantalum',...
+            'Rhenium','Zirconium','Zirconium1','Zirconium2'};
         
       case 'DefinedWindows'
         rho = 1;
@@ -2717,8 +2724,25 @@ switch material
         rho = 21.02;
         c0 = 4.184;
         s = 1.367;
-        g0 = 2.44;      
+        g0 = 2.44;    
+  
+    case 'Zirconium'
+        rho = 6.506;
+        c0 = 3.89;
+        s = 0.292;
+        g0 = 0.93;  
         
+    case 'Zirconium1'
+        rho = 6.506;
+        c0 = 3.757;
+        s = 1.018;
+        g0 = 1.09; 
+        
+    case 'Zirconium2'
+        rho = 6.506;
+        c0 = 3.296;
+        s = 1.271;
+        g0 = 1.09;       
         
     %% Windows    
     case 'Diamond'

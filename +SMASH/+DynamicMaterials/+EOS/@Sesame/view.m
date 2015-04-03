@@ -1,8 +1,7 @@
 % VIEW View Sesame object graphically
 %
-% This method displays Sesame objects as isotherm line plots, which are 
-% drawn in a new figure by default. A pressure cutoff of 1e-3 is used to
-% reduce clutter in the plot. 
+% This method displays Sesame objects as line plots, which are drawn in a
+% new figure by default.
 %    >> view(object); 
 %    >> h=view(object); % return line's graphic handle
 % The line's properties (color, width, etc.), axes labels, and title are
@@ -16,19 +15,22 @@
 % be drawn in the current axes and overwrites the labels; if no axes is
 % present, a new one is created.
 %
-% By default, a plot Pressure vs Density isotherms is returned. It is
-% possilbe to view the Temperature vs Pressure isochors by specifying:
-%   >> [...]=view(object,target,'isochors');
+% By default, a plot in the Pressure-Density plane is returned is returned.
+% If the object is a table, isotherms for each temperature are produced.
+%   >> [...]=view(object,target,'PD');
+% Objects can also be viewed in the Temperature-Pressure plane by
+% specifying 'TP'. For sesame objects isochors at each density are
+% produced.
+%   >> [...]=view(object,target,'TP');
 %
 % See also Sesame
-
 %
 % created December 18, 2014 by Justin Brown (Sandia National Laboratories)
 %
 function varargout=view(object,target,plottype)
 
 % handle input
-new=false;
+new=false; table=0;
 if (nargin<2) || isempty(target);
     target=figure;   
     new=true;
@@ -37,7 +39,7 @@ elseif ~ishandle(target)
 end
 
 if (nargin < 3)
-    plottype = 'isotherms';
+    plottype = 'PD';
 end
     
 switch lower(get(target,'Type'))
@@ -55,61 +57,70 @@ switch lower(get(target,'Type'))
 end
 axes(target);
 
-rho = unique(object.Density);
-temp = unique(object.Temperature);
 
-% create isotherms
-if strcmpi(plottype,'isotherms')
-
-    for i = 1:length(temp)
-        tempobj = isotherm(object,rho,temp(i));
-            x = tempobj.Density;
-            y = tempobj.Pressure;
-
-            minpressure = max(min(object.Pressure),1e-3);
-            bad = y <= minpressure;
-            y(bad) = minpressure;
-
-        h=line(log10(x),log10(y));
-        apply(object.GraphicOptions,h);
-    end
+if strcmpi(object.SourceFormat,'sesame')
+    table=1;
 end
 
-% create isochors
-if strcmpi(plottype,'isochors')
-    rho = unique(object.Density);
-    temp = unique(object.Temperature);
 
-    for i = 1:length(rho)
-        tempobj = isochor(object,temp,rho(i));
-            x = tempobj.Pressure;
-            y = tempobj.Temperature;
-            
-            minpressure = max(min(object.Pressure),1e-3);
-            bad = x <= minpressure;
-            x(bad) = minpressure;
-            
-        h=line(log10(x),log10(y));
-        apply(object.GraphicOptions,h);
-    end
-end
+% View in Pressure-Density plane
+if strcmpi(plottype,'PD')
+    if table
+        rho = unique(object.Density);
+        temp = unique(object.Temperature);
+        for i = 1:length(temp)
+            tempobj = isotherm(object,rho,temp(i));
+                x = tempobj.Density;
+                y = tempobj.Pressure;
 
-%set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
-%    'LineWidth',object.LineWidth,'Marker',object.Marker);
+                minpressure = max(min(object.Pressure),1e-3);
+                bad = y <= minpressure;
+                y(bad) = minpressure;
 
-% fill out new figure
-if new
-    if strcmpi(plottype,'isochors')
-        xlabel(['log ',object.ZLabel]);
-        ylabel(['log ',object.YLabel]);
+            %h=line(log10(x),log10(y));
+            set(target,'xscale','log','yscale','log');
+            h=line(x,y);
+            apply(object.GraphicOptions,h);
+            axis tight;
+        end
     else
-        xlabel(['log ',object.XLabel]);
-        ylabel(['log ',object.ZLabel]);
+        h=line(object.Density,object.Pressure);
+        apply(object.GraphicOptions,h);
     end
-    title(target,object.Title);
-    box(target,'on');
+    xlabel([object.XLabel]);
+    ylabel([object.ZLabel]);
 end
 
+% View in Temperature-Pressure plane
+if strcmpi(plottype,'TP')
+    if table
+        rho = unique(object.Density);
+        temp = unique(object.Temperature);
+
+        for i = 1:length(rho)
+            tempobj = isochor(object,temp,rho(i));
+                x = tempobj.Pressure;
+                y = tempobj.Temperature;
+
+                minpressure = max(min(object.Pressure),1e-3);
+                bad = x <= minpressure;
+                x(bad) = minpressure;
+
+            set(target,'xscale','log','yscale','log');
+            h=line(x,y);
+            apply(object.GraphicOptions,h);
+            axis tight;
+        end
+    else
+        h=line(object.Pressure,object.Temperature);
+        apply(object.GraphicOptions,h);
+    end
+    xlabel([object.ZLabel]);
+    ylabel([object.YLabel]);
+end
+
+title(target,object.Title);
+box(target,'on');
 figure(fig);
 
 % handle output
