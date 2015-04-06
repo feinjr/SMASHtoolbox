@@ -57,6 +57,15 @@ end
 cb = sqrt(dpdr + (dpdt.*dpdt)./(density.*density)./dedt.*temperature);
 cl = cb.*density./rho0;
 
+% %Compute particle velocities
+% up1=0;
+% if length(density)==1
+%     up = up1;
+% else
+%     up = up1 + cumtrapz(density,cl./density);
+% end
+
+
 pressure = lookup(object,'Pressure',density,temperature);
 energy = lookup(object,'Energy',density,temperature);
 entropy = lookup(object,'Entropy',density,temperature);
