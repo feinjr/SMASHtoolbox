@@ -277,6 +277,13 @@ for i=1:numfiles
             dens = rho0./(1-data.Data(iu,4)); dens(1)=rho0;
             stress = data.Data(iu,3);
             
+        % [dens, temp, press, energy, entropy, up, c] -- SMASH output
+        elseif p.NumberColumns == 7
+            t = 1:numel(data.Data(iu,1));
+            u = data.Data(iu,6);
+            cl = data.Data(iu,7);
+            dens = data.Data(iu,1);
+            stress = data.Data(iu,3);     
         
         % [t, uw,up,cl, ce, stress,volume,strain,strainrate] -- Old Default
         elseif p.NumberColumns >= 9 
