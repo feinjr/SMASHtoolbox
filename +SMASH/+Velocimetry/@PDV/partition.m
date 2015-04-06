@@ -1,4 +1,4 @@
-% parition Set/view partition settings
+% partition Set/view partition settings
 %
 % This method controls the partitioning of PDV objects.  Partitions can be
 % specifed as a number of points, time durations, or a total number of

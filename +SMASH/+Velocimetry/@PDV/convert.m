@@ -1,15 +1,18 @@
 % convert Convert frequency results to velocity
 %
 % This method converts frequency results from the "analyze" method to
-% velocity.  The standard conversion is:
-%     velocity=(lambda/2)*(frequency-f0);
-% using the object's wavelength (lambda) and reference frequency (f0)
-% settings.  Alternate conversions can be specified by changing the
-% ConvertFunction setting.
+% velocity.  The standard conversion uses the object's Wavelength and
+% ReferenceFrequency (B0) settings to convert beat frequency (B) to
+% velocity (v).
+%     v=(Wavelength/2)*(B-B0);
+% Alternate conversions can be defined in a custom function.
+%     >> object=configure(object,'ConvertFunction',@myfunc);
+% The function handle "myfunc" must accept two inputs (t and B) and return
+% a single output (v).
 %
-% This method is automatically called by the "analyze" method.  It should
-% only be called manually when the conversion function, wavelength, or
-% reference frequency are changed.
+% This method is automatically called within the "analyze" method.  It
+% should only be called manually when the conversion function, wavelength,
+% or reference frequency are changed.
 %
 % See also PDV, configure
 %
@@ -26,7 +29,7 @@ f0=object.Settings.ReferenceFrequency;
         velocity=(lambda/2)*(frequency-f0);
     end
 
-location=object.Results.Location;
+location=object.Results.BeatFrequency;
 if isempty(object.Settings.ConvertFunction)
     v=standardConvert(location.Grid,location.Data);
 else

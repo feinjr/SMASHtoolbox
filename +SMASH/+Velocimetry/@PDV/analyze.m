@@ -18,7 +18,7 @@
 %
 % created march 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object,mode)
+function object=analyze(object,mode,varargin)
 
 %% manage input
 if (nargin<2) || isempty(mode)
@@ -120,20 +120,20 @@ end
 %% separate and convert results
 result=struct();
 index=1:numel(boundary);
-result.Location=...
+result.BeatFrequency=...
     SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.Location.GridLabel='Time';
-result.Location.DataLabel='Frequency location';
+result.BeatFrequency.GridLabel='Time';
+result.BeatFrequency.DataLabel='Beat Frequency';
 index=index+numel(boundary);
-result.Width=...
+result.BeatWidth=...
     SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.Width.GridLabel='Time';
-result.Width.DataLabel='Frequency width';
+result.BeatWidth.GridLabel='Time';
+result.BeatWidth.DataLabel='Beat frequency width';
 index=index+numel(boundary);
-result.Amplitude=...
+result.BeatAmplitude=...
     SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.Amplitude.GridLabel='Time';
-result.Amplitude.DataLabel='Power';
+result.BeatAmplitude.GridLabel='Time';
+result.BeatAmplitude.DataLabel='Beat amplitude';
 object.Results=result;
 
 object=convert(object);

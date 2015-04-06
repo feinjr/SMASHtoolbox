@@ -22,7 +22,7 @@ assert(nargin==3,'ERROR: invalid number of inputs');
 % interpret array input
 if islogical(array) && (numel(array)==numel(object.Grid))    
     % valid request 
-elseif strcmpi(array,'all')
+elseif strcmpi(array,'all') || isempty(array)
     array=true(size(object.Grid));
 elseif isnumeric(array) && (numel(array)==2)
     array=(object.Grid>=array(1)) & (object.Grid<=array(2));

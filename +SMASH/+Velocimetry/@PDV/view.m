@@ -3,15 +3,15 @@
 % This method displays PDV objects as line plots.  The default view is the
 % measured signal.
 %     >> view(object);
-%     >> view(object,'measurement'); % same as above
+%     >> view(object,'Measurement'); % same as above
 % Results can be viewed *after* the analysis method has been used.
-%     >> view(object,'velocity');
-%     >> view(object,'location');
+%     >> view(object,'Velocity');
+%     >> view(object,'BeatFrequency');
 %
 % Specifying an output returns graphic handles for lines from this method.
 %     >> h=view(...);
 % 
-% See also PDV
+% See also PDV, analyze, preview
 %
 
 % 
@@ -21,16 +21,22 @@ function varargout=view(object,mode,varargin)
 
 % manage input
 if (nargin<2) || isempty(mode)
-    mode='velocity';
+    mode='measurement';
 end
 assert(ischar(mode),'ERROR: invalid mode');
 
 switch lower(mode)
     case 'measurement'
         h=view(object.Measurement,varargin{:});
-    case 'location'
+    case 'beatfrequency'
         assert(~isempty(object.Results),'ERROR: no analysis results yet');
-        h=view(object.Results.Location,varargin{:});
+        h=view(object.Results.BeatFrequency,varargin{:});
+    case 'beatwidth'
+        assert(~isempty(object.Results),'ERROR: no analysis results yet');
+        h=view(object.Results.BeatWidth,varargin{:});
+    case 'beatamplitude'
+        assert(~isempty(object.Results),'ERROR: no analysis results yet');
+        h=view(object.Results.BeatAmplitude,varargin{:});
     case 'velocity'
         assert(~isempty(object.Results),'ERROR: no analysis results yet');
         h=view(object.Results.Velocity,varargin{:});

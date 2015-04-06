@@ -14,7 +14,8 @@
 
 %
 % created February 19, 2015 by Daniel Dolan (Sandia National Laboratories)
-%
+% revised April 6, 2015 by Daniel Dolan
+%   -allow direct modifications to partition parameters
 function varargout=configure(object,varargin)
 
 Narg=numel(varargin);
@@ -33,24 +34,24 @@ if nargout==0
     L=max(L,max(cellfun(@numel,name)));
     format=sprintf('\t%%%ds : ',L);
     fprintf('\n');
-    % print FFT options
-    fprintf('** FFT settings **\n');
-    name=properties(object.Measurement.FFToptions);
-    for k=1:numel(name);
-        fprintf(format,name{k});
-        printValue(object.Measurement.FFToptions.(name{k}));
-        fprintf('\n');
-    end
     % print partition setttings
-    fprintf('** Partition settings **\n');
+    fprintf('*** Partition settings ***\n');
     name=fieldnames(object.Measurement.Partition);
     for k=1:numel(name);
         fprintf(format,name{k});
         printValue(object.Measurement.Partition.(name{k}));
         fprintf('\n');
     end
+    % print FFT options
+    fprintf('*** FFT settings ***\n');
+    name=properties(object.Measurement.FFToptions);
+    for k=1:numel(name);
+        fprintf(format,name{k});
+        printValue(object.Measurement.FFToptions.(name{k}));
+        fprintf('\n');
+    end   
     % print PDV settings
-    fprintf('** Analysis settings **\n');
+    fprintf('*** Analysis settings ***\n');
     name=fieldnames(object.Settings);
     for k=1:numel(name);
         fprintf(format,name{k});
@@ -121,16 +122,38 @@ for n=1:2:Narg
             object.Measurement.FFToptions.SpectrumType=value;
         % partition configuration
         case 'partition'
-            warning('SMASH:PDV',...
-                'Use the "partition" method for partition settings');
-            try
-                object.Measurement=...
-                    partition(object.Measurement,value{1},value{2});
-            catch
-                error('ERROR: invalid partition value');
-            end
+            object=partition(object,value{1},value{2});
+        case 'block'
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid block setting');
+            value(2)=object.Measurement.Partition.Overlap;            
+            object=partition(object,'block',value);
+        case 'overlap'
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid overlap setting');            
+            value(2)=value(1);
+            value(1)=object.Measurement.Partition.Blocks;
+            object=partition(object,'block',value);
+        case 'duration'
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid duration setting');
+            value(2)=object.Measurement.Partition.Advance;
+            object=partition(object,'duration',value);
+        case 'advance'
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid advance setting');
+            value(2)=value(1);
+            value(1)=object.Measurement.Partition.Duration;
+            object=partition(object,'duration',value);
+        case 'points'
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid Points setting');
+            value(2)=object.Measurement.Partition.Advance;
+            object=partition(object,'duration',value);
+        case 'skip'
+            
         otherwise
-            error('ERROR: "%s" is an invalid setting');
+            error('ERROR: "%s" is an invalid setting',name);
     end
 end
 varargout{1}=object;
