@@ -126,7 +126,8 @@ switch choice
         assert(value(1)>1,'ERROR: blocks value must be greater than 1');        
         assert(value(2)>=0,'ERROR: Overlap value must be greater than or equal to 0');                       
         skip=floor(numpoints/value(1));        
-        assert(skip>0,'ERROR: blocks exceed the number of grid points');
+        %assert(skip>0,'ERROR: blocks exceed the number of grid points');
+        skip=max(skip,1);
         points=(value(2)+1)*skip;        
     otherwise        
         error('ERROR: invalid division choice');

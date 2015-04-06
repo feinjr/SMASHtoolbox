@@ -24,10 +24,10 @@ classdef PDV
     %%
     properties
         Measurement % PDV measurement (STFT object)        
+        Preview % Preview spectrogram (Image object)
     end
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
-        Preview % Preview spectrogram (Image object)
         Results % Analysis results (structure)           
     end
     %%
@@ -74,6 +74,11 @@ classdef PDV
             assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
                 'ERROR: Measurement property must be a STFT object');
             object.Measurement=value;
+        end
+        function object=set.Preview(object,value)
+            assert(isa(value,'SMASH.ImageAnalysis.Image'),...
+                'ERROR: Preview property must be an Image object');
+            object.Preview=value;
         end
     end
 end

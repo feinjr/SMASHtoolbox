@@ -13,11 +13,12 @@
 %
 % The 'dig' format is used for *.dig files, which requires numerical arrays
 % "time" and "signal" of the same size.
-%    >> writeFile('myfile.dig',time,signal); % 'dig' format
+%    >> writeFile('myfile.dig',time,signal);
 %
-% The 'sda' format is used for *.sda files, which require at text input
+% The 'sda' format is used for *.sda files, which require a text input
 % "label" followed by the data.
-%    >> writeFile('myfile.sda',label,data); % 'sda' format
+%    >> writeFile('myfile.sda',label,data,[description],[deflate]);
+% Description and deflate inputs are optional.
 %
 % See also FileAccess, fprintf, SDAfile
 %
@@ -43,10 +44,10 @@ end
 switch lower(ext)
     case '.dig'
         object=SMASH.FileAccess.DIGfile(filename);
-        write(object,varargin{:});
+        write(object,varargin{:});    
     case '.sda'
         object=SMASH.FileAccess.SDAfile(filename);
-        insert(object,varargin{:});
+        insert(object,varargin{:});        
     otherwise
         object=SMASH.FileAccess.ColumnFile(filename);
         write(object,varargin{:});
