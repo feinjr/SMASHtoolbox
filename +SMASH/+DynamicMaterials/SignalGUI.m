@@ -1041,11 +1041,10 @@ function CombineData(src,varargin)
     [x2 y2] = limit(sig{sig_num(2)});
     %Add Signal
     %Interpolate sig 2 to same time base
-    y2 = interp1(x2,y2,x1,'pchip',0)
+    y2 = interp1(x2,y2,x1,'pchip',0);
     [~,ia]=unique(y1);
-    newsig = SMASH.SignalAnalysis.Signal(y1(ia),y2(ia));
     sig_tot = sig_tot + 1;
-    sig{sig_tot} = reset(sig{sig_num(1)},newsig);
+    sig{sig_tot} = SMASH.SignalAnalysis.Signal(y1(ia),y2(ia));
     makeGridUniform(sig{sig_tot});
     %Set some object properties
     sig{sig_tot}.Name = 'Combined Signal'; 
@@ -2067,10 +2066,12 @@ if ~isempty(lh)
     style = get(lh,'LineStyle');
     if ~iscell(style); style = {style}; end;
     width = get(lh,'LineWidth');
-    if ~iscell(width); width = {width}; end;
+    if ~iscell(wideth); width = {width}; end;
     mark = get(lh,'Marker');
     if ~iscell(mark); mark = {mark}; end;
-
+    marksize = get(lh,'MarkerSize');
+    if ~iscell(marksize); marksize = {marksize}; end;
+    
     %Update as long as signal numbering is OK
     if (numel(color) == numel(sig_num))
         for i = 1:numel(sig_num);
@@ -2079,6 +2080,7 @@ if ~isempty(lh)
             sig{sig_num(i)}.GraphicOptions.LineColor=color{index,1};
             sig{sig_num(i)}.GraphicOptions.LineStyle=style{index,1};
             sig{sig_num(i)}.GraphicOptions.Marker=mark{index,1};
+            sig{sig_num(i)}.GraphicOptions.MarkerSize=marksize{index,1};
         end
     end
 end
