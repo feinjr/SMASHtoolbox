@@ -30,17 +30,25 @@ if nargout==0
     L=max(cellfun(@numel,name));
     name=fieldnames(object.Settings);
     L=max(L,max(cellfun(@numel,name)));
-    name=fieldnames(object.Measurement.Partition);
-    L=max(L,max(cellfun(@numel,name)));
+    try
+        name=fieldnames(object.Measurement.Partition);
+        L=max(L,max(cellfun(@numel,name)));   
+    catch
+        % do nothing
+    end
     format=sprintf('\t%%%ds : ',L);
     fprintf('\n');
     % print partition setttings
     fprintf('*** Partition settings ***\n');
-    name=fieldnames(object.Measurement.Partition);
-    for k=1:numel(name);
-        fprintf(format,name{k});
-        printValue(object.Measurement.Partition.(name{k}));
-        fprintf('\n');
+    try
+        name=fieldnames(object.Measurement.Partition);
+        for k=1:numel(name);
+            fprintf(format,name{k});
+            printValue(object.Measurement.Partition.(name{k}));
+            fprintf('\n');
+        end
+    catch
+        fprintf('\t (undefined)\n');
     end
     % print FFT options
     fprintf('*** FFT settings ***\n');
@@ -123,35 +131,63 @@ for n=1:2:Narg
         % partition configuration
         case 'partition'
             object=partition(object,value{1},value{2});
-        case 'block'
+        case {'block','blocks'}
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid block setting');
-            value(2)=object.Measurement.Partition.Overlap;            
+            try
+                value(2)=object.Measurement.Partition.Overlap;
+            catch
+                value(2)=0;
+            end
             object=partition(object,'block',value);
         case 'overlap'
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid overlap setting');            
             value(2)=value(1);
-            value(1)=object.Measurement.Partition.Blocks;
+            try
+                value(1)=object.Measurement.Partition.Blocks;
+            catch
+                value(1)=1000;
+            end
             object=partition(object,'block',value);
-        case 'duration'
+        case {'duration','durations'}
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid duration setting');
-            value(2)=object.Measurement.Partition.Advance;
+            try
+                value(2)=object.Measurement.Partition.Advance;
+            catch
+                value(2)=value(1);
+            end
             object=partition(object,'duration',value);
         case 'advance'
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid advance setting');
             value(2)=value(1);
-            value(1)=object.Measurement.Partition.Duration;
+            try
+                value(1)=object.Measurement.Partition.Duration;
+            catch
+                value(1)=value(2);
+            end
             object=partition(object,'duration',value);
-        case 'points'
+        case {'point','points'}
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid Points setting');
-            value(2)=object.Measurement.Partition.Advance;
-            object=partition(object,'duration',value);
+            try
+                value(2)=object.Measurement.Partition.Skip;
+            catch
+                value(2)=value(1);
+            end
+            object=partition(object,'points',value);
         case 'skip'
-            
+            assert(isnumeric(value) & numel(value)==1,...
+                'ERROR: invalid Skip setting');
+            value(2)=value(1);
+            try
+                value(1)=object.Measurement.Partition.Points;
+            catch
+                value(1)=value(2);
+            end
+            object=partition(object,'points',value);
         otherwise
             error('ERROR: "%s" is an invalid setting',name);
     end

@@ -4,7 +4,8 @@
 % object's Results property.  The number of histories generated during the
 % analysis depends on the number of specified boundaries; if no boundaries
 % are defined, a single history with no frequency bounds is generated.
-%
+
+% OLD SYNTAX
 % The default analysis calculates centroids for each boundary region.
 %     >> object=analyze(object);
 %     >> object=analyze(object,'centroid'); % same as above
@@ -18,14 +19,8 @@
 %
 % created march 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object,mode,varargin)
-
-%% manage input
-if (nargin<2) || isempty(mode)
-    mode='centroid';
-end
-assert(ischar(mode),'ERROR: invalid mode');
-mode=lower(mode);
+%function object=analyze(object,mode,varargin)
+function object=analyze(object)
 
 %% manage boundaries and limits
 [xlimit,~]=limit(object.Measurement);
@@ -93,13 +88,11 @@ object.Measurement=limit(object.Measurement,xbound);
     end
 
 previous.FFToptions=object.Measurement.FFToptions;
-object.Measurement.FFToptions.FrequencyDomain='positive';
-switch lower(mode)
-    case 'centroid'
-        object.Measurement.FFToptions.SpectrumType='power';    
+type=object.Measurement.FFToptions.SpectrumType;
+switch lower(type)
+    case 'power'       
         history=analyze(object.Measurement,@centroid);       
-    case 'fit'        
-        object.Measurement.FFToptions.SpectrumType='complex';     
+    case 'complex'           
         Window={'gaussian' 3};
         temp=object.Measurement.FFToptions.Window;
         if iscell(temp)

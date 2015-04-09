@@ -72,7 +72,7 @@ switch mode
         f=f(keep);
         P=P(keep);
         [~,index]=max(P);
-        object.Parameter.ReferenceFrequency=f(index);        
+        object.Settings.ReferenceFrequency=f(index);        
     otherwise
         error('ERROR: invalid mode request');
 end

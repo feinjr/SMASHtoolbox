@@ -48,9 +48,13 @@ if ~strcmpi(object.LimitIndex,'all')
     object.LimitIndex='all';
 end
 
-param=object.Partition;
-points=param.Points;
-skip=param.Skip;
+if isempty(object.Partition)
+    warning('SMASH:ShortTime',...
+        'No partitioning specified--using 10 blocks with 0 overlap');
+    object=partition(object,'blocks',[10 0]);
+end
+points=object.Partition.Points;
+skip=object.Partition.Skip;
 
 time=object.Grid;
 numpoints=numel(time);

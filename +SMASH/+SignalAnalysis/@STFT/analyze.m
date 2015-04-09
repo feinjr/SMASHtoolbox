@@ -44,6 +44,13 @@ if (nargin<3) || isempty(normalization)
     normalization='global';
 end
 
+% verify partitioning
+if isempty(object.Partition)
+    warning('SMASH:STFT',...
+        'No partitioning specified--using 10 blocks with 0 overlap');
+    object=partition(object,'block',[10 0]);
+end
+
 % detect down sampling 
 frequency=[];
 local=object;

@@ -40,7 +40,7 @@ classdef PDV
             p.Bandwidth=[];
             p.NoiseRegion=[]; % [tmin tmax fmin fmax]  
             p.UniqueTolerance=1e-3; 
-            p.Boundary={}; 
+            p.Boundary={};            
             p.ConvertFunction=[];
             p.HarmonicFunction=[];
             object.Settings=p;
@@ -79,6 +79,6 @@ classdef PDV
             assert(isa(value,'SMASH.ImageAnalysis.Image'),...
                 'ERROR: Preview property must be an Image object');
             object.Preview=value;
-        end
+        end        
     end
 end
