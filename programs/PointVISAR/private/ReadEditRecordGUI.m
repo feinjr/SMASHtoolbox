@@ -90,8 +90,8 @@ else % generate the figure
         'Accelerator', '4', 'Callback', @ViewMenuCallback);
     % create panels
     [slider,panel]=FourPanels('Parent',func);
-    %colors=DistinguishedLines(4);
-    colors=get(0,'DefaultAxesColorOrder');
+    colors=DistinguishedLinesRecord(1:4);
+    %colors=get(0,'DefaultAxesColorOrder');
     % create raw signals axes
     ii=1;
     ha(ii) = axes('Parent',panel(ii),'Tag','RawSignals','Box','on');
