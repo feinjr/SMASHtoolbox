@@ -453,13 +453,13 @@ function TabularFit(src,varargin)
     for i = 1:numel(header)
         if strncmp(lower(header{i}),'rho',3) | strncmp(lower(header{i}),'dens',3) 
             dens = data.Data(:,i);
-        elseif strncmp(lower(header{i}),'p(',1) |strncmp(lower(header{i}),'pressure',8)
+        elseif strncmp(lower(header{i}),'p(',2) |strncmp(lower(header{i}),'pressure',8)
             stress = data.Data(:,i);
         elseif strncmp(lower(header{i}),'cs',2)
             ce = data.Data(:,i);
         elseif strncmp(lower(header{i}),'up',2) | strncmp(lower(header{i}),'particle',8)
             u = data.Data(:,i);
-        elseif strncmp(lower(header{i}),'cl',2) | strncmp(lower(header{i}),'wave',4)
+        elseif strncmp(lower(header{i}),'cl',2) | strncmp(lower(header{i}),'wave',4) | strncmp(lower(header{i}),'lagw',4)
             c = data.Data(:,i);
         end
     end

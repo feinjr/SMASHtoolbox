@@ -87,7 +87,8 @@ else % generate the GUI
     set(button(1),'Tag','ActiveRecord','Callback',@ChooseRecord);
     set(button(2),'Tag','SelectedRecords','Callback',@ChooseRecord);
     % determine standard line color sequence
-    color=get(0,'DefaultAxesColorOrder');
+    %color=get(0,'DefaultAxesColorOrder');
+    color=DistinguishedLinesRecord(1:2);
     % create signal axes children
     ii=1;
     set(panel(ii),'Tag','Signals');
