@@ -71,7 +71,7 @@ amplitude=mean(radiance);
 yfit=radiance/amplitude;
 
 % calculate residual error
-chi2=sum((y(:)-yfit).^2);
+chi2=sum((y(:)-yfit(:)).^2);
 params=[temperature amplitude];
 
 end

@@ -12,7 +12,8 @@ else
         object.Temperature,object.Emissivity);
 end
 object.Name='Planck object';
-object.Title='Planck object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+object.GraphicOptions.Title='Planck object';
 object.DataLabel='Spectral Radiance (W·sr^{-1}·m^{-2}·nm^{-1}) ';
 object.GridLabel='Wavelength (nm) ';
 object.GridType='Wavelength';
