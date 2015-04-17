@@ -1,6 +1,16 @@
 % Spectroscopy package
 % 
 % UNDER CONSTRUCTION
+%
+% Functions:
+%     generatePlanck - Generate Planck emission data
+%     fitPlanck      - Fit emission data with a Planck curve
+%
+% See also SMASH
+%
+
+% Last updated April 17, 2015 by Daniel Dolan
+
 
 
 %
