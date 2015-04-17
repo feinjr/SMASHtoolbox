@@ -52,7 +52,7 @@ set(h,'Callback',@UpdateCallback);
         emissivity=sscanf(value{4},'%g');
         newfig=value{5};
         % calculate Planck radiance
-        objPlanck=calPlanck(wavelength1,wavelength2,temperature,emissivity);
+        %objPlanck=calPlanck(wavelength1,wavelength2,temperature,emissivity);
         % create figure
         if isempty(figPlanck)
             figPlanck=SMASH.MUI.Figure();
@@ -100,10 +100,10 @@ figPlanck=[];
 
 end
 
-function objPlanck=calPlanck(wavelength1,wavelength2,temperature,emissivity)
-
-% calculate Planck radiance
-wavelength=linspace(wavelength1,wavelength2,1000);
-objPlanck=SMASH.Spectroscopy.Planck(wavelength,temperature,emissivity);
-
-end
+% function objPlanck=calPlanck(wavelength1,wavelength2,temperature,emissivity)
+% 
+% % calculate Planck radiance
+% wavelength=linspace(wavelength1,wavelength2,1000);
+% objPlanck=SMASH.Spectroscopy.Planck(wavelength,temperature,emissivity);
+% 
+% end

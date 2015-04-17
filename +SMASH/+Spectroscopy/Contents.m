@@ -1,4 +1,8 @@
 % Spectroscopy package
+% 
+% UNDER CONSTRUCTION
+
+
 %
 % This toolbox contains the classes for spectroscopy analysis.
 %    Spectrum   - subclass of Signal
