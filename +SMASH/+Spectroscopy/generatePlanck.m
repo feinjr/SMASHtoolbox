@@ -83,7 +83,7 @@ c2=1.4388e4; % um*K
 % calculation
 wavelength=wavelength/1e3; % convert nm to um
 radiance=c1./wavelength.^5./(exp(c2./(wavelength*temperature))-1); % [W/m^2/sr/um]
-radiance=radiance/1e3; % [W/m^2/sr/um]
+radiance=radiance/1e3; % [W/m^2/sr/nm]
 radiance=radiance.*emissivity;
 
 % manage output

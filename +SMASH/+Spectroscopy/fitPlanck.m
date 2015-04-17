@@ -87,7 +87,7 @@ for n=1:2:Narg
             setting.Bound=value;
         case 'emissivity'
             try % verify emissivity using generate function
-                SMASH.Spectroscopy.generatePlanck(wavelength,1000,value);
+                [~]=SMASH.Spectroscopy.generatePlanck(wavelength,1000,value);
                 setting.Emissivity=value;
             catch
                 error('ERROR: invalid Emissivity value(s)');
