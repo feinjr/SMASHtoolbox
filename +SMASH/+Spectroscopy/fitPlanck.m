@@ -141,8 +141,8 @@ q=fminsearch(@residual,guess,setting.Options);
                 fit=dLdx;
                 scale=nan;
             case 'relative'
-                %scale=dLdx\y;            
-                scale=y\dLdx;
+                scale=dLdx\y;            
+                %scale=y\dLdx;
                 fit=scale*dLdx;
         end
         chi2=sum(weight.*(y-fit).^2);        
