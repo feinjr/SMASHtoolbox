@@ -11,7 +11,7 @@
 %
 % To calculate the spectral radiance, one must specify an array of
 % wavelenghs (in nanometers) and a temperature (in Kelvin).
-%     >> radiance=Planck(wavelength,temperature);
+%     >> radiance=generatePlanck(wavelength,temperature);
 % The output is an array of spectral radiance values for each specified
 % wavelength in units of watts per square meter per steradian per
 % nanometer.
@@ -150,7 +150,7 @@ set(h,'Callback',@UpdateCallback);
         newfig=value{5};
         % calculate Planck radiance
         wavelength=linspace(wavelength1,wavelength2,1000);
-        radiance=SMASH.Spectroscopy.Planck(wavelength,temperature,emissivity);
+        radiance=SMASH.Spectroscopy.generatePlanck(wavelength,temperature,emissivity);
         % create figure
         if isempty(figPlanck) || ~ishandle(figPlanck.Handle) || (newfig==1)
             figPlanck=SMASH.MUI.Figure();

@@ -3,7 +3,7 @@
 % This function matches Planck emission with a spectroscopic measurement,
 % resulting in an estimate of emitter temperature.  The basic calling
 % sequence is:
-%     >> T=fitPlanck(wavelength,radiance,guess);
+%     >> [T,fit,scale]=fitPlanck(wavelength,radiance,guess);
 % where wavelength is in nanometers and (spectral) radiance is in watts per
 % square meter per steradian per nanometer.  A guess temperature must be
 % provided to initiated the optimization; this temperature and the output
@@ -12,15 +12,15 @@
 %
 % The default optimization assumes perfect emissivity at all wavelengths.
 % Different emissivities can be specified manaully.
-%     >> T=fitPlanck(...,'Emissivity',value);
+%     >> [...]=fitPlanck(...,'Emissivity',value);
 % Emissivities can be scalars, arrays (consistent with the wavelength
 % input), or function handles.
 %
 % Measurements that are proportional to spectral radiance can be analyzed
 % in a relative manner.
-%     >> T=fitPlanck(wavelength,measurement,guess,'Mode','relative');
+%     >> [...]=fitPlanck(wavelength,measurement,guess,'Mode','relative');
 % Absolute analysis can be specified explicitly:
-%     >> T=fitPlanck(...,'Mode','absolute');
+%     >> [...]=fitPlanck(...,'Mode','absolute');
 % but doing so is not necessary.  For constant emissivity, relative
 % analysis *may* perform better than absolute analysis, particularly when
 % peak emission occurs at longer wavelengths than the measurement. Relative
@@ -30,23 +30,23 @@
 % emissivity have no impact on relative analysis.
 %
 % Optimization can be restricted to a finite temperature range.
-%     >> T=fitPlanck(...,'Bound',[Tmin Tmax]);
+%     >> [...]=fitPlanck(...,'Bound',[Tmin Tmax]);
 % The default range is ~2e-16 to infinity.  The second entry must be
 % greater than the first, and both numbers must be positive.  The guess
 % temperature must always fall inside the specified bounds.
 %
 % Weighting can be specified to preferentially fit portions of the
 % measurement over less reliable regions.
-%     >> T=fitPlanck(...'Weight',array);
+%     >> [...]=fitPlanck(...'Weight',array);
 % The weight array must be consistent with the wavelength and measurement
 % inputs.  Weights are normalized internally.
 %
 % General optimization controls (number of iterations, etc.) can be
 % controlled by passing an options structure.
-%     >> T=fitPlanck(...,'Options',options);
+%     >> [...]=fitPlanck(...,'Options',options);
 % For more information, refer to the optimset function.
 %
-% If no op
+% If no outputs are specified, results are plotted to a new figure window.
 %
 % See also Spectroscopy, generatePlanck, optimset
 %
@@ -133,19 +133,21 @@ end
 % perform optimization
 weight=setting.Weight/sum(setting.Weight);
 q=fminsearch(@residual,guess,setting.Options);
-    function [chi2,fit,T]=residual(q)
+    function [chi2,fit,T,scale]=residual(q)
         T=convert(q);
         dLdx=SMASH.Spectroscopy.generatePlanck(x,T,setting.Emissivity);
         switch setting.Mode
             case 'absolute'
                 fit=dLdx;
+                scale=nan;
             case 'relative'
-                scale=dLdx\y;            
+                %scale=dLdx\y;            
+                scale=y\dLdx;
                 fit=scale*dLdx;
         end
         chi2=sum(weight.*(y-fit).^2);        
     end
-[~,fit,temperature]=residual(q);
+[~,fit,temperature,scale]=residual(q);
 
 % manage output
 if nargout==0
@@ -153,11 +155,12 @@ if nargout==0
     plot(x,y,'o',x,fit);
     xlabel('Wavelength (nm)');
     ylabel('Measurement');
-    label=sprintf('Temperature=%.0f K',temperature);
+    label=sprintf('Temperature=%.0f K, scale=%g',temperature,scale);
     title(label);
 else
     varargout{1}=temperature;
     varargout{2}=fit;
+    varargout{3}=1./scale;
 end
 
 end
