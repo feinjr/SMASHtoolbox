@@ -74,6 +74,10 @@ elseif (nargin==2) && isstruct(varargin{1})
     object.Partition=varargin{1};
     varargout{1}=object;
     return
+elseif (nargin==2) && isempty(varargin{1})
+    object.Partition=[];
+    varargout{1}=object;
+    return
 elseif nargin==3
     choice=varargin{1};
     value=varargin{2};

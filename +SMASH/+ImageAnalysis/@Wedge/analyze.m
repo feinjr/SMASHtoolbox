@@ -35,7 +35,7 @@ end
 
 exposure=10.^(-OD);
 %exposure=exposure/exposure(2,end); % normalize by midpoint
-exposure=exposure/median(exposure(:)); % normaliz my median
+exposure=exposure/median(exposure(:)); % normalize by median
 %exposure=transpose(exposure);
 exposure=exposure(:);
 Nexposure=numel(exposure);

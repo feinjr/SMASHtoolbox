@@ -57,13 +57,14 @@ else
     param=varargin{2};
 end
 
-previous.Partition=object.Measurement.Partition;
+PreviousPartition=object.Measurement.Partition;
 object.Measurement=partition(object.Measurement,type,param);
 object.Preview=analyze(object.Measurement);
 object.Preview.Name='Preview spectrogram';
 object.Preview.GraphicOptions.Title='Preview spectrogram';
 
-object.Measurement=partition(object.Measurement,previous.Partition);
+object.Measurement=partition(object.Measurement,PreviousPartition);
+%bject.Measurement.Partition=PreviousPartition;
 varargout{1}=object;
 
 end

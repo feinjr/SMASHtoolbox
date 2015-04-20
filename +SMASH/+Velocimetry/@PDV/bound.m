@@ -35,7 +35,7 @@
 % desired order (all valid indices must be listed).
 %     >> object=bound(object,'order',array);
 %
-% See also PDV, track
+% See also PDV
 %
 
 %

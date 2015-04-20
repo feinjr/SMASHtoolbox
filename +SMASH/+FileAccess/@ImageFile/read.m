@@ -37,6 +37,9 @@ extra=struct();
 switch object.Format
     case 'graphics'
         [data,map]=imread(object.FullName);
+        if isempty(map)
+            map=gray(64);
+        end
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
     case 'hamamatsu'

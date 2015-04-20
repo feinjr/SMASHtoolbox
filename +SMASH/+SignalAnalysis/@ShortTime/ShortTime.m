@@ -37,9 +37,6 @@ classdef ShortTime < SMASH.SignalAnalysis.Signal
         function object=ShortTime(varargin)
             object=object@SMASH.SignalAnalysis.Signal(varargin{:});
             object=makeGridUniform(object); % force uniform Grid spacing
-            if isempty(object.Partition)                
-                object=partition(object,'blocks',[10 0]);
-            end
         end
     end
     %% protected methods

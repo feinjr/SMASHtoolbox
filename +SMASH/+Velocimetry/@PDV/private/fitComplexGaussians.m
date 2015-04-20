@@ -73,6 +73,9 @@ guess=zeros(Nbound,2);
 %guess(:,1)=location(:);
 parameter=fminsearch(@residual,guess);
 [~,fit,full]=residual(parameter);
+if full(3)<1.5e-23
+    keyboard
+end
 
 % store results
 for k=1:Nbound
