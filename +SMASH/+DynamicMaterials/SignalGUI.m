@@ -492,7 +492,7 @@ for i=1:numel(sig_num)
     h=addblock(dlg,'edit',sig{sig_num(i)}.Name); set(h(2),'String', sig{sig_num(i)}.Name);
 end
 h=addblock(dlg,'button',{ 'Apply Label Change', 'Cancel'});
-dlg.Hidden = false
+dlg.Hidden = false;
 
 %Define button callbacks
     set(h(1),'Callback',@ApplyCallback);
@@ -538,11 +538,24 @@ function SaveSignal(src,varargin)
        %Export all objects to Sandia Data Archive if .sda extension, otherwise ASCII
        [~,~,ext]=fileparts(savename);
        if strcmp(ext,'.sda')
+          
+           for i=1:numel(savenum)
+               labelnames{i} = sig{i}.Name;
+           end
+           [~,ia] = unique(labelnames);
+           %duplicates = labelnames;
+           %duplicates(ia)=[];
+           duplicate_ind = setxor(ia,1:numel(labelnames))
+           for i=1:length(duplicate_ind)
+               warning(sprintf('Duplicate label name detected : %s',labelnames{duplicate_ind(i)}));
+               labelnames{duplicate_ind(i)} = sprintf('%s%i',labelnames{duplicate_ind(i)},i);
+           end
+           
            for i = 1:numel(savenum)
             %labelname = inputdlg('Enter label name for sda file','SDA Label',1,{sig{savenum(i)}.Name}); labelname = labelname{1};
-            labelname = sig{savenum(i)}.Name;
+            %labelname = sig{savenum(i)}.Name;
             %export(sig{savenum(i)},fullfile(savepath,savename),labelname);
-            store(sig{savenum(i)},fullfile(savepath,savename),labelname);
+            store(sig{savenum(i)},fullfile(savepath,savename),labelnames{i});
            end
            return; %Only ask for sda name once
        else
@@ -2066,7 +2079,7 @@ if ~isempty(lh)
     style = get(lh,'LineStyle');
     if ~iscell(style); style = {style}; end;
     width = get(lh,'LineWidth');
-    if ~iscell(wideth); width = {width}; end;
+    if ~iscell(width); width = {width}; end;
     mark = get(lh,'Marker');
     if ~iscell(mark); mark = {mark}; end;
     marksize = get(lh,'MarkerSize');
