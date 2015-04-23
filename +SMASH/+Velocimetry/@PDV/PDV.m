@@ -43,6 +43,7 @@ classdef PDV
             p.Boundary={};            
             p.ConvertFunction=[];
             p.HarmonicFunction=[];
+            p.Shocks=[];
             object.Settings=p;
             % manage input
             if (nargin==1) && isobject(varargin{1})

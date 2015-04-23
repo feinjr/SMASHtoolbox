@@ -33,48 +33,57 @@ function object=characterize(object,mode,varargin)
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
 assert(ischar(mode),'ERROR: invalid mode request');
-mode=lower(mode);
 
+tbound=[-inf +inf];
+fbound=[-inf +inf];
 Narg=numel(varargin);
+if Narg==0
+    preview(object);
+    fig=gcf;
+    ha=gca;
+    hb=uicontrol('Style','pushbutton','String','Done',...
+        'Callback','delete(gcbo)');
+    waitfor(hb);
+    tbound=xlim(ha);
+    fbound=ylim(ha);
+    close(fig);    
+elseif Narg==1
+    tbound=varargin{1};
+elseif Narg==2
+    tbound=varargin{1};
+    fbound=varargin{2};
+end
+
+% error checking
+assert(isnumeric(tbound) && (numel(tbound)==2),...
+    'ERROR: invalid time range');
+tbound=sort(tbound);
+assert(isnumeric(fbound) && (numel(fbound)==2),...
+    'ERROR: invalid frequency range');
+fbound=sort(fbound);
 
 % perform characterization
-switch mode
+switch lower(mode)
     case 'bandwidth'
         
     case 'noisefloor'
         
-    case 'referencefrequency'
-        % determine bounds
-        tbound=[-inf +inf];
-        fbound=[-inf +inf];
-        if Narg>=1
-            tbound=varargin{1};
-        end
-        if Narg==2
-            fbound=varargin{2};
-        elseif Narg>2
-            error('ERROR: too many inputs');
-        end
-        assert(isnumeric(tbound) && (numel(tbound)==2),...
-            'ERROR: invalid time range');
-        tbound=sort(tbound);
-        assert(isnumeric(fbound) && (numel(fbound)==2),...
-            'ERROR: invalid frequency range');
-        fbound=sort(fbound);
+    case 'referencefrequency'              
         % analyze bounded region
         temp=object.Measurement;
         temp=limit(temp,'all');
         temp=crop(temp,tbound);
-        %temp=crop(object.Measurement,tbound);
-        [f,P]=fft(temp,'FrequencyDomain','positive','SpectrumType','power',...
-            'NumberFrequencies',1e6);
+        temp.FFToptions.FrequencyDomain='positive';
+        temp.FFToptions.SpectrumType='power';
+        temp.FFToptions.NumberFrequencies=1e6;
+        [f,P]=fft(temp,temp.FFToptions);
         keep=(f>=fbound(1)) & (f<=fbound(2));
         f=f(keep);
         P=P(keep);
         [~,index]=max(P);
         object.Settings.ReferenceFrequency=f(index);        
     otherwise
-        error('ERROR: invalid mode request');
+        error('ERROR: %s is an invalid mode',mode);
 end
 
 end
