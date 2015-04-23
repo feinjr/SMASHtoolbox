@@ -65,10 +65,6 @@ assert(numel(wavelength)==numel(measurement),...
     'ERROR: inconsisent wavelength/measurement');
 x=wavelength(:);
 y=measurement(:);
-index = isnan(y)|isnan(x);
-index = ~index;
-x = x(index);
-y = y(index);
 
 assert(isnumeric(guess) & isscalar(guess) & guess>0,...
     'ERROR: invalid guess temperature');
@@ -134,6 +130,9 @@ else
     guess=asin((guess-baseline)/amplitude);
 end
 
+% manage NaN's
+index = isnan(y|)
+
 % perform optimization
 weight=setting.Weight/sum(setting.Weight);
 q=fminsearch(@residual,guess,setting.Options);
@@ -150,9 +149,9 @@ q=fminsearch(@residual,guess,setting.Options);
                 fit=scale*dLdx;
         end
         chi2=sum(weight.*(y-fit).^2);
-%         if isnan(chi2)
-%             keyboard;
-%         end
+        if isnan(chi2)
+            keyboard;
+        end
     end
 [~,fit,temperature,scale]=residual(q);
 
