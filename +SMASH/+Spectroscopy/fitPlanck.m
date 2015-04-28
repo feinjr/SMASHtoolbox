@@ -56,14 +56,6 @@
 %
 function varargout=fitPlanck(wavelength,measurement,guess,varargin)
 
-% default settings
-setting=struct();
-setting.Bound=[eps inf];
-setting.Emissivity=ones(size(x));
-setting.Options=optimset;
-setting.Mode='absolute';
-setting.Weight=ones(size(y));
-
 % manage input
 assert(nargin>=3,'ERROR: insufficient input');
 
@@ -73,15 +65,20 @@ assert(numel(wavelength)==numel(measurement),...
     'ERROR: inconsisent wavelength/measurement');
 x=wavelength(:);
 y=measurement(:);
-index = isnan(y)|isnan(x);
-index = ~index;
-x = x(index);
-y = y(index);
-setting.Weight=setting.Weight(index);
+KeepIndex = isnan(y)|isnan(x);
+KeepIndex = ~KeepIndex;
+x = x(KeepIndex);
+y = y(KeepIndex);
 
 assert(isnumeric(guess) & isscalar(guess) & guess>0,...
     'ERROR: invalid guess temperature');
 
+setting=struct();
+setting.Bound=[eps inf];
+setting.Emissivity=ones(size(x));
+setting.Options=optimset;
+setting.Mode='absolute';
+setting.Weight=ones(size(y));
 Narg=numel(varargin);
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 for n=1:2:Narg
@@ -117,7 +114,8 @@ for n=1:2:Narg
         case 'weight'
             assert(isnumeric(value) & (numel(value)==numel(x)),...
                 'ERROR: inconsistent measurement/weight arrays');
-            setting.Weight=value(:);
+            value=value(:);
+            setting.Weight=value(KeepIndex);
         otherwise
             error('ERROR: %s is an invalid setting',name);
     end
