@@ -112,10 +112,11 @@ for n=1:2:Narg
                       error('ERROR: invalid Mode value');  
             end
         case 'weight'
+            value=value(:);
+            value=value(KeepIndex);
             assert(isnumeric(value) & (numel(value)==numel(x)),...
                 'ERROR: inconsistent measurement/weight arrays');
-            value=value(:);
-            setting.Weight=value(KeepIndex);
+            setting.Weight=value;
         otherwise
             error('ERROR: %s is an invalid setting',name);
     end
