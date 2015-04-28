@@ -56,6 +56,14 @@
 %
 function varargout=fitPlanck(wavelength,measurement,guess,varargin)
 
+% default settings
+setting=struct();
+setting.Bound=[eps inf];
+setting.Emissivity=ones(size(x));
+setting.Options=optimset;
+setting.Mode='absolute';
+setting.Weight=ones(size(y));
+
 % manage input
 assert(nargin>=3,'ERROR: insufficient input');
 
@@ -69,18 +77,13 @@ index = isnan(y)|isnan(x);
 index = ~index;
 x = x(index);
 y = y(index);
+setting.Weight=setting.Weight(index);
 
 assert(isnumeric(guess) & isscalar(guess) & guess>0,...
     'ERROR: invalid guess temperature');
 
 Narg=numel(varargin);
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
-setting=struct();
-setting.Bound=[eps inf];
-setting.Emissivity=ones(size(x));
-setting.Options=optimset;
-setting.Mode='absolute';
-setting.Weight=ones(size(y));
 for n=1:2:Narg
     name=varargin{n};
     value=varargin{n+1};
