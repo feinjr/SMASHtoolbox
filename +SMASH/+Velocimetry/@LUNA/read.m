@@ -11,16 +11,19 @@ if (nargin<2) || isempty(filename)
 end
 
 % read file based on extension
-assert(exist(filename,'file'),'ERROR: source file does not exist');
+assert(exist(filename,'file')==2,'ERROR: source file does not exist');
 
-[~,~,extension]=fileparts(filename);
+[~,shortname,extension]=fileparts(filename);
 switch lower(extension)
     case '.obr'
-        data=read_OBR(filename);
+        [time,signal,header]=read_OBR(filename);
     otherwise
-        data=read_text(filename);
+        [time,signal,header]=read_text(filename);
 end
-
-% transfer data into object
+object.SourceFile=[shortname extension];
+object.FileHeader=header;
+object.Time=single(time(:));
+object.LinearAmplitude=single(signal(:));
+object.IsModified=false;
 
 end
