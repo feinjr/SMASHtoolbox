@@ -47,6 +47,12 @@ if newplot
     xlabel('Transit time (ns)');
     ylabel('Linear return (1/mm)');
     set(gca,'YScale','log');
+    if object.IsModified
+        label=sprintf('Measurement file: %s (modified)',object.SourceFile);
+    else
+        label=sprintf('Measurement file: %s',object.SourceFile);
+    end
+    title(label,'Interpreter','none');
 end
 
 % manage output

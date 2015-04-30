@@ -49,7 +49,7 @@ Sreal=fread(fid,N,'float64');
 Simag=fread(fid,N,'float64');
 
 signal=Preal.^2+Pimag.^2+Sreal.^2+Simag.^2;
-signal=signal*header.GainAdjust;
+signal=signal*(header.GainAdjust)^2;
 
 N=numel(signal);
 time=header.StartTime+(0:N-1)*header.TimeIncrement;
