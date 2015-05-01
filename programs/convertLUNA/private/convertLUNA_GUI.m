@@ -123,10 +123,10 @@ set(h(2),'Callback',@modifyAll);
     function modifyAll(varargin)
         if isempty(setting.Source)
             return
-        end        
+        end
         sub=SMASH.MUI.Dialog;
         sub.Hidden=true;
-        sub.Name='Modify all settings';        
+        sub.Name='Modify all settings';
         hStep=addblock(sub,'edit','Time step (ns):',20);
         set(hStep(1),'FontWeight','bold');
         hRange=addblock(sub,'edit','Time range (ns):',20);
@@ -158,8 +158,8 @@ set(h(2),'Callback',@modifyAll);
                 setting.TimeRange{k}=entry{2};
             end
             delete(sub);
-    end
-h=findobj(sub.Handle,'Type','Text');
+        end
+        h=findobj(sub.Handle,'Type','Text');
         set(h,'FontWeight','bold');
         locate(sub,'center',main.Handle);
         sub.Hidden=false;
@@ -187,8 +187,15 @@ hTarget=addblock(main,'edit_button',{'Target file:',dummy},minwidth);
 set(hTarget(2),'Callback',@refreshTarget);
     function refreshTarget(varargin)
         setting.Target=get(hTarget(2),'String');
+        [pathname,filename,extension]=fileparts(setting.Target);
+        if ~strcmpi(extension,'.sda')
+            extension=[extension '.sda'];
+        end
+        setting.Target=fullfile(pathname,[filename extension]);
+        set(hTarget(2),'String',setting.Target);
+        set(hTarget(end),'String','Select','Callback',@selectTarget);
     end
-set(hTarget(end),'String','Select','Callback',@selectTarget);
+set(hTarget(3),'Callback',@selectTarget);
     function selectTarget(varargin)
         filespec={'*.sda;*.SDA','Sandia Data Archive files'};
         [filename,pathname]=uiputfile(filespec,'Select target file');
@@ -200,7 +207,7 @@ set(hTarget(end),'String','Select','Callback',@selectTarget);
             extension='.sda';
         end
         setting.Target=fullfile(pathname,[filename extension]);
-        set(hTarget(2),'String',setting.Target);       
+        set(hTarget(2),'String',setting.Target);
     end
 
 h=addblock(main,'button',{'Convert','Done'});
@@ -214,7 +221,7 @@ set(h(1),'Callback',@convertFiles)
             return
         end
         convertLUNA(setting.Source,setting.Target,...
-            setting.TimeStep,setting.TimeRange);   
+            setting.TimeStep,setting.TimeRange);
     end
 set(h(2),'Callback','close(gcbf)');
 
