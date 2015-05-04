@@ -44,7 +44,6 @@
 function varargout=bound(object,operation,varargin)
 
 % manage input
-%assert(nargin>=2,'ERROR: insufficient input');
 if nargin<2
     operation='manage';
 end
@@ -55,7 +54,7 @@ if nargin<3
 end
 
 % verify index
-IndexList=1:numel(object.Settings.Boundary);
+IndexList=1:numel(object.Boundary);
     function verifyIndex(array)
         for k=1:numel(array)
             assert(any(array(k)==IndexList),'ERROR: invalid index request');
@@ -66,11 +65,11 @@ IndexList=1:numel(object.Settings.Boundary);
 Narg=numel(varargin);
 switch lower(operation)
     case 'add'
-       object.Settings.Boundary{end+1}=SMASH.ROI.BoundingCurve('horizontal');
+       object.Boundary{end+1}=SMASH.ROI.BoundingCurve('horizontal');
        if (Narg>=1) 
            name=varargin{1};
            assert(ischar(name),'ERROR: invalid name');
-           object.Settings.Boundary{end}.Label=name;
+           object.Boundary{end}.Label=name;
        end
     case 'rename'
         assert(Narg==2,'ERROR: invalid number of inputs');
@@ -79,14 +78,14 @@ switch lower(operation)
         assert(isscalar(index),'ERROR: invalid index');
         name=varargin{2};
         assert(ischar(name),'ERROR: invalid name');
-        object.Settings.Boundary{index}.Label=name;
+        object.Boundary{index}.Label=name;
     case 'define'
         assert(Narg>1,'ERROR: invalid number of inputs');
         index=varargin{1};
         verifyIndex(index);
         assert(isscalar(index),'ERROR: invalid index');
         varargin=varargin(2:end);
-        object.Settings.Boundary{index}=define(object.Settings.Boundary{index},varargin{:});
+        object.Boundary{index}=define(object.Boundary{index},varargin{:});
     case 'select'
         if Narg==0
             % under construction
@@ -101,15 +100,15 @@ switch lower(operation)
             preview(object);
             target=gca;
         end
-        object.Settings.Boundary{index}=select(object.Settings.Boundary{index},target);
+        object.Boundary{index}=select(object.Boundary{index},target);
     case 'copy'
         assert(Narg>1,'ERROR: invalid number of inputs');
         index=varargin{1};
         verifyIndex(index);
         assert(isscalar(index),'ERROR: invalid index');
-        object.Settings.Boundary{end+1}=object.Settings.Boundary{index};
-        name=sprintf('Copy of %s',object.Settings.Boundary{index}.Label);
-        object.Settings.Boundary{end}.Label=name;
+        object.Boundary{end+1}=object.Boundary{index};
+        name=sprintf('Copy of %s',object.Boundary{index}.Label);
+        object.Boundary{end}.Label=name;
     case 'order'    
         assert(Narg>1,'ERROR: invalid number of inputs');
         array=varargin{1};
@@ -120,12 +119,12 @@ switch lower(operation)
         catch
             error('ERROR: invalid order array');
         end        
-        object.Settings.Boundary=object.Settings.Boundary(index);
+        object.Boundary=object.Boundary(index);
     case 'summarize'
-        if isempty(object.Settings.Boundary)
+        if isempty(object.Boundary)
             fprintf('No defined boundaries \n');
         else            
-            N=numel(object.Settings.Boundary);
+            N=numel(object.Boundary);
             if Narg==0
                 list=1:N;
                 fprintf('There %d defined boundaries\n',N);
@@ -137,7 +136,7 @@ switch lower(operation)
                 error('ERROR: too many inputs');
             end           
             for n=list
-                fprintf('%3d : %s\n',n,object.Settings.Boundary{n}.Label);
+                fprintf('%3d : %s\n',n,object.Boundary{n}.Label);
             end
         end
     case 'remove'
@@ -145,21 +144,21 @@ switch lower(operation)
         array=varargin{1};
         verifyIndex(array);
         array=unique(array);       
-        N=numel(object.Settings.Boundary); 
+        N=numel(object.Boundary); 
         keep=true(1,N);
         for n=1:N
             if any(n==array)
                 keep(n)=false;
             end
         end
-        object.Settings.Boundary=object.Settings.Boundary(keep);
+        object.Boundary=object.Boundary(keep);
     case 'manage'
         if isempty(object.Preview)
             object=preview(object);
         end
         preview(object);
         target=gca;
-        object.Settings.Boundary=manage(object.Settings.Boundary,target);
+        object.Boundary=manage(object.Boundary,target);
     otherwise
         error('ERROR: invalid operation requested');
 end

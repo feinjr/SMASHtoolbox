@@ -28,7 +28,8 @@ classdef PDV
     end
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
-        Results % Analysis results (structure)           
+        Results  % Analysis results (structure) 
+        Boundary = {} % ROI boundaries (BoundaryCurve object)
     end
     %%
     methods (Hidden=true)
@@ -37,13 +38,12 @@ classdef PDV
             p=struct();
             p.Wavelength=1550e-9;
             p.ReferenceFrequency=0;
-            p.Bandwidth=[];
-            p.NoiseRegion=[]; % [tmin tmax fmin fmax]  
-            p.UniqueTolerance=1e-3; 
-            p.Boundary={};            
+            %p.NoiseRegion=[]; % [tmin tmax fmin fmax]  
+            p.NoiseAmplitude=[];
+            p.UniqueTolerance=1e-3;         
             p.ConvertFunction=[];
-            p.HarmonicFunction=[];
-            p.Shocks=[];
+            p.HarmonicFunction={};
+            p.ShockTable=[];
             object.Settings=p;
             % manage input
             if (nargin==1) && isobject(varargin{1})

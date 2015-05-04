@@ -47,7 +47,7 @@
 % choice, "phase", calculates the phase angle (in radians) of transform.
 % Each choice of spectrum choice can be generated for 'positive' (default),
 % 'negative', or 'all' frequencies.
-%    >> [...]=fft(objet,'FrequencDomain',value,...);
+%    >> [...]=fft(object,'FrequencDomain',value,...);
 %
 % Options can be passed as a struction array:
 %    >> [...]=fft(object,option);

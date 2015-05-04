@@ -63,25 +63,34 @@ assert(isnumeric(fbound) && (numel(fbound)==2),...
 fbound=sort(fbound);
 
 % perform characterization
+temp=object.Measurement;
+temp=limit(temp,'all');
+temp=crop(temp,tbound);
+temp.FFToptions.FrequencyDomain='positive';
+temp.FFToptions.SpectrumType='power';
+temp.FFToptions.NumberFrequencies=1e6;
+[f,P]=fft(temp,temp.FFToptions);
+keep=(f>=fbound(1)) & (f<=fbound(2));
+f=f(keep);
+P=P(keep);
 switch lower(mode)
-    case 'bandwidth'
-        
-    case 'noisefloor'
-        
-    case 'referencefrequency'              
-        % analyze bounded region
-        temp=object.Measurement;
-        temp=limit(temp,'all');
-        temp=crop(temp,tbound);
-        temp.FFToptions.FrequencyDomain='positive';
-        temp.FFToptions.SpectrumType='power';
-        temp.FFToptions.NumberFrequencies=1e6;
-        [f,P]=fft(temp,temp.FFToptions);
-        keep=(f>=fbound(1)) & (f<=fbound(2));
-        f=f(keep);
+    %case 'bandwidth'
+    case 'noise'        
+        noisefloor=mean(P);        
+        t=object.Measurement.Grid;
+        keep=(t>=tbound(1)) & (t<=tbound(2));
+        t=t(keep);
+        s=randn(size(t));
+        new=SMASH.SignalAnalysis.Signal(t,s);
+        [f,P]=fft(new,temp.FFToptions);
+        keep=(f>=fbound(1)) & (f<fbound(2));
+        %f=f(keep);
         P=P(keep);
+        correction=noisefloor/mean(P);
+        object.Settings.NoiseAmplitude=sqrt(correction);
+    case 'referencefrequency'
         [~,index]=max(P);
-        object.Settings.ReferenceFrequency=f(index);        
+        object.Settings.ReferenceFrequency=f(index);
     otherwise
         error('ERROR: %s is an invalid mode',mode);
 end
