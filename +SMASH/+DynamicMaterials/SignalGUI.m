@@ -190,7 +190,7 @@ uimenu(hm,'Label','Shift and Scale','Callback',@ShiftScale);
 uimenu(hm,'Label','Limit','Callback',@LimitSignal);
 uimenu(hm,'Label','Smooth','Callback',@SmoothSignal);
 uimenu(hm,'Label','Regrid','Callback',@RegridSignal);
-uimenu(hm,'Label','Reset Active Signals','Callback',@ResetSignal);
+%uimenu(hm,'Label','Reset Active Signals','Callback',@ResetSignal);
 
 
 
@@ -485,7 +485,7 @@ end
 
 dlg.Hidden = true;
 dlg.Name = 'Label Signal';
-locate(dlg,'south');
+locate(dlg,'north');
 
 %Create edit box for each signal
 for i=1:numel(sig_num)
@@ -545,7 +545,7 @@ function SaveSignal(src,varargin)
            [~,ia] = unique(labelnames);
            %duplicates = labelnames;
            %duplicates(ia)=[];
-           duplicate_ind = setxor(ia,1:numel(labelnames))
+           duplicate_ind = setxor(ia,1:numel(labelnames));
            for i=1:length(duplicate_ind)
                warning(sprintf('Duplicate label name detected : %s',labelnames{duplicate_ind(i)}));
                labelnames{duplicate_ind(i)} = sprintf('%s%i',labelnames{duplicate_ind(i)},i);
