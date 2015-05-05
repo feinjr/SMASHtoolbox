@@ -65,22 +65,18 @@ assert(numel(wavelength)==numel(measurement),...
     'ERROR: inconsisent wavelength/measurement');
 x=wavelength(:);
 y=measurement(:);
-KeepIndex = isnan(y)|isnan(x);
-KeepIndex = ~KeepIndex;
-x = x(KeepIndex);
-y = y(KeepIndex);
 
 assert(isnumeric(guess) & isscalar(guess) & guess>0,...
     'ERROR: invalid guess temperature');
 
+Narg=numel(varargin);
+assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 setting=struct();
 setting.Bound=[eps inf];
 setting.Emissivity=ones(size(x));
 setting.Options=optimset;
 setting.Mode='absolute';
 setting.Weight=ones(size(y));
-Narg=numel(varargin);
-assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 for n=1:2:Narg
     name=varargin{n};
     value=varargin{n+1};
@@ -112,11 +108,9 @@ for n=1:2:Narg
                       error('ERROR: invalid Mode value');  
             end
         case 'weight'
-            value=value(:);
-            value=value(KeepIndex);
             assert(isnumeric(value) & (numel(value)==numel(x)),...
                 'ERROR: inconsistent measurement/weight arrays');
-            setting.Weight=value;
+            setting.Weight=value(:);
         otherwise
             error('ERROR: %s is an invalid setting',name);
     end
@@ -136,6 +130,9 @@ else
     guess=asin((guess-baseline)/amplitude);
 end
 
+% manage NaN's
+index = isnan(y|)
+
 % perform optimization
 weight=setting.Weight/sum(setting.Weight);
 q=fminsearch(@residual,guess,setting.Options);
@@ -152,9 +149,9 @@ q=fminsearch(@residual,guess,setting.Options);
                 fit=scale*dLdx;
         end
         chi2=sum(weight.*(y-fit).^2);
-%         if isnan(chi2)
-%             keyboard;
-%         end
+        if isnan(chi2)
+            keyboard;
+        end
     end
 [~,fit,temperature,scale]=residual(q);
 

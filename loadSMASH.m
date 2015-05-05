@@ -19,9 +19,9 @@
 % or import the package into the workspace.
 %     >> import SMASH.(package_name).(function_name);
 %     >> function_name(...) % imported function name
-% Note that imports are workspace-specific!  Packages loaded into the base
-% workspaced are not automatically available in function workspaces (and
-% vice versa).
+% Note that imports are workspace specific!  Packages loaded into the base
+% workspaced are not automatically available in function workspaces and
+% vice versa.
 %
 % Toolbox Java directories are added to the dynamic Java path.
 %     >> loadSMASH -java name % specific directory

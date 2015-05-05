@@ -22,6 +22,16 @@
 %function object=analyze(object,mode,varargin)
 function object=analyze(object)
 
+%% verify partition settings
+if isempty(object.Measurement.Partition)
+    message{1}='ERROR: analysis partitions are undefined';
+    message{2}='       Use the "configure" method before "analyze"';
+    error('%s\n',message{:});
+end
+
+%% analyze noise region(s)
+
+
 %% manage boundaries and limits
 [xlimit,~]=limit(object.Measurement);
 M=numel(xlimit);
@@ -30,7 +40,7 @@ SampleTime=diff(xlimit)/(M-1);
 NyquistFrequency=1/(2*SampleTime);
 previous.Bound=xlimit;
 
-boundary=object.Settings.Boundary;
+boundary=object.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
     table(1,:)=[xlimit(1) 0 NyquistFrequency];

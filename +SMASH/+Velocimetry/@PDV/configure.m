@@ -40,15 +40,15 @@ if nargout==0
     fprintf('\n');
     % print partition setttings
     fprintf('*** Partition settings ***\n');
-    try
+    if isempty(object.Measurement.Partition)
+        fprintf('\t (undefined)\n');
+    else
         name=fieldnames(object.Measurement.Partition);
         for k=1:numel(name);
             fprintf(format,name{k});
             printValue(object.Measurement.Partition.(name{k}));
             fprintf('\n');
-        end
-    catch
-        fprintf('\t (undefined)\n');
+        end                
     end
     % print FFT options
     fprintf('*** FFT settings ***\n');
@@ -89,20 +89,30 @@ for n=1:2:Narg
             assert(isnumeric(value) && isscalar(value),...
                 'ERROR: invalid ReferenceFrequency value');
             object.Settings.ReferenceFrequency=value;
-        case 'bandwidth'
-            assert(isnumeric(value) && isscalar(value),...
-                'ERROR: invalid BandWidth value');
-            object.Settings.Bandwidth=value;
-        case 'noiseregion'
-            assert(isnumeric(value) && (numel(value)==4),...
-                'ERROR: invalid NoiseRegion value');
-            object.Settings.NoiseRegion=reshape(value,[1 4]);
+        %case 'noiseregion' % [tmin tmax fmin fmax]            
+        %    if isempty(value)
+        %        value=[];
+        %    elseif strcmp(value,'select')
+        %        preview(object);
+        %        h=uicontrol('Style','pushbutton','String','done',...
+        %            'Callback','delete(gcbo)');
+        %        title('Select noise region');
+        %        waitfor(h);
+        %        value=axis(gca);
+        %        delete(gcf);
+        %    else
+        %        %assert(isnumeric(value) && (numel(value)==4 || size(value,2)==4),...
+        %        assert(isnumeric(value) && (numel(value)==4),...
+        %            'ERROR: invalid NoiseRegion value');
+        %        if size(value,2)~=4
+        %            value=reshape(value,[1 4]);
+        %        end
+        %    end            
+        %    object.Settings.NoiseRegion=value;
         case 'uniquetolerance'
             assert(isnumeric(value) && isscalar(value) && (value>0),...
                 'ERROR: invalid UniqueTolerance value');
             object.Settings.UniqueTolerance=value;
-        case 'boundary'
-            error('ERROR: use the "bound" method instead of "configure"');
         case 'convertfunction'
             if ischar(value)
                 value=str2func(value);
@@ -117,6 +127,13 @@ for n=1:2:Narg
             assert(isa(value,'function_handle') | isempty(value),...
                 'ERROR: invalid HarmonicFunction value');
             object.Settings.HarmonicFunction=value;
+        case 'shocktable' % [index start stop]
+            if isempty(value)
+                object.Settings.ShockTable=[];
+                return
+            end
+            assert(size(value,2)==3,'ERROR: invalid ShockTable value');
+            object.Settings.ShockTable=value;
         % FFT options
         case 'window'
             object.Measurement.FFToptions.Window=value;
@@ -198,11 +215,13 @@ end
 
 function printValue(value)
 
-if isnumeric(value) || islogical(value)
+if isempty(value)
+    % do nothing
+elseif isnumeric(value) || islogical(value)
     format='%.6g ';
     if isscalar(value)
         fprintf(format,value);
-    elseif numel(value)<10
+    elseif (size(value,1)==1) && (numel(value)<10)
         fprintf('[');
         fprintf(format,value);
         fprintf('\b]');

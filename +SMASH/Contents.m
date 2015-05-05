@@ -1,21 +1,22 @@
 % The SMASH package supports a variety of data processing and
 % visualization.  The core packages are:
-%    CurveFit         - nonlinear curve fitting and common basis functions
-%    FileAccess       - file read/write support
-%    General          - general purpose routines
-%    ImageAnalysis    - 2D data processing
-%    MUI              - Manual User Interface creation
-%    ROI              - Region Of Interest selection
-%    SignalAnalysis   - 1D data data processing
-%    System           - system tools
+%    CurveFit          - nonlinear curve fitting and common basis functions
+%    FileAccess        - file read/write support
+%    General           - general purpose routines
+%    ImageAnalysis     - 2D data processing
+%    MUI               - Manual User Interface creation
+%    ROI               - Region Of Interest selection
+%    SignalAnalysis    - 1D data data processing
+%    System            - system tools
 % More specific packages are also provided.
-%    DynamicMaterials - DMP routines (UNDER CONSTRUCTION)
-%    Graphics         - special plotting routines
-%    MonteCarlo       - Monte Carlo routines (UNDER CONSTRUCTION)
-%    PDE              - Partial Differential Equation solvers (UNDER CONSTRUCTION)
-%    Radiometry       - radiometry analysis (UNDER CONSTRUCTION)
-%    Spectroscopy     - spectroscopy analysis (UNDER CONSTRUCTION)
-%    Velocimetry      - velocimetry analysis (UNDER CONSTRUCTION)
+%    DynamicMaterials  - DMP routines (UNDER CONSTRUCTION)
+%    Graphics          - special plotting routines
+%    MonteCarlo        - Monte Carlo routines (UNDER CONSTRUCTION)
+%    PDE               - Partial Differential Equation solvers (UNDER CONSTRUCTION)
+%    Radiometry        - radiometry analysis (UNDER CONSTRUCTION)
+%    Reference         - physical constants, etc. (UNDER CONSTRUCTION)
+%    Spectroscopy      - spectroscopy analysis (UNDER CONSTRUCTION)
+%    Velocimetry       - velocimetry analysis (UNDER CONSTRUCTION)
 %
 % To learn more about these package, press the links above or use the "doc"
 % command.
@@ -32,4 +33,4 @@
 % See also SMASHtoolbox
 %
 
-% Last updated December 8, 2014
+% Last updated April 27, 2015
