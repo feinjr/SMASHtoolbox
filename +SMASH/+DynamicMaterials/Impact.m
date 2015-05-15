@@ -136,11 +136,18 @@ uimenu(hm,'Label','Axis Limits','Callback',@SetAxis);
 
 fig.Hidden = false;
 
+% Set default data directory if it doesn't exist
+check = setDataDirectory('DynamicMaterials');
+if ~exist(check)
+    defaultpath = which('SMASH.DynamicMaterials.Impact');
+    [defaultpath,~,~] = fileparts(defaultpath);
+    setDataDirectory('DynamicMaterials',[defaultpath,'/Data'])
+end
+eospath = setDataDirectory('DynamicMaterials');
+
 
 %Load Hugoniot data from EOS-Data.txt
-filename=mfilename('fullpath');
-[filename,~]=fileparts(filename);
-fid=fopen(fullfile(filename,'EOS-Data.txt'));
+fid=fopen(fullfile(eospath,'EOS-Data.txt'));
 count=0; MGdata=1;
 while MGdata > 0
     count=count+1;
@@ -445,12 +452,6 @@ end
 
 dlg.Hidden = true;
 dlg.Name = 'Sesame Curve Addition';
-
-%Find sesame files
-%eospath=mfilename('fullpath');
-%[eospath,~,~] = fileparts(fullfile(filename,'TabularEOS','temp.m'));
-%eospath = '/remote/jlbrown/EOS/sesame';
-eospath = 'N:\EOS\sesame';
 
 contents = dir(eospath);
 eosfiles=[];

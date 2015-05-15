@@ -10,7 +10,8 @@ object.GraphicOptions.LineStyle='-';
 Narg=numel(varargin);
 assert(Narg>0,'Must Enter at least material number');
 if Narg==1 % prompt user to select file
-    [filename,pathname]=uigetfile({'*.*','All files'},'Select file');
+    defaultpath = setDataDirectory('DynamicMaterial');
+    [filename,pathname]=uigetfile({'*.*','All files'},'Select file',defaultpath);
     if isnumeric(filename)
         error('ERROR: no file selected');
     end

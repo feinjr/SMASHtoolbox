@@ -28,7 +28,7 @@
 % will populate a table based on the isentrope specified by the particle
 % velocity, uref, wavespeed, cref, initial density, d0, Gruniesen paramter,
 % g0, and specific heat, cv. Units should be the Kerley standard (g/cc,
-% GPA, MJ/kg). See CreateSesame for additional details.
+% GPA, MJ/kg-K). See CreateSesame for additional details.
 %
 % See also FileAccess, DataClass, ImportFile, CreateSesame
 
