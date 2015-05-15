@@ -793,7 +793,7 @@ plotdata(fig.Handle,sig,sig_num);
 x=[]; y=[]; count = 1;
 
 %Plot only "unique" intersections
-xtrack(1)=0; ytrack(1)=0;
+xtrack(1)=1e-3; ytrack(1)=1e-3; tol = 0.01;
 
 for i=1:numel(sig_num)-1
     
@@ -802,8 +802,17 @@ for i=1:numel(sig_num)-1
         [x,y] = intersections(sig{sig_num(i)}.Grid,sig{sig_num(i)}.Data,sig{sig_num(j)}.Grid,sig{sig_num(j)}.Data); 
         lc = sig{sig_num(i)}.GraphicOptions.LineColor;
         
+        %Don't accept a curve intersecting with a similar one
         if numel(x) == 1 & y > 0
-            text(x,y,[' \leftarrow',sprintf('(%3.3f, %3.3f)',x,y)],'FontSize',16,'Color',lc);
+            diffx = abs(1-x./xtrack);
+            diffy = abs(1-y./ytrack);x
+            
+            %Don't repeat intersections within tol
+            if ~any(diffx <= tol) & ~any(diffy <= tol)
+                text(x,y,[' \leftarrow',sprintf('(%3.3f, %3.3f)',x,y)],'FontSize',16,'Color',lc);
+                xtrack = [xtrack,x];
+                ytrack = [ytrack,y];
+            end
         end
         
         
@@ -1167,26 +1176,6 @@ function newsig = IM(n)
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
