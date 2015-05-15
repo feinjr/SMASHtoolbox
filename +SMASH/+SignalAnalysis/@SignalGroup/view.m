@@ -18,8 +18,8 @@
 %
 % Passing an index array limits the plot to specific signals from the
 % group.
-%    >> view(object,target,1); % display first signal only
-%    >> view(object,target,[2 3]); % display second and third signals
+%    >> view(object,1,target); % display first signal only
+%    >> view(object,[2 3],target); % display second and third signals
 %
 % See also Signal
 %

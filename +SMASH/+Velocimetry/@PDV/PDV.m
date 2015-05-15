@@ -15,7 +15,8 @@
 % the "analyze" method tracks spectral features as a function of time.
 %
 % See also Velocimetry, FileAccess.readFile, SignalAnalysis.STFT,
-% ImageAnalysis.Image
+% ImageAnalysis.Image, SignalAnalysis.SignalGroup
+%
 
 %
 % created February 18, 2015 by Daniel Dolan (Sandia National Laboratories)
@@ -26,9 +27,11 @@ classdef PDV
         Measurement % PDV measurement (STFT object)        
         Preview % Preview spectrogram (Image object)
     end
+    %Results = {} % Analysis results (cell array of SignalGroup objects)
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
-        Results  % Analysis results (structure) 
+        BeatFrequency % Beat frequency results (cell array of SignalGroup objects)
+        Velocity % Velocity results (cell array of SignalGroup objects)
         Boundary = {} % ROI boundaries (BoundaryCurve object)
     end
     %%
@@ -38,12 +41,12 @@ classdef PDV
             p=struct();
             p.Wavelength=1550e-9;
             p.ReferenceFrequency=0;
-            %p.NoiseRegion=[]; % [tmin tmax fmin fmax]  
+            p.WindowCorrection=1;
             p.NoiseAmplitude=[];
-            p.UniqueTolerance=1e-3;         
-            p.ConvertFunction=[];
-            p.HarmonicFunction={};
-            p.ShockTable=[];
+            p.UniqueTolerance=1e-3;
+            p.AnalysisMode='centroid';
+            p.HarmonicFunction=[];
+            p.ShockTable=[];            
             object.Settings=p;
             % manage input
             if (nargin==1) && isobject(varargin{1})

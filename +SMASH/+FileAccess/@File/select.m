@@ -27,7 +27,7 @@ else
         pathname=pwd;
         cd(current);
     else
-        error('ERROR: invalid path specified');        
+        error('ERROR: invalid path or file name specified');        
     end
     object.PathName=pathname;        
 end

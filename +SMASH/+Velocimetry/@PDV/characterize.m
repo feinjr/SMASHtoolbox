@@ -1,32 +1,31 @@
 % characterize Determine settings from measurement
 %
-% This method determines certain settings in a PDV object from the
-% meausured signal.  User guidance is an important part of the process.
-%
-% To determine the reference frequency:
-%     >> object=characterize(object,'ReferenceFrequency',[t1 t2]);
-%     >> object=characterize(object,'ReferenceFrequency',[t1 t2],[f1 f2]);
-% Both expressions use a power spectrum generated from the specified time
-% bound.  The reference frequency is associated with the peak location in
-% this spectrum.  The first expression searches the entire power spectrum,
-% while the second expression limits the search to specified frequency
-% range.
+% This method characterizes certain settings in a PDV object from the
+% meausured signal.  Characterization is performed over a rectangular
+% region of time-frequency space (t1 <= t <= t2 and f1 <= f <= f2).  This
+% region can be specified manually:
+%     >> object=characterize(object,mode,[t1 t2]); % use all frequencies
+%     >> object=characterize(object,mode,[t1 t2],[f1 f2]);
+% or by interactive selection from the object's preview image.
+%     >> object=characterize(object,mode);
+% 
+% Several characterization modes are supported.
+%     -'ReferenceFrequency' determines the reference frequency, i.e. the
+%     beat frequency associated with zero velocity.  The characterization
+%     region should contain a single spectral peak at fixed frequency.  The
+%     frequency range should be as narrow as possible.
+%     -'NoiseAmplitude' determines the RMS noise of the signal.  The
+%     selected region should contain noise with *no* harmonic content.  the
+%     frequency range should be as wide as possible.
+% Large time ranges improves characterization in all cases.
 %
 % See also PDV, configure
 %
 
-%%% UNDER CONSTRUCTION
-% The first expression uses the entire power spectra from a specified
-% time bound.  The
-%
-%     >> object=characterize(object,'Bandwidth');
-%     >> object=characterize(object,'Bandwidth',tbound);
-%
-%     >> object=characterize(object,'NoiseFloor',tbound,fbound);
-%%%
-
 %
 % created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
+% modified May 5, 2015 by Daniel Dolan
+%   -Added noise amplitude characterization
 %
 function object=characterize(object,mode,varargin)
 
@@ -75,7 +74,7 @@ f=f(keep);
 P=P(keep);
 switch lower(mode)
     %case 'bandwidth'
-    case 'noise'        
+    case 'noiseamplitude'        
         noisefloor=mean(P);        
         t=object.Measurement.Grid;
         keep=(t>=tbound(1)) & (t<=tbound(2));

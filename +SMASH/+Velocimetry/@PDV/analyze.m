@@ -5,6 +5,8 @@
 % analysis depends on the number of specified boundaries; if no boundaries
 % are defined, a single history with no frequency bounds is generated.
 
+
+
 % OLD SYNTAX
 % The default analysis calculates centroids for each boundary region.
 %     >> object=analyze(object);
@@ -17,9 +19,8 @@
 %
 
 %
-% created march 2, 2015 by Daniel Dolan (Sandia National Laboratories)
+% Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-%function object=analyze(object,mode,varargin)
 function object=analyze(object)
 
 %% verify partition settings
@@ -28,9 +29,6 @@ if isempty(object.Measurement.Partition)
     message{2}='       Use the "configure" method before "analyze"';
     error('%s\n',message{:});
 end
-
-%% analyze noise region(s)
-
 
 %% manage boundaries and limits
 [xlimit,~]=limit(object.Measurement);
@@ -67,82 +65,54 @@ xbound(2)=min(xbound(2),xlimit(2));
 object.Measurement=limit(object.Measurement,xbound);
 
 %% perform analysis    
-    function out=centroid(f,y,t,~)    
-        tmid=(t(end)+t(1))/2;
-        out=nan(Nboundary,3);
-        for k=1:Nboundary            
-            [fA,fB]=probe(boundary{k},tmid);
-            if isnan(fA) || isnan(fB)
-                continue
-            end
-            index=(f>=fA)&(f<=fB);
-            fb=f(index);
-            w=y(index);
-            out(k,3)=trapz(fb,w); % area
-            w=w/out(k,3);
-            out(k,1)=trapz(fb,w.*fb); % center location
-            out(k,2)=trapz(fb,w.*(fb-out(k,1)).^2); % standard deviation
-            out(k,2)=sqrt(out(k,2));
-        end        
-        out=out(:);
-    end
-
-    function out=fit(f,y,t,~)               
-        tmid=(t(end)+t(1))/2;
-        [fA,fB]=deal(nan(Nboundary,1));
-        for k=1:Nboundary
-            [fA(k),fB(k)]=probe(boundary{k},tmid);                        
-        end
-        out=fitComplexGaussians(f,y,fA,fB,FitOptions);
-        out=out(:);
-    end
-
-previous.FFToptions=object.Measurement.FFToptions;
-type=object.Measurement.FFToptions.SpectrumType;
-switch lower(type)
-    case 'power'       
-        history=analyze(object.Measurement,@centroid);       
-    case 'complex'           
+%previous.FFToptions=object.Measurement.FFToptions;
+switch lower(object.Settings.AnalysisMode)
+    case 'centroid'
+        object.Measurement.FFToptions.SpectrumType='power';
+        history=analyze(object.Measurement,...
+            @(f,y,t,s) CentroidAnalysis(f,y,t,s,boundary));       
+    case 'fit'           
+        object.Measurement.FFToptions.SpectrumType='complex';
         Window={'gaussian' 3};
-        temp=object.Measurement.FFToptions.Window;
-        if iscell(temp)
-            if strcmpi(temp{1},'gaussian') || strcmpi(temp{1},'gauss')
-                Window=temp;
-            end
-        end
         object.Measurement.FFToptions.Window=Window;
-        FitOptions=struct();
-        FitOptions.UniqueTolerance=object.Settings.UniqueTolerance;
-        FitOptions.Tau=object.Measurement.Partition.Duration;
-        FitOptions.Tau=FitOptions.Tau/(2*Window{2});
-        history=analyze(object.Measurement,@fit);
+        options=struct();
+        options.UniqueTolerance=object.Settings.UniqueTolerance;
+        options.Tau=object.Measurement.Partition.Duration;
+        options.Tau=options.Tau/(2*Window{2});
+        history=analyze(object.Measurement,...
+            @(f,y,t,s) FitAnalysis(f,y,t,s,boundary,options)); 
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
 
-%% separate and convert results
-result=struct();
-index=1:numel(boundary);
-result.BeatFrequency=...
-    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.BeatFrequency.GridLabel='Time';
-result.BeatFrequency.DataLabel='Beat Frequency';
-index=index+numel(boundary);
-result.BeatWidth=...
-    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.BeatWidth.GridLabel='Time';
-result.BeatWidth.DataLabel='Beat frequency width';
-index=index+numel(boundary);
-result.BeatAmplitude=...
-    SMASH.SignalAnalysis.SignalGroup(history.Grid,history.Data(:,index));
-result.BeatAmplitude.GridLabel='Time';
-result.BeatAmplitude.DataLabel='Beat amplitude';
-object.Results=result;
+%% separate results
+N=numel(boundary);
+object.BeatFrequency=cell(1,N);
+index=1:4;
+for m=1:N
+    % remove NaN entries
+    t=history.Grid;
+    data=history.Data(:,index);
+    keep=~isnan(data(:,1));
+    t=t(keep);
+    data=data(keep,:);
+    % store new object
+    object.BeatFrequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
+    object.BeatFrequency{m}.GridLabel='Time';
+    object.BeatFrequency{m}.DataLabel='';
+    object.BeatFrequency{m}.Legend={'Position','Width','Amplitude','Uncertainty'};    
+    object.BeatFrequency{m}.Name=object.Boundary{m}.Label;
+    index=index+numel(index);
+end
 
+%% complete uncertainty analysis
+
+
+%% convert frequency to velocity
 object=convert(object);
 
-%% restore previous state
+%% restore previous settings
 object=limit(object,previous.Bound);
-object.Measurement.FFToptions=previous.FFToptions;
+%object.Measurement.FFToptions=previous.FFToptions;
 
 end

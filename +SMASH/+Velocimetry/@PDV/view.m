@@ -17,7 +17,7 @@
 % 
 % created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=view(object,mode,varargin)
+function varargout=view(object,mode,target)
 
 % manage input
 if (nargin<2) || isempty(mode)
@@ -25,21 +25,43 @@ if (nargin<2) || isempty(mode)
 end
 assert(ischar(mode),'ERROR: invalid mode');
 
+if (nargin<3) || isempty(target)
+    target=[];
+end
+
+% generate plot
+% NEEDS WORK!
 switch lower(mode)
     case 'measurement'
-        h=view(object.Measurement,varargin{:});
+        h=view(object.Measurement,target);
     case 'beatfrequency'
-        assert(~isempty(object.Results),'ERROR: no analysis results yet');
-        h=view(object.Results.BeatFrequency,varargin{:});
-    case 'beatwidth'
-        assert(~isempty(object.Results),'ERROR: no analysis results yet');
-        h=view(object.Results.BeatWidth,varargin{:});
-    case 'beatamplitude'
-        assert(~isempty(object.Results),'ERROR: no analysis results yet');
-        h=view(object.Results.BeatAmplitude,varargin{:});
+        N=numel(object.Velocity);
+        assert(N>0,'ERROR: beat frequency has not been calculated yet');
+        color=lines(N);        
+        h=nan(1,N);
+        label=cell(1,N);
+        for n=1:N
+            h(n)=view(object.BeatFrequency{n},1,target);
+            set(h(n),'Color',color(n,:));
+            target=gca;
+            label{n}=object.BeatFrequency{n}.Name;
+        end
+        ylabel('Beat frequency');
+        legend(label,'Location','best');
     case 'velocity'
-        assert(~isempty(object.Results),'ERROR: no analysis results yet');
-        h=view(object.Results.Velocity,varargin{:});
+        N=numel(object.Velocity);
+        assert(N>0,'ERROR: beat frequency has not been calculated yet');
+        color=lines(N);
+        h=nan(1,N);
+        label=cell(1,N);
+        for n=1:N
+            h(n)=view(object.Velocity{n},1,target);
+            set(h(n),'Color',color(n,:));
+            target=gca;
+            label{n}=object.Velocity{n}.Name;
+        end
+        ylabel('Beat frequency');
+        legend(label,'Location','best');
     otherwise
         error('ERROR: invalid view mode');
 end

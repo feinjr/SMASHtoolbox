@@ -1,5 +1,7 @@
-% convert Convert frequency results to velocity
+% convert Convert frequency to velocity
 %
+
+
 % This method converts frequency results from the "analyze" method to
 % velocity.  The standard conversion uses the object's Wavelength and
 % ReferenceFrequency (B0) settings to convert beat frequency (B) to
@@ -20,25 +22,37 @@
 %
 % created February 23, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=convert(object)
+function object=convert(object,ConvertFunction)
 
-% frequency to velocity conversion
+% define standard conversion
 lambda=object.Settings.Wavelength;
 f0=object.Settings.ReferenceFrequency;
-    function velocity=standardConvert(~,frequency)
-        velocity=(lambda/2)*(frequency-f0);
+correction=object.Settings.WindowCorrection;
+    function velocity=standardConvert(index,time,frequency) %#ok<INUSL>
+        velocity=correction*(lambda/2)*(frequency-f0);
     end
 
-location=object.Results.BeatFrequency;
-if isempty(object.Settings.ConvertFunction)
-    v=standardConvert(location.Grid,location.Data);
-else
-    v=feval(object.Settings.ConvertFunction,location.Grid,location.Data);
+% manage input
+if (nargin<2) || isempty(ConvertFunction)
+    ConvertFunction=@standardConvert;
 end
-object.Results.Velocity=SMASH.SignalAnalysis.SignalGroup(location.Grid,v);
-object.Results.Velocity.GridLabel='Time';
-object.Results.Velocity.DataLabel='Velocity';
+assert(isa(ConvertFunction,'function_handle'),...
+    'ERROR: invalid ConvertFunction');
 
-% uncertainty analysis (UNDER CONSTRUCTION)
+% apply conversion function
+N=numel(object.BeatFrequency);
+object.Velocity=cell(1,N);
+for n=1:N
+    t=object.BeatFrequency{n}.Grid;
+    f=object.BeatFrequency{n}.Data(:,1);
+    v=feval(ConvertFunction,n,t,f);
+    df=object.BeatFrequency{n}.Data(:,4);
+    dv=df*correction*(lambda/2);
+    object.Velocity{n}=SMASH.SignalAnalysis.SignalGroup(t,[v(:) dv(:)]);
+    object.Velocity{n}.GridLabel='Time';
+    object.Velocity{n}.DataLabel='';
+    object.Velocity{n}.Legend={'Velocity','Uncertainty'};    
+    object.Velocity{n}.Name=object.BeatFrequency{n}.Name;
+end
 
 end

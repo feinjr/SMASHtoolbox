@@ -49,3 +49,5 @@ object.Measurement=partition(object.Measurement,varargin{:});
 varargout{1}=object;
 
 end
+
+% SHOULD THIS BECOME A HIDDEN OR PROTECTED METHOD ????

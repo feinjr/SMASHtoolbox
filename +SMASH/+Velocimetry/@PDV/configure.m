@@ -44,6 +44,7 @@ if nargout==0
         fprintf('\t (undefined)\n');
     else
         name=fieldnames(object.Measurement.Partition);
+        name=sort(name);
         for k=1:numel(name);
             fprintf(format,name{k});
             printValue(object.Measurement.Partition.(name{k}));
@@ -53,7 +54,11 @@ if nargout==0
     % print FFT options
     fprintf('*** FFT settings ***\n');
     name=properties(object.Measurement.FFToptions);
-    for k=1:numel(name);
+    name=sort(name);
+    for k=1:numel(name)
+        if strcmpi(name{k},'FrequencyDomain') || strcmpi(name{k},'SpectrumType')
+            continue
+        end
         fprintf(format,name{k});
         printValue(object.Measurement.FFToptions.(name{k}));
         fprintf('\n');
@@ -61,6 +66,7 @@ if nargout==0
     % print PDV settings
     fprintf('*** Analysis settings ***\n');
     name=fieldnames(object.Settings);
+    name=sort(name);
     for k=1:numel(name);
         fprintf(format,name{k});
         printValue(object.Settings.(name{k}));
@@ -80,7 +86,7 @@ for n=1:2:Narg
     assert(ischar(name),'ERROR: invalid setting name');
     value=varargin{n+1};
     switch lower(name)
-        % PDV settings
+        %% PDV settings
         case 'wavelength'
             assert(isnumeric(value) && isscalar(value),...
                 'ERROR: invalid Wavelength value');
@@ -89,37 +95,33 @@ for n=1:2:Narg
             assert(isnumeric(value) && isscalar(value),...
                 'ERROR: invalid ReferenceFrequency value');
             object.Settings.ReferenceFrequency=value;
-        %case 'noiseregion' % [tmin tmax fmin fmax]            
-        %    if isempty(value)
-        %        value=[];
-        %    elseif strcmp(value,'select')
-        %        preview(object);
-        %        h=uicontrol('Style','pushbutton','String','done',...
-        %            'Callback','delete(gcbo)');
-        %        title('Select noise region');
-        %        waitfor(h);
-        %        value=axis(gca);
-        %        delete(gcf);
-        %    else
-        %        %assert(isnumeric(value) && (numel(value)==4 || size(value,2)==4),...
-        %        assert(isnumeric(value) && (numel(value)==4),...
-        %            'ERROR: invalid NoiseRegion value');
-        %        if size(value,2)~=4
-        %            value=reshape(value,[1 4]);
-        %        end
-        %    end            
-        %    object.Settings.NoiseRegion=value;
+        case 'noiseamplitude'
+            assert(isnumeric(value) && isscalar(value) && value>0,...
+                'ERROR: invalid NoiseAmplitude value');
+            object.Settings.NoiseAmplitude=value;           
         case 'uniquetolerance'
             assert(isnumeric(value) && isscalar(value) && (value>0),...
                 'ERROR: invalid UniqueTolerance value');
             object.Settings.UniqueTolerance=value;
-        case 'convertfunction'
-            if ischar(value)
-                value=str2func(value);
+%         case 'convertfunction'
+%             if ischar(value)
+%                 value=str2func(value);
+%             end
+%             assert(isa(value,'function_handle') | isempty(value),...
+%                 'ERROR: invalid ConvertFunction value');
+%             object.Settings.ConvertFunction=value;
+        case 'analysismode'
+            assert(ischar(value),'ERROR: invalid AnalysisMode value');
+            switch lower(value)
+                case 'centroid'
+                    object.Settings.AnalysisMode='centroid';
+                    object.Measurement.FFToptions.SpectrumType='power';
+                case 'fit'
+                    object.Settings.AnalysisMode='fit';
+                    object.Measurement.FFToptions.SpectrumType='complex';
+                otherwise
+                    error('ERROR: %s is an invalid AnalysisMode');
             end
-            assert(isa(value,'function_handle') | isempty(value),...
-                'ERROR: invalid ConvertFunction value');
-            object.Settings.ConvertFunction=value;
         case 'harmonicfunction'
             if ischar(value)
                 value=str2func(value);
@@ -134,18 +136,24 @@ for n=1:2:Narg
             end
             assert(size(value,2)==3,'ERROR: invalid ShockTable value');
             object.Settings.ShockTable=value;
-        % FFT options
+        %% FFT options
         case 'window'
             object.Measurement.FFToptions.Window=value;
         case 'numberfrequencies'
             object.Measurement.FFToptions.NumberFrequencies=value;
         case 'removedc'
             object.Measurement.FFToptions.RemoveDC=value;
-        case 'frequencydomain'
-            object.Measurement.FFToptions.FrequencyDomain=value;
-        case 'spectrumtype'
-            object.Measurement.FFToptions.SpectrumType=value;
-        % partition configuration
+        %case 'frequencydomain'
+        %    object.Measurement.FFToptions.FrequencyDomain=value;
+        %case 'spectrumtype'
+        %    object.Measurement.FFToptions.SpectrumType=value;
+        %    switch lower(object.Measurement.FFToptions.SpectrumType)
+        %        case 'power'
+        %            object.Settings.AnalysisMode='centroid';
+        %        case 'complex'
+        %            object.Settings.AnalysisMode='fit';
+        %    end
+        %% partition configuration
         case 'partition'
             object=partition(object,value{1},value{2});
         case {'block','blocks'}

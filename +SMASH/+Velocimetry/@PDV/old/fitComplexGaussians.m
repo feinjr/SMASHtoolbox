@@ -23,7 +23,6 @@ Nbound=numel(MasterIndex);
         full=nan(Nbound,3); % [location width amplitude] parameters
         % calculate basis functions
         for m=1:Nbound
-            %b=parameter(m,1); % beat frequency
             b=fmid(m)+famp(m)*sin(parameter(m,1)); % beat frequency
             c=parameter(m,2); % chirp factor
             sigma2=4*pi^2*options.Tau^2;
