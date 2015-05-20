@@ -14,7 +14,7 @@
 % output "result" is a SignalGroup object, with function evaluations stored
 % in the Data property and regional time centers stored in the Grid
 % property.
-% 
+%
 % This method automatically manages parallel processing as available.  If
 % multiple MATLAB workers are present, regional evaluations are managed
 % with a parallelized "parfor" loop; otherwise, a standard "for" loop is
@@ -78,7 +78,18 @@ data=nan(numel(temp),Niter);
 data(:,1)=temp(:);
 
 % analyze remaining blocks
-if exist('matlabpool','file') && (matlabpool('size')>0)
+parallel=false;
+try
+    if exist('matlabpool','file') && (matlabpool('size')>0) %#ok<DPOOL>
+        parallel=true; % MATLAB 2013a and earlier
+    end
+catch
+    if ~isempty(gcp('nocreate'))
+        parallel=true; % MATLAB 2014a and later
+    end
+end
+
+if parallel
     fprintf('Performing analysis...');
     parfor k=2:Niter
         local=constructLocal(object,left(k),right(k));

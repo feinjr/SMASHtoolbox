@@ -25,24 +25,18 @@ end
 assert(exist(filename,'file')==2,'ERROR: file not found');
 
 if nargin<2
-    format='';
+    format=determineFormat(filename);
 end
 
 % probe object
-[~,~,ext]=fileparts(filename);
-switch lower(ext)
-    case '.h5'
-        object=SMASH.FileAccess.DigitizerFile(filename,'agilent');   
-    case '.hdf'
-        switch lower(format)
-            case {'zdas','saturn'}
-                object=SMASH.FileAccess.DigitizerFile(filename,format);   
-            otherwise
-                error('ERROR: no format specified');
-        end        
-    case '.pff'
+switch format
+    case {'agilent','keysight'}
+        object=SMASH.FileAccess.DigitizerFile(filename,format);   
+    case {'zdas','saturn'}
+        object=SMASH.FileAccess.DigitizerFile(filename,format);    
+    case 'pff'
         object=SMASH.FileAccess.PFFfile(filename);
-    case '.sda'
+    case 'sda'
         object=SMASH.FileAccess.SDAfile(filename);   
     otherwise
         object=SMASH.FileAccess.ColumnFile(filename);

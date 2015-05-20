@@ -51,7 +51,7 @@ output.FileName=object.FullName;
 output.Format=object.Format;
 output.FileOption=record;
 switch object.Format
-    case 'agilent'
+    case {'agilent','keysight'}
         report=probe(object);
         if isempty(record)
             if report.NumberSignals==1
@@ -70,27 +70,11 @@ switch object.Format
             error('ERROR: invalid record number ');
         end
         output.FileOption=record;
-        [signal,time]=read_agilent(object.FullName,record);
-    case 'keysight'
-        report=probe(object);
-        if isempty(record)
-            if report.NumberSignals==1
-                record=1;
-            else
-                [record,ok]=listdlg(...
-                    'PromptString','Select signal',...
-                    'Name','Select signal',...
-                    'ListString',report.Name,...
-                    'SelectionMode','single');
-                if ~ok % user pressed cancel or closed the dialog
-                    error('ERROR: no signal selected');
-                end
-            end
-        elseif ~any(record==(1:report.NumberSignals))
-            error('ERROR: invalid record number ');
-        end
-        output.FileOption=record;
-        [signal,time]=read_keysight(object.FullName,record);
+        if strcmpi(object.Format,'agilent')
+            [signal,time]=read_agilent(object.FullName,record);
+        elseif strcmpi(object.Format,'keysight')
+            [signal,time]=read_keysight(object.FullName,record);
+        end        
     case 'lecroy'
         [signal,time]=read_lecroy(object.FullName);
     case 'tektronix'
