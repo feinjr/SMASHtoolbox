@@ -18,18 +18,8 @@ assert(exist(object.FullName,'file')==2,...
 
 % look inside source file
 switch object.Format
-    case {'agilent'}
-        N=h5readatt(object.FullName,'/Waveforms','NumWaveforms');
-        report.NumberSignals=N;
-        info=hdf5info(object.FullName);        
-        info=info.GroupHierarchy.Groups(3);        
-        report.Name=cell(1,N);
-        for n=1:N
-            temp=info.Groups(n).Name;
-            [~,report.Name{n}]=fileparts(temp);
-        end
-    case 'keysight'
-        report=probe_keysight(object.FullName);        
+    case {'agilent','keysight'}
+        report=probe_agilent(object.FullName);               
     case {'zdas','saturn'}
         file_id = hdfh('open',object.FullName,'read',0);
         status = hdfv('start',file_id); %#ok<NASGU>

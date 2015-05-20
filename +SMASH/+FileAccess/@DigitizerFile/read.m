@@ -69,12 +69,8 @@ switch object.Format
         elseif ~any(record==(1:report.NumberSignals))
             error('ERROR: invalid record number ');
         end
-        output.FileOption=record;
-        if strcmpi(object.Format,'agilent')
-            [signal,time]=read_agilent(object.FullName,record);
-        elseif strcmpi(object.Format,'keysight')
-            [signal,time]=read_keysight(object.FullName,record);
-        end        
+        output.FileOption=record;    
+        [signal,time]=read_agilent(object.FullName,record);                
     case 'lecroy'
         [signal,time]=read_lecroy(object.FullName);
     case 'tektronix'
