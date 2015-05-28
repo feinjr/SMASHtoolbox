@@ -27,6 +27,7 @@ assert(exist(filename,'file')==2,'ERROR: file not found');
 if nargin<2
     format=determineFormat(filename);
 end
+assert(ischar(format),'ERROR: invalid format');
 
 % probe object
 switch format
@@ -38,8 +39,10 @@ switch format
         object=SMASH.FileAccess.PFFfile(filename);
     case 'sda'
         object=SMASH.FileAccess.SDAfile(filename);   
-    otherwise
+    case 'column'
         object=SMASH.FileAccess.ColumnFile(filename);
+    otherwise
+        error('ERROR: unable to probe ''%s'' format',format);
 end
 
 try
@@ -52,7 +55,5 @@ try
 catch
     error('ERROR: unable to probe file');
 end
-
-
 
 end
