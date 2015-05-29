@@ -14,6 +14,7 @@ function object=analyze(object)
 
 %helpers
 npts = object.Settings.NumberPoints;
+dt = (object.MeasuredWindow.Grid(end)-object.MeasuredWindow.Grid(1))/length(object.MeasuredWindow.Grid);
 
 
 % Determine a functional form for time causality correlation
@@ -21,21 +22,26 @@ assert(numel(object.Settings.WindowTimes)==numel(object.Settings.InsituTimes),'T
 [windowtimes,ia] = sort(object.Settings.WindowTimes);
 insitutimes = object.Settings.InsituTimes(ia);
 p=polyfit(object.Settings.WindowTimes,object.Settings.InsituTimes,3);
-windowstep = (max(windowtimes)-min(windowtimes))/(5-1);
-window_start = min(windowtimes);
+%windowstep = (max(windowtimes)-min(windowtimes))/(5-1);
+%window_start = min(windowtimes);
+
 
 tresult=[];vresult=[];
 tshift=[];tscale=[];
-for i=1:length(windowtimes);
+for i=1:length(windowtimes)-1;
     
     %Define time regions
-    window_end = window_start + windowstep;
-    insitu_start = polyval(p,window_start);
-    insitu_end = polyval(p,window_end);
+    %window_end = window_start + windowstep;
+    window_start = windowtimes(i);
+    window_end = windowtimes(i+1);
+    %insitu_start = polyval(p,window_start);
+    %insitu_end = polyval(p,window_end);
+    insitu_start = insitutimes(i);
+    insitu_end = insitutimes(i+1);
     
-    limit(object.MeasuredWindow,[window_start window_end]);
-    limit(object.SimulatedWindow,[window_start window_end]);
-    limit(object.SimulatedInsitu,[insitu_start insitu_end]);
+    object.MeasuredWindow=limit(object.MeasuredWindow,[window_start-dt window_end]);
+    object.SimulatedWindow=limit(object.SimulatedWindow,[window_start-dt window_end]);
+    object.SimulatedInsitu=limit(object.SimulatedInsitu,[insitu_start-dt insitu_end]);
     
     [t{1},v{1}] = limit(object.MeasuredWindow);
     [t{2},v{2}] = limit(object.SimulatedWindow);
@@ -56,7 +62,7 @@ for i=1:length(windowtimes);
     
     
     %FFT Solution
-    n_fpts = 2^nextpow2((2*npts-1)*1);
+    n_fpts = 2^nextpow2((2*npts-1)*2);
    
     for j=1:3
         vfft{j} = fft(nv{j},n_fpts);
@@ -64,26 +70,30 @@ for i=1:length(windowtimes);
     TF = vfft{3}./vfft{2};
     
     vout = ifft(TF.*vfft{1}); vout = vout(1:npts);
-    tout = tnorm.*tscale(2)+tshift(2);
+    tout = tnorm.*tscale(3)+tshift(3);
     
-    %Interpolate back to original timebase
-    vout = interp1(tout,vout,t{1},'pchip', 0);
-    
-    tresult=[tresult;t{1}];
+    tresult=[tresult;tout];
     vresult=[vresult;vout];
 end
    
+
+
+    %Interpolate back to original timebase
+    %object.MeasuredWindow=limit(object.MeasuredWindow,[min(windowtimes) max(windowtimes)]);
+    %[tfinal,~] = limit(object.MeasuredWindow);
+    %vresult = interp1(tresult,vresult,texp,'pchip', 0); tresult=tfinal
+
     %Remove overlap
-    trim = tresult<max(windowtimes);
-    tresult=tresult(trim); vresult=vresult(trim);
+    %trim = tresult<max(windowtimes);
+    %tresult=tresult(trim); vresult=vresult(trim);
     [~,ia]=unique(tresult);
     object.Results = SMASH.SignalAnalysis.Signal(tresult(ia),vresult(ia));
     object.Results.GraphicOptions.LineColor=[1.00 0.00 0.50]; %pink
 
     %Reset limits
-    limit(object.MeasuredWindow,'all');
-    limit(object.MeasuredWindow,'all');
-    limit(object.MeasuredWindow,'all');
+    object.MeasuredWindow = limit(object.MeasuredWindow,'all');
+    object.SimulatedWindow = limit(object.SimulatedWindow,'all');
+    object.SimulatedInsitu=limit(object.SimulatedInsitu,'all');
     
     
 end
