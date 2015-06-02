@@ -168,7 +168,7 @@ function PlotVelocities(mode)
         temp=analyze(temp);
         [x y]=limit(temp.Results);
         h=line(x,y);
-        set(h,'Color',[0.1 0.1 0.1]);
+        set(h,'Color',[1.00 0.00 0.50]);
     end
     
     

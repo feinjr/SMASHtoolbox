@@ -1978,9 +1978,10 @@ dlg.Hidden = true;
 %Cv (mgrun.ref to SI units): cv*1e-4/11604.5
 
 %init = [19.24,2.97,1,1.2667e-4,79,1.9697e2,1.66953e2]; % Au
-init = [16.55,1.6,1,1.3788e-4,73,1.80948e2,1.9953e2]; % Ta
+%init = [16.55,1.6,1,1.3788e-4,73,1.80948e2,1.9953e2]; % Ta
 %init = [1.84,1.19,1,2.7662e-3,4,9.0122,1.13367372e2]; % Be
 %init = [21.02,2.44,1,1.3357e-4,75,1.86207e2,3.70e2]; % Re
+init = [10.915,2.5,1,1.2064e-4,82,207.2,4.178e2]; % Pb
 
 
 ReferenceOptions={'cuisentrope','pdisentrope','usup','pdhugoniot'};
@@ -2672,7 +2673,7 @@ switch material
         s = 1;
         g0 = 1; 
         material = {'Aluminum','Beryllium','Copper','Gold', ...
-            'LiF','Molybdenum','Stainless Steel','Tantalum',...
+            'LiF','Lead','Molybdenum','Stainless Steel','Tantalum',...
             'Rhenium','Zirconium','Zirconium1','Zirconium2'};
         
       case 'DefinedWindows'
@@ -2716,7 +2717,14 @@ switch material
         c0 = 3.056;
         s = 1.572;
         g0 = 2.97;
-   
+    
+    case 'Lead'
+        rho = 11.3463;
+        c0 = 2.16895;
+        s = 1.41186;
+        g0 = 2.5;   
+        
+        
     case 'Molybdenum'
         rho = 10.215;
         c0 = 5.122;

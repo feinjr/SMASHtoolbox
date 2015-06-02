@@ -759,19 +759,28 @@ function newsig = applylimit(n)
              
         newsig = sig{n};
         [time data] = limit(newsig);
-        [~,im] = max(data(:,1));
         
+       
         %Find time values corresponding to selection
         if ~value{3}
-            if minval < min(data(1:im,1)); minval = min(data(1:im,1)); end
-            if maxval > max(data(1:im,1)); maxval = max(data(1:im,1)); end
-            t1 = interp1(data(1:im,1),time(1:im),minval);
-            t2 = interp1(data(1:im,1),time(1:im),maxval);
+            i1 = find(data(:,1)>minval,1,'first');
+            i2 = find(data(:,1)>maxval,1,'first');
+            t1=time(i1);
+            t2=time(i2);
+            %if minval < min(data(1:im,1)); minval = min(data(1:im,1)); end
+            %if maxval > max(data(1:im,1)); maxval = max(data(1:im,1)); end
+            %t1 = interp1(data(1:im,1),time(1:im),minval);
+            %t2 = interp1(data(1:im,1),time(1:im),maxval);
         else
-            if minval < min(data(im:end,1)); minval = min(data(im:end,1)); end
-            if maxval > max(data(im:end,1)); maxval = max(data(im:end,1)); end
-            t1 = interp1(data(im:end,1),time(im:end),minval);
-            t2 = interp1(data(im:end,1),time(im:end),maxval);
+            %if minval < min(data(im:end,1)); minval = min(data(im:end,1)); end
+            %if maxval > max(data(im:end,1)); maxval = max(data(im:end,1)); end
+            %t1 = interp1(data(im:end,1),time(im:end),minval);
+            %t2 = interp1(data(im:end,1),time(im:end),maxval);
+            i1 = find(data(:,1)>maxval,1,'last');
+            i2 = find(data(:,1)>minval,1,'last');
+            t1=time(i1);
+            t2=time(i2);
+            
         end
             
 
