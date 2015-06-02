@@ -2,6 +2,9 @@ function out=FitAnalysis(f,y,t,~,boundary,options)
 
 % determine active frequency bounds
 tmid=(t(end)+t(1))/2;
+%if (tmid>=2663) && (tmid<=2665)
+%    keyboard
+%end
 
 Nboundary=numel(boundary);
 [fA,fB]=deal(nan(Nboundary,1));
@@ -41,13 +44,13 @@ Npoints=numel(f);
             Bplus =exp(-(b-f).^2/(2*sigma2));
             Bminus=exp(-(b+f).^2/(2*sigma2));
             X(:,column)=Bplus+Bminus;
-            Y(:,column)=Bplus-Bminus;
-            [p,~]=linsolve(X,real(y));
-            [q,~]=linsolve(Y,imag(y));
-            fit=(X*p+1i*Y*q);
-            chi2=y-fit;
-            chi2=mean(real(chi2.*conj(chi2)));
-        end       
+            Y(:,column)=Bplus-Bminus;            
+        end 
+        [p,~]=linsolve(X,real(y));
+        [q,~]=linsolve(Y,imag(y));
+        fit=(X*p+1i*Y*q);
+        chi2=y-fit;
+        chi2=mean(real(chi2.*conj(chi2)));
         full(:,3)=p.^2+q.^2;
     end
 parameter=fminsearch(@residual,guess);
@@ -75,7 +78,7 @@ end
 parameter(~isUnique,end)=nan;
 
 % manage output
-out=nan(Nboundary,3);
+out=nan(Nboundary,4);
 out(active,:)=parameter;
 out=out(:);
 

@@ -21,7 +21,13 @@
 %
 % Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object)
+function object=analyze(object,AnalysisMode)
+
+%% manage input
+if (nargin<2) || isempty(AnalysisMode)
+    AnalysisMode='centroid';
+end
+assert(ischar(AnalysisMode),'ERROR: invalid analysis mode');
 
 %% verify partition settings
 if isempty(object.Measurement.Partition)
@@ -66,7 +72,7 @@ object.Measurement=limit(object.Measurement,xbound);
 
 %% perform analysis    
 %previous.FFToptions=object.Measurement.FFToptions;
-switch lower(object.Settings.AnalysisMode)
+switch lower(AnalysisMode)
     case 'centroid'
         object.Measurement.FFToptions.SpectrumType='power';
         history=analyze(object.Measurement,...
@@ -88,7 +94,8 @@ end
 %% separate results
 N=numel(boundary);
 object.BeatFrequency=cell(1,N);
-index=1:4;
+%index=1:4;
+index=1:3;
 for m=1:N
     % remove NaN entries
     t=history.Grid;
@@ -100,8 +107,12 @@ for m=1:N
     object.BeatFrequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
     object.BeatFrequency{m}.GridLabel='Time';
     object.BeatFrequency{m}.DataLabel='';
-    object.BeatFrequency{m}.Legend={'Position','Width','Amplitude','Uncertainty'};    
-    object.BeatFrequency{m}.Name=object.Boundary{m}.Label;
+    object.BeatFrequency{m}.Legend={'Position','Width','Amplitude','Uncertainty'}; 
+    try
+        object.BeatFrequency{m}.Name=object.Boundary{m}.Label;
+    catch
+        object.BeatFrequency{m}.Name='(no name)';
+    end
     index=index+numel(index);
 end
 
@@ -109,7 +120,7 @@ end
 
 
 %% convert frequency to velocity
-object=convert(object);
+%object=convert(object);
 
 %% restore previous settings
 object=limit(object,previous.Bound);

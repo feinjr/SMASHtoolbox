@@ -35,7 +35,7 @@ switch lower(mode)
     case 'measurement'
         h=view(object.Measurement,target);
     case 'beatfrequency'
-        N=numel(object.Velocity);
+        N=numel(object.BeatFrequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
         color=lines(N);        
         h=nan(1,N);

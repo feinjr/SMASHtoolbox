@@ -12,12 +12,14 @@ for k=1:Nboundary
     index=(f>=fA)&(f<=fB);
     fb=f(index);
     w=y(index);
-    out(k,3)=trapz(fb,w); % area
-    w=w/out(k,3);
-    out(k,1)=trapz(fb,w.*fb); % center location
-    out(k,2)=trapz(fb,w.*(fb-out(k,1)).^2); % variance
+    area=trapz(fb,w); % area
+    w=w/area;
+    out(k,1)=trapz(fb,w.*fb); % beat frequency
+    out(k,2)=trapz(fb,w.*(fb-out(k,1)).^2); %
     out(k,2)=sqrt(out(k,2)); % standard deviation
-    out(k,4)=out(k,3)/out(k,2); % height estimate
+    %out(k,3)=out(k,3)/out(k,2); % height estimate
+    out(k,3)=area/(sqrt(2*pi)*out(k,2)); % estimated power
+    out(k,4)=true; % unique flag
 end
 out=transpose(out);
 out=out(:);
