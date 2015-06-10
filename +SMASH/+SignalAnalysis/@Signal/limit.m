@@ -65,6 +65,9 @@ elseif isnumeric(bound) && (numel(bound)==2)
             error('ERROR: invalid units');
     end
     keep=(object.Grid>=bound(1)) & (object.Grid<bound(2));
+    if sum(keep)==0
+        warning('Requested limits contain no data points');
+    end
     index=1:len;
     object.LimitIndex=index(keep);
 else

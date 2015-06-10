@@ -24,7 +24,7 @@
 % the largest spectral value as a column vector.  These outputs are
 % collected into a SignalGroup group object in the final result.
 %
-% See also STFT, partition, preview, track, ImageAnalysis.Image,
+% See also STFT, partition, preview, ImageAnalysis.Image,
 % SignalAnalysis.SignalGroup
 %
 
