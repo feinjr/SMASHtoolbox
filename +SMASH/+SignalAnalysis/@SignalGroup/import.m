@@ -34,7 +34,7 @@ switch data.Format
         object.Data=data.Signal;
     case 'pff'
         errmsg{1}='ERROR: cannot import this dataset into a Signal object';
-        if numel(dataset)>1
+        if numel(data)>1
             errmsg{2}='     Multiple blocks detected';
             error('%s\n',errmsg{:});
         end
