@@ -21,13 +21,13 @@
 %
 % Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object,AnalysisMode)
+function object=analyze(object,SpectrumType,varargin)
 
 %% manage input
-if (nargin<2) || isempty(AnalysisMode)
-    AnalysisMode='centroid';
+if (nargin<2) || isempty(SpectrumType)
+    SpectrumType='power';
 end
-assert(ischar(AnalysisMode),'ERROR: invalid analysis mode');
+assert(ischar(SpectrumType),'ERROR: invalid analysis mode');
 
 %% verify partition settings
 if isempty(object.Measurement.Partition)
@@ -70,32 +70,34 @@ xbound(1)=max(xbound(1),xlimit(1));
 xbound(2)=min(xbound(2),xlimit(2));
 object.Measurement=limit(object.Measurement,xbound);
 
-%% perform analysis    
-%previous.FFToptions=object.Measurement.FFToptions;
-switch lower(AnalysisMode)
-    case 'centroid'
-        object.Measurement.FFToptions.SpectrumType='power';
-        history=analyze(object.Measurement,...
-            @(f,y,t,s) CentroidAnalysis(f,y,t,s,boundary));       
+%% perform analysis
+options=struct();
+options.ScaleFactor=Spectrum2SignalScale(object.Measurement);
+switch lower(SpectrumType)
+    case 'power'
+        object.Measurement.FFToptions.SpectrumType='power';        
+        if isempty(varargin) || strcmpi(varargin{1},'centroid')
+            TargetFunction=@(f,y,t,s) PowerAnalysisCentroid(...
+                f,y,t,s,boundary,options);
+        else
+            error('ERROR: alternate power modes not supported yet');
+        end
     case 'fit'           
         object.Measurement.FFToptions.SpectrumType='complex';
         Window={'gaussian' 3};
         object.Measurement.FFToptions.Window=Window;
-        options=struct();
         options.UniqueTolerance=object.Settings.UniqueTolerance;
         options.Tau=object.Measurement.Partition.Duration;
         options.Tau=options.Tau/(2*Window{2});
-        history=analyze(object.Measurement,...
-            @(f,y,t,s) FitAnalysis(f,y,t,s,boundary,options)); 
+        TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
+history=analyze(object.Measurement,TargetFunction,'none');
 
-%% separate results
+%% separate and process results
 N=numel(boundary);
-object.BeatFrequency=cell(1,N);
-%index=1:4;
-index=1:3;
+index=1:4; % location, strength, unique, chirp
 for m=1:N
     % remove NaN entries
     t=history.Grid;
@@ -104,26 +106,20 @@ for m=1:N
     t=t(keep);
     data=data(keep,:);
     % store new object
-    object.BeatFrequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
-    object.BeatFrequency{m}.GridLabel='Time';
-    object.BeatFrequency{m}.DataLabel='';
-    object.BeatFrequency{m}.Legend={'Position','Width','Amplitude','Uncertainty'}; 
+    object.Results{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
+    object.Results{m}.GridLabel='Time';
+    object.Results{m}.DataLabel='';
+    object.Results{m}.Legend={'Center','Width','Strength','Unique'}; 
+    % transfer label
     try
-        object.BeatFrequency{m}.Name=object.Boundary{m}.Label;
+        object.Results{m}.Name=object.Boundary{m}.Label;
     catch
-        object.BeatFrequency{m}.Name='(no name)';
+        object.Results{m}.Name='(no name)';
     end
     index=index+numel(index);
 end
 
-%% complete uncertainty analysis
-
-
-%% convert frequency to velocity
-%object=convert(object);
-
 %% restore previous settings
 object=limit(object,previous.Bound);
-%object.Measurement.FFToptions=previous.FFToptions;
 
 end

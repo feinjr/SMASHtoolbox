@@ -46,6 +46,7 @@ assert(numel(Grid)==numel(Data),...
     'ERROR: inconsistenct Grid/Data arrays');
 object.Grid=Grid;
 object.Data=Data;
+object=limit(object,'all');
 
 object=updateHistory(object);
 

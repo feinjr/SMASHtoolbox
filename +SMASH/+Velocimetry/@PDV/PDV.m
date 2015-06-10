@@ -30,8 +30,7 @@ classdef PDV
     %Results = {} % Analysis results (cell array of SignalGroup objects)
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
-        BeatFrequency % Beat frequency results (cell array of SignalGroup objects)
-        Velocity % Velocity results (cell array of SignalGroup objects)
+        Results % 
         Boundary = {} % ROI boundaries (BoundaryCurve object)
     end
     %%
@@ -42,9 +41,9 @@ classdef PDV
             p.Wavelength=1550e-9;
             p.ReferenceFrequency=0;
             p.WindowCorrection=1;
-            p.NoiseAmplitude=[];
+            p.NoiseAmplitude=nan;
             p.UniqueTolerance=1e-3;
-            p.AnalysisMode='centroid';
+            %p.AnalysisMode='centroid';
             p.HarmonicFunction=[];
             p.ShockTable=[];            
             object.Settings=p;
