@@ -54,8 +54,8 @@ switch lower(method)
         if ~isnumeric(argument) || (size(argument,2)~=2) || (size(argument,1)<2)
             error('ERROR: invalid argument for lookup table mapping');
         end
+        argument=sortrows(argument,1);
         temp=interp1(argument(:,1),argument(:,2),data(:),'linear');
-        data=reshape(temp,size(data));
     case 'custom'
         if ~isa(argument,'function_handle')
             error('ERROR: invalid argment for user-function mapping');

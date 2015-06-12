@@ -3,7 +3,7 @@
 % This method resets the Grid and Data stored in a Signal object.  Arrays
 % can be passed directly into the object:
 %    >> object=replace(object,Grid,Data);
-% where Grid and data are arrays of consistent size.  Passing an empty
+% where grid and data are arrays of consistent size.  Passing an empty
 % array bypasses the reset.
 %    >> object=replace(object,[],Data); % replace Data, preserve original Grid
 %    >> object=replace(object,Grid,[]); % replace Grid, preserve original Data
