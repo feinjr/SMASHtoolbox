@@ -17,20 +17,20 @@ end
 if ~isa(target,'SMASH.ImageAnalysis.Image')
     error('ERROR: wedge transfer can only be applied to Image objects');
 end
-    
-% map z coordinate using wedge transfer table
+
+% prepare table
 table=object.TransferTable;
 table=sortrows(table,1);
-table(2:end+1,:)=table;
-table(1,:)=nan;
-table(end+1,:)=nan;
 
-table(1,1)=min(object.Data(:));
-table(1,2)=table(2,2);
-table(end,1)=max(object.Data(:));
-table(end,2)=table(end-1,2);
+% locate values outside of the table
+index1=(target.Data<table(1,1));
+index2=(target.Data>table(end,1));
 
+% map z coordinate using wedge transfer table
 target=map(target,'Data','table',table);
+target.Data(index1)=table(1,2);
+target.Data(index2)=table(end,2);
+
 target=updateHistory(target);
 
 end
