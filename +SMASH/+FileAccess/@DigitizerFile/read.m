@@ -65,10 +65,10 @@ switch object.Format
                 if ~ok % user pressed cancel or closed the dialog
                     error('ERROR: no signal selected');
                 end
-            end
-        elseif ~any(record==(1:report.NumberSignals))
-            error('ERROR: invalid record number ');
-        end
+            end        
+        end      
+        index=1:report.NumberSignals;
+        assert(any(record==index),'ERROR: invalid record request');
         output.FileOption=record;    
         [signal,time]=read_agilent(object.FullName,record);                
     case 'lecroy'

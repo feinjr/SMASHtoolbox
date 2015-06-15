@@ -117,12 +117,16 @@ FileName=fullfile(PathName,[BaseName extension]);
 
 % determine file format
 switch lower(extension)
+    case '.bin'
+        choice={'agilent'};
     case '.bmp'
         choice={'graphics'};
+    case '.dig'
+        choice={'dig'};
     case '.gif'
         choice={'graphics'};
     case '.h5'
-        choice={'agilent','keysight'};
+        choice={'agilent'};
     case '.hdf'
         choice={'film' 'saturn' 'zdas'};
     case '.hdr'

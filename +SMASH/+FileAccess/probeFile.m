@@ -3,8 +3,8 @@
 % This function reveals the contents of multi-record files.  
 %    >> probefile(filename);
 % Supported file formats include *.sda (Sandia Data Archive), *.pff
-% (Portable File Format), and *.h5 (Agilent digitizer files).  All other
-% extensions are interpreted as text files in the "column" format.
+% (Portable File Format), and *.h5 (Agilent/Keysight digitizer files).  All
+% other extensions are interpreted as text files in the "column" format.
 %
 % See also FileAccess
 %

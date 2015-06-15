@@ -48,6 +48,7 @@ end
 function SliceImage(target)
 
 ha=ancestor(target,'axes');
+bound=caxis(ha);
 current=get(ha,'CurrentPoint');
 x0=current(1,1);
 y0=current(1,2);
@@ -81,12 +82,14 @@ plot(x,interp2(x,y,z,x,y0,'linear'));
 label=sprintf('Horizontal slice @ %s = %g',ylab,y0);
 title(label);
 xlabel(xlab);
+ylim(bound);
 
 subplot(2,1,2);
 plot(y,interp2(x,y,z,x0,y,'linear'));
 label=sprintf('Vertical slice @ %s = %g',xlab,x0);
 title(label);
 xlabel(ylab);
+ylim(bound);
 
 name=sprintf('Image slice created %s',datestr(now));
 set(newfig,'Name',name);
