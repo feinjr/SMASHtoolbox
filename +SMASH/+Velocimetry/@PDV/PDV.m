@@ -27,10 +27,10 @@ classdef PDV
         Measurement % PDV measurement (STFT object)        
         Preview % Preview spectrogram (Image object)
     end
-    %Results = {} % Analysis results (cell array of SignalGroup objects)
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
-        Results % 
+        Frequency % Analysis results (cell array of SignalGroup objects)
+        Velocity % Converted results (cell array of SignalGroup objects)
         Boundary = {} % ROI boundaries (BoundaryCurve object)
     end
     %%
@@ -42,8 +42,7 @@ classdef PDV
             p.ReferenceFrequency=0;
             p.WindowCorrection=1;
             p.NoiseAmplitude=nan;
-            p.UniqueTolerance=1e-3;
-            %p.AnalysisMode='centroid';
+            p.Signal2SpectrumScale=nan;
             p.HarmonicFunction=[];
             p.ShockTable=[];            
             object.Settings=p;

@@ -59,10 +59,9 @@
 function varargout=partition(object,varargin)
 
 % handle input
-if nargin==1
-    assert(nargout==0,'ERROR: partition assignment requires choice/value inputs');
-    fprintf('Partition parameters:\n');
+if nargout==0   
     param=object.Partition;
+    assert(~isempty(param),'ERROR: no partitions defined');    
     fprintf('\tPoints   = %#13.0d\tSkip    = %#13.0d\n',...
         param.Points,param.Skip);
     fprintf('\tDuration = %#13.6g\tAdvance = %#13.6g\n',...
@@ -70,6 +69,10 @@ if nargin==1
     fprintf('\tBlocks   = %#13.0d\tOverlap = %#13.6g\n',...
         param.Blocks,param.Overlap);
     return
+elseif nargin==1
+    fprintf('No partitions specified--using default settings\n');
+    choice='blocks';
+    value=1000;
 elseif (nargin==2) && isstruct(varargin{1})
     object.Partition=varargin{1};
     varargout{1}=object;

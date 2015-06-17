@@ -13,8 +13,8 @@ switch lower(mode)
     case 'spectrum'      
         [f,P]=fft(object.Measurement);                
         temp=SMASH.SignalAnalysis.Signal(f,P);
-        temp.GridLabel('Frequency');
-        temp.DataLabel('Power');
+        temp.GridLabel='Frequency';
+        temp.DataLabel='Power';
         hl=view(temp,varargin);        
     case 'autocorrelation'
         

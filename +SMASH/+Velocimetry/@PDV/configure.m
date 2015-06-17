@@ -99,10 +99,10 @@ for n=1:2:Narg
             assert(isnumeric(value) && isscalar(value) && value>0,...
                 'ERROR: invalid NoiseAmplitude value');
             object.Settings.NoiseAmplitude=value;           
-        case 'uniquetolerance'
-            assert(isnumeric(value) && isscalar(value) && (value>0),...
-                'ERROR: invalid UniqueTolerance value');
-            object.Settings.UniqueTolerance=value;
+        %case 'uniquetolerance'
+        %    assert(isnumeric(value) && isscalar(value) && (value>0),...
+        %        'ERROR: invalid UniqueTolerance value');
+        %    object.Settings.UniqueTolerance=value;
 %         case 'convertfunction'
 %             if ischar(value)
 %                 value=str2func(value);
@@ -110,18 +110,18 @@ for n=1:2:Narg
 %             assert(isa(value,'function_handle') | isempty(value),...
 %                 'ERROR: invalid ConvertFunction value');
 %             object.Settings.ConvertFunction=value;
-        case 'analysismode'
-            assert(ischar(value),'ERROR: invalid AnalysisMode value');
-            switch lower(value)
-                case 'centroid'
-                    object.Settings.AnalysisMode='centroid';
-                    object.Measurement.FFToptions.SpectrumType='power';
-                case 'fit'
-                    object.Settings.AnalysisMode='fit';
-                    object.Measurement.FFToptions.SpectrumType='complex';
-                otherwise
-                    error('ERROR: %s is an invalid AnalysisMode');
-            end
+        %case 'analysismode'
+        %    assert(ischar(value),'ERROR: invalid AnalysisMode value');
+        %    switch lower(value)
+        %        case 'centroid'
+        %            object.Settings.AnalysisMode='centroid';
+        %            object.Measurement.FFToptions.SpectrumType='power';
+        %        case 'fit'
+        %            object.Settings.AnalysisMode='fit';
+        %            object.Measurement.FFToptions.SpectrumType='complex';
+        %        otherwise
+        %            error('ERROR: %s is an invalid AnalysisMode');
+        %    end
         case 'harmonicfunction'
             if ischar(value)
                 value=str2func(value);
@@ -165,16 +165,16 @@ for n=1:2:Narg
                 value(2)=0;
             end
             object=partition(object,'block',value);
-        case 'overlap'
-            assert(isnumeric(value) & numel(value)==1,...
-                'ERROR: invalid overlap setting');            
-            value(2)=value(1);
-            try
-                value(1)=object.Measurement.Partition.Blocks;
-            catch
-                value(1)=1000;
-            end
-            object=partition(object,'block',value);
+        %case 'overlap'
+        %    assert(isnumeric(value) & numel(value)==1,...
+        %        'ERROR: invalid overlap setting');            
+        %    value(2)=value(1);
+        %    try
+        %        value(1)=object.Measurement.Partition.Blocks;
+        %    catch
+        %        value(1)=1000;
+        %    end
+        %    object=partition(object,'block',value);
         case {'duration','durations'}
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid duration setting');
@@ -184,16 +184,16 @@ for n=1:2:Narg
                 value(2)=value(1);
             end
             object=partition(object,'duration',value);
-        case 'advance'
-            assert(isnumeric(value) & numel(value)==1,...
-                'ERROR: invalid advance setting');
-            value(2)=value(1);
-            try
-                value(1)=object.Measurement.Partition.Duration;
-            catch
-                value(1)=value(2);
-            end
-            object=partition(object,'duration',value);
+        %case 'advance'
+        %    assert(isnumeric(value) & numel(value)==1,...
+        %        'ERROR: invalid advance setting');
+        %    value(2)=value(1);
+        %    try
+        %        value(1)=object.Measurement.Partition.Duration;
+        %    catch
+        %        value(1)=value(2);
+        %    end
+        %    object=partition(object,'duration',value);
         case {'point','points'}
             assert(isnumeric(value) & numel(value)==1,...
                 'ERROR: invalid Points setting');
@@ -203,16 +203,16 @@ for n=1:2:Narg
                 value(2)=value(1);
             end
             object=partition(object,'points',value);
-        case 'skip'
-            assert(isnumeric(value) & numel(value)==1,...
-                'ERROR: invalid Skip setting');
-            value(2)=value(1);
-            try
-                value(1)=object.Measurement.Partition.Points;
-            catch
-                value(1)=value(2);
-            end
-            object=partition(object,'points',value);
+        %case 'skip'
+        %    assert(isnumeric(value) & numel(value)==1,...
+        %        'ERROR: invalid Skip setting');
+        %    value(2)=value(1);
+        %    try
+        %        value(1)=object.Measurement.Partition.Points;
+        %    catch
+        %       value(1)=value(2);
+        %    end
+        %    object=partition(object,'points',value);
         otherwise
             error('ERROR: "%s" is an invalid setting',name);
     end

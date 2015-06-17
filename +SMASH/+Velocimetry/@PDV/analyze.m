@@ -1,6 +1,9 @@
 % analyze Perform history analysis
 %
-% This method performs PDV history analysis and stores the output in the
+
+
+% This method performs PDV history analysis...
+%and stores the output in the
 % object's Results property.  The number of histories generated during the
 % analysis depends on the number of specified boundaries; if no boundaries
 % are defined, a single history with no frequency bounds is generated.
@@ -35,6 +38,7 @@ if isempty(object.Measurement.Partition)
     message{2}='       Use the "configure" method before "analyze"';
     error('%s\n',message{:});
 end
+object=characterize(object,'Scaling');
 
 %% manage boundaries and limits
 [xlimit,~]=limit(object.Measurement);
@@ -72,7 +76,7 @@ object.Measurement=limit(object.Measurement,xbound);
 
 %% perform analysis
 options=struct();
-options.ScaleFactor=Spectrum2SignalScale(object.Measurement);
+options.ScaleFactor=object.Settings.Signal2SpectrumScale;
 switch lower(SpectrumType)
     case 'power'
         object.Measurement.FFToptions.SpectrumType='power';        
@@ -97,6 +101,8 @@ history=analyze(object.Measurement,TargetFunction,'none');
 
 %% separate and process results
 N=numel(boundary);
+object.Frequency=cell(1,N);
+object.Velocity=cell(1,N);
 index=1:4; % location, strength, unique, chirp
 for m=1:N
     % remove NaN entries
@@ -106,15 +112,15 @@ for m=1:N
     t=t(keep);
     data=data(keep,:);
     % store new object
-    object.Results{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
-    object.Results{m}.GridLabel='Time';
-    object.Results{m}.DataLabel='';
-    object.Results{m}.Legend={'Center','Width','Strength','Unique'}; 
+    object.Frequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
+    object.Frequency{m}.GridLabel='Time';
+    object.Frequency{m}.DataLabel='';
+    object.Frequency{m}.Legend={'Center','Width','Strength','Unique'}; 
     % transfer label
     try
-        object.Results{m}.Name=object.Boundary{m}.Label;
+        object.Frequency{m}.Name=object.Boundary{m}.Label;
     catch
-        object.Results{m}.Name='(no name)';
+        object.Frequency{m}.Name='(no name)';
     end
     index=index+numel(index);
 end
