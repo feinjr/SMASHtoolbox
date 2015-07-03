@@ -33,7 +33,7 @@ function object=modify(object,step,range)
 
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
-assert(isnumeric(step) && isscalar(step) && (step>0),...
+assert(isnumeric(step) && numel(step<=1) && (step>0),...
     'ERROR: invalid step');
 
 if (nargin<3) || isempty(range)
@@ -47,6 +47,9 @@ range(2)=min(range(2),object.Time(end));
 
 % enforce uniform time base
 dt=(object.Time(end)-object.Time(1))/(numel(object.Time)-1);
+if isempty(step)
+    step=dt;
+end
 t1=object.Time(1):dt:object.Time(end);
 y=object.LinearAmplitude;
 y=interp1(object.Time,y,t1);

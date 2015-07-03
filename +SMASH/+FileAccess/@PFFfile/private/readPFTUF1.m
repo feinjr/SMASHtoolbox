@@ -5,7 +5,7 @@ NBLKS=ReadWord(fid);
 for block=1:NBLKS
     % read data
     NX=ReadLong(fid);
-    ReadWord(fid,5); % skip ISPARE
+    ISPARE=ReadWord(fid,5); %#ok<NASGU>
     X0=ReadFloat(fid);
     DX=ReadFloat(fid);
     temp.X=X0+(0:(NX-1))*DX;

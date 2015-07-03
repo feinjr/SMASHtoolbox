@@ -1,6 +1,7 @@
 function result=ReadFloat(fid)
 
 word=fread(fid,3,'int16');
+%word=fread(fid,3,'uint16');
 two15=pow2(15);
 rtwo15=1/two15;
 
