@@ -1,17 +1,17 @@
-% hist Create 1D/2D histograms of Cloud data
+% histogram Create 1D/2D histograms of Cloud data
 %
 % This method generates one- and two-dimensional histograms for variables
 % inside of a data cloud.  The choice of variable(s) is specified by the
 % second input argument.
-%    >> hist(object,2); % 1D histogram of variable 2
-%    >> hist(object,[1 3]); % 2D histogram of variables 1 and 3
+%    >> histogram(object,2); % 1D histogram of variable 2
+%    >> histogram(object,[1 3]); % 2D histogram of variables 1 and 3
 % The second input is required unless the cloud only has two variables, in
 % which case the histogram defaults to the first and second variables.  If
 % the input is omitted in any other case, the user will be prompted to
 % select one or two variables before the histogram can be generatd.
 %
 % Options for controlling the histogram are specified as name/value pairs.
-%    >> hist(object,variable,'Name',value);
+%    >> histogram(object,variable,'Name',value);
 % Valid options are specified below.
 %    -'bin'/'xbin'/'hbin' : horizontal bin specification
 %    -'ybin'/'vbin'       : vertical bin specification (2D histograms only)
@@ -23,8 +23,8 @@
 %  array of numbers.
 %
 % As in MATLAB's bin function, the use of outputs suppresses plot generation.
-%    >> [count,bin]=hist(object,...); % 1D histogram
-%    >> [count,xbin,ybin]=hist(object,...); % 2D histogram
+%    >> [count,bin]=histogram(object,...); % 1D histogram
+%    >> [count,xbin,ybin]=histogram(object,...); % 2D histogram
 %
 % See also Cloud, ellipse, view
 %
@@ -35,7 +35,7 @@
 % revised August 8, 2014 by Daniel Dolan
 %    -changed output handling to match MATLAB hist convention
 %
-function varargout=hist(object,variable,varargin)
+function varargout=histogram(object,variable,varargin)
 
 % handle input
 if (nargin<2) || isempty(variable)

@@ -1,4 +1,4 @@
-% compare Determine of cloud variables are statistcally distinct
+% compare Determine of cloud variables are distinct
 %
 % This method compares two Cloud objects having the same number of
 % variables.  For each variable, a distribution of median differences is
@@ -47,8 +47,8 @@ end
 statistic=@(table) median(table,1);
 table=nan(iterations,Nvar);
 for k=1:iterations
-    A=bootstrap(reference);
-    B=bootstrap(target);
+    A=regenerate(reference,'bootstrap');
+    B=regenerate(target,'bootstrap');
     table(k,:)=statistic(A.Data)-statistic(B.Data);
 end
 
@@ -74,9 +74,9 @@ if nargout==0
     fprintf('Cloud comparison:\n');
     for m=1:Nvar        
         if distinct(m)
-            fprintf('\tVariable %d is statistically distinct at the %.2f span\n',m,span);
+            fprintf('\tVariable %d is distinct at the %.2f span\n',m,span);
         else
-           fprintf('\tVariable %d is NOT statistically distinct at the %.2f span\n',m,span); 
+           fprintf('\tVariable %d is NOT distinct at the %.2f span\n',m,span); 
         end
     end
 else

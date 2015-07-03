@@ -1,5 +1,17 @@
 % view Display Cloud data
 %
+% under construction...
+%
+% view(object)
+% view(object);
+% view(...,'Variable',[1 3]);
+% view(...,'Points','on');
+% view(...,'Points','off'); % default
+% view(...,'ImageMode','histogram'); % default
+% view(...,'ImageMode','density');
+
+
+%
 % This method displays data cloud points for visualization.  
 %    >> view(object,variable);
 % Up to three cloud variables (if present) can be specified at a time.
@@ -15,54 +27,86 @@
 %
 % created August 5, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=view(object,variable)
+function varargout=view(object,modeA,modeB)
 
 % handle input
-if (nargin<2) || isempty(variable)
-    variable=selectVariables(object,3,'bound');
+if (nargin<2) || isempty(modeA)
+    modeA='density';
+    %modeA='histogram';
 end
-assert(numel(variable)<=3,'ERROR: too many plot variables');
-for k=1:numel(variable)
-    assert(SMASH.General.testNumber(variable(k),'positive','integer') & ...
-        variable(k)>0 & variable(k)<=object.NumberVariables,...
-        'ERROR: invalid variable number');
+assert(ischar(modeA),'ERROR: invalid modeA');
+modeA=lower(modeA);
+
+if (nargin<3) || isempty(modeB)
+    %modeB='histogram';
+    modeB='density';
 end
 
-switch numel(variable)
-    case 1
-        x=object.Data(:,variable(1));
-        y=ones(size(x));
-        h=plot(x,y);
-        xlabel(object.DataLabel{variable(1)});
-        ylabel('');
-        set(gca,'YTick',[]);
-    case 2
-        x=object.Data(:,variable(1));
-        y=object.Data(:,variable(2));
-        h=plot(x,y);
-        xlabel(object.DataLabel{variable(1)});
-        ylabel(object.DataLabel{variable(2)});
-    case 3
-        x=object.Data(:,variable(1));
-        y=object.Data(:,variable(2));
-        z=object.Data(:,variable(3));
-        h=plot3(x,y,z);
-        xlabel(object.DataLabel{variable(1)});
-        ylabel(object.DataLabel{variable(2)});
-        zlabel(object.DataLabel{variable(3)});
+% manage width settings
+width=object.Width;
+width=abs(width);
+N=numel(width);
+bins=cell(1,N);
+for k=1:numel(width)
+    value1=min(object.Data(:,k));
+    value2=max(object.Data(:,k));
+    if isnan(width(k))
+        width(k)=(value2-value1)/(10-1);
+    end
+    bins{k}=value1:width(k):value2;                  
 end
-%set(h,'Color',object.LineColor,'LineStyle',object.LineStyle,...
-%    'Marker',object.Marker,'MarkerSize',object.MarkerSize);
-apply(object.GraphicOptions,h,'noparent');
-set(h,'LineStyle','none');
+
+% create plots
+figure;
+
+ha=[];
+hb=[];
+for m=1:object.NumberVariables
+    % single variable plot
+    index=sub2ind([N N],m,m);
+    ha(end+1)=subplot(N,N,index); %#ok<AGROW>
+    box on;
+    switch modeA
+        case 'histogram'
+            [count,xbin]=histogram(object,m,'xbin',bins{m});
+        case 'density'
+            [count,xbin]=density(object,m,width(m));
+    end
+    line(xbin,count,'Color','k');
+    temp=sprintf('%s  ',object.VariableName{m});
+    xlabel(temp);
+    % cross variable plots
+    for n=(m+1):N
+        %index=sub2ind([N N],m,n); % lower triangle
+        index=sub2ind([N N],n,m); % upper triangle
+        hb(end+1)=subplot(N,N,index); %#ok<AGROW>
+        box on;
+        switch modeB
+            case 'points'
+                line(object.Data(:,m),object.Data(:,n),...
+                    'LineStyle','none','Marker','.','Color','r');
+            case 'histogram'
+                [count,xbin,ybin]=histogram(object,[m n],...
+                    'xbin',bins{m},'ybin',bins{n});
+                imagesc(xbin,ybin,count);
+            case 'density'
+                [count,xbin,ybin]=density(object,[m n],...
+                    width([m n]));
+                imagesc(xbin,ybin,count);
+            case 'ellipse'
+                [x,y]=ellipse(object,[m n]);
+                line(x,y,'Color','k');
+        end
+       
+        xlabel(object.VariableName{m});
+        ylabel(object.VariableName{n});
+    end
+end
 
 % handle output
-if nargout>=1
-    varargout{1}=h;
-end
-
-if nargout>=2
-    varargout{2}=variable;
+if nargout>0
+    varargout{1}=ha;
+    varargout{2}=hb;
 end
 
 end

@@ -56,13 +56,13 @@ if nargout==0
     else
         fprintf('Confidence region for %.2f-%.2f span\n',span(1),span(2));
     end
-    width=cellfun(@length,object.DataLabel);
+    width=cellfun(@length,object.VariableName);
     width=max(width);
     format=['   ' sprintf('%%%ds',width) '%15s%15s\n'];
     fprintf(format,'','Lower','Upper');
     format=['   ' sprintf('%%%ds',width) '%#+15g%#+15g\n'];
     for n=1:object.NumberVariables
-        fprintf(format,object.DataLabel{n},result(1,n),result(2,n));
+        fprintf(format,object.VariableName{n},result(1,n),result(2,n));
     end    
 end
 

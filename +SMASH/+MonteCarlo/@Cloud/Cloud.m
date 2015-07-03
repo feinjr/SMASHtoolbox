@@ -17,7 +17,7 @@
 %    - A correlations matrix can be specified to link variations between
 %     variables.  This input must be square, symmetric, and contain values
 %     between -1 and +1 (inclusive) with +1 along the diagonal.  The
-%     default value of is the identity matrix.
+%     default value is the identity matrix.
 %    - The number of cloud points can be any integer greater than 0.  The
 %    default value is 1000.
 % Cloud properties can be modified object creation.  For example:
@@ -25,17 +25,17 @@
 %    >> object.Points=25;
 %    >> object.Moments=[0 2; 2 2; 3 2];
 %    >> object.Correlations=[1 +0.5 0; +0.5 1 0; 0 0 1];
-%    >> object=generate(object);
+%    >> object=regenerate(object);
 % changes a 1000-point cloud centered at (0,1,2) with a common variance of 1
 % to a 25-point cloud centered at (0,2,3) with a common variance of 2.  Note
-% that the object's data table is not updated until the "generate" method
+% that the object's data table is not updated until the regenerate method
 % is called.
 %
 % Cloud objects can also be created by manually passing a data table.
 %    >> object=Cloud(table,'table');
 % Each column of the table represents one cloud dimension.
 %
-% See also MonteCarlo, bootstrap, generate
+% See also MonteCarlo
 %
 
 % created April 29, 2014 by Daniel Dolan (Sandia National Laboratories)
@@ -43,33 +43,39 @@
 %    -modifed input handling
 %    -simplified execution, eliminating all obsolete DataCloud references
 %    -enabled manual object creation with a data table
-classdef Cloud < SMASH.General.DataClass
+classdef Cloud %< SMASH.General.DataClass
     %%
     properties
         Seed = []; % Random number generator seed
         NumberPoints = 1000 % Number of cloud points
         Moments % Statistical moments
         Correlations % Correlation matrix
+        VariableName % cell array of text labels
+        Width % widths used in histograms and kernel density estimates
     end
-    properties (SetAccess=?SMASH.General.DataClass)
+    properties (SetAccess=protected)
+        Data % Random data table (columns = variables)
         NumberVariables % Cloud dimensions
-        %Source % Cloud creation: 'apply', 'bootstrap, 'moments', or 'table'
+        Source % moments, table, apply, or bootstrap
     end
     %% constructor
     methods (Hidden=true)
         function object=Cloud(varargin)
-            object=object@SMASH.General.DataClass(varargin{:});            
+            object=create(object,varargin{:});        
         end
     end
     %% 
     methods (Access=protected,Hidden=true)
         varargout=create(varargin);
         varargout=import(varargin);
+        varargout=histogram(varargin);
+        varargout=density(varargin);
+        varargout=ellipse(varargin);
     end
     %% utility methods
-    methods (Access=protected,Hidden=true)
-        varargout=selectVariables(varargin)
-    end
+    %methods (Access=protected,Hidden=true)
+    %    varargout=selectVariables(varargin)
+    %end
     %% property setters
     methods
         function object=set.Moments(object,moments)
@@ -103,6 +109,20 @@ classdef Cloud < SMASH.General.DataClass
                 error('ERROR: invalid seed value');
             end
             object.Seed=seed;
+        end
+        function object=set.Width(object,width)
+            assert(isnumeric(width),'ERROR: invalid bin width(s) setting');
+            if isempty(object.Width)
+                object.Width=width;
+            elseif isempty(width)
+                width=nan(size(object.Width));
+            end
+            if numel(width)==1
+                width=repmat(width,size(object.Width));
+            end
+            assert(numel(width)==numel(object.Width),...
+                'ERROR: invalid number of bin widths');
+            object.Width=width;
         end
     end
 end

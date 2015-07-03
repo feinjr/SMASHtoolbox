@@ -25,7 +25,11 @@ switch numel(variable)
         if isnan(width(1))
             width(1)=std(x);
         end
-        xgrid=linspace(min(x)-3*width(1),max(x)+3*width(1),1000);
+        %xgrid=linspace(min(x)-3*width(1),max(x)+3*width(1),1000);
+        xmin=min(x)-3*width(1);
+        xmax=max(x)+3*width(1);
+        dx=width(1)/5;
+        xgrid=xmin:dx:xmax;
         count=zeros(size(xgrid));
         for k=1:numel(x)
             count=count+exp(-(xgrid-x(k)).^2/(2*width(1)^2))/(sqrt(2*pi)*width(1));
@@ -36,24 +40,24 @@ switch numel(variable)
         if isnan(width(1))
             width(1)=std(x);
         end        
-        xgrid=linspace(min(x)-3*width(1),max(x)+3*width(1),1000);
+        xgrid=linspace(min(x)-3*width(1),max(x)+3*width(1),100);
         y=object.Data(:,variable(2));
         if isnan(width(2))
             width(2)=std(y);
         end        
-        ygrid=linspace(min(y)-3*width(1),max(y)+3*width(1),1000);
+        ygrid=linspace(min(y)-3*width(1),max(y)+3*width(1),100);
         [xgrid,ygrid]=meshgrid(xgrid,ygrid);
         count=zeros(size(xgrid));
-        hw=waitbar(0);
+        %hw=waitbar(0);
         for k=1:numel(x)
             count=count+...
                 exp(-(xgrid-x(k)).^2/(2*width(1)^2)-(ygrid-y(k)).^2/(2*width(2)^2))/...
                 sqrt(2*pi*width(1))/width(1)/width(2);
-            waitbar(k/numel(x),hw);
-            fprintf('%4d\n',k);
+            %waitbar(k/numel(x),hw);
+            %fprintf('%4d\n',k);
         end
         count=count/numel(x);
-        delete(hw);
+        %delete(hw);
 end
 
 % handle output
@@ -71,7 +75,9 @@ else
             varargout{1}=count;
             varargout{2}=xgrid;
         case 2
-            % under construction
+            varargout{1}=count;
+            varargout{2}=xgrid(1,:);
+            varargout{3}=ygrid(:,1);
     end
 end
 
