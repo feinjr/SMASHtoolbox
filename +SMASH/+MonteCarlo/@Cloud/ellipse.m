@@ -64,7 +64,8 @@ low=low-0.5;
         value=sum(value)/object.NumberPoints;
         err=value-span;
     end
-options=optimset('Display','none','TolX',0.01);
+options=optimset('Display','none','TolX',0.001);
+%options=optimset('Display','iter','TolX',0.01);
 sigma=fzero(@residual,[low high],options);
 [~,value]=residual(sigma);
 

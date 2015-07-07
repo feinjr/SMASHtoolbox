@@ -1,10 +1,11 @@
 % summarize Calculate actual moments and corelations
 %
 % This method summarizes the statistical properties of the Data stored in a
-% Cloud object.
+% Cloud object.  When called without outputs:
+%     summarize(object);
+% the moments array and correlation matrix are printed in the command
+% window.  This information can also be returned as outputs.
 %    >> [moments,correlations]=summarize(object);
-% The results typically differ from values specified at object creation
-% because of the finite number of cloud points.
 %
 % See also Cloud, confidence
 %
@@ -31,12 +32,18 @@ correlations=corrcoef(object.Data);
 
 % handle output
 if nargout==0
-    fprintf('Statistical moments (mean variance skewness kurtosis):\n');
-    fprintf('\t%#10.3g %#10.3g %#10.3g %10.3g\n',...
-        transpose(moments));
-    
+    fprintf('Statistical moments:\n');
+    width=cellfun(@length,object.VariableName);
+    width=max(width);    
+    format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
+    fprintf(format,'','mean','variance','skewness','kurtosis');
+    format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g%#+10.3g%#+10.3g\n'];
+    for n=1:object.NumberVariables
+        fprintf(format,object.VariableName{n},moments(n,:));
+    end    
+   
     fprintf('Correlations:\n');
-    format=repmat('%+.3f ',[1 object.NumberVariables]);
+    format=repmat('%+10.3f ',[1 object.NumberVariables]);
     format=['\t' format '\n'];
     fprintf(format,correlations);
 else

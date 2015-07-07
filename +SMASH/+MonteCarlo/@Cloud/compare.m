@@ -1,4 +1,4 @@
-% compare Determine of cloud variables are distinct
+% compare Determine if cloud variables are distinct
 %
 % This method compares two Cloud objects having the same number of
 % variables.  For each variable, a distribution of median differences is

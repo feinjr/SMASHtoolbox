@@ -6,8 +6,8 @@
 %    >> new=generate(object,'moments'); % same as above
 % Bootstrapping can also be used to resample the current cloud data.
 %    >> new=generate(object,'bootstrap'); 
-% The moments and correlations of a resampled cloud are revised for
-% consistency with the data.
+% The moments and correlations of a resampled cloud are calculated from the
+% new data.
 %
 % See also Cloud
 %

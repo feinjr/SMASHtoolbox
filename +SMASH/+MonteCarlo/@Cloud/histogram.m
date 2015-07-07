@@ -86,20 +86,22 @@ switch numel(variable)
         x=object.Data(:,variable(1));
         y=object.Data(:,variable(2));
         if numel(xbin)==1
-            xbin=linspace(min(x),max(x),xbin);
+            %xbin=linspace(min(x),max(x),xbin);
+            [~,xbin]=hist(x,xbin);
         end
         if numel(ybin)==1
-            ybin=linspace(min(y),max(y),ybin);
+            %ybin=linspace(min(y),max(y),ybin);
+            [~,ybin]=hist(y,ybin);
         end
-        count=zeros(numel(ybin),numel(xbin));
-        left=[-inf xbin(1:end-1)];
-        right=[xbin(2:end) +inf];
+        count=zeros(numel(ybin),numel(xbin));       
+        center=(xbin(1:end-1)+xbin(2:end))/2;
+        left=[-inf center];
+        right=[center +inf];
         for n=1:numel(xbin)
             index=(x>=left(n)) & (x<right(n));
-            temp=hist(y(index),ybin);
+            temp=hist(y(index),ybin); 
             count(:,n)=temp(:);
-        end
-        
+        end              
 end
 
 % handle ouput

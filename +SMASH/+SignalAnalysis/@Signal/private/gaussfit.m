@@ -1,13 +1,16 @@
 % gaussfit
-function report=gaussfit(x,y)
+function report=gaussfit(x,y,guess)
+
+% manage input
+if isempty(guess)
+    [~,index]=max(abs(y));
+    xp=x(index);
+    xtemp=reshape(x-xp,size(y));
+    sigma=sqrt(sum(y.*(xtemp-xp).^2)/sum(y));
+    guess=[xp sigma];
+end
 
 % inital preprations
-[~,index]=max(abs(y));
-xp=x(index);
-xtemp=reshape(x-xp,size(y));
-sigma=sqrt(sum(y.*(xtemp-xp).^2)/sum(y));
-guess=[xp sigma];
-
 options=optimset('TolX',1e-6,'TolFun',1e-6);
 
 % normalize data

@@ -58,9 +58,9 @@ if nargout==0
     end
     width=cellfun(@length,object.VariableName);
     width=max(width);
-    format=['   ' sprintf('%%%ds',width) '%15s%15s\n'];
+    format=['\t' sprintf('%%%ds',width) '%10s%10s\n'];
     fprintf(format,'','Lower','Upper');
-    format=['   ' sprintf('%%%ds',width) '%#+15g%#+15g\n'];
+    format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g\n'];
     for n=1:object.NumberVariables
         fprintf(format,object.VariableName{n},result(1,n),result(2,n));
     end    

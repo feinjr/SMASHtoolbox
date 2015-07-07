@@ -28,20 +28,29 @@
 %
 % created November 15, 2013 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=locate(object,curvefit)
+function varargout=locate(object,curvefit,guess)
 
-% handle input
+% manage input
 if (nargin<2) || isempty(curvefit) || strcmpi(curvefit,'peak') ...
         || strcmpi(curvefit,'gaussian')
-    curvefit=@(x,y) gaussfit(x,y);
+    curve='gauss';
 elseif strcmpi(curvefit,'step')
-    curvefit=@(x,y) erffit(x,y);
+    curve='erf';
+end
+
+if nargin<3
+    guess=[];
 end
 
 % apply curvefit
 [x,y]=limit(object);
 try
-    report=feval(curvefit,x,y);
+    switch curve
+        case 'gauss'
+            report=gaussfit(x,y,guess);
+        case 'step'
+            report=erffit(x,y,guess);
+    end
 catch
     message={};
     message{end+1}='ERROR: locate failed';
