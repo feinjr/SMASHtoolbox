@@ -1945,7 +1945,7 @@ function newsig = IW(n)
     stress = rho0.*cumtrapz(u,cl);
     strain = cumtrapz(u,1./cl);
     dens = rho0./(1-strain);
-    newsig = SMASH.SignalAnalysis.Signal(strain,stress);
+    newsig = SMASH.SignalAnalysis.Signal(dens,stress);
  
 
     %If checked, write file
@@ -2012,7 +2012,7 @@ function PerformCallback(varargin);
         g0 = str2num(value{3});
         L = str2num(value{4});
         cv = str2num(value{5});
-        sesobj = SMASH.DynamicMaterials.EOS.Sesame('Mie-Gruneisen',value{1},x,y,rho0,g0,L,cv);
+        sesobj = SMASH.DynamicMaterials.EOS.Sesame('Mie-Gruneisen',value{1},x,y,rho0,g0,L,cv,298.15,1.0e4,300,100);
         [sesname,sespath] = uiputfile({'*.*','All Files';'*.ses*;*.a;*.asc','Sesame Files'},'Select Sesame File');
         
         %Table 201 paramters

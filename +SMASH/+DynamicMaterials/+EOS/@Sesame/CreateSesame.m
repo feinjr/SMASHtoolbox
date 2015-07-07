@@ -108,10 +108,13 @@ switch lower(modtype)
                     pinit = g0/v0.*cv.*(tgrid(j)-t0);
 
                     %Solve ode for p(v)
-                    [vsol, psol] = ode45(@(vo,po) isentrope_ode(vo,po,v,v0,prefgrid,temperaturenew,g0,L,cv),[v(1) v(end)],pinit);
+                    %maxstep = abs(min(diff(v)));
+                    %options = odeset('MaxStep',maxstep);
+                    options = odeset('RelTol',1e-7);
+                    [vsol, psol] = ode45(@(vo,po) isentrope_ode(vo,po,v,v0,prefgrid,temperaturenew,g0,L,cv),[v(1) v(end)],pinit,options);
 
                     %Interpolate solution back to desired grid
-                    pressurenew = interp1(vsol,psol,v);
+                    pressurenew = interp1(vsol,psol,v,'pchip');
                     
                     %Solve for energy and entropy. Note: T=1 taken as absolute 0 reference                                 
                     dedv = cv.*temperaturenew.*g0.*v.^(L-1)./(v0.^L) - pressurenew;
@@ -152,10 +155,11 @@ switch lower(modtype)
                     pinit = g0/v0.*cv.*(tgrid(j)-t0);
                     
                     %Solve ode for p(v)
-                    [vsol, psol] = ode45(@(vo,po) hugoniot_ode(vo,po,v,v0,prefgrid,temperaturenew,g0,L,cv),[v(1) v(end)],pinit);
+                    options = odeset('RelTol',1e-6);
+                    [vsol, psol] = ode45(@(vo,po) hugoniot_ode(vo,po,v,v0,prefgrid,temperaturenew,g0,L,cv),[v(1) v(end)],pinit,options);
 
                     %Interpolate solution back to desired grid
-                    pressurenew = interp1(vsol,psol,v);
+                    pressurenew = interp1(vsol,psol,v,'pchip');
                     
                     %Solve for energy and entropy. Note: ln(1) taken as absolute 0 reference                                 
                     dedv = cv.*temperaturenew.*g0.*v.^(L-1)./(v0.^L) - pressurenew;
