@@ -39,9 +39,9 @@ for i=1:length(windowtimes)-1;
     insitu_start = insitutimes(i);
     insitu_end = insitutimes(i+1);
     
-    object.MeasuredWindow=limit(object.MeasuredWindow,[window_start-dt window_end]);
-    object.SimulatedWindow=limit(object.SimulatedWindow,[window_start-dt window_end]);
-    object.SimulatedInsitu=limit(object.SimulatedInsitu,[insitu_start-dt insitu_end]);
+    object.MeasuredWindow=limit(object.MeasuredWindow,[window_start window_end]);
+    object.SimulatedWindow=limit(object.SimulatedWindow,[window_start window_end]);
+    object.SimulatedInsitu=limit(object.SimulatedInsitu,[insitu_start insitu_end]);
     
     [t{1},v{1}] = limit(object.MeasuredWindow);
     [t{2},v{2}] = limit(object.SimulatedWindow);
@@ -55,10 +55,10 @@ for i=1:length(windowtimes)-1;
         tscale(j) = max(t{j})-min(t{j});
         nt{j} = (t{j}-tshift(j))./tscale(j);
         %Interpolate to normalized time base
-        nv{j} = interp1(nt{j},v{j},tnorm,'pchip', 0);
+        nv{j} = interp1(nt{j},v{j},tnorm,'pchip');
     end
     nt{1} = (t{1}-tshift(2))./tscale(2);
-    nv{1} = interp1(nt{1},v{1},tnorm,'pchip', 0);
+    nv{1} = interp1(nt{1},v{1},tnorm,'pchip');
     
     
     %FFT Solution
