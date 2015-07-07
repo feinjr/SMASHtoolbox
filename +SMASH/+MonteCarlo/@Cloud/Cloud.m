@@ -44,12 +44,12 @@ classdef Cloud %< SMASH.General.DataClass
     properties (SetAccess=protected)
         NumberVariables % Number of variables (cloud dimensions)
         VariableName % Variable names (cell array of text strings)     
-        Moments % Statistical moments array
-        Correlations % Correlation matrix
+        Moments % Statistical moments array (2-4 columns)
+        Correlations % Correlation matrix (symmetric)
         NumberPoints = 1000 % Number of cloud points
         Data % Cloud data table (columns = variables)
         Source % Data soure ('moments', 'table', 'apply', or 'bootstrap')
-        Seed = []; % Random number generator seed          
+        Seed = []; % Random number generator seed (uint32 value or text string)          
         NumberBins = 10 % Number of histogram bins        
         EllipseSpan = 0.90 % Bounding ellipse span (fraction of points inside)
     end

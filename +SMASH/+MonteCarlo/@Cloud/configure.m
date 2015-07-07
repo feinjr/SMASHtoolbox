@@ -54,7 +54,9 @@ for k=1:2:Narg
                  'ERROR: incompatible moments array');
              moments=zeros(object.NumberVariables,4);
              moments(:,1:N)=value;
-             object.Moments=moments;
+             assert(all(moments(:,2))>0,...
+                 'ERROR: variances must be greater than zero');
+             object.Moments=moments;             
              refresh=true;
         case 'correlations'
             assert(isnumeric(value) && ismatrix(value),...

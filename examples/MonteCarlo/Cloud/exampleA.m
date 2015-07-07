@@ -4,11 +4,8 @@ object=SMASH.MonteCarlo.Cloud(moments);
 
 plot(object.Data(:,1),object.Data(:,2),'.');
 axis equal;
-
-%% summary and confidence regions
-summarize(object);
-
-confidence(object);
+xlabel('x');
+ylabel('y');
 
 %% visualization
 view(object);
@@ -22,8 +19,45 @@ view(object,'density','ellipse');
 
 view(object,'','points');
 
+%% summary and confidence regions
+summarize(object);
+
+confidence(object);
+
 %% saving for later
 SMASH.FileAccess.writeFile('myclouds.sda','first cloud',object);
 
 SMASH.FileAccess.probeFile('myclouds.sda')
 previous=SMASH.FileAccess.readFile('myclouds.sda','sda','first cloud');
+
+%% what does skewness do?
+clear all;
+close all;
+
+N=1e6;
+object1=SMASH.MonteCarlo.Cloud([0 1 0  0],[],N);
+object2=SMASH.MonteCarlo.Cloud([0 1 +0.9 0],[],N);
+object3=SMASH.MonteCarlo.Cloud([0 1 -0.9 0],[],N);
+
+bins=linspace(-5,5,100);
+y1=hist(object1.Data,bins);
+y2=hist(object2.Data,bins);
+y3=hist(object3.Data,bins);
+
+plot(bins,y1,bins,y2,bins,y3);
+
+%% what does kurtosis do?
+clear all;
+close all;
+
+N=1e6;
+object1=SMASH.MonteCarlo.Cloud([0 1 0  0],[],N);
+object2=SMASH.MonteCarlo.Cloud([0 1 0 +10],[],N);
+object3=SMASH.MonteCarlo.Cloud([0 1 0 -1],[],N);
+
+bins=linspace(-5,5,100);
+y1=hist(object1.Data,bins);
+y2=hist(object2.Data,bins);
+y3=hist(object3.Data,bins);
+
+plot(bins,y1,bins,y2,bins,y3);

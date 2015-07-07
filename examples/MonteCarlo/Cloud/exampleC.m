@@ -7,7 +7,7 @@ view(object,'density','ellipse');
 %% transform cloud 
 clc
 new=transform(object,@transformC1);
-new=configure(new,'VariableName',{'X','X*Y'});
+new=configure(new,'VariableName',{'X','X^2/Y'});
 view(new,'density','points');
 
 summarize(object);
