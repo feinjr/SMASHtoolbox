@@ -1,15 +1,11 @@
 % regenerate Generate new data from an existing cloud
 %
-% This method generates new cloud data from an existing cloud object.  By
-% default, data is generated from the current moments and correlations.
-%    >> new=generate(object);
-%    >> new=generate(object,'moments'); % same as above
-% Bootstrapping can also be used to resample the current cloud data.
-%    >> new=generate(object,'bootstrap'); 
-% The moments and correlations of a resampled cloud are calculated from the
-% new data.
+% This method generates new cloud data using the current moments and
+% correlations.
+%    >> new=regenerate(object);
+%    >> new=regenerate(object,'moments'); % same as above
 %
-% See also Cloud
+% See also Cloud, bootstrap
 %
 
 %
@@ -18,14 +14,7 @@
 %   -changed method from generate to regenerate
 %   -merged with bootstrap method
 %
-function object=regenerate(object,mode)
-
-% manage input
-if (nargin<2) || isempty(mode)
-    mode='moments';
-end
-assert(ischar(mode),'ERROR: invalid mode requested');
-mode=lower(mode);
+function object=regenerate(object)
 
 % manage random number generator
 if isempty(object.Seed)
@@ -40,19 +29,9 @@ else
 end
 
 % regenerate cloud data
-switch mode
-    case 'moments'
-        object.Data=MCinput(object.Moments,object.Correlations,...
-            object.NumberPoints);
-    case 'bootstrap'
-        index=randi(object.NumberPoints,[object.NumberPoints 1]);
-        object.Data=object.Data(index,:);
-        [moments,correlations]=summarize(object);
-        object.Moments=moments;
-        object.Correlations=correlations;
-    otherwise
-        error('ERROR: invalid mode requested');
-end
-object.Source=mode;
+object.Data=MCinput(object.Moments,object.Correlations,...
+    object.NumberPoints);
+
+object.Source='moments';
 
 end

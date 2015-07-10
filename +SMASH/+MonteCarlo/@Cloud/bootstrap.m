@@ -16,18 +16,27 @@
 %
 % created August 6, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=bootstrap(object,numpoints)
+function object=bootstrap(object,numpoints,UpdateMode)
 
 % handle input
 if (nargin<2) || isempty(numpoints)
-    numpoints=object.NumberPoints;
+    numpoints=object.NumberPoints;    
+end
+assert(numpoints>=10*object.NumberVariables,...
+    'ERROR: ERROR: at least 10 points per variable required');
+
+if (nargin<3) || isempty(update)
+    UpdateMode='update';
 end
 
 index=randi(object.NumberPoints,[numpoints 1]);
 object.Data=object.Data(index,:);
-[moments,correlations]=summarize(object);
-object.Moments=moments;
-object.Correlations=correlations;
+if strcmpi(UpdateMode,'update')
+    [moments,correlations]=summarize(object);
+    object.Moments=moments;
+    object.Correlations=correlations;
+end
+
 object.Source='bootstrap';
 
 end

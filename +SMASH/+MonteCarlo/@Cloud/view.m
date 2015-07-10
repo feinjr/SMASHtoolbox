@@ -89,13 +89,20 @@ for m=1:N
     box on;
     switch DiagonalPlots
         case 'histogram'
-            [count,xbin]=histogram(object,m,'xbin',object.NumberBins);           
+            [count,xbin]=histogram(object,m,'xbin',object.NumberBins);
+            switch object.HistogramMode
+                case 'bar'
+                    hb=bar(xbin,count,1);
+                    set(hb,'FaceColor','none');
+                case 'line'
+                    line(xbin,count,'Color','k');
+            end
             ylabel('Counts');
         case 'density'
             [count,xbin]=density(object,m,width(m));
+            line(xbin,count,'Color','k');
             ylabel('Density');
     end
-    line(xbin,count,'Color','k');
     temp=sprintf('%s ',object.VariableName{m});
     xlabel(temp);    
     % cross variable plots
@@ -129,9 +136,9 @@ for m=1:N
         temp=sprintf('%s ',object.VariableName{m});
         xlabel(temp);
         temp=sprintf('%s ',object.VariableName{n});
-        ylabel(temp);
-        daspect([1 1 1]);
-        pbaspect([1 1 1]);
+        ylabel(temp);       
+        %daspect([1 1 1]);
+        %pbaspect([1 1 1]);
     end
 end
 

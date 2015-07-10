@@ -13,6 +13,11 @@
 % all workspaces and remain on the MATLAB path throughout the current
 % session (unless manually removed).
 %
+% Toolbox package examples can be copied to the current directory.
+%     >> loadSMASH -example name % specific package examples
+%     >> loadSMASH -example * % all examples
+% Examples should be copied from the toolbox before execution. 
+%
 % Due to a MATLAB bug, this function cannot manage toolbox packages.  To
 % access packages in SMASH, use dot notation:
 %     >> SMASH.(package_name).(function_name)(...) % absolute function name
@@ -58,7 +63,7 @@ while numel(varargin)>0
         case '-silent'
             verbose=false;
             varargin=varargin(2:end);
-        case {'-program','-java'}
+        case {'-program','-java','-example'}
             assert(isempty(mode),'ERROR: mode conflict detected');
             mode=varargin{1};
             varargin=varargin(2:end);
@@ -68,7 +73,7 @@ while numel(varargin)>0
                 end
                 name{end+1}=varargin{1}; %#ok<AGROW>
                 varargin=varargin(2:end);
-            end 
+            end             
         case '-package'
             error('ERROR: package load not currently supported');
         otherwise
@@ -82,46 +87,48 @@ assert(~isempty(name),'ERROR: no names specified');
 switch mode
     case '-program'
         loadProgram(name,verbose);
-    case '-package'
-        %loadPackage(name,verbose);
-        % look at package directory
-        local=mfilename('fullpath');
-        [local,~]=fileparts(local);
-        local=fullfile(local,'+SMASH');
-        list=scanDirectory(local,'package');        
-        % load requested program(s)
-        if (numel(name)==1) && strcmp(name{1},'*')
-            name=list;
-        end        
-        N=numel(name);
-        %tempfile=sprintf('%f',now);
-        %tempfile=strrep(tempfile,'.','_');
-        %tempfile=sprintf('TemporaryScript_%s.m',tempfile);
-        %fid=fopen(tempfile,'w+');
-        for k=1:N
-            test=cellfun(@(x) strcmp(x,name{k}),list);
-            match=find(test,1);
-            if isempty(match)
-                warning('SMASHtoolbox:package',...
-                    'Package %s not found in SMASH toolbox',name{k});
-            else
-                command=sprintf('import(''SMASH.%s.*'')',name{k});
-                %fig=figure('Visible','off');               
-                %set(fig,'CloseRequestFcn',command);
-                %evalin('base',command);
-                evalin('caller',command);
-                %fprintf(fid,'import(''SMASH.%s.*'')\n',name{k});
-                % do something
-                if verbose
-                    fprintf('Importing the %s package\n',name{k});
-                end
-                %close(fig);
-            end
-        end
-        %fclose(fid);
-        %evalin('base',sprintf('run(''%s'')',tempfile));
-        %delete(tempfile);
-        import
+    case '-example'
+        loadExample(name,verbose);
+%     case '-package'
+%         %loadPackage(name,verbose);
+%         % look at package directory
+%         local=mfilename('fullpath');
+%         [local,~]=fileparts(local);
+%         local=fullfile(local,'+SMASH');
+%         list=scanDirectory(local,'package');        
+%         % load requested program(s)
+%         if (numel(name)==1) && strcmp(name{1},'*')
+%             name=list;
+%         end        
+%         N=numel(name);
+%         %tempfile=sprintf('%f',now);
+%         %tempfile=strrep(tempfile,'.','_');
+%         %tempfile=sprintf('TemporaryScript_%s.m',tempfile);
+%         %fid=fopen(tempfile,'w+');
+%         for k=1:N
+%             test=cellfun(@(x) strcmp(x,name{k}),list);
+%             match=find(test,1);
+%             if isempty(match)
+%                 warning('SMASHtoolbox:package',...
+%                     'Package %s not found in SMASH toolbox',name{k});
+%             else
+%                 command=sprintf('import(''SMASH.%s.*'')',name{k});
+%                 %fig=figure('Visible','off');               
+%                 %set(fig,'CloseRequestFcn',command);
+%                 %evalin('base',command);
+%                 evalin('caller',command);
+%                 %fprintf(fid,'import(''SMASH.%s.*'')\n',name{k});
+%                 % do something
+%                 if verbose
+%                     fprintf('Importing the %s package\n',name{k});
+%                 end
+%                 %close(fig);
+%             end
+%         end
+%         %fclose(fid);
+%         %evalin('base',sprintf('run(''%s'')',tempfile));
+%         %delete(tempfile);
+%         import
     case '-java'
         loadJava(name,verbose);
 end
@@ -157,6 +164,54 @@ for k=1:N
         addpath(fullfile(local,name{k}));
         if verbose
             fprintf('Adding %s to the MATLAB path\n',name{k});
+        end
+    end
+end
+
+end
+
+function loadExample(name,verbose)
+
+% look at program directory
+local=mfilename('fullpath');
+[local,~]=fileparts(local);
+local=fullfile(local,'examples');
+list=scanDirectory(local);
+
+% verify target directory
+[master,~]=fileparts(local);
+target=pwd;
+if strfind(target,master)
+    error('ERROR: examples cannot be loaded here');
+end
+
+target=fullfile(target,'examples');
+if exist(target,'dir')
+    rmdir(target,'s');
+end
+mkdir(target);
+
+% load requested example(s)
+if (numel(name)==1) && strcmp(name{1},'*')
+    name=list;
+end
+
+N=numel(name);
+for k=1:N
+    test=cellfun(@(x) strcmp(x,name{k}),list);
+    match=find(test,1);
+    if isempty(match)       
+        warning('SMASHtoolbox:example',...
+            'Example directory %s not found in SMASH toolbox',name{k});
+    else
+        source=fullfile(local,name{k});
+        try
+            copyfile(source,fullfile(target,name{k}));
+        catch
+            mkdir(fullfile(target,name{k}));
+        end
+        if verbose
+            fprintf('Copying %s examples \n',name{k});
         end
     end
 end

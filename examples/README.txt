@@ -1,0 +1,5 @@
+This directory contains examples for various packages in the SMASH toolbox.  Cell-formatted scripts illustrate the use of a particular function or class.  Data files and support function may be located with the scripts as necessary.
+
+Developers are encouraged to provide examples here rather than as part of the online documentation.  Doing so allows more extensive demonstration capabilities and keeps the online documentation short.  Multiple examples, each focusing on a few topics, are recommended over a single comprehensive script.  Remember that everything is this directory is part of a Git repository, so example data files should be as small as possible.
+
+Standard users should copy example directories to another location before making any modifications!  Example scripts may modify the directory they reside in, so best practice is to copy the example directory before running any of the scripts.

@@ -19,11 +19,15 @@ function varargout=configure(object,varargin)
 Narg=numel(varargin);
 if Narg==0
     assert(nargout==0,'ERROR: output cannot be generated without inputs');   
-    name={'VariableName','Moments','Correlations','NumberPoints','Seed','NumberBins'};
+    name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
+        'NumberBins','HistogramMode',...
+        'EllipseSpan'};
     for k=1:numel(name)
         fprintf('%s:\n',name{k});
         if isempty(object.(name{k}))
-            fprintf('\t(empty)\n');
+            fprintf('\t(empty)\n\n');
+        elseif ischar(object.(name{k}))
+            fprintf('\t%s\n\n',object.(name{k}));
         else           
             disp(object.(name{k}));
         end
@@ -108,6 +112,15 @@ for k=1:2:Narg
                 SMASH.General.testNumber(value,'positive','integer')...
                 && (value>0),'ERROR: invalid number of bins');
             object.NumberBins=value;            
+        case 'histogrammode'
+            assert(ischar(value),'ERROR: invalid histogram mode');
+            value=lower(value);
+            switch value
+                case {'bar','line'}
+                    object.HistogramMode=value;
+                otherwise
+                    error('ERROR: invalid histogram mode');
+            end
         case 'ellipsespan'
             assert(...
                 SMASH.General.testNumber(value)...

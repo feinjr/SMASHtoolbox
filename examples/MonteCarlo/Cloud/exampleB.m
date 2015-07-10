@@ -23,7 +23,8 @@ summarize(object);
 summarize(new);
 
 %% transform a large cloud
-LargeObject=configure(object,'NumberPoints',1e5,'NumberBins',100);
+%LargeObject=configure(object,'NumberPoints',1e5,'NumberBins',100);
+LargeObject=configure(object,'NumberPoints',1e6,'NumberBins',100);
 
 tic;
 new1=transform(LargeObject,@transformB);
