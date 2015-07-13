@@ -29,6 +29,7 @@ if NumGroups==NumWaveforms
         report.GroupName{n}=info.Groups(n).Name;
         report.DatasetName{n}=fullfile(...
             info.Groups(n).Name,info.Groups(n).Datasets(1).Name);
+        report.DatasetName{n}=strrep(report.DatasetName{n},'\','/'); % Windows fix
     end
 else
     info=info.Groups;
@@ -39,6 +40,7 @@ else
         report.Name{n}=info.Datasets(n).Name;
         report.GroupName{n}=info.Name;
         report.DatasetName{n}=fullfile(info.Name,info.Datasets(n).Name);
+        report.DatasetName{n}=strrep(report.DatasetName{n},'\','/'); % Windows fix
     end
 end
 report.NumberSignals=NumWaveforms;
