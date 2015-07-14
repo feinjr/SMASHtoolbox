@@ -46,6 +46,7 @@ format{end+1}='yokogawa';
 format{end+1}='zdas';
 format{end+1}='saturn';
 
+format{end+1}='ditabis';
 format{end+1}='film';
 format{end+1}='graphics';
 format{end+1}='optronis';

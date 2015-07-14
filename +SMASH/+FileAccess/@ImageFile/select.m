@@ -43,6 +43,9 @@ object.Format=format;
         short={};
         full={};
         
+        short{end+1}='ditabis';
+        full{end+1}='Image plate scans (*.tif)';
+        
         short{end+1}='film';
         full{end+1}='Film scans (*.img, *.hdf, *.pff)';
         
