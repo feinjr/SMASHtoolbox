@@ -1,5 +1,5 @@
 % gaussfit
-function report=gaussfit(x,y,guess)
+function report=gaussfit(x,y,guess,bound)
 
 % manage input
 if isempty(guess)

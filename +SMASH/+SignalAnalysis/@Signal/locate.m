@@ -28,7 +28,7 @@
 %
 % created November 15, 2013 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=locate(object,curvefit,guess)
+function varargout=locate(object,curvefit,guess,bound)
 
 % manage input
 if (nargin<2) || isempty(curvefit) || strcmpi(curvefit,'peak') ...
@@ -47,9 +47,9 @@ end
 try
     switch curve
         case 'gauss'
-            report=gaussfit(x,y,guess);
+            report=gaussfit(x,y,guess,bound);
         case 'step'
-            report=erffit(x,y,guess);
+            report=erffit(x,y,guess,bound);
     end
 catch
     message={};
