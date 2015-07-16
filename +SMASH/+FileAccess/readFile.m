@@ -90,7 +90,7 @@ switch format
     case 'dig'
         object=SMASH.FileAccess.DIGfile(filename);
         data=read(object);
-    case {'film','plate','winspec','sbfp','optronis','hamamatsu','graphics'}
+    case {'film','plate','winspec','sbfp','optronis','hamamatsu','graphics','ditabis'}
         object=SMASH.FileAccess.ImageFile(filename,format);
         data=read(object,record);
     case 'pff'

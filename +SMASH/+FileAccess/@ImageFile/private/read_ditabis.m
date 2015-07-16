@@ -49,6 +49,8 @@ else
     
     dx = 1/info.XResolution*25400;
     dy  =1/info.YResolution*25400;
+%    dx = 1/info.XResolution*25.4;
+%    dy  =1/info.YResolution*25.4;
     
     X = dx*(0:info.Width-1);
     Y = dy*(0:info.Height-1);

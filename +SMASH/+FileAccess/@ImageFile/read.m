@@ -36,7 +36,7 @@ map=jet(64);
 extra=struct();
 switch object.Format
     case 'ditabis'
-        [data,~,grid1,~,grid2] = read_ditabis(varargin);        
+        [data,~,grid1,~,grid2] = read_ditabis(object.FullName);        
     case 'graphics'
         [data,map]=imread(object.FullName);
         if isempty(map)

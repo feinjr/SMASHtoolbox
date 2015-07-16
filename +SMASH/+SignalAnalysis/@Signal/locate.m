@@ -42,6 +42,10 @@ if nargin<3
     guess=[];
 end
 
+if nargin<4
+    bound=[];
+end
+
 % apply curvefit
 [x,y]=limit(object);
 try
