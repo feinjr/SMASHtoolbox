@@ -11,6 +11,7 @@
 % See also IMAGE
 
 % created July 24, 2014 by Tommy Ao (Sandia National Laboratories)
+% updated July 16, 2015 by Tommy Ao
 
 %
 function object=bandpass(object,varargin)
