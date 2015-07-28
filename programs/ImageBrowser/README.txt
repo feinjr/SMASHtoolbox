@@ -1,1 +1,0 @@
-Do NOT place data files or local scripts/functions in +SMASH or any of its subdirectories!  Instead, add the directory containing +SMASH to your MATLAB path and keep your files in a separate location.
