@@ -26,7 +26,7 @@ switch data.Format
             'ERROR: cannot import Image from this file');
         object.Grid1=1:size(object.Data,1);
         object.Grid2=transpose(1:size(object.Data,2));
-    case {'graphics','winspec','optronis','hamamatsu','film','plate','ditabis'}
+    case {'graphics','winspec','optronis','hamamatsu','film','plate'}
         object.Grid1=data.Grid1;
         object.Grid2=data.Grid2;
         object.Data=data.Data;

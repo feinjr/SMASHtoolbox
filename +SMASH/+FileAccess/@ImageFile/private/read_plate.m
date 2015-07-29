@@ -11,6 +11,8 @@ switch lower(ext)
         grid2=1:size(data,1);
         grid2=(grid2-1)*dy;
         grid2=grid2(:);
+    case '.tif'
+        [data,~,grid1,~,grid2] = read_ditabis(name);
 end
 
 end
