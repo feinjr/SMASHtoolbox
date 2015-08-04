@@ -62,7 +62,7 @@ if nargout==0
         fprintf(format,name{k});
         printValue(object.Measurement.FFToptions.(name{k}));
         fprintf('\n');
-    end   
+    end       
     % print PDV settings
     fprintf('*** Analysis settings ***\n');
     name=fieldnames(object.Settings);
@@ -129,13 +129,13 @@ for n=1:2:Narg
             assert(isa(value,'function_handle') | isempty(value),...
                 'ERROR: invalid HarmonicFunction value');
             object.Settings.HarmonicFunction=value;
-        case 'shocktable' % [index start stop]
-            if isempty(value)
-                object.Settings.ShockTable=[];
-                return
-            end
-            assert(size(value,2)==3,'ERROR: invalid ShockTable value');
-            object.Settings.ShockTable=value;
+        %case 'shocktable' % [index start stop]
+        %    if isempty(value)
+        %        object.Settings.ShockTable=[];
+        %        return
+        %    end
+        %    assert(size(value,2)==3,'ERROR: invalid ShockTable value');
+        %    object.Settings.ShockTable=value;
         %% FFT options
         case 'window'
             object.Measurement.FFToptions.Window=value;
@@ -157,62 +157,26 @@ for n=1:2:Narg
         case 'partition'
             object=partition(object,value{1},value{2});
         case {'block','blocks'}
-            assert(isnumeric(value) & numel(value)==1,...
+            assert(isnumeric(value) & any(numel(value)==[1 2]),...
                 'ERROR: invalid block setting');
-            try
-                value(2)=object.Measurement.Partition.Overlap;
-            catch
+            if isscalar(value)
                 value(2)=0;
             end
-            object=partition(object,'block',value);
-        %case 'overlap'
-        %    assert(isnumeric(value) & numel(value)==1,...
-        %        'ERROR: invalid overlap setting');            
-        %    value(2)=value(1);
-        %    try
-        %        value(1)=object.Measurement.Partition.Blocks;
-        %    catch
-        %        value(1)=1000;
-        %    end
-        %    object=partition(object,'block',value);
+            object=partition(object,'block',value);        
         case {'duration','durations'}
-            assert(isnumeric(value) & numel(value)==1,...
+            assert(isnumeric(value) & any(numel(value)==[1 2]),...
                 'ERROR: invalid duration setting');
-            try
-                value(2)=object.Measurement.Partition.Advance;
-            catch
+            if isscalar(value)
                 value(2)=value(1);
             end
-            object=partition(object,'duration',value);
-        %case 'advance'
-        %    assert(isnumeric(value) & numel(value)==1,...
-        %        'ERROR: invalid advance setting');
-        %    value(2)=value(1);
-        %    try
-        %        value(1)=object.Measurement.Partition.Duration;
-        %    catch
-        %        value(1)=value(2);
-        %    end
-        %    object=partition(object,'duration',value);
+            object=partition(object,'duration',value);        
         case {'point','points'}
-            assert(isnumeric(value) & numel(value)==1,...
+            assert(isnumeric(value) & any(numel(value)==[1 2]),...
                 'ERROR: invalid Points setting');
-            try
-                value(2)=object.Measurement.Partition.Skip;
-            catch
+            if isscalar(value)
                 value(2)=value(1);
             end
-            object=partition(object,'points',value);
-        %case 'skip'
-        %    assert(isnumeric(value) & numel(value)==1,...
-        %        'ERROR: invalid Skip setting');
-        %    value(2)=value(1);
-        %    try
-        %        value(1)=object.Measurement.Partition.Points;
-        %    catch
-        %       value(1)=value(2);
-        %    end
-        %    object=partition(object,'points',value);
+            object=partition(object,'points',value);       
         otherwise
             error('ERROR: "%s" is an invalid setting',name);
     end

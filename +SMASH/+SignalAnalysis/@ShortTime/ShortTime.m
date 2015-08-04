@@ -40,7 +40,7 @@ classdef ShortTime < SMASH.SignalAnalysis.Signal
         end
     end
     %% protected methods
-    methods (Access=protected)
+    methods (Access=protected, Hidden=true)
         varargout=create(varargin);
         varargout=import(varargin);
     end

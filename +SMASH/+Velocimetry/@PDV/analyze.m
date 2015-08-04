@@ -1,6 +1,9 @@
 % analyze Perform history analysis
 %
 
+%
+% object=analyze(object,'sinusoid');
+% 
 
 % This method performs PDV history analysis...
 %and stores the output in the
@@ -86,6 +89,7 @@ switch lower(SpectrumType)
         else
             error('ERROR: alternate power modes not supported yet');
         end
+        history=analyze(object.Measurement,TargetFunction,'none');
     case 'fit'           
         object.Measurement.FFToptions.SpectrumType='complex';
         Window={'gaussian' 3};
@@ -94,10 +98,13 @@ switch lower(SpectrumType)
         options.Tau=object.Measurement.Partition.Duration;
         options.Tau=options.Tau/(2*Window{2});
         TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
+        history=analyze(object.Measurement,TargetFunction,'none');
+    case 'sinusoid'
+        history=SinusoidFit(object.Measurement,boundary,varargin{:});       
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
-history=analyze(object.Measurement,TargetFunction,'none');
+
 
 %% separate and process results
 N=numel(boundary);
