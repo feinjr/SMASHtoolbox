@@ -54,8 +54,10 @@ previous.Bound=xlimit;
 boundary=object.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
-    table(1,:)=[xlimit(1) 0 NyquistFrequency];
-    table(2,:)=[xlimit(2) 0 NyquistFrequency];
+    %table(1,:)=[xlimit(1) 0 NyquistFrequency];
+    %table(2,:)=[xlimit(2) 0 NyquistFrequency];
+    table(1,:)=[xlimit(1) NyquistFrequency/2 NyquistFrequency/2];
+    table(2,:)=[xlimit(2) NyquistFrequency/2 NyquistFrequency/2];
     boundary=SMASH.ROI.BoundingCurve('horizontal',table);
     boundary.Label='Default boundary';
     boundary={boundary};
@@ -100,7 +102,10 @@ switch lower(SpectrumType)
         TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
         history=analyze(object.Measurement,TargetFunction,'none');
     case 'sinusoid'
-        history=SinusoidFit(object.Measurement,boundary,varargin{:});       
+        measurement=...
+            SMASH.SignalAnalysis.ShortTime.convert(object.Measurement);
+        analyzeSinusoid('-setup',boundary,varargin{:});
+        history=analyze(measurement,@analyzeSinusoid);
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end

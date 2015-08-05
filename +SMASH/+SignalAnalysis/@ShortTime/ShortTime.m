@@ -46,5 +46,6 @@ classdef ShortTime < SMASH.SignalAnalysis.Signal
     end
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
+        varargout=convert(varargin);
     end
 end
