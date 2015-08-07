@@ -27,13 +27,13 @@
 %
 % Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object,SpectrumType,varargin)
+function object=analyze(object,AnalysisMode,varargin)
 
 %% manage input
-if (nargin<2) || isempty(SpectrumType)
-    SpectrumType='power';
+if (nargin<2) || isempty(AnalysisMode)
+    AnalysisMode='power';
 end
-assert(ischar(SpectrumType),'ERROR: invalid analysis mode');
+assert(ischar(AnalysisMode),'ERROR: invalid analysis mode');
 
 %% verify partition settings
 if isempty(object.Measurement.Partition)
@@ -82,7 +82,7 @@ object.Measurement=limit(object.Measurement,xbound);
 %% perform analysis
 options=struct();
 options.ScaleFactor=object.Settings.Signal2SpectrumScale;
-switch lower(SpectrumType)
+switch lower(AnalysisMode)
     case 'power'
         object.Measurement.FFToptions.SpectrumType='power';        
         if isempty(varargin) || strcmpi(varargin{1},'centroid')
@@ -107,7 +107,7 @@ switch lower(SpectrumType)
         analyzeSinusoid('-setup',boundary,varargin{:});
         history=analyze(measurement,@analyzeSinusoid);
     otherwise
-        error('ERROR: %s is not a valid analysis mode',mode);
+        error('ERROR: %s is not a valid analysis mode',AnalysisMode);
 end
 
 

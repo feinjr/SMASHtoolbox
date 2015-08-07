@@ -14,6 +14,7 @@
 % are generated with 'add' mode.
 %     >> object=bound(object,'add'); % default name is "Boundary curve"
 %     >> object=bound(object,'add',name); % specify name at creation
+%     >> object=bound(object,'add',existing); % add existing BoundingCurve object
 % New boundaries are added at the end of the current boundary list.
 % Exisiting boundaries are accessed by numeric index, which are revealed in
 % 'summarize' mode.
@@ -66,10 +67,14 @@ Narg=numel(varargin);
 switch lower(operation)
     case 'add'
        object.Boundary{end+1}=SMASH.ROI.BoundingCurve('horizontal');
-       if (Narg>=1) 
-           name=varargin{1};
-           assert(ischar(name),'ERROR: invalid name');
-           object.Boundary{end}.Label=name;
+       if Narg>=1 
+           if ischar(varargin{1})
+               object.Boundary{end}.Label=varargin{1};
+           elseif isa(varargin{1},'SMASH.ROI.BoundingCurve')
+               object.Boundary{end}=varargin{1};
+           else
+              error('ERROR: invalid "add" input');
+           end
        end
     case 'rename'
         assert(Narg==2,'ERROR: invalid number of inputs');
@@ -127,11 +132,16 @@ switch lower(operation)
             N=numel(object.Boundary);
             if Narg==0
                 list=1:N;
-                fprintf('There %d defined boundaries\n',N);
+                if N==1
+                    fprintf('There is %d defined boundary\n',N); 
+                else
+                    fprintf('There are %d defined boundaries\n',N);
+                end               
             elseif Narg==1
                 list=varargin{1};
                 verifyIndex(list);
-                fprintf('There %d defined boundaries (%d shown)\n',N,numel(list));
+                fprintf('There are %d defined boundaries (%d shown)\n',...
+                    N,numel(list));
             else
                 error('ERROR: too many inputs');
             end           
