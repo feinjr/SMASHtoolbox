@@ -20,6 +20,8 @@
 %    >> writeFile('myfile.sda',label,data,[description],[deflate]);
 % Description and deflate inputs are optional.
 %
+%
+% 
 % See also FileAccess, fprintf, SDAfile
 %
 
@@ -38,6 +40,17 @@ if (nargin<1) || isempty(filename)
     end
     filename=fullfile(pathname,filename);
 end
+
+% handle overwrite mode
+Narg=numel(varargin);
+keep=true(1,Narg);
+for n=1:Narg
+    if strcmp(varargin{1},'-overwrite')
+        
+        keep(n)=false;
+    end
+end
+varargin=varargin(keep);
 
 % write file
 [~,~,ext]=fileparts(filename);

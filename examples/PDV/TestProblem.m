@@ -19,7 +19,11 @@ velocity(index)=v2*exp(-(time(index)-t2)/50);
 %plot(time,velocity);
 time=time*1e-9; % convert ns to s
 data=[time(:) velocity(:)];
-SMASH.FileAccess.writeFile('VelocityInput.txt',data,'%#g %#g\n',...
+filename='VelocityInput.txt';
+if exist(filename,'file')
+    delete(filename)
+end
+SMASH.FileAccess.writeFile(filename,data,'%#g %#g\n',...
     {'Time (s) Velocity (m/s)'});
 
 %% create PDV signal
@@ -28,20 +32,28 @@ params.fshift=1e9;
 params.coupling='AC';
 %params.noise_fraction=0.10; % crude noise generator
 loadSMASH -program fringen
-signal=fringen('PDV','VelocityInput.txt',params); 
+signal=fringen('PDV',filename,params); 
 
 noise=randn(size(signal));
-noise=conv2(noise,ones(5,1),'same');
-noise=noise*(0.20/std(noise));
+kernel=-11:11;
+kernel=exp(-kernel.^2/(2*3^2));
+noise=conv2(noise,kernel,'same');
+sigma=0.20;
+noise=noise*(sigma/std(noise));
 signal=signal+noise;
 
 %% create PDV object
 object=SMASH.Velocimetry.PDV(time,signal);
-object=configure(object,'Window','Hann');
+%object=configure(object,'Window','Hann');
+object=configure(object,'Window','boxcar');
 object=preview(object,'Duration',[5e-9 1e-9]);
-%preview(object);
+preview(object);
 
-object=configure(object,'Duration',[5e-9 1e-9]);
+duration=5e-9;
+skip=0.2e-9;
+%skip=0.1e-9;
+%object=configure(object,'Duration',[5e-9 1e-9]);
+%object=configure(object,'Duration',[5e-9 0.1e-9]);
 
 %% define bounds
 manual=false;
@@ -54,6 +66,8 @@ else
 end
 
 %% power analysis
+object=configure(object,'Window','Hann','Duration',[duration*(0.58/0.34) skip]);
+
 object=analyze(object,'power');
 result1=split(object.Frequency{1});
 
@@ -61,7 +75,11 @@ result1=scale(result1,1e9);
 result1=result1/1e9;
 
 %% sinusoid analysis
+object=configure(object,'Duration',[duration skip]);
+
+tic;
 object=analyze(object,'sinusoid');
+toc;
 result2=split(object.Frequency{1});
 
 result2=scale(result2,1e9);
@@ -81,3 +99,18 @@ beat=params.fshift+2*velocity/params.wavelength;
 line(time*1e9,beat/1e9,'Color','k');
 
 legend('centroid','sinusoid','source');
+
+%%
+fs=(numel(time)-1)/(time(end)-time(1));
+tau=duration;
+uncertainty=sqrt(6/fs/tau^3)*sigma/pi;
+uncertainty=uncertainty/1e9;
+fprintf('Limiting uncertainty: %#.1g GHz\n',uncertainty);
+
+temp=regrid(result1,result2.Grid);
+view(temp-result2);
+xlabel('Time (ns)')
+ylabel('Difference (GHz)');
+
+line(xlim,repmat(uncertainty,[1 2]),'Color','k','LineStyle','--');
+line(xlim,repmat(-uncertainty,[1 2]),'Color','k','LineStyle','--');

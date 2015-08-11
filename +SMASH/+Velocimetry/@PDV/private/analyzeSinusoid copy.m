@@ -1,6 +1,5 @@
 % under construction
 
-% MAJOR CHANGE: BOUNDARY POINTS ARE NOW FIXED!!!
 
 %   analyzeSinusoid('-setup',name,value,...);
 %
@@ -74,18 +73,16 @@ time=varargin{1}(:);
 tc=(time(end)+time(1))/2;
 t=time-tc;
 tau=time(end)-time(1);
-dt=tau/(numel(t)-1);
 
 signal=varargin{2}(:);
 signal=signal-mean(signal);
 L=numel(signal); % number of signal points
 
-% analyze components
+% identify active components and associated subregions
 Nm=ones(Mtotal,1); % subregions
 active=true(Mtotal,1);
 InteriorSelection=repmat(struct('X',[],'Y',[]),[1 Mtotal]);
 for m=1:Mtotal
-    % determine if comopnent is active
     [bminL,~]=probe(boundary{m},time(1)); % left side
     [bminR,~]=probe(boundary{m},time(end)); % right side
     if isnan(bminL) || isnan(bminR)
@@ -93,19 +90,12 @@ for m=1:Mtotal
         continue;
     end
     active(m)=true;
-    % determine the number of subdomains    
-    table=boundary{m}.Data(:,1:2);
-    table=sortrows(table,1);
-    table=table(2:end-1,:);
-    index=(table(:,1)>time(1)) & (table(:,1)<time(end));
-    table=table(index,:);
-    if size(table,1)>0
-        keep=[true; diff(table(:,1))>=dt];
-        table=table(keep,:);
-        InteriorSelection(m).X=table(:,1);
-        InteriorSelection(m).Y=table(:,2);
-    end    
-    Nm(m)=size(table,1)+1;
+    xselect=boundary{m}.Data(2:end-1,1);
+    yselect=boundary{m}.Data(2:end-1,2);
+    index=(xselect>time(1)) & (xselect<time(end));
+    Nm(m)=sum(index)+1;
+    InteriorSelection(m).X=xselect(index);
+    InteriorSelection(m).Y=yselect(index);
 end
 active=find(active);
 
@@ -127,14 +117,20 @@ for m=active
 end
 
 % setup nonlinear parameters
-%NumParam=2*sum(Nm(active));
-NumParam=sum(Nm(active)+1);
+NumParam=2*sum(Nm(active));
+%NumParam=1+sum(Nm(active));
 guess=nan(NumParam,1);
 ConstraintTable=nan(NumParam,2);
-[left,right]=deal(nan(Mtotal,max(Nm)));
 index=1;
-for m=active   
-    % identify boundaries
+[left,right]=deal(nan(Mtotal,max(Nm)));
+for m=active
+    % average frequencies
+    [bmin,bmax]=probe(boundary{m},tc);
+    ConstraintTable(index,1)=(bmin+bmax)/2; % center
+    ConstraintTable(index,2)=(bmax-bmin)/2; % amplitude
+    guess(index)=0;
+    index=index+1;
+    % chirp values and subregion transitions
     for n=1:Nm(m)
         if n==1
             left(m,n)=time(1);
@@ -143,90 +139,125 @@ for m=active
         end
         if (Nm(m)==1) || (n==Nm(m))
             right(m,n)=time(end);
-        else
+        else%if n<Nm(m)
             right(m,n)=InteriorSelection(m).X(n);
-        end                        
-    end
-    % characterize subdomain widths
-    %for n=1:(Nm(m)-1)
-    %    guess(index)=sqrt(right(m,n)-left(m,n));
-    %    ConstraintTable(index,1)=dt;
-    %    index=index+1;
-    %end
-    % characterize beat parameters   
-    for n=1:(Nm(m)+1)
-        if n<=Nm(m)
-            [bmin,bmax]=probe(boundary{m},left(m,n));
-        else
-            [bmin,bmax]=probe(boundary{m},right(m,n-1));
         end
-        ConstraintTable(index,1)=(bmin+bmax)/2; % center
-        ConstraintTable(index,2)=(bmax-bmin)/2; % amplitude
+        [bminL,bmaxL]=probe(boundary{m},left(m,n));
+        [bminR,bmaxR]=probe(boundary{m},right(m,n));
+        cmax=(bmaxR-bminL)/(right(m,n)-left(m,n));
+        cmin=(bminR-bmaxL)/(right(m,n)-left(m,n));
+        ConstraintTable(index,1)=(cmin+cmax)/2; % center
+        ConstraintTable(index,2)=(cmax-cmin)/2; % amplitude
         guess(index)=0;
-        index=index+1;                    
+        index=index+1;
+        if (Nm(m)>1) && (n<Nm(m))
+            delta=(right(m,n)-left(m,n))/tau;
+            guess(index)=1;
+            guess(index)=sqrt(delta);
+            ConstraintTable(index,1)=0; % minimum value
+            %ConstraintTable(index,2)=+1; % direction
+            index=index+1;
+        end
     end
 end
 
 % perform nonlinear optimization
+%FrequencyMatrix=nan(sum(Nm));
+%FrequencyVector=nan(sum(Nm),1);
 BasisMatrix=nan(L,NumCol);
-beat=nan(Mtotal,max(Nm)+1);
-%left(:)=nan;
-%right(:)=nan;
+bave=nan(Mtotal,1);
+[beat,chirp]=deal(nan(Mtotal,max(Nm)));
+left(:)=nan;
+right(:)=nan;
 g=[]; % linear parameters
     function [chi2,fit]=residual(param)
         % transform slack variables
         index=1;
         for mr=active
-            % subdomain boundaries
-            %             for nr=1:Nm(mr)
-            %                 if (Nm(mr)==1) || (nr==1)
-            %                     left(mr,nr)=time(1);
-            %                 else
-            %                     left(mr,nr)=right(mr,nr-1);
-            %                 end
-            %                 if (Nm(mr)==1) || (nr==Nm(mr))
-            %                     right(mr,nr)=time(end);
-            %                 else
-            %                     right(mr,nr)=left(mr,nr)+...
-            %                         ConstraintTable(index,1)+param(index)^2;
-            %                     index=index+1;
-            %                     if right(mr,nr)>time(end)
-            %                         right(mr,nr)=time(end);
-            %                     end
-            %                 end
-            %             end
-            % beat parameters
-            for nr=1:(Nm(mr)+1)
-                beat(mr,nr)=ConstraintTable(index,1)+...
+            % average frequencies
+            bave(mr)=ConstraintTable(index,1)+...
+                ConstraintTable(index,2)*sin(param(index));
+            index=index+1;
+            % chirp values and subregion durations
+            left(mr,1)=time(1);
+            for nr=1:Nm(mr)
+                chirp(mr,nr)=ConstraintTable(index,1)+...
                     ConstraintTable(index,2)*sin(param(index));
                 index=index+1;
+                if (Nm(mr)>1) && (nr<Nm(mr))
+                    delta=ConstraintTable(index,1)+param(index)^2;
+                    index=index+1;
+                    right(mr,nr)=left(mr,nr)+delta*tau;
+                    if right(mr,nr)>time(end)
+                        right(mr,nr)=time(end);
+                    end
+                    left(mr,nr+1)=right(mr,nr);
+                else
+                    right(mr,nr)=time(end);
+                end
             end
-        end                               
-        % update basis matrix
-        for col=1:NumCol
-            BasisMatrix(:,col)=0;
-            mr=ColumnTable(col,1);
-            nr=ColumnTable(col,2);
-            if (left(mr,nr)==time(end))
+        end
+        % calculate subdomain frequencies
+        beat(:)=nan;
+        for mr=active
+            beat(mr,1)=bave(mr);
+            if Nm(mr)==1
                 continue
             end
+            for nr=2:Nm(mr)
+                beat(mr,nr)=beat(mr,nr-1)+...
+                    (chirp(mr,nr-1)-chirp(mr,nr))*(left(mr,nr)-tc);
+            end
+        end
+        %         index=1;
+        %         for mr=active
+        %             if Nm(mr)==1
+        %                 FrequencyMatrix(index,:)=0;
+        %                 FrequencyMatrix(index,index)=+1;
+        %                 FrequencyVector(index)=bave(mr);
+        %                 index=index+1;
+        %             else
+        %                 for nr=1:(Nm(mr)-1)
+        %                     FrequencyMatrix(index,:)=0;
+        %                     FrequencyMatrix(index,index)=+1;
+        %                     FrequencyMatrix(index,index+1)=-1;
+        %                     FrequencyVector(index)=(chirp(mr,nr+1)-chirp(mr,nr))*(right(mr,nr)-tc);
+        %                     index=index+1;
+        %                 end
+        %                 FrequencyMatrix(index,:)=0;
+        %                 for nr=1:Nm(mr)
+        %                     FrequencyMatrix(index,nr)=(right(mr,nr)-left(mr,nr))/tau;
+        %                 end
+        %                 FrequencyVector(index)=bave(mr);
+        %                 index=index+1;
+        %             end
+        %         end
+        %         [FrequencyVector,~]=linsolve(FrequencyMatrix,FrequencyVector);
+        %         start=1;
+        %         for mr=active
+        %             index=start:Nm(mr);
+        %             beat(mr,1:Nm(mr))=FrequencyVector(index);
+        %             start=index(end)+1;
+        %         end
+        % update basis matrix
+        for col=1:NumCol
+            mr=ColumnTable(col,1);
+            nr=ColumnTable(col,2);
             pr=ColumnTable(col,3);
             qr=ColumnTable(col,4);
-            br=ColumnTable(col,5);                       
+            br=ColumnTable(col,5);
+            temp=zeros(L,1);
             index=(time>=left(mr,nr)) & (time<=right(mr,nr));
-            t=time(index)-left(mr,nr);
-            phase=abs(bref(mr)+qr*(beat(mr,nr)-bref(mr)))*t;
-            if sum(index)>2
-                chirp=(beat(mr,nr+1)-beat(mr,nr))/(right(mr,nr)-left(mr,nr));
-                phase=phase+(chirp/2)*t.^2;
-            end
-            phase=2*pi*pr*phase;
+            phase=...
+                pr*abs(bref(mr)+qr*(beat(mr,nr)-bref(mr)))*t(index)...
+                +pr*qr/2*chirp(mr,nr)*t(index).^2;
             switch br
                 case 1
-                    BasisMatrix(index,col)=cos(phase);
+                    temp(index)=cos(2*pi*phase);
                 case 2
-                    BasisMatrix(index,col)=sin(phase);                    
+                    temp(index)=sin(2*pi*phase);
             end
+            BasisMatrix(:,col)=temp;
         end
         %test=isnan(BasisMatrix);
         %if any(test(:))
@@ -237,9 +268,9 @@ g=[]; % linear parameters
         fit=BasisMatrix*g;
         % residual calculation
         chi2=mean((signal-fit).^2);
-        if stop
-            keyboard
-        end
+        %if stop
+        %    keyboard
+        %end
     end
 
 stop=false;
@@ -248,18 +279,13 @@ result=fminsearch(@residual,guess,OptimizationOptions);
 
 f=nan(Mtotal,1);
 for m=active
-    finst=nan(L,1);
+    temp=nan(L,1);
     for n=1:Nm(m)
         index=(time>=left(m,n)) & (time<=right(m,n));
-        finst(index)=beat(m,n);
-        if sum(index)>2
-            chirp=(beat(m,n+1)-beat(m,n))/(right(m,n)-left(m,n));
-            t=time(index)-left(m,n);
-            finst(index)=finst(index)+chirp*t;
-        end       
+        temp(index)=beat(m,n)+chirp(m,n)*t(index);
     end
-    finst=finst(~isnan(finst));
-    f(m)=mean(finst);
+    temp=temp(~isnan(temp));
+    f(m)=mean(temp);
 end
 
 %out(:,1)=bave;
@@ -267,9 +293,8 @@ out(:,1)=f;
 out(:,2:4)=nan;
 varargout{1}=out(:);
 
-if false
-%if true
-%if any(f)<0 || any(Nm>3)
+%if false
+if any(f)<0 || any(Nm>3)
 %if any(Nm>1)
     ha(1)=subplot(2,1,1);
     view(boundary{1},gca);
@@ -278,8 +303,7 @@ if false
     linkaxes(ha,'x');
     xlim(ha(2),[time(1) time(end)]);
     set(ha(1),'YLimMode','auto');
-    title(sprintf('Nm=%g ',Nm));
-    for n=1:numel(right);line(repmat(right(1,n),[1 2]),ylim);end
+    title(sprintf('%g ',Nm));
     keyboard
     if stop
         result=fminsearch(@residual,guess,OptimizationOptions);
