@@ -92,20 +92,22 @@ switch lower(AnalysisMode)
             error('ERROR: alternate power modes not supported yet');
         end
         history=analyze(object.Measurement,TargetFunction,'none');
-    case 'fit'           
-        object.Measurement.FFToptions.SpectrumType='complex';
-        Window={'gaussian' 3};
-        object.Measurement.FFToptions.Window=Window;
-        options.UniqueTolerance=object.Settings.UniqueTolerance;
-        options.Tau=object.Measurement.Partition.Duration;
-        options.Tau=options.Tau/(2*Window{2});
-        TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
-        history=analyze(object.Measurement,TargetFunction,'none');
+%    case 'fit'           
+%        object.Measurement.FFToptions.SpectrumType='complex';
+%        Window={'gaussian' 3};
+%        object.Measurement.FFToptions.Window=Window;
+%        options.UniqueTolerance=object.Settings.UniqueTolerance;
+%        options.Tau=object.Measurement.Partition.Duration;
+%        options.Tau=options.Tau/(2*Window{2});
+%        TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
+%        history=analyze(object.Measurement,TargetFunction,'none');
     case 'sinusoid'
         measurement=...
             SMASH.SignalAnalysis.ShortTime.convert(object.Measurement);
-        analyzeSinusoid('-setup',boundary,varargin{:});
-        history=analyze(measurement,@analyzeSinusoid);
+        %analyzeSinusoid('-setup',boundary,varargin{:});
+        %history=analyze(measurement,@analyzeSinusoid);
+        %TargetFunction=@(t,s) analyzeSinusoid(t,s,varargin{:});
+        history=analyzeSinusoid(measurement,boundary,varargin{:});
     otherwise
         error('ERROR: %s is not a valid analysis mode',AnalysisMode);
 end
