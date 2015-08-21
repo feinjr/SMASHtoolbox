@@ -56,6 +56,7 @@ switch lower(method)
         end
         argument=sortrows(argument,1);
         temp=interp1(argument(:,1),argument(:,2),data(:),'linear');
+        data=reshape(temp,size(data));
     case 'custom'
         if ~isa(argument,'function_handle')
             error('ERROR: invalid argment for user-function mapping');
