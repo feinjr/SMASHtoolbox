@@ -70,7 +70,10 @@ classdef Wedge < SMASH.ImageAnalysis.Image
             object.StepOffsets=value;
         end
         function object=set.CalibrationRange(object,value)
-            assert(isnumeric(value) & numel(value(2)==2) ...
+            if isempty(value)
+                value=[0.025 0.975];
+            end
+            assert(isnumeric(value) & numel(value==2) ...
                 & all(value>0) & all(value<1),...
                 'ERROR: invalid CalibrationRange value');
             value=sort(value);
