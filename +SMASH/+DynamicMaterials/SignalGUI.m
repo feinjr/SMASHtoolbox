@@ -485,7 +485,7 @@ end
 
 dlg.Hidden = true;
 dlg.Name = 'Label Signal';
-locate(dlg,'north');
+locate(dlg,'center');
 
 %Create edit box for each signal
 for i=1:numel(sig_num)
@@ -1022,12 +1022,12 @@ function AverageSignals(src,varargin)
     yaverage = mean(ytot')';
     
     %Custom averaging
-        %weights = [1/3 2/3];
+        weights = [2/4 2/4];
         %weights = [4/3 -1/3];
-        %yaverage = weights(1).*ytot(:,1)+weights(2).*ytot(:,2);
+        yaverage = weights(1).*ytot(:,1)+weights(2).*ytot(:,2);
     
         %ysub = yaverage - ytot(:,2);
-        %yaverage = ytot(:,2)-2*ysub;
+        %yaverage = ytot(:,1)-4*ysub;
     
     %Add Signal
     newsig = SMASH.SignalAnalysis.Signal(xgrid,yaverage);
@@ -1981,8 +1981,9 @@ dlg.Hidden = true;
 %init = [16.55,1.6,1,1.3788e-4,73,1.80948e2,1.9953e2]; % Ta
 %init = [1.84,1.19,1,2.7662e-3,4,9.0122,1.13367372e2]; % Be
 %init = [21.02,2.44,1,1.3357e-4,75,1.86207e2,3.70e2]; % Re
-init = [10.915,2.5,1,1.2064e-4,82,207.2,4.178e2]; % Pb
-
+%init = [10.915,2.5,1,1.2064e-4,82,207.2,4.178e2]; % Pb
+init = [2.5,0.5,1,8.0e-4,10,60.08,39.0]; % Soda Lime Glass
+%init = [2.21,0.5,1,8.0e-4,10,60.08,39.0]; % Borosilicate Glass
 
 ReferenceOptions={'cuisentrope','pdisentrope','usup','pdhugoniot'};
 h=addblock(dlg,'listbox','ReferenceCurveType',ReferenceOptions);
