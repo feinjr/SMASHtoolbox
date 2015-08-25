@@ -152,7 +152,8 @@ ys=polyval(p,xs);
 object.TransferTable=[ys(:) 10.^(xs(:))];
 
 % handle output
-basic_figure;
+%basic_figure;
+SMASH.MUI.Figure;
 ha(1)=subplot(3,1,1);
 imagesc(object.Grid1,object.Grid2,object.Data);
 colormap(object.GraphicOptions.ColorMap);
