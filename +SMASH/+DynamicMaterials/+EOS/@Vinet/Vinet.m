@@ -83,7 +83,7 @@ classdef Vinet
         end
         function object=set.BP0(object,value)
             assert((isnumeric(value) & isscalar(value) & isfinite(value)),'ERROR: invalid BP0');
-            assert(value>0,'ERROR: BP0 must be > 0');
+%            assert(value>0,'ERROR: BP0 must be > 0');
             object.BP0=value;
         end
         function object=set.d(object,value)

@@ -25,8 +25,8 @@ function object =calibrate(object,rhoData,pData,varargin)
 
 
 pIC = [object.B0,object.BP0,object.d];
-p_lower = [object.B0*0.5, object.BP0*0.5, object.d-1000];
-p_upper = [object.B0*2.0, object.BP0*2.0, object.d+1000];
+p_lower = [object.B0*0.5, min(object.BP0*0.5,object.BP0*2.0), object.d-1000];
+p_upper = [object.B0*2.0, max(object.BP0*0.5,object.BP0*2.0), object.d+1000];
 
 %Bounds specification
 if nargin > 3
