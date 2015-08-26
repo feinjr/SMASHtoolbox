@@ -1,4 +1,4 @@
-% view View object graphically
+% view View XRD object graphically
 %
 % This method displays XRD objects as Image plots.  The default view is the
 % measured data.
