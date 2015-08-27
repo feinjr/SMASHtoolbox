@@ -24,13 +24,15 @@ classdef XRD
     end
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)
+        AngularProfile % Analysis result (Signal object)
     end
     %%
     methods (Hidden=true)
         function object=XRD(varargin)
             % default settings
             p=struct();
-            p.Center=0;            
+            p.Center=0;
+            p.Radius=0;
             object.Settings=p;
             % manage input
             if (nargin==1) && isobject(varargin{1})
