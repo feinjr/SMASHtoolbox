@@ -1,46 +1,19 @@
-% view View XRD object graphically
-%
-% This method displays XRD objects as Image plots.  The default view is the
-% measured data.
-%     >> view(object);
-%     >> view(object,'Measurement'); % same as above
-% Results can be viewed *after* the analysis method has been used.
-%     >> view(object,'Angle');
-%
-% Specifying an output returns graphic handles for lines from this method.
-%     >> h=view(...);
-% 
-% See also XRD, analyze
-%
+function varargout=view(object,choice,varargin)
 
-% 
-% created August 25, 2015 by Tommy Ao (Sandia National Laboratories)
-%
-function varargout=view(object,mode,target)
 
 % manage input
-if (nargin<2) || isempty(mode)
-    mode='measurement';
+if (nargin<2) || isempty(choice)
+    choice='measurement';
 end
-assert(ischar(mode),'ERROR: invalid mode');
+assert(ischar(choice),'ERROR: invalid view choice');
 
-if (nargin<3) || isempty(target)
-    target=[];
-end
-
-% generate plot
-% NEEDS WORK!
-switch lower(mode)
+% perform requested view
+varargout=cell(1,nargout);
+switch lower(choice)
     case 'measurement'
-        h=view(object.Measurement,target);
-    case 'angle'
+        [varargout{:}]=view(object.Measurement,varargin{:});
     otherwise
-        error('ERROR: invalid view mode');
-end
-
-% manage output
-if nargout>0
-    varargout{1}=h;
+        error('ERROR: invalid view choice');
 end
 
 end
