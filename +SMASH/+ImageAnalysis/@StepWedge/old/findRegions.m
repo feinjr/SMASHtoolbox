@@ -2,12 +2,12 @@ function findRegions(object)
 
 % horizontal edges
 temp=mean(object.Measurement,'Grid2');
-deriv=differentiate(temp,object.DerivativeParams);
+deriv=differentiate(temp,object.Settings.DerivativeParams);
 x=deriv.Grid;
 z=deriv.Data.^2;
 z=z/max(z);
 
-N=numel(object.StepLevels)-1;
+N=numel(object.SettingsStepLevels)-1;
 previous=1;
 threshold=0.50;
 test2=deal(false(size(z)));
@@ -51,11 +51,11 @@ left=[object.Measurement.Grid1(1) xedge];
 right=[xedge object.Measurement.Grid1(end)];
 
 % vertical edges
-M=numel(object.StepOffsets)-1;
+M=numel(object.SettingsStepOffsets)-1;
 yedge=nan(M,N+1);
 for n=1:(N+1)
     temp=mean(object.Measurement,'Grid1',[left(n) right(n)]);
-    deriv=differentiate(temp,object.DerivativeParams);
+    deriv=differentiate(temp,object.SettingsDerivativeParams);
     y=deriv.Grid;
     z=deriv.Data.^2;
     z=z/max(z);
@@ -77,7 +77,7 @@ end
 %     yboundB=[positionB y(end)];
 % else
 %     yboundB=[y(1) positionA];
-%     yboundA=[positionB y(end)];
+%     yboundA=[positionB y(end)]
 % end
 
 end

@@ -1,3 +1,21 @@
+% view Step wedge visualization
+%
+% This method visually displays step wedge information.  The default
+% visualization is the measured image.
+%     >> view(object);
+%     >> view(object,'Measurement');
+%     >> view(object,'Measurement',option);
+%  The default option is 'display'; 'detail' and 'explore' are also valid
+%  options.
+%
+% UNDER CONSTRUCTION...
+%
+% See also StepWedge, clean, crop, rotate, ImageAnalysis.Image.view
+%
+
+%
+% created August 26, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 function varargout=view(object,choice,varargin)
 
 

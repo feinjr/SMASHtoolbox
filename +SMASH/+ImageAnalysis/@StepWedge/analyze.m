@@ -1,8 +1,37 @@
+% UNDER CONSTRUCTION
+%
+% analyze Analyze measured image
+%
+% This method method analyzes the step wedge image to determine how
+% measured optical density maps to film exposure.  
+%     >> object=analyze(object);
+% Analysis must be performed before the apply method can be used.
+%
+% Step wedge analysis several intermediate steps.
+%   -The user is prompted to crop the measurement (if not already done).
+%   -Automatic rotation is applied to orient the measurement.
+%   -Constant regions are identified by transitions of peak slope.
+%   -Median values from each constant region are associated with total
+%   optical density (step value plus offset)
+%
+% UNDER construction
+%
+%   -
+%
+% See also StepWedge, analyze, clean, crop, rotate
+%
+
+%
+% created August 26, 2016 by Daniel Dolan (Sandia National Laboratory)
+%
 function varargout=analyze(object)
 
 % initial preparations
-%object=crop(object,'manual');
+if ~object.Cropped
+    object=crop(object,'manual');
+end
 object=rotate(object,'auto');
+object=locate(object);
 
 % generate exposure table
 N=numel(object.StepOffsets);
@@ -34,12 +63,6 @@ for k=1:size(object.RegionTable,1)
     m=(object.Measurement.Grid2>=y1) & (object.Measurement.Grid2<=y2);
     temp=object.Measurement.Data(m,n);
     level(k)=median(temp(:));    
-%     temp=sort(temp(:));
-%     start=round(0.25*numel(temp));
-%     stop=round(0.75*numel(temp));
-%     temp=temp(start:stop);
-%     level(k)=mean(temp);
-%     Dlevel(k)=std(temp);
 end
 [level,index]=sort(level);
 exposure=exposure(index);
@@ -56,6 +79,7 @@ xs=linspace(min(x(keep)),max(x(keep)),100);
 ys=polyval(p,xs);
 
 object.TransferTable=[ys(:) 10.^(xs(:))];
+object.TransferPoints=[x(:) y(:)];
 
 % handle output
 SMASH.MUI.Figure;
