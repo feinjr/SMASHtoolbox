@@ -1,7 +1,7 @@
-% clean Remove measurement outliers
+% clean Remove local artifacts
 %
-% This method "cleans" step wedge measurements.  Local outliers are removed
-% from a specified neighborhood via a median filter.
+% This method "cleans" step wedge measurements.  Local artifacts are
+% removed from a specified neighborhood via a median filter.
 %     >> object=clean(object); % default neighborhood is 9x9 pixels
 %     >> object=clean(object,nhood);
 % Neighborhoods are specified by one or two numbers: the vertical and

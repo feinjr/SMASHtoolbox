@@ -24,7 +24,7 @@
 % that matches more than one file, the object is contructed from the sum of
 % the individual files (consistent size required).
 %
-% See also ImageAnalysis, FileAccess.SupportedFormats
+% See also SMASH.ImageAnalysis, SMASH.FileAccess.SupportedFormats
 %
 
 % created November 5, 2013 by Tommy Ao (Sandia National Laboratories)

@@ -7,14 +7,16 @@ object.Measurement.GraphicOptions.Title='Step wedge';
 
 % set up settings structure
 settings=struct();
+
 settings.StepLevels = object.DefaultStepLevels;
 settings.StepOffsets = object.DefaultStepOffsets;
 
-%settings.CalibrationRange=[0.025 0.975]; % allowed calibration range
 settings.DerivativeParams= object.DefaultDerivativeParams; % [order nhood]
-
 settings.HorizontalMargin=object.DefaultHorizontalMargin; % fractional
 settings.VerticalMargin=object.DefaultVerticalMargin; % fraction
+
+settings.AnalysisRange=object.DefaultAnalysisRange; % [min max] (fractional)
+settings.PolynomialOrder=object.DefaultPolynomialOrder; % polynomial fit order
 
 object.Settings=settings;
 

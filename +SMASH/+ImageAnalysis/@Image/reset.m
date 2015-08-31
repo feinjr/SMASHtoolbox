@@ -20,7 +20,7 @@ function object=reset(object,varargin)
 
 % manage input
 Narg=numel(varargin);
-assert(any(Narg==[1 3]), 'ERROR: invalid number of inputs');
+assert(any(Narg==3), 'ERROR: invalid number of inputs');
 
 if isa(varargin{1},'SMASH.ImageAnalysis.Image')
     Grid1=varargin{1}.Grid1;
@@ -39,7 +39,7 @@ if isempty(Grid1)
 end
 
 if isempty(Grid2)
-    Grid1=object.Grid2;
+    Grid2=object.Grid2;
 end
 
 if isempty(Data)
@@ -49,8 +49,8 @@ end
 % transfer inputs to object
 assert(numel(Grid1)==size(Data,2) && numel(Grid2)==size(Data,1),...
     'ERROR: inconsistenct Grid/Data arrays');
-object.Grid1=rehape(Grid1,[1 numel(Grid1)]);
-object.Grid2=rehape(Grid2,[numel(Grid2) 1]);
+object.Grid1=reshape(Grid1,[1 numel(Grid1)]);
+object.Grid2=reshape(Grid2,[numel(Grid2) 1]);
 object.Data=Data;
 object=limit(object,'all');
 

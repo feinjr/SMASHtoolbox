@@ -1,4 +1,29 @@
-% UNDER CONSTRUCTION
+% configure Configure analysis settings
+%
+% This method configures settings used by the analysis method.
+% Configurations are specified by name/value pairs.
+%     >> object=configure(object,name1,value1,...);
+% Valid settings include:
+%   StepLevels       : array of optical densities for the step wedge
+%   StepOffsets      : array of density offsets overlad on the step wedge
+%   DerivativeParams : numerical differentiation settings [order size]
+%   HorizontalMargin : margin between boundary and step region (fractional) 
+%   VerticalMargin   : margin between boundary and step region (fractional)
+%   AnalysisRange    : density range used for linearization (fractional)
+%   PolynomialOrder  : polynomial order used in linearization
+% Specifying an empty value, e.g.:
+%     >> object=configure(object,'AnalysisRange',[]);
+% resets the setting to its default value.
+%
+% Calling this method with no inputs or outputs:
+%     >> configure(object);
+% displays the current settings.
+%
+% See also StepWedge, analyze
+
+%
+% created August 26, 2016 by Daniel Dolan (Sandia National Laboratory)
+%
 function varargout=configure(object,varargin)
 
 % mange input
@@ -43,7 +68,7 @@ value=setting.StepOffsets;
 if isempty(value)
     value=object.DefaultStepOffsets;
 end
-assert(isnumeric(value) & numel(value)>0 & all(value>=0),...
+assert(isnumeric(value) && numel(value)>0 && all(value>=0),...
     'ERROR: invalid StepOffsets value');
 value=reshape(value,[1 numel(value)]);
 value=sort(value);
@@ -53,24 +78,49 @@ value=setting.DerivativeParams;
 if isempty(value)
     value=object.DefaultDerivativeParams;
 end
-assert(isnumeric(value) & numel(value==2) ...
-    & all(value>0),...
+assert(isnumeric(value) && numel(value==2) ...
+    && all(value>0),...
     'ERROR: invalid DerivativeParams value');
 setting.DerivativeParams=value;
+
+value=setting.HorizontalMargin;
+if isempty(value)
+    value=object.DefaultHorizontalMargin;
+end
+assert(isnumeric(value) && isscalar(value) ...
+    && (value>0) && (value<1),...
+    'ERROR: invalid HorizontalMargin value');
+setting.HorizontalMargin=value;
+
+value=setting.VerticalMargin;
+if isempty(value)
+    value=object.DefaultVerticallMargin;
+end
+assert(isnumeric(value) && isscalar(value) ...
+    && (value>0) && (value<1),...
+    'ERROR: invalid VerticalMargin value');
+setting.VerticalMargin=value;
+
+value=setting.AnalysisRange;
+if isempty(value)
+    value=object.DefaultAnalysisRange;
+end
+assert(isnumeric(value) && (numel(value)==2) ...
+    && all(value>0) && all(value<1),...
+    'ERROR: invalid AnalysisRange value');
+value=sort(value);
+setting.AnalysisRange=value;
+
+value=setting.PolynomialOrder;
+if isempty(value)
+    value=object.DefaultPolynomialOrder;
+end
+assert(SMASH.General.testNumber(value,'integer') &&  (value>0), ...
+    'ERROR: invalid PolynomialOrder value');
+setting.PolynomialOrder=value;
 
 % finish up
 object.Settings=setting;
 varargout{1}=object;
 
-end   
-    %         function object=set.CalibrationRange(object,value)
-    %             if isempty(value)
-    %                 value=[0.025 0.975];
-    %             end
-    %             assert(isnumeric(value) & numel(value==2) ...
-    %                 & all(value>0) & all(value<1),...
-    %                 'ERROR: invalid CalibrationRange value');
-    %             value=sort(value);
-    %             object.CalibrationRange=value;
-    %         end
-    
+end       

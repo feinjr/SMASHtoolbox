@@ -19,9 +19,11 @@
 % revised March 13, 2015 by Daniel Dolan
 %   -added interactive selection
 %   -created documentation
-function object=replace(object,value,array1,array2)
+function object=replace(object,value,varargin)
+%function object=replace(object,value,array1,array2)
 
 % manage input
+Narg=numel(varargin);
 if nargin==2 % manual select mode
     h=view(object,'show');
     title(h.axes,'Use zoom/pan to select replace region');    
@@ -32,8 +34,17 @@ if nargin==2 % manual select mode
     array1=xlim;
     array2=ylim;
     close(h.figure);
+elseif Narg==1
+    index=varargin{1};
+    assert(islogical(index) & all(size(index)==size(object.Data)),...
+        'ERROR: invalid logical array for this object');
+    object.Data(index)=value;
+    return    
+elseif Narg==2
+    array1=varargin{1};
+    array2=varargin{2};
 else
-    assert(nargin==4,'ERROR: invalid number of inputs');
+    error('ERROR: invalid number of inputs');
 end
 
 % interpret array1 input

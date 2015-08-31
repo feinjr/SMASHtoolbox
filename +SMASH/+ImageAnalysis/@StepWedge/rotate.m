@@ -16,19 +16,24 @@
 %
 % created August 26, 2016 by Daniel Dolan (Sandia National Laboratory)
 %
-function object=rotate(object,value)
+function object=rotate(object,theta,value)
 
 % manage input
-if (nargin<2) || isempty(value)
-    value='auto';
+if (nargin<2) || isempty(theta)
+    theta='auto';
+end
+
+if nargin<3
+    value=[];
 end
 
 % perform rotation
-if strcmpi(value,'auto')
+if strcmpi(theta,'auto')
     % make the long side horizontal
     [Ly,Lx]=size(object.Measurement.Data);
     if Ly>Lx
-        object.Measurement.Data=transpose(object.Measurement.Data);
+        %object.Measurement.Data=transpose(object.Measurement.Data);
+        object.Measurement=rotate(object.Measurement,'right');
     end
     % intensity increases to the horizontal position
     temp=mean(object.Measurement,'Grid2');
@@ -43,7 +48,11 @@ if strcmpi(value,'auto')
         object.Measurement=flip(object.Measurement,'Grid2');
     end
 else
-    object.Measurement=rotate(object.Measurement,value);
+    object.Measurement=rotate(object.Measurement,theta);
+    if ~isempty(value)
+        index=isnan(object.Measurement.Data);
+        object.Measurement=replace(object.Measurement,value,index);
+    end
 end
 
 end

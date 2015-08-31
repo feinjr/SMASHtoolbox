@@ -46,8 +46,8 @@ options=odeset('RelTol',1e-6);
     end
 L=max(x)-min(x);
 guess=[min(x)+L/4 0 max(x)-L/4 0];
-%guess(end+1:end+2)=0;
-guess(end+1:end+4)=0;
+guess(end+1:end+2)=0;
+%guess(end+1:end+4)=0;
 result=fminsearch(@residual,guess)
 
 xf=linspace(min(x),max(x),1000);

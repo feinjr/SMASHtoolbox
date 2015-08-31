@@ -1,6 +1,36 @@
-% UNDER CONSTRUCTION
+%
+% This class manages analysis and application of step wedge measurements.
+% Step wedge measurements characterize the nonlinear response of film.
+% StepWedge objects are used in conjuction with Image objects: the step
+% wedge measurement linearizes other measurements performed on the same
+% type of film.
+%
+% StepWedge objects are usually created from a data file.
+%     >> object=StepWedge(filename,format); % single-record files
+%     >> object=StepWedge(filename,format,record); % multi-record files
+% The object proves methods for
+%     -Viewing for quality and orientation verification.
+%     -Rotating for alignment with the horizontal axes.
+%     -Cleaning local artifacts.
+%     -Cropping regions outside the wedge.
+% Almost all step wedge files require some degree of cropping; the other
+% methods are typically optional.
+% 
+% When a satisfactory step wedge image is achieved, the object is:
+%     -Analyzed to associate exposure with optical density
+%     -Applied to an Image object
+% Step wedges are associated with images derived from the same type of film
+% undergoing similar processing.  Ideally, the step wedge measurement is
+% performed on film from the same batch as the measurements of interest and
+% developed simultaneously.  
+%
+% See also SMASH.ImageAnalysis, SMASH.ImageAnalysis.Image,
+% SMASH.FileAccess.SupportedFormats
+%
 
-
+%
+% created August 28, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 %%
 classdef StepWedge
     %%
@@ -20,7 +50,10 @@ classdef StepWedge
         DefaultDerivativeParams=[1 9]; 
         DefaultHorizontalMargin=0.20;
         DefaultVerticalMargin=0.10;
+        DefaultAnalysisRange=[0.025 0.975];
+        DefaultPolynomialOrder=4;
         Cropped=false;
+        Analyzed=false;
     end
     %% constructor
     methods (Hidden=true)

@@ -40,12 +40,13 @@ matrix=ones(N,4);
         x2=param(3);
         L2=param(4);
         arg=(x-x2)/L2;
-        matrix(:,3)=sech(arg).^2;        
+        %matrix(:,3)=sech(arg);        
+        matrix(:,3)=tanh(arg);
         % shoulder
         x3=param(5);
         L3=param(6);
         arg=(x-x3)/L3;
-        matrix(:,4)=sech(arg).^2;
+        matrix(:,4)=sech(arg);
         vector=matrix\y;
         fit2=matrix*vector;
         chi2=(fit2-y).^2;
