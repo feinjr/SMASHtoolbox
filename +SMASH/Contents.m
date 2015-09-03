@@ -17,6 +17,7 @@
 %    Reference         - physical constants, etc. (UNDER CONSTRUCTION)
 %    Spectroscopy      - spectroscopy analysis (UNDER CONSTRUCTION)
 %    Velocimetry       - velocimetry analysis (UNDER CONSTRUCTION)
+%    Xray              - x-ray analysis (UNDER CONSTRUCTION)
 %
 % To learn more about these package, press the links above or use the "doc"
 % command.
@@ -33,4 +34,4 @@
 % See also SMASHtoolbox
 %
 
-% Last updated April 27, 2015
+% Last updated August 27, 2015
