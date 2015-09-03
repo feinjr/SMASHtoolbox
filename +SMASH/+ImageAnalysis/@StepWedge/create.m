@@ -1,4 +1,4 @@
-% This method filles in the Settings and Results property during object
+% This method fills in the Settings and Results property during object
 % creation
 function object=create(object)
 
@@ -7,6 +7,8 @@ object.Measurement.GraphicOptions.Title='Step wedge';
 
 % set up settings structure
 settings=struct();
+
+settings.ID=object.DefaultID;
 
 settings.StepLevels = object.DefaultStepLevels;
 settings.StepOffsets = object.DefaultStepOffsets;

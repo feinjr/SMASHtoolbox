@@ -54,6 +54,13 @@ for m=1:2:Narg
 end
 
 % error checking
+value=setting.ID;
+if isempty(value)
+    value=object.DefaultID;
+end
+assert(ischar(value),'ERROR: invalid ID value');
+seting.ID=value;
+
 value=setting.StepLevels;
 if isempty(value)
     value=object.DefaultStepLevels;
