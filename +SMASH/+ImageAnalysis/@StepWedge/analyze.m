@@ -61,11 +61,13 @@ for k=1:size(object.Results.RegionTable,1)
     level(k)=median(temp(:));    
 end
 [level,index]=sort(level);
-exposure=exposure(index);
+%exposure=exposure(index);
 layer=layer(index);
 
 % create transfer curve
-x=log10(exposure);
+%x=log10(exposure);
+x=-OD(index);
+x=x-median(x);
 y=level;
 object.Results.TransferPoints=[x(:) y(:) layer(:)];
 %fitStep(x,y);

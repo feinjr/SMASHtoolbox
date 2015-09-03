@@ -70,14 +70,15 @@ classdef DataClass
                 object.GraphicOptions=SMASH.General.GraphicOptions;
             end
         end
-        varargin=concealMethod(varargin);
-        varargin=concealProperty(varargin);
-        varargin=disp(varargin);
-        varargin=doc(varargin);
-        varargin=help(varargin);
-        varargin=revealMethod(varargin);
-        varargin=revealProperty(varargin);
-        varargin=updateHistory(varargin);
+        varargout=concealMethod(varargin);
+        varargout=concealProperty(varargin);
+        varargout=disp(varargin);
+        varargout=doc(varargin);
+        varargout=help(varargin);
+        varargout=revealMethod(varargin);
+        varargout=revealProperty(varargin);
+        varargout=updateHistory(varargin);
+        varargout=store(varargout);
     end
     %% protected methods
     methods (Access=protected, Hidden=true)
