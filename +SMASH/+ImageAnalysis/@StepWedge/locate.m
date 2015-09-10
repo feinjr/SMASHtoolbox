@@ -33,7 +33,8 @@ z=deriv.Data.^2;
 z=z/max(z);
 
 N=numel(object.Settings.StepLevels)-1;
-xedge=findPeaks(x,z,N);
+%xedge=findPeaks(x,z,N);
+xedge=findPeaks2(x,z,N); % CHANGE THIS WHEN READY!
 left=[object.Measurement.Grid1(1) xedge];
 right=[xedge object.Measurement.Grid1(end)];
 
@@ -129,5 +130,52 @@ for n=1:N
     x=x(stop:end);
     z=z(stop:end);
 end
+
+end
+
+function location=findPeaks2(x,z,N)
+
+% initial preparation
+x1=min(x);
+x2=max(x);
+
+% estimate peak spacing
+temp=SMASH.SignalAnalysis.Signal(x,z);
+[f,P]=fft(temp,'NumberFrequencies',10e3);
+guess=(N+1)/(x2-x1);
+fb=[0.75 1.75]*guess;
+index=(f>fb(1)) & (f<fb(2));
+f=f(index);
+P=P(index);
+P=P/max(P);
+index=(P>=0.50);
+f=f(index);
+P=P(index);
+f0=trapz(f,f.*P)/trapz(f,P);
+spacing=1/f0;
+
+% find the strongest peak near the center
+x0=mean(x);
+left=x0-spacing;
+right=x0+spacing;
+index=(x>=left) & (x<=right);
+xc=x(index);
+zc=z(index);
+[~,index]=max(zc);
+x0=xc(index);
+
+% estimate peak centers
+guess=x0+(-N:N)*spacing;
+keep=((guess)>x1) & (guess<x2);
+guess=guess(keep);
+
+% YOU ARE HERE
+keyboard
+
+
+
+
+
+
 
 end

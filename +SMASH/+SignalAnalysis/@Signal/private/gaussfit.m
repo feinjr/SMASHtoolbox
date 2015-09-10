@@ -5,8 +5,9 @@ function report=gaussfit(x,y,guess,bound)
 if isempty(guess)
     [~,index]=max(abs(y));
     xp=x(index);
-    xtemp=reshape(x-xp,size(y));
-    sigma=sqrt(sum(y.*(xtemp-xp).^2)/sum(y));
+    %xtemp=reshape(x-xp,size(y));
+    %sigma=sqrt(sum(y.*(xtemp-xp).^2)/sum(y));
+    sigma=(max(x)-min(x))/4;
     guess=[xp sigma];
 end
 

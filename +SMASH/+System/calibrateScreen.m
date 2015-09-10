@@ -23,9 +23,10 @@ function varargout=calibrateScreen(varargin)
 % handle input
 if nargin==0
     % do nothing
-elseif (nargin==1) && strcmpi(varargin{1},'restore')
-   restoreDPI; 
-   return
+% restore feature removed    
+%elseif (nargin==1) && strcmpi(varargin{1},'restore')
+%   restoreDPI; 
+%   return
 else
     error('ERROR: invalid input');
 end
@@ -66,6 +67,9 @@ apply=local_uicontrol('Style','pushbutton','String','Apply',...
         end       
         set(0,'ScreenPixelsPerInch',DPI);
         fprintf('Calibrated DPI value is %.1f\n',DPI);        
+        command=sprintf('set(0,''ScreenPixelsPerInch'',%.1f);',DPI);
+        fprintf('To use this DPI in future sessions, add the command:\n\t%s\n',command);
+        fprintf('to your startup file.\n');
         update_width;
         %storeDPI(DPI);        
     end
