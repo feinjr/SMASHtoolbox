@@ -33,8 +33,8 @@ z=deriv.Data.^2;
 z=z/max(z);
 
 N=numel(object.Settings.StepLevels)-1;
-%xedge=findPeaks(x,z,N);
-xedge=findPeaks2(x,z,N); % CHANGE THIS WHEN READY!
+xedge=findPeaks(x,z,N);
+%xedge=findPeaks2(x,z,N); % CHANGE THIS WHEN READY!
 left=[object.Measurement.Grid1(1) xedge];
 right=[xedge object.Measurement.Grid1(end)];
 
@@ -170,7 +170,7 @@ keep=((guess)>x1) & (guess<x2);
 guess=guess(keep);
 
 % YOU ARE HERE
-keyboard
+%keyboard
 
 
 
