@@ -22,7 +22,7 @@ classdef XRD
     properties
         Measurement % XRD measurement (Image object)        
     end
-    properties (SetAccess=protected)
+    properties % (SetAccess=protected)
         Settings % Analysis settings (structure)
         AngularProfile % Analysis result (Signal object)
     end
@@ -49,8 +49,8 @@ classdef XRD
             else
                 object.Measurement=SMASH.ImageAnalysis.Image(varargin{:});
             end
-            object.Measurement.Name='XRD measurement';
-            object.Measurement.GraphicOptions.Title='XRD measurement';
+            object.Measurement.Name='XRD Measurement';
+            object.Measurement.GraphicOptions.Title='XRD Measurement';
         end
         varargout=partition(varargin);
     end
