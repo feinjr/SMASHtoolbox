@@ -73,7 +73,7 @@ object.Data=z./count;
 object.LimitIndex1='all';
 object.LimitIndex2='all';
 object.Source='Object merge';
-concealProperty(object,'SourceFormat','SourceRecord');
+%concealProperty(object,'SourceFormat','SourceRecord');
 object.ObjectHistory={}; % start fresh
 
 end
