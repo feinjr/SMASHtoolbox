@@ -11,7 +11,6 @@
 %
 % Signal formats:
 %   'agilent'        : Agilent digitizer files (*.h5)
-%   'dig'            : Nevada Test Site signal files (*.dig)
 %   'keysight'       : Keysight digitizer files (*.h5)
 %   'lecroy'         : Lecroy digitizer files (*.trc)
 %   'saturn'         : Saturn Data Acquisition System files (*.hdf)
@@ -28,7 +27,8 @@
 %   'sbfp'           : Santa Barbara Focal Plan camera measurement (*.img)
 %   'winspec'        : Princeton Instruments WinSpec measurements (*.spe)
 %
-% General binary formats:
+% Special formats:
+%   'dig'            : Nevada Test Site signal files (*.dig)
 %   'pff'            : Portable File Format files (*.pff)
 %   'sda'            : Sanda Data Archive files (*.sda)
 %

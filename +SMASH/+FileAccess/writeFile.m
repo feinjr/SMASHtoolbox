@@ -20,7 +20,13 @@
 %    >> writeFile('myfile.sda',label,data,[description],[deflate]);
 % Description and deflate inputs are optional.
 %
-%
+% By default, users are prompted to replace single-record files that
+% already exist; existing *.sda files are appended if the requested label
+% is unique.  Existing files can be automatically overwritten by passing
+% '-overwrite' at any location after the file name.
+%   >> writeFiel(filename,'-overwrite',...);
+% The existing file is deleted before the write operation; previous records
+% in a *.sda file are discarded.
 % 
 % See also FileAccess, fprintf, SDAfile
 %
@@ -45,8 +51,8 @@ end
 Narg=numel(varargin);
 keep=true(1,Narg);
 for n=1:Narg
-    if strcmp(varargin{1},'-overwrite')
-        
+    if strcmp(varargin{n},'-overwrite')
+        delete(filename);
         keep(n)=false;
     end
 end

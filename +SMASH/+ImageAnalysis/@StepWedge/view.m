@@ -34,7 +34,7 @@ switch lower(choice)
         ha(1)=subplot(3,1,1);
         view(object,'Measurement','show',gca);
         temp=sprintf('Wedge regions for ''%s''',object.Measurement.GraphicOptions.Title);
-        title(temp);
+        title(ha(1),temp);
         for n=1:size(object.Results.RegionTable,1)
             rectangle('Position',object.Results.RegionTable(n,:),'EdgeColor','k','LineStyle','-');
             rectangle('Position',object.Results.RegionTable(n,:),'EdgeColor','w','LineStyle','--');

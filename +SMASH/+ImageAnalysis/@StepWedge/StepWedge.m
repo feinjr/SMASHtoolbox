@@ -35,7 +35,7 @@
 classdef StepWedge
     %%
     properties        
-        Measurement % Step wedge measurment (Image object)
+        Measurement % Measured step wedge (Image object)
     end
     properties (SetAccess=protected)
         Settings % Analysis settings (structure)

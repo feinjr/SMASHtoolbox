@@ -12,13 +12,17 @@
 % revised October 9, 2014 by Daniel Dolan
 %    -altered method to match revised SDA specification
 %
-function import(object,filename,description)
+function import(object,filename,description,deflate)
 
 % handle input
 assert(nargin>=2,'ERROR: insufficient number of inputs');
 
 if (nargin<3) || isempty(description)
     description='';
+end
+
+if (nargin<3) || isempty(deflate)
+    deflate=0;
 end
 
 % determine if archive is writable
@@ -37,7 +41,7 @@ fclose(fid);
 shortname=[fname ext];
 
 % insert file into archive
-insert(object,shortname,data,description);
+insert(object,shortname,data,description,deflate);
 h5writeatt(object.ArchiveFile,['/' shortname],'RecordType','file');
 
 end
