@@ -21,7 +21,7 @@ if (nargin<3) || isempty(description)
     description='';
 end
 
-if (nargin<3) || isempty(deflate)
+if (nargin<4) || isempty(deflate)
     deflate=0;
 end
 
