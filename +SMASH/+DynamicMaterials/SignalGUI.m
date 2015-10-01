@@ -1982,8 +1982,8 @@ dlg.Hidden = true;
 %init = [1.84,1.19,1,2.7662e-3,4,9.0122,1.13367372e2]; % Be
 %init = [21.02,2.44,1,1.3357e-4,75,1.86207e2,3.70e2]; % Re
 %init = [10.915,2.5,1,1.2064e-4,82,207.2,4.178e2]; % Pb
-init = [2.5,0.5,1,8.0e-4,10,60.08,39.0]; % Soda Lime Glass
-%init = [2.21,0.5,1,8.0e-4,10,60.08,39.0]; % Borosilicate Glass
+%init = [2.5,0.5,1,8.0e-4,10,60.08,39.0]; % Soda Lime Glass
+init = [2.21,0.5,1,8.0e-4,10,60.08,39.0]; % Borosilicate Glass
 
 ReferenceOptions={'cuisentrope','pdisentrope','usup','pdhugoniot'};
 h=addblock(dlg,'listbox','ReferenceCurveType',ReferenceOptions);
