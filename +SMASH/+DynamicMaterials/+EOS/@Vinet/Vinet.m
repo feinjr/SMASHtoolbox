@@ -42,7 +42,7 @@ classdef Vinet
         cv = 0 % Heat capacity
         B0 = 0 % Bulk modulus
         BP0 = 0 % Pressure derivative of bulk modulus
-        d = [0] % Higher order coefficients (arbitrary number)
+        d = [] % Higher order coefficients (arbitrary number)
         e0 = 0  % Energy offset
         s0 = 0  % Entropy offset
     end

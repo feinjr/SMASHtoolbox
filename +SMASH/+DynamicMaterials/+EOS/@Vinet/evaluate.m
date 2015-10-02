@@ -14,8 +14,8 @@
 %
 function [P,S,G] = evaluate(object,rho,T)
 
-rho=rho(:);
-T=T(:);
+%rho=rho(:);
+%T=T(:);
 
 [P,S,G] = calculateVinet(object,rho,T);
 

@@ -16,8 +16,8 @@
 %
 function [P,S,G] =calculateVinet(object,rho,T,varargin)
 
-rho=rho(:);
-T=T(:);
+%rho=rho(:);
+%T=T(:);
 
 rho0=object.rho0;
 T0=object.T0;
@@ -42,7 +42,7 @@ end
 %Calculate reference curve
 x=(rho0./rho).^(1/3);
 z=1-x;
-eta0 = 3.0/2.0*(BP0-1);
+eta0 = 3.0/2.0.*(BP0-1);
 LeadTerm = (3.*B0./(x.^2)).*z.*exp(eta0.*z);
 Pref = LeadTerm;
 
@@ -53,12 +53,16 @@ Pref = LeadTerm;
 
 %Total EOS
 P=Pref+a0*B0*(T-T0);
+%P = 3.*B0./((rho0./rho).^(2./3)).*(1-((rho0./rho).^(1/3))).*exp(eta0.*(1-((rho0./rho).^(1./3))))+a0.*B0.*(T-T0);
     
    
 %Entropy
 S=zeros(size(P));
-S0=0;
-S = S0+a0.*B0.*(1./rho-1./rho0)+cv0.*log(T./T0);
+if T0>0 & T>0
+    S = s0+a0.*B0.*(1./rho-1./rho0)+cv0.*log(T./T0);
+else
+    S = s0+a0.*B0.*(1./rho-1./rho0);
+end
 
 
 
@@ -69,7 +73,7 @@ G=zeros(size(P));
 d(1)=1.0; d(2)=0.0; d=[d dn];
 f=zeros(size(d));
 f(1)=1;
-sumZ = f(1);
+sumZ = 0;
 for i=2:length(d)
     if i == length(d)
         f(i)=d(i);
@@ -80,8 +84,8 @@ for i=2:length(d)
 end
 
 %Internal
-%U = 9.*B0./(rho0.*eta0.^2).*(1-exp(eta0.*z))+a0.*B0*T0.*(1./rho0-1./rho)+cv0.*(T-T0)+e0;
-U = 9.*B0./(rho0.*eta0.^2).*(f(1)-exp(eta0.*z.*(f(1)+sumZ)))-a0.*B0./rho0*(1-x.^3).*T0+cv0.*(T-T0)+e0;
+%U = 9.*B0./(rho0.*(eta0.^2)).*(1-exp(eta0.*(1-((rho0./rho).^(1./3)))).*(1-eta0.*(1-((rho0./rho).^(1/3)))))+cv0.*(T-T0)+a0.*B0*T0.*(1./rho-1./rho0)+e0;
+U = 9.*B0./(rho0.*eta0.^2).*(f(1)-exp(eta0.*z).*(f(1)-eta0.*z.*(f(1)+sumZ)))-a0.*B0./rho0.*(1-x.^3).*T0+cv0.*(T-T0)+e0;
 %Helmholtz
 F=U-T.*S;
 %Gibbs
