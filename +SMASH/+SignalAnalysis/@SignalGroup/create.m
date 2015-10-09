@@ -21,16 +21,13 @@ elseif numel(object.Grid)==size(object.Data,2)
     object.Data=transpose(object.Data);
     fprintf('Transposing Data array for consistency with Grid array\n');
 else
-        error('ERROR: incompatible Grid/Data arrays') 
+    error('ERROR: incompatible Grid/Data arrays')
 end
 object.Grid=object.Grid(:);
-object.NumberSignals=size(object.Data,2);                          
+object.NumberSignals=size(object.Data,2);
 
 label=cell(1,object.NumberSignals);
 for k=1:object.NumberSignals
     label{k}=sprintf('signal %d',k);
 end
 object.Legend=label;
-
-
-            

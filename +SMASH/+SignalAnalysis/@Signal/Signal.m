@@ -52,8 +52,7 @@ classdef Signal < SMASH.General.DataClass
     %% hidden methods
     methods (Hidden=true) % constructor
         function object=Signal(varargin)
-            object=object@SMASH.General.DataClass(varargin{:}); % call superclass constructor
-            object=verifyGrid(object);
+            object=object@SMASH.General.DataClass(varargin{:}); % call superclass constructor            
         end
     end
     methods (Hidden=true)

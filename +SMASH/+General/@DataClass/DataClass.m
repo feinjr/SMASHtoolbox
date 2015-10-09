@@ -53,7 +53,7 @@ classdef DataClass
             elseif (nargin==1) && isstruct(varargin{1})
                 object=restore(object,varargin{1});
                 object.Source='Restored object';
-            elseif (nargin==1) && isobject(varargin{1}) % object transer (undocumented)
+            elseif (nargin==1) && isobject(varargin{1}) % object transfer (undocumented)
                 name=properties(varargin{1});
                 for k=1:numel(name)
                     if isprop(object,name{k})

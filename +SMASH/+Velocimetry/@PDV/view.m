@@ -34,6 +34,8 @@ end
 switch lower(mode)
     case 'measurement'
         h=view(object.Measurement,target);
+    case 'preview'
+        h=view(object.Preview,'show',target);
     case 'beatfrequency'
         N=numel(object.BeatFrequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');

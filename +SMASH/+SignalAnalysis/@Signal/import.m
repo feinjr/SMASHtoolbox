@@ -66,4 +66,6 @@ switch data.Format
         error('ERROR: cannot import Signal from this format');
 end
 
+object=verifyGrid(object);
+
 end

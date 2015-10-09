@@ -11,7 +11,7 @@ assert(isnumeric(varargin{1}) && isnumeric(varargin{2}),...
     'ERROR: invalid input');
 
 object.Data=varargin{2}(:);
-numpoints=numel(object.Data); 
+numpoints=numel(object.Data);
 
 object.Grid=varargin{1}(:);
 if isempty(object.Grid)
@@ -23,3 +23,8 @@ elseif numel(object.Grid)==1
 end
 assert(numel(object.Grid)==numel(object.Data),...
     'ERROR: incompatible Grid/Data arrays');
+
+object=verifyGrid(object);
+if size(object.Data,2)>1
+    object.Data=object.Data(:,1);
+end

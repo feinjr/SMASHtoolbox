@@ -30,7 +30,7 @@ classdef SignalGroup < SMASH.SignalAnalysis.Signal
     %% hidden methods
     methods (Hidden=true)
         function object=SignalGroup(varargin)
-            object=object@SMASH.SignalAnalysis.Signal(varargin{:}); % call superclass constructor
+            object=object@SMASH.SignalAnalysis.Signal(varargin{:}); % call superclass constructor         
         end
         varargout=convolve(varargin)
         varargout=fft(varargin)

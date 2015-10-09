@@ -1,6 +1,6 @@
 % MERGE Merge objects into a single object
 %
-% This method merges mutiple SignalGroup objects (each containing the same
+% This method merges multiple SignalGroup objects (each containing the same
 % number of signals) into a single object.
 %    >> new=merge(object1,object2,...);
 % The new object Grid is determined by the outermost points of the source

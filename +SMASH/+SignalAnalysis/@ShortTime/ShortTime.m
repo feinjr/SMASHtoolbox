@@ -36,7 +36,7 @@ classdef ShortTime < SMASH.SignalAnalysis.Signal
     methods (Hidden=true)
         function object=ShortTime(varargin)
             object=object@SMASH.SignalAnalysis.Signal(varargin{:});
-            object=makeGridUniform(object); % force uniform Grid spacing
+            object=makeGridUniform(object); % force uniform Grid spacing            
         end
     end
     %% protected methods

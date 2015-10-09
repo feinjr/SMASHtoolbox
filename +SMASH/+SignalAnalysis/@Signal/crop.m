@@ -29,6 +29,7 @@ bound=sort(bound);
 keep=(object.Grid>=bound(1)) & (object.Grid<=bound(2));
 object.Grid=object.Grid(keep);
 object.Data=object.Data(keep);
+object.LimitIndex='all';
 
 object=updateHistory(object);
 
