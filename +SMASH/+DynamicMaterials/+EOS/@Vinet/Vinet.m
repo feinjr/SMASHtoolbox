@@ -11,6 +11,8 @@
 %       B0    : Reference bulk modulus
 %       BP0   : First pressure derivative of the bulk modulus
 %       d     : Vector array of [d2,d3,...] cold curve expansion coefficients
+%       e0    : Initial internal energy offset
+%       s0    : Initial entropy offset
 %
 % The formulation follows the extended Alegra (see manual) implementation. 
 % The pressure as a function of density and temperature is given as
@@ -40,7 +42,9 @@ classdef Vinet
         cv = 0 % Heat capacity
         B0 = 0 % Bulk modulus
         BP0 = 0 % Pressure derivative of bulk modulus
-        d = [0] % Higher order coefficients (arbitrary number)
+        d = [] % Higher order coefficients (arbitrary number)
+        e0 = 0  % Energy offset
+        s0 = 0  % Entropy offset
     end
 
     %%
@@ -63,7 +67,7 @@ classdef Vinet
         end
         function object=set.T0(object,value)
             assert((isnumeric(value) & isscalar(value) & isfinite(value)),'ERROR: invalid T0');
-            assert(value>0,'ERROR: T0 must be > 0');
+            assert(value>=0,'ERROR: T0 must be >= 0');
             object.T0=value;
         end
         function object=set.alpha(object,value)
