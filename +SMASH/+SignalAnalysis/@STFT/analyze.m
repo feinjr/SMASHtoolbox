@@ -76,10 +76,11 @@ frequency=[];
         end  
     end
 result=analyze@SMASH.SignalAnalysis.ShortTime(object,@local_function);
+frequency=reshape(frequency,[1 numel(frequency)]);
 
 if isempty(targetfunc)
     result=SMASH.ImageAnalysis.Image(...
-        result.Grid,transpose(frequency),transpose(result.Data));
+        result.Grid,frequency,transpose(result.Data));
     result.GraphicOptions.YDir='normal';
     result.Grid1Label='Time';
     result.Grid2Label='Frequency';

@@ -66,9 +66,9 @@ classdef Cloud %< SMASH.General.DataClass
     %%
     methods (Access=protected,Hidden=true)
         varargout=create(varargin);
-        varargout=histogram(varargin);
-        varargout=density(varargin);
-        varargout=ellipse(varargin);
+        %varargout=histogram(varargin);
+        %varargout=density(varargin);
+        %varargout=ellipse(varargin);
     end
     %%
     methods (Static=true,Hidden=true)
