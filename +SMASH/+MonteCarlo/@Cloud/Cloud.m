@@ -54,6 +54,9 @@ classdef Cloud %< SMASH.General.DataClass
         HistogramMode = 'bar' % Histogram plot mode: 'bar' or 'line'
         EllipseSpan = 0.90 % Bounding ellipse span (fraction of points inside)
     end
+    %properties
+    %    Name
+    %end
     %% constructor
     methods (Hidden=true)
         function object=Cloud(varargin)

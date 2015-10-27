@@ -28,21 +28,22 @@
 %
 % created October 17, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef CloudFit2
+classdef CloudFit2D
     %%
     properties (SetAccess=protected)
         CloudData = {} % Cell array of Cloud objects        
         NumberClouds = 0 % Number of Cloud objects
-        ActiveClouds = [] % Indices of active Cloud objects
+        ActiveClouds = [] % Active cloud indices        
         ActiveOptions = SMASH.Graphics.GraphicOptions % Active cloud graphic options        
-        InactiveClouds = [] % Indices of inactive Cloud objects
+        InactiveClouds = [] % Inactive cloud indices
         InactiveOptions = SMASH.Graphics.GraphicOptions % Inactive cloud graphic options
         CloudWeights % Array of cloud weights
-        ModelFunction % Function handle for model
-        NumberParameters % Number of model parameters
-        ModelParameters = struct % Structure array of parameter settings
-        ModelCurve = SMASH.Graphics.LineSegments % Discrete representation of the model
-        ModelCurveOptions=SMASH.Graphics.GraphicOptions; % Model curve graphic options
+    end
+    properties
+        %Model = SMASH.CurveFit.Model2D % 2D model object       
+    end
+    properties (SetAccess=protected) % eventally will be hidden
+        
     end
     properties
         CloudSize = 100 % Maximum number of points per cloud
@@ -53,19 +54,19 @@ classdef CloudFit2
     end
     %%
     methods (Hidden=true)
-        function object=CloudFit2(varargin)
+        function object=CloudFit2D(varargin)
             if nargin>0
-                object=setup(object,varargin{:});
+                object=addCloud(object,varargin{:});
             end
            
         end
     end
     %% 
-    methods (Static=true, Hidden=true)
-        function object=restore(data)
-            error('ERROR: restore method is not ready yet!');
-        end
-    end
+    %methods (Static=true, Hidden=true)
+    %    function object=restore(data)
+    %        error('ERROR: restore method is not ready yet!');
+    %    end
+    %end
     %% property setters
     methods
         function object=set.CloudSize(object,value)
@@ -76,11 +77,6 @@ classdef CloudFit2
                 object=regenerate(object);
             end
         end
-        %function object=set.Iterations(object,value)
-        %    assert(SMASH.General.testNumber(value,'integer'),...
-        %        'ERROR: invalid Iterations setting');
-        %    object.Iterations=value;
-        %end
         function object=set.XLabel(object,value)
             assert(ischar(value),'ERROR: invalid XLabel setting');
             object.XLabel=value;
@@ -91,6 +87,11 @@ classdef CloudFit2
         end        
         %function object=set.WeightFunction(object,value)
         %    assert(ischar(value),'ERROR: invalid WeightFunction setting');
+        %end
+        %function object=set.Model(object,value)
+        %    assert(isa(value,'SMASH.MonteCarlo.Model2D'),...
+        %        'ERROR: invalid model object');
+        %    object.Model=value;
         %end
     end
     

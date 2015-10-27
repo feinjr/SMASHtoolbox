@@ -17,6 +17,9 @@ function object=reset(object,data)
 if nargin==1
     data=object.Points;
 end
+if isempty(data)
+    data=zeros(0,2);
+end
 %assert(nargin==2,'ERROR: invalid number of inputs');
 
 if isa(data,'SMASH.Graphics.LineSegments')
