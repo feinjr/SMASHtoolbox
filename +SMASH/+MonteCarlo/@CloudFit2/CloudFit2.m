@@ -31,33 +31,33 @@
 classdef CloudFit2
     %%
     properties (SetAccess=protected)
+        CloudData = {} % Cell array of Cloud objects        
         NumberClouds = 0 % Number of Cloud objects
-        ActiveClouds = logical([]) % Logical array indicating active Clouds
-        Clouds = {} % Cell array of Cloud objects        
-    end
-    properties
-        Function % Fit function handle or file name
-        Parameter % Fit parameters
-        Bounds % Fit parameter bounds
+        ActiveClouds = [] % Indices of active Cloud objects
+        ActiveOptions = SMASH.Graphics.GraphicOptions % Active cloud graphic options        
+        InactiveClouds = [] % Indices of inactive Cloud objects
+        InactiveOptions = SMASH.Graphics.GraphicOptions % Inactive cloud graphic options
+        CloudWeights % Array of cloud weights
+        ModelFunction % Function handle for model
+        NumberParameters % Number of model parameters
+        ModelParameters = struct % Structure array of parameter settings
+        ModelCurve = SMASH.Graphics.LineSegments % Discrete representation of the model
+        ModelCurveOptions=SMASH.Graphics.GraphicOptions; % Model curve graphic options
     end
     properties
         CloudSize = 100 % Maximum number of points per cloud
-        DrawSize = 1 % Cloud points drawn during each iteration
-        Iterations = 100 % Monte Carlo iterations
+        %DrawSize = 1 % Cloud points drawn during each iteration
+        %Iterations = 100 % Monte Carlo iterations
         XLabel = 'x' % Horizontal coordinate label
         YLabel = 'y' % Vertical coordinate label
-        WeightFunction = 'RMS' % Cloud distance weighting function
-        GraphicOptions % Graphic options
     end
     %%
     methods (Hidden=true)
-        function object=CloudFitXY(varargin)
+        function object=CloudFit2(varargin)
             if nargin>0
                 object=setup(object,varargin{:});
             end
-            if isempty(object.GraphicOptions)
-                object.GraphicOptions=SMASH.General.GraphicOptions;
-            end
+           
         end
     end
     %% 
@@ -76,11 +76,11 @@ classdef CloudFit2
                 object=regenerate(object);
             end
         end
-        function object=set.Iterations(object,value)
-            assert(SMASH.General.testNumber(value,'integer'),...
-                'ERROR: invalid Iterations setting');
-            object.Iterations=value;
-        end
+        %function object=set.Iterations(object,value)
+        %    assert(SMASH.General.testNumber(value,'integer'),...
+        %        'ERROR: invalid Iterations setting');
+        %    object.Iterations=value;
+        %end
         function object=set.XLabel(object,value)
             assert(ischar(value),'ERROR: invalid XLabel setting');
             object.XLabel=value;
@@ -89,9 +89,9 @@ classdef CloudFit2
             assert(ischar(value),'ERROR: invalid YLabel setting');
             object.YLabel=value;
         end        
-        function object=set.WeightFunction(object,value)
-            assert(ischar(value),'ERROR: invalid WeightFunction setting');
-        end
+        %function object=set.WeightFunction(object,value)
+        %    assert(ischar(value),'ERROR: invalid WeightFunction setting');
+        %end
     end
     
 end

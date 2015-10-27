@@ -1,6 +1,6 @@
-% add Add data points 
+% addCloud Add cloud(s)
 %
-% This method adds data to a CloudFitXY object.  Existing Cloud objects can
+% This method adds data to a CloudFit1 object.  Existing Cloud objects can
 % be added directly.
 %    >> object=add(object,cloud1,cloud2,...);
 % Tabular data can also be added.
@@ -14,15 +14,10 @@
 %     -Columns 7--8 (excess kurtosis) are optional and default to zero.
 %     -Column 9 (correlation) is optional and defaults to zero.
 %
-% See also CloudFitXY, remove, Cloud
+% See also CloudFit2, removeCloud, Cloud
 %
 
-%
-% created October 17, 2014 by Daniel Dolan (Sandia National Laboratories)
-% revised January 19, 2014 by Daniel Dolan
-%   -simplified tabular input
-%
-function object=add(object,varargin)
+function object=addCloud(object,varargin)
 
 % manage input
 assert(nargin>1,'ERROR: insufficient number inputs');
@@ -44,6 +39,8 @@ elseif isnumeric(varargin{1}) % tabular input
         object.Clouds{end+1}=SMASH.MonteCarlo.Cloud(...
             moments,correlation,object.CloudSize);
     end
+elseif ischar(varargin{1})
+    % read from file
 else
     error('ERROR: invalid input');
 end

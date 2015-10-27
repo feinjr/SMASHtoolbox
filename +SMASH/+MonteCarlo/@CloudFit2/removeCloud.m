@@ -11,7 +11,7 @@
 % created October 17, 2014 by Daniel Dolan (Sandia National Laboratories)
 %%
 
-function object=remove(object,index)
+function object=removeCloud(object,index)
 
 assert(nargin>1,'ERROR: insufficient number of inputs');
 valid=1:object.NumberClouds;
