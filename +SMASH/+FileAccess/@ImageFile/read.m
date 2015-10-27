@@ -61,6 +61,11 @@ switch object.Format
         data=read_sbfp(object.FullName);
         grid1=1:size(data,2);
         grid2=transpose(1:size(data,1));
+    case 'sydor'
+        [data,info]=read_sydor(object.FullName);
+        grid1=1:size(data,2);
+        grid2=transpose(1:size(data,1));
+        extra=info;
     case 'winspec'
         data=read_winspec(object.FullName);
         grid1=1:size(data,2);

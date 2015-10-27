@@ -25,6 +25,7 @@
 %   'optronis'       : Optronis streak camera measurements (*.imd)
 %   'plate'          : Image plate measurementes (*.img)
 %   'sbfp'           : Santa Barbara Focal Plan camera measurement (*.img)
+%   'sydor'          : Sydor streak camera measurements (*.hdf)
 %   'winspec'        : Princeton Instruments WinSpec measurements (*.spe)
 %
 % Special formats:
@@ -81,6 +82,8 @@ list{end+1}='plate';
 description{end+1}='Image plate scan';
 list{end+1}='sbfp';
 description{end+1}='Santa Barabara Focal Plane camera record';
+list{end+1}='sydor';
+description{end+1}='Sydor streak camera record';
 list{end+1}='winspec';
 description{end+1}='Winspec CCD record';
 

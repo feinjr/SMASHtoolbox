@@ -27,8 +27,10 @@ if isempty(format)
             format='optronis';
         case '.img'
             format=chooseIMG;
-        case {'.hdf','.pff'}
+        case '.pff'
             format='film';
+        case '.hdf'
+            format=SMASH.FileAccess.determineFormat(filename,{'film' 'sydor'});
         case ''
             format=SupportedFormats();
         otherwise

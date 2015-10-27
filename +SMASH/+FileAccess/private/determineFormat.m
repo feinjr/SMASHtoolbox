@@ -52,6 +52,7 @@ format{end+1}='optronis';
 format{end+1}='hamamatsu';
 format{end+1}='plate';
 format{end+1}='sbfp';
+format{end+1}='sydor';
 format{end+1}='winspec';
 
 format{end+1}='dig';
@@ -128,7 +129,7 @@ switch lower(extension)
     case '.h5'
         choice={'agilent'};
     case '.hdf'
-        choice={'film' 'saturn' 'zdas'};
+        choice={'film' 'saturn' 'sydor' 'zdas'};
     case '.hdr'
         choice={'film'};
         fileimg=fullfile(PathName,[BaseName '.img']);
