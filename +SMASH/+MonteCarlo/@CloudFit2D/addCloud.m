@@ -17,9 +17,12 @@
 %     -Columns 7--8 (excess kurtosis) are optional and default to zero.
 %     -Column 9 (correlation) is optional and defaults to zero.
 %
-% See also CloudFit2, removeCloud, Cloud
+% See also CloudFit2D, removeCloud, Cloud
 %
 
+%
+% 
+%
 function object=addCloud(object,varargin)
 
 % manage input
@@ -71,5 +74,8 @@ else % process arrays
         object.ActiveClouds(end+1)=object.NumberClouds;
     end    
 end  
+
+% update weights
+object=calculateWeights(object);
 
 end

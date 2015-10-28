@@ -33,17 +33,17 @@ classdef Model2D
         Curve=SMASH.MonteCarlo.Support.LineSegments() % LineSegments object
     end
     properties
-        Options=optimset;
+        OptimizationSettings=optimset; % Optimization settings (see "optimset" function)
     end
     %%
     properties (SetAccess=protected)
         NumberParameters
-        SlackFunction        
+        SlackFunction
     end
     %%
     methods (Hidden=true)
         function object=Model2D(target,guess)
-            % manage input
+            % manage input            
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(isa(target,'function_handle'),...
                 'ERROR: invalid function handle');
@@ -62,6 +62,20 @@ classdef Model2D
                 object.SlackFunction{n}=@(q) guess(n)+q;
             end
             
+        end
+    end
+    %% restore method allows objects to be restored from SDA files
+    methods (Static=true, Hidden=true)
+        function object=restore(data)
+            object=SMASH.MonteCarlo.Support.Model2D(...
+                data.Function,data.Parameters);
+            data=rmfield(data,{'Function','Parameters'});
+            name=fieldnames(data);
+            for n=1:numel(name)
+                if isprop(object,name{n})
+                    object.(name{n})=data.(name{n});
+                end
+            end
         end
     end
 end

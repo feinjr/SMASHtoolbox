@@ -10,7 +10,7 @@
 %
 
 %
-% 
+% created October 28, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function object=deactivateCloud(object,index)
 
@@ -34,5 +34,8 @@ for n=1:numel(index)
     keep(active==index(n))=false;
 end
 object.ActiveClouds=active(keep);
+
+% update weights
+object=calculateWeights(object);
 
 end

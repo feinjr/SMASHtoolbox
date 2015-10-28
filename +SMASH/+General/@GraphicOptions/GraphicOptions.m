@@ -53,7 +53,7 @@ classdef GraphicOptions %< hgsetget
 %% static methods
     methods (Static=true, Hidden=true)
         function object=restore(data)
-            object=SMASH.General.GraphicOptions();
+            object=SMASH.Graphics.GraphicOptions();
             name=fieldnames(data);
             for k=1:numel(name)
                 if isprop(object,name{k})

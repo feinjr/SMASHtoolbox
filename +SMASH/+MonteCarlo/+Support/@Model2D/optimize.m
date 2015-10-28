@@ -46,7 +46,8 @@ matrix=nan(2,2);
         end
     end
 
-result=fminsearch(@residual,object.SlackVariables,object.Options);
+result=fminsearch(@residual,object.SlackVariables,...
+    object.OptimizationSettings);
 for m=1:object.NumberParameters
     object=setParameter(object,m,result(m));
 end

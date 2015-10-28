@@ -91,8 +91,16 @@ classdef LineSegments
             object=reset(object);
         end
     end
-    %%
-    methods (Static=true, Hidden=true)
-        varargout=restore(varargin);
+    %% restore method allows objects to be restored from SDA files
+     methods (Static=true, Hidden=true)
+        function object=restore(data)
+            object=SMASH.MonteCarlo.Support.LineSegments();
+            name=fieldnames(data);
+            for n=1:numel(name)
+                if isprop(object,name{n})
+                    object.(name{n})=data.(name{n});
+                end
+            end
+        end
     end
 end

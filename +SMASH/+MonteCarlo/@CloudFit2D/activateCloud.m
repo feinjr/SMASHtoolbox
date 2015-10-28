@@ -12,7 +12,7 @@
 %
 
 %
-%
+% created October 28, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function object=activateCloud(object,index)
 
@@ -32,5 +32,8 @@ end
 
 active=unique(active);
 object.ActiveClouds=active;
+
+% update weights
+object=calculateWeights(object);
 
 end

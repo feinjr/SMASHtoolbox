@@ -39,8 +39,7 @@ classdef CloudFit2D
         CloudWeights % Array of cloud weights
     end
     properties
-        %DrawSize = 1 % Cloud points drawn during each iteration
-        ViewOptions = processViewOptions() % View options structure
+        ViewOptions = processViewOptions() % Display options (structure)
         Model % 2D model object
     end
     %%
@@ -50,13 +49,20 @@ classdef CloudFit2D
                 object=addCloud(object,varargin{:});
             end
         end
+        varargout=calculateWeights(varargin);
     end
     %%
-    %methods (Static=true, Hidden=true)
-    %    function object=restore(data)
-    %        error('ERROR: restore method is not ready yet!');
-    %    end
-    %end
+    methods (Static=true, Hidden=true)
+        function object=restore(data)
+            object=SMASH.MonteCarlo.CloudFit2D();            
+            name=fieldnames(data);
+            for n=1:numel(name)
+                if isprop(object,name{n})
+                    object.(name{n})=data.(name{n});
+                end
+            end
+        end
+    end
     %% property setters
     methods
         function object=set.CloudData(object,value)
@@ -68,8 +74,12 @@ classdef CloudFit2D
             object.CloudData=value;
         end
         function object=set.Model(object,value)
+            if isempty(value)
+                % do nothing
+            else
             assert(isa(value,'SMASH.MonteCarlo.Support.Model2D'),...
                 'ERROR: invalid model');
+            end
             object.Model=value;
         end
         function object=set.ViewOptions(object,value)
