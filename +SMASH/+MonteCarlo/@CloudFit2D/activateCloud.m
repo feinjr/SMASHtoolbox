@@ -31,6 +31,6 @@ for k=1:numel(index)
 end
 
 active=unique(active);
-object.ActiveClouds(index)=active;
+object.ActiveClouds=active;
 
 end

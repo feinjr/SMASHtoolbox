@@ -46,7 +46,7 @@ function [D2,location]=calculateDistance(object,origin,matrix)
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
 
-if isa(origin,'SMASH.Graphics.LineSegments')
+if isa(origin,'SMASH.MonteCarlo.Support.LineSegments')
     origin=origin.Coordinates;
 end
 assert(ismatrix(origin),'ERROR: invalid origin input');

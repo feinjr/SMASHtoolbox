@@ -22,7 +22,7 @@ if isempty(data)
 end
 %assert(nargin==2,'ERROR: invalid number of inputs');
 
-if isa(data,'SMASH.Graphics.LineSegments')
+if isa(data,'SMASH.MonteCarlo.Support.LineSegments')
     object=data;
     return
 elseif isnumeric(data) && ismatrix(data)

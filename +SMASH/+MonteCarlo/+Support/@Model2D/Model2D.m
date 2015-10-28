@@ -19,8 +19,6 @@
 % constraints may be applied to each parameter using the bound method.
 %
 %
-% See also CurveFit
-%
 
 %
 % created October 27, 2015 by Daniel Dolan (Sandia National Laboratories)
@@ -32,7 +30,7 @@ classdef Model2D
         Parameters % Array of model parameters
         Bounds % Array of parameter bounds [lower upper]
         SlackVariables % Array of slack variables
-        Curve=SMASH.Graphics.LineSegments() % LineSegments object
+        Curve=SMASH.MonteCarlo.Support.LineSegments() % LineSegments object
     end
     properties
         Options=optimset;

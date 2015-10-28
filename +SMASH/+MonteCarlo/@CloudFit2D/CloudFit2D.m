@@ -30,15 +30,17 @@
 %
 classdef CloudFit2D
     %%
+    properties
+        CloudData = {} % Cell array of Cloud objects
+    end
     properties (SetAccess=protected)
-        CloudData = {} % Cell array of Cloud objects        
         NumberClouds = 0 % Number of Cloud objects
-        ActiveClouds = [] % Active cloud indices                
+        ActiveClouds = [] % Active cloud indices
         CloudWeights % Array of cloud weights
     end
     properties
         %DrawSize = 1 % Cloud points drawn during each iteration
-        ViewOptions = processViewOptions() % View options structure  
+        ViewOptions = processViewOptions() % View options structure
         Model % 2D model object
     end
     %%
@@ -49,19 +51,27 @@ classdef CloudFit2D
             end
         end
     end
-    %% 
+    %%
     %methods (Static=true, Hidden=true)
     %    function object=restore(data)
     %        error('ERROR: restore method is not ready yet!');
     %    end
     %end
     %% property setters
-    methods       
+    methods
+        function object=set.CloudData(object,value)
+            assert(iscell(value),'ERROR: invalid cloud data');
+            for n=1:numel(value)
+                assert(isa(value{n},'SMASH.MonteCarlo.Cloud'),...
+                    'ERROR: invalid cloud data');
+            end
+            object.CloudData=value;
+        end
         function object=set.Model(object,value)
-            assert(isa(value,'SMASH.CurveFit.Model2D'),...
+            assert(isa(value,'SMASH.MonteCarlo.Support.Model2D'),...
                 'ERROR: invalid model');
             object.Model=value;
-        end                
+        end
         function object=set.ViewOptions(object,value)
             object.ViewOptions=processViewOptions(value);
         end
