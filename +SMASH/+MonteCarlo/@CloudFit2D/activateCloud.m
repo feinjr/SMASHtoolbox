@@ -1,30 +1,36 @@
-% activate Activate data points
+% activateCloud Activate cloud(s)
 %
-% This method activates data points.  Only data clouds from active points
-% are used during fit analysis.  
+% This method activates clouds in CloudFit2D object.  
 %    >> object=activate(object,index);
-% Data points are referenced in the order they were added.
+% Data points are referenced in the order they were added.  To activate all
+% clouds:
+%    >> object=activate(object,'all');
 %
-% See also CloudFitXY, deactivate, summarize
+% Only data clouds from active points are used during analysis.
+% 
+% See also CloudFit2D, deactivateCloud
 %
 
 %
-% created October 17, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=activate(object,index)
+%
+function object=activateCloud(object,index)
 
-% handle input
+% manage input
 assert(nargin>1,'ERROR: insufficient number of inputs');
 if strcmpi(index,'all')
     index=1:object.NumberClouds;
 end
 
+% process request
+active=object.ActiveClouds;
 valid=1:object.NumberClouds;
 for k=1:numel(index)
     assert(any(index(k)==valid),'ERROR: invalid index');
+    active(end+1)=index(k); %#ok<AGROW>
 end
 
-% active requested clouds
-object.ActiveClouds(index)=true;
+active=unique(active);
+object.ActiveClouds(index)=active;
 
 end

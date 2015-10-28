@@ -3,7 +3,12 @@
 %
 % UNDER CONSTRUCTION
 
-classdef CloudFit1
-   
+classdef CloudFit1D
+    %%
+    properties
+    end
+    %%
+    methods
+    end
     
 end

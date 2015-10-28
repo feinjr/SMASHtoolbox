@@ -68,6 +68,7 @@ else % process arrays
         object.CloudData{end+1}=SMASH.MonteCarlo.Cloud(...
             moments,correlation,varargin{4});
         object.NumberClouds=object.NumberClouds+1;
+        object.ActiveClouds(end+1)=object.NumberClouds;
     end    
 end  
 

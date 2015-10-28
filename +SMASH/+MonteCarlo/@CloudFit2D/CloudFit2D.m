@@ -33,24 +33,13 @@ classdef CloudFit2D
     properties (SetAccess=protected)
         CloudData = {} % Cell array of Cloud objects        
         NumberClouds = 0 % Number of Cloud objects
-        ActiveClouds = [] % Active cloud indices        
-        ActiveOptions = SMASH.Graphics.GraphicOptions % Active cloud graphic options        
-        InactiveClouds = [] % Inactive cloud indices
-        InactiveOptions = SMASH.Graphics.GraphicOptions % Inactive cloud graphic options
+        ActiveClouds = [] % Active cloud indices                
         CloudWeights % Array of cloud weights
     end
     properties
-        %Model = SMASH.CurveFit.Model2D % 2D model object       
-    end
-    properties (SetAccess=protected) % eventally will be hidden
-        
-    end
-    properties
-        CloudSize = 100 % Maximum number of points per cloud
         %DrawSize = 1 % Cloud points drawn during each iteration
-        %Iterations = 100 % Monte Carlo iterations
-        XLabel = 'x' % Horizontal coordinate label
-        YLabel = 'y' % Vertical coordinate label
+        ViewOptions = processViewOptions() % View options structure  
+        Model % 2D model object
     end
     %%
     methods (Hidden=true)
@@ -58,7 +47,6 @@ classdef CloudFit2D
             if nargin>0
                 object=addCloud(object,varargin{:});
             end
-           
         end
     end
     %% 
@@ -68,31 +56,15 @@ classdef CloudFit2D
     %    end
     %end
     %% property setters
-    methods
-        function object=set.CloudSize(object,value)
-            assert(SMASH.General.testNumber(value,'integer'),...
-                'ERROR: invalid CloudSize setting');
-            if value~=object.CloudSize
-                object.CloudSize=value;
-                object=regenerate(object);
-            end
+    methods       
+        function object=set.Model(object,value)
+            assert(isa(value,'SMASH.CurveFit.Model2D'),...
+                'ERROR: invalid model');
+            object.Model=value;
+        end                
+        function object=set.ViewOptions(object,value)
+            object.ViewOptions=processViewOptions(value);
         end
-        function object=set.XLabel(object,value)
-            assert(ischar(value),'ERROR: invalid XLabel setting');
-            object.XLabel=value;
-        end
-        function object=set.YLabel(object,value)
-            assert(ischar(value),'ERROR: invalid YLabel setting');
-            object.YLabel=value;
-        end        
-        %function object=set.WeightFunction(object,value)
-        %    assert(ischar(value),'ERROR: invalid WeightFunction setting');
-        %end
-        %function object=set.Model(object,value)
-        %    assert(isa(value,'SMASH.MonteCarlo.Model2D'),...
-        %        'ERROR: invalid model object');
-        %    object.Model=value;
-        %end
     end
     
 end
