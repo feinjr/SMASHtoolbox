@@ -29,6 +29,12 @@ assert((size(group,2)==2) && all(group(:,2)>=group(:,1)),...
 % normalize weight
 weight=weight/sum(weight);
 
+% determine evaluation span
+smin=min(data,[],1);
+smax=max(data,[],1);
+xspan=[smin(1) smax(1)];
+yspan=[smin(2) smax(2)];
+
 % perform optimization
 L=size(group,1);
 matrix=nan(2,2);
@@ -40,16 +46,17 @@ matrix=nan(2,2);
             matrix(2,1)=covariance(k,3);
             matrix(2,2)=covariance(k,2);           
             index=group(k,1):group(k,2);
-            object=evaluate(object,p);
-            D2=calculateDistance(object.Curve,data(index,:),matrix);
+            object=evaluate(object,p,xspan,yspan);
+            [D2,intersect]=calculateDistance(object.Curve,data(index,:),matrix);
             chi2=chi2+sum(D2.*weight(index));
         end
     end
-
 result=fminsearch(@residual,object.SlackVariables,...
-    object.OptimizationSettings);
+    object.OptimizationSettings); % result in slack variable form!
+
+[~,param]=evaluate(object,result,xspan,yspan);
 for m=1:object.NumberParameters
-    object=setParameter(object,m,result(m));
+    object=setParameter(object,m,param(m));
 end
 
 end

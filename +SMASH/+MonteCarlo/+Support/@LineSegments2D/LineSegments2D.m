@@ -1,12 +1,9 @@
 % This class describes curves as a sequence of line segments.  In this
-% context, a "curve" is an ordered group of points arranged in a
-% two-dimensional array.  The number of columns in this array describes the
-% curve's dimensionality, e.g. a curve in the (x,y) plane is defined by a
-% table with two columns.  Each row of the array corresponds to a single
-% point on the curve.  
+% context, a "curve" is any ordered group of points in a two-column array
+% ([x y]).  Each row of the array corresponds to one point on the curve.
 %
-% LineSegments objects are created with a points array.
-%     >> object=LineSegments(array);
+% LineSegments2D objects are created with a points array.
+%     >> object=LineSegments2D(array);
 % At present, the class supports to two-dimensional curves only.  The
 % points array of an object can be read from the Points property:
 %     >> data=object.Point;
@@ -14,15 +11,13 @@
 % the add, remove, and reset methods.
 %
 % Curves are single-valued functions of one independent variable.  This
-% variable is implicitly linked to the row index of the points array;
-% explicit specification is not required.  For example, a two-dimensional
-% curve is a set of dependent variables x(t) and y(t), where t might
-% represent time, arc length, or some other monotonically increasing
-% variable.  Curves are *not* limited to single-valued relationships
-% between dimensions, such as y(x).
+% variable is implicitly linked to the row index of the points array.
+% Conceptually, x=x(t) and y=y(t) where t might represent time, arc length,
+% or some other monotonically increasing variable.  Explicit specification
+% of this variable or it's link to row index is *not* required.
 %
 % Segments are linear connections between adjacent points on a curve.  
-% Consider a two-dimensional curve defined by three points.
+% Consider a curve defined by three points.
 %     point 1: (0,0)
 %     point 2: (1,0)
 %     point 3: (1,1)
@@ -48,30 +43,27 @@
 % Changing boundary types may alter the Segments property, epsecially when
 % switching between 'wrapped' and 'projected'/'closed' modes.
 %
-% See also Graphics
-%
 
 %
 % created October 22, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef LineSegments
+classdef LineSegments2D
     %%
     properties (SetAccess=protected)
-        Points % 2D array of point coordinates
-        Segments % 3D array of segment data
+        Points % Point coordiantes (two-column array)
+        Segments % Segment data (three dimensional array)
     end
     properties
-        GraphicOptions=SMASH.General.GraphicOptions() % Graphic options object
+        GraphicOptions=SMASH.General.GraphicOptions('Marker','none') % Graphic options object
         BoundaryType='projected' % Boundary type: ['projected'], 'closed', or 'wrapped'
     end
     properties (SetAccess=protected,Hidden=true)
         NumberPoints
-        NumberDimensions
         NumberSegments      
     end
     %%
     methods (Hidden=true)
-        function object=LineSegments(varargin)
+        function object=LineSegments2D(varargin)
             object=reset(object,varargin{:});
         end
         varargout=create(varargin);
@@ -94,7 +86,7 @@ classdef LineSegments
     %% restore method allows objects to be restored from SDA files
      methods (Static=true, Hidden=true)
         function object=restore(data)
-            object=SMASH.MonteCarlo.Support.LineSegments();
+            object=SMASH.MonteCarlo.Support.LineSegments2D();
             name=fieldnames(data);
             for n=1:numel(name)
                 if isprop(object,name{n})

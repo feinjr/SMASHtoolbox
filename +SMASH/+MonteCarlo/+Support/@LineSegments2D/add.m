@@ -19,8 +19,7 @@ assert(isnumeric(coordinates) && ismatrix(coordinates) && ~isempty(coordinates),
     'ERROR: invalid coordinate matrix');
 [Nrow,Ncol]=size(coordinates);
 assert(Nrow==1,'ERROR: points must be added one at a time');
-assert(Ncol==object.NumberDimensions,...
-    'ERROR: incompatible coordinate array');
+assert(Ncol==2,'ERROR: invalid coordinate array');
 
 if (nargin<3) || isempty(index)
     index=object.NumberPoints+1;
@@ -29,7 +28,7 @@ assert(isnumeric(index),'ERROR: invalid index specified')
 assert(numel(index)==Nrow,'ERROR: inconsistent index specified');
 
 % add data and reset object
-data=nan(object.NumberPoints+1,object.NumberDimensions);
+data=nan(object.NumberPoints+1,2);
 k=1:(index-1);
 data(k,:)=object.Points(k,:);
 data(index,:)=coordinates;

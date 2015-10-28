@@ -37,6 +37,10 @@ for n=1:numel(varargin)
             if ~(value<0)
                 return
             end
+        case 'notzero'
+            if value==0
+                return
+            end
         case 'integer'
             if ~(value==floor(value))
                 return

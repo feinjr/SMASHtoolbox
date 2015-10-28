@@ -1,27 +1,32 @@
-% This class manages two-dimensional models using an arbitrary number of
-% parameters.  Given a set of parameters, the model function generates a
-% two-column ([x y]) table.
-%     table=model(param);
-% The parameter array controls the model's underlying behavior, and in
-% principle these parameters could be optimized to match a set of (x,y)
-% measurements.
+% This class manages models of two variables (x and y) with an arbitrary
+% number of parameters.  Given a set of parameters, the model function
+% generates a two-column table ([x y]).
+%     table=model(param,xspan,yspan);
+%        param : vector array of model parameters
+%        xspan : characteristic span of variable x [min(x) max(x)]
+%        yspan : characteristic span of variable y [min(y) max(y)]
+% Each row of the output table is a point in the (x,y) plane.  Adjacent
+% table points are connected in a piece-wise linear fashion.
+% Discontinuities between points are specified by rows containing a NaN
+% value.
 %
-% Models are defined by a function handle and an array of parameter
-% guesses.
+% Models are constructed with a function handle and an array of parameter
+% values.
 %     object=Model2D(target,guess);
-% The model function "target" must accept a parameter array as the first
-% argument.  Additional input arguments for
-% the model function can be managed through an intermediate function
-% handle.
-%     target=@(p) model(p,arg1,arg2,...);
+% The target function must accept three inputs as described above.  The
+% second input specifies an initial parameter state, which is usually a
+% guess for the optimal values (with respect to some dataset).  The guess
+% input must be a numeric array (arbitrary size/shape) understood by the
+% target function.
 %
 % By default, model parameters are unconstrained.  One-side and two-sided
 % constraints may be applied to each parameter using the bound method.
+% Slack variables ...
 %
 %
 
 %
-% created October 27, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 %
 classdef Model2D
     %%
@@ -30,10 +35,10 @@ classdef Model2D
         Parameters % Array of model parameters
         Bounds % Array of parameter bounds [lower upper]
         SlackVariables % Array of slack variables
-        Curve=SMASH.MonteCarlo.Support.LineSegments() % LineSegments object
+        Curve=SMASH.MonteCarlo.Support.LineSegments2D() % LineSegments2D object
     end
     properties
-        OptimizationSettings=optimset; % Optimization settings (see "optimset" function)
+        OptimizationSettings=optimset(); % Optimization settings (optimset structure)
     end
     %%
     properties (SetAccess=protected)
@@ -43,7 +48,7 @@ classdef Model2D
     %%
     methods (Hidden=true)
         function object=Model2D(target,guess)
-            % manage input            
+            % manage input
             assert(nargin==2,'ERROR: invalid number of inputs');
             assert(isa(target,'function_handle'),...
                 'ERROR: invalid function handle');
@@ -76,6 +81,17 @@ classdef Model2D
                     object.(name{n})=data.(name{n});
                 end
             end
+        end
+    end
+    %% setters
+    methods
+        function object=set.OptimizationSettings(object,value)
+            try
+                value=optimset(value);
+            catch
+                error('ERROR: invalid optimization settings');
+            end
+            object.OptimizationSettings=value;
         end
     end
 end

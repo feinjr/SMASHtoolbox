@@ -49,12 +49,11 @@ assert(nargin>=2,'ERROR: insufficient input');
 if isa(origin,'SMASH.MonteCarlo.Support.LineSegments')
     origin=origin.Coordinates;
 end
-assert(ismatrix(origin),'ERROR: invalid origin input');
-assert(size(origin,2)==object.NumberDimensions,...
-    'ERROR: inconsistent dimensionality');
+assert(ismatrix(origin) || (size(origin,2)==2),...
+    'ERROR: invalid origin input');
 
 if (nargin<3) || isempty(matrix)
-    matrix=eye(object.NumberDimensions);
+    matrix=eye(2,2);
 end
 assert(ismatrix(matrix),'ERROR: invalid covariance matrix');
 assert(all(diag(matrix)>0),...
@@ -68,7 +67,7 @@ assert(all(change(:))<1e-9,'ERROR: covariance matrix must be symmetric ')
 Q=pinv(matrix);
 Norigin=size(origin,1);
 D2=inf(Norigin,1);
-location=nan(object.NumberDimensions,Norigin);
+location=nan(2,Norigin);
 
 ref=transpose(object.Segments(:,:,1));
 Delta=transpose(object.Segments(:,:,3));

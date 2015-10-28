@@ -8,26 +8,25 @@
 %
 %
 %
-function [object,param]=evaluate(object,state,mode)
+function [object,param]=evaluate(object,param,xspan,yspan,mode)
 
 % manage input
-assert(nargin>=2,'ERROR: insufficient input');
-assert(numel(state)==object.NumberParameters,...
+assert(nargin>=4,'ERROR: insufficient input');
+assert(numel(param)==object.NumberParameters,...
     'ERROR: invalid number of parameters');
 
-if (nargin<3) || isempty(mode)
+if (nargin<5) || isempty(mode)
     mode='slack';
 end
 assert(ischar(mode),'ERROR: invalid evaluation mode');
 
 % translate variables
-param=state;
 if strcmp(mode,'slack')
     for n=1:object.NumberParameters
-        param(n)=object.SlackFunction{n}(state(n));
+        param(n)=object.SlackFunction{n}(param(n));
     end
 end
 
 % evaluate function
-table=object.Function(param);
+table=object.Function(param,xspan,yspan);
 object.Curve=reset(object.Curve,table);

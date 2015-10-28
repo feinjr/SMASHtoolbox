@@ -26,17 +26,16 @@ if isa(data,'SMASH.MonteCarlo.Support.LineSegments')
     object=data;
     return
 elseif isnumeric(data) && ismatrix(data)
-    [object.NumberPoints,object.NumberDimensions]=size(data);
+    assert(size(data,2)==2,'ERROR: invalid points array');
+    object.NumberPoints=size(data,1);
     object.Points=data;
 else
     error('ERROR: invalid input');
 end
 
-assert(object.NumberDimensions==2,...
-    'ERROR: only two-dimensinal segments are currently supported');
 
 % segment processing
-object.Segments=nan(object.NumberPoints+1,object.NumberDimensions,3);
+object.Segments=nan(object.NumberPoints+1,2,3);
 index=0;
 for k=1:(object.NumberPoints-1)
     current=object.Points(k,:);

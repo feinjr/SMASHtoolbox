@@ -4,6 +4,9 @@
 %    >> object=deactivate(object,index);
 % Data points are referenced in the order they were added.
 %
+% To deactivate all clouds:
+%    >> object=deactivate(object,'all');
+%
 % Only data clouds from active points are used during fit analysis.
 %
 % See also CloudFit2D, activateCloud

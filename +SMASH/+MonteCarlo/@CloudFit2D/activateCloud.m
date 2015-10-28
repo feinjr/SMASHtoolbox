@@ -2,8 +2,9 @@
 %
 % This method activates clouds in CloudFit2D object.  
 %    >> object=activate(object,index);
-% Data points are referenced in the order they were added.  To activate all
-% clouds:
+% Data points are referenced in the order they were added.  
+%
+% To activate all clouds:
 %    >> object=activate(object,'all');
 %
 % Only data clouds from active points are used during analysis.
