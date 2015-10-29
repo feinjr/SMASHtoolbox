@@ -19,31 +19,26 @@
 % input must be a numeric array (arbitrary size/shape) understood by the
 % target function.
 %
-% By default, model parameters are unconstrained.  One-side and two-sided
-% constraints may be applied to each parameter using the bound method.
-% Slack variables ...
-%
-%
 
 %
-%
+% created October 29, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef Model2D
     %%
     properties (SetAccess=protected)
-        Function % Model function handle
-        Parameters % Array of model parameters
-        Bounds % Array of parameter bounds [lower upper]
-        SlackVariables % Array of slack variables
-        Curve=SMASH.MonteCarlo.Support.LineSegments2D() % LineSegments2D object
+        Function % Model function (function handle)
+        Parameters % Model parameters (column vector)
+        Bounds % Parameter bounds (1x2 array)
+        SlackVariables % Slack variables (column vector)
     end
     properties
+        Curve=SMASH.MonteCarlo.Support.LineSegments2D() % LineSegments2D object
         OptimizationSettings=optimset(); % Optimization settings (optimset structure)
     end
     %%
     properties (SetAccess=protected)
-        NumberParameters
-        SlackFunction
+        NumberParameters % Number of model parameter
+        SlackFunction % Slack variable conversions (cell array of function handles)
     end
     %%
     methods (Hidden=true)
@@ -85,6 +80,11 @@ classdef Model2D
     end
     %% setters
     methods
+        function object=set.Curve(object,value)
+            assert(isa(value,'SMASH.MonteCarlo.Support.LineSegments2D'),...
+                'ERROR: invalid Curve setting');
+            object.Curve=value;
+        end
         function object=set.OptimizationSettings(object,value)
             try
                 value=optimset(value);

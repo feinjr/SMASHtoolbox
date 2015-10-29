@@ -1,3 +1,16 @@
+% optimize Optimize model parameters 
+%
+% This method optimizes the parameters of a model function to match a
+% specified dataset.
+%
+% UNDER CONSTRUCTION...
+%
+% See also Model2D, evaluate
+%
+
+%
+% created October 29, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=optimize(object,data,weight,covariance,group)
 
 % manage input
@@ -58,5 +71,6 @@ result=fminsearch(@residual,object.SlackVariables,...
 for m=1:object.NumberParameters
     object=setParameter(object,m,param(m));
 end
+object.SlackVariables=result;
 
 end
