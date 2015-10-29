@@ -50,7 +50,8 @@ assert(test,'ERROR: invalid diagonal plot setting');
 DiagonalPlots=lower(DiagonalPlots);
 
 if (nargin<3) || isempty(CrossPlots)
-    CrossPlots='histogram';  
+    %CrossPlots='histogram';  
+    CrossPlots='ellipse';
 end
 test=strcmpi(CrossPlots,'points')      ...
     || strcmpi(CrossPlots,'ellipse') ...
@@ -132,6 +133,8 @@ for m=1:N
             case 'ellipse'
                 [x,y]=ellipse(object,[m n],object.EllipseSpan);
                 line(x,y,'Color','k');
+                label=sprintf('Span = %.0f%%',object.EllipseSpan*100);
+                title(label);
         end
         temp=sprintf('%s ',object.VariableName{m});
         xlabel(temp);

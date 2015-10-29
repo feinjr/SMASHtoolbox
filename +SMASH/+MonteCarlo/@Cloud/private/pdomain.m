@@ -71,4 +71,9 @@ for m=1:N
 end
 x=data(:,1);
 y=data(:,2);
+
+% enfore wrap
+x(end)=x(1);
+y(end)=y(1);
+
 end

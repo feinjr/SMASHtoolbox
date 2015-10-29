@@ -110,13 +110,13 @@ if nargout==0
     switch numel(variable)
         case 1
             bar(xbin,count,'hist');
-            xlabel(target,object.DataLabel{1});
-            ylabel(target,'Number of counts');
+            %xlabel(target,object.DataLabel{1});
+            %ylabel(target,'Number of counts');
         case 2
             imagesc(xbin,ybin,count);
             set(target,'YDir','normal');
-            xlabel(target,object.DataLabel{variable(1)});
-            ylabel(target,object.DataLabel{variable(2)});
+            %xlabel(target,object.DataLabel{variable(1)});
+            %ylabel(target,object.DataLabel{variable(2)});
     end
 else
     switch numel(variable)
