@@ -21,13 +21,20 @@ if Narg==0
     assert(nargout==0,'ERROR: output cannot be generated without inputs');   
     name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
         'NumberBins','HistogramMode',...
-        'EllipseSpan'};
+        'EllipseSpan','EllipseDistortion'};
     for k=1:numel(name)
         fprintf('%s:\n',name{k});
         if isempty(object.(name{k}))
             fprintf('\t(empty)\n\n');
         elseif ischar(object.(name{k}))
             fprintf('\t%s\n\n',object.(name{k}));
+        elseif islogical(object.(name{k}))
+            fprintf('\t%d',object.(name{k}));
+            if object.(name{k})
+                fprintf(' (true)\n\n');
+            else
+                fprintf(' (false)\n\n');
+            end
         else           
             disp(object.(name{k}));
         end
@@ -127,6 +134,10 @@ for k=1:2:Narg
                 && (value>0) && (value<1),...
                 'ERROR: invalid ellipse span');
             object.EllipseSpan=value;
+        case 'ellipsedistortion'
+            assert(islogical(value),...
+                'ERROR: invalid ellipse distortion value');
+            object.EllipseDistortion=value;
         otherwise
             error('ERROR: invalid name');
     end

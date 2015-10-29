@@ -8,11 +8,18 @@
 % directly.
 %    >> [x,y]=ellipse(object,[1 3]); % select first and third variable
 %
-% The bounding curve may be a distorted ellipse if either cloud variable
-% has a non-normal distribution.  These distortions indicate skewness
-% and/or excess kurtosis.  Bounding curves may be poorly defined if there
-% are too few cloud points or large span fractions (e.g., >0.99) are
-% requested.  
+% The bounding ellipse may be distorted if the cloud variables have a
+% non-normal distribution; these distortions indicate skewness and/or
+% excess kurtosis. Distorted ellipses are only generated if the object's
+% EllipseDistortion property is true (the default value is false).
+%
+% Bounding curves may be poorly defined if there are too few cloud points
+% (<1000).  Ellipse calculations may be slow for very large clouds (>1
+% million points), though not unbearable except for distorted calculations
+% on highly non-normal distributions (which may not converge).  Large span
+% fractions (e.g., >0.99) may be ill defined if there are signifiant gaps
+% in the outmost cloud points.  Recommend values for the ellipse span are
+% 0.50-0.95.
 %
 % See also Cloud, hist, view
 %
@@ -25,6 +32,7 @@
 %    -Implemented faster refinement of the ellipse boundary
 %    -Added an input for refinement options (currently undocumented)
 %    -Ellipse span input removed (using object property instead)
+%    -Enabled undistorted ellipse capability (on by default)
 function varargout=ellipse(object,variable,options)
 
 % handle input
@@ -52,6 +60,9 @@ end
 span=object.EllipseSpan;
 
 moment=object.Moments(variable,:);
+if ~object.EllipseDistortion
+    moment(:,3:4)=0;
+end
 correlation=object.Correlations(variable(1),variable(2));
 correlation=[1 correlation; correlation 1];
 

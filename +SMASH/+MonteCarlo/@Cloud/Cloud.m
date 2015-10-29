@@ -53,6 +53,7 @@ classdef Cloud %< SMASH.General.DataClass
         NumberBins = 10 % Number of histogram bins        
         HistogramMode = 'bar' % Histogram plot mode: 'bar' or 'line'
         EllipseSpan = 0.90 % Bounding ellipse span (fraction of points inside)
+        EllipseDistortion = false % Allow distorted bounding ellipse
     end
     %properties
     %    Name
