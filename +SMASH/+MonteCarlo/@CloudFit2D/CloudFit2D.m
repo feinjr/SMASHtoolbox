@@ -41,6 +41,8 @@ classdef CloudFit2D
     properties
         ViewOptions = processViewOptions() % Display options (structure)
         Model % 2D model object
+        NumberDraws = 1 % Points drawn from each cloud for model optimization
+        DrawMode = 'standard' % Draw mode ('standard' or 'economy'?)
     end
     %%
     methods (Hidden=true)
@@ -73,6 +75,9 @@ classdef CloudFit2D
             end
             object.CloudData=value;
         end
+        function object=set.ViewOptions(object,value)
+            object.ViewOptions=processViewOptions(value);
+        end
         function object=set.Model(object,value)
             if isempty(value)
                 % do nothing
@@ -80,10 +85,25 @@ classdef CloudFit2D
             assert(isa(value,'SMASH.MonteCarlo.Support.Model2D'),...
                 'ERROR: invalid model');
             end
-            object.Model=value;
+            object.Model=value;        
         end
-        function object=set.ViewOptions(object,value)
-            object.ViewOptions=processViewOptions(value);
+        function object=set.NumberDraws(object,value)
+            assert(...
+                SMASH.General.testNumber(value,'integer','positive','notzero'),...
+                'ERROR: invalid number of draws');
+            object.NumberDraws=value;
+        end
+        function object=set.DrawMode(object,value)
+            assert(ischar(value),'ERROR: invalid draw mode');
+            value=lower(value);
+            switch value
+                case 'standard'
+                    object.DrawMode=value;
+                case 'economy'
+                    error('ERROR: economy mode not supported yet');
+                otherwise
+                    error('ERROR: invalid draw mode');
+            end
         end
     end
     

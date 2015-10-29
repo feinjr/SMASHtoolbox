@@ -27,7 +27,7 @@
 %
 
 
-function result=analyze(object,iterations,draws) % economy mode?
+function result=analyze(object,iterations)
 
 % manage input
 if (nargin<2) || isempty(iterations)
@@ -44,12 +44,43 @@ test=SMASH.General.testNumber(draws,'positive','integer') ...
     && (draws>0);
 assert(test,'ERROR: invalid number of draws');
 
-% perform analysis
+% check parallel state
+parallel=false;
+try
+    if exist('matlabpool','file') && (matlabpool('size')>0) %#ok<DPOOL>
+        parallel=true; % MATLAB 2013a and earlier
+    end
+catch
+    if ~isempty(gcp('nocreate'))
+        parallel=true; % MATLAB 2014a and later
+    end
+end
 
+% perform analysis
+result=nan(object.Model.NumberParameters,iterations);
+for k=1:iterations
+    if parallel
+        parfor m=1:M
+            temp=fitModel(object,draws);
+            result(:,m)=temp(:);
+        end
+    else
+        for m=1:M
+            temp=fitModel(object,draws);
+            result(:,m)=temp(:);
+        end
+    end
+end
+result=transpose(result);
+
+% manage output
+result=SMASH.MonteCarlo.Cloud(result,'table');
 
 end
 
-function result=fitModel(object,draws)
+function result=fitModel(clouds,weights,draws,model)
+
+% ! UNDER CONSTRUCTION !
 
 % draw points from clouds
 
