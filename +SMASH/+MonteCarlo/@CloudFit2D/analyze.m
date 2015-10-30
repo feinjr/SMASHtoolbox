@@ -37,13 +37,6 @@ test=SMASH.General.testNumber(iterations,'positive','integer') ...
     && (iterations>0);
 assert(test,'ERROR: invalid number of iterations');
 
-if (nargin<3) || isempty(draws)
-    draws=1;
-end
-test=SMASH.General.testNumber(draws,'positive','integer') ...
-    && (draws>0);
-assert(test,'ERROR: invalid number of draws');
-
 % check parallel state
 parallel=false;
 try
@@ -58,19 +51,18 @@ end
 
 % perform analysis
 result=nan(object.Model.NumberParameters,iterations);
-for k=1:iterations
-    if parallel
-        parfor m=1:M
-            temp=fitModel(object,draws);
-            result(:,m)=temp(:);
-        end
-    else
-        for m=1:M
-            temp=fitModel(object,draws);
-            result(:,m)=temp(:);
-        end
+if parallel
+    parfor m=1:iterations
+        temp=fitModel(object);
+        result(:,m)=temp(:);
+    end
+else
+    for m=1:iterations
+        temp=fitModel(object);
+        result(:,m)=temp(:);
     end
 end
+
 result=transpose(result);
 
 % manage output
@@ -78,112 +70,10 @@ result=SMASH.MonteCarlo.Cloud(result,'table');
 
 end
 
-function result=fitModel(clouds,weights,draws,model)
+function result=fitModel(object)
 
-% ! UNDER CONSTRUCTION !
-
-% draw points from clouds
-
-% optimize model
+[points,weights,covariance,group]=drawPoints(object);
+temp=optimize(object.Model,points,weights,covariance,group);
+result=temp.Parameters;
 
 end
-
-
-% 
-% % extract cloud data
-% clouds=getActiveClouds(object);
-% M=numel(clouds);
-% N=object.CloudSize;
-% [X,Y]=deal(nan(M,N));
-% for k=1:M
-%     temp=clouds{k}.Data(:,1);
-%     X(k,:)=reshape(temp,[1 object.CloudSize]);
-%     temp=clouds{k}.Data(:,2);
-%     Y(k,:)=reshape(temp,[1 object.CloudSize]);
-% end
-% 
-% % normalize clouds
-% xb=[+inf -inf];
-% yb=[+inf -inf];
-% for m=1:M
-%     temp=clouds{m}.Moments;
-%     xm=temp(1,1);
-%     xb(1)=min(xb(1),xm);
-%     xb(2)=max(xb(2),xm);
-%     ym=temp(2,1);
-%     yb(1)=min(yb(1),ym);
-%     yb(2)=max(yb(2),ym);
-% end
-% 
-% x0=xb(1);
-% Lx=xb(2)-xb(1);
-% y0=yb(1);
-% Ly=yb(2)-yb(1);
-% 
-% Xnorm=(X-x0)/Lx;
-% Ynorm=(Y-y0)/Ly;
-% 
-% % prepare curves for normalization
-% if isempty(evaluation)
-%     evaluation=linspace(xb(1),xb(2),100);
-% elseif SMASH.General.testNumber(evaluation,'integer')
-%     evaluation=linspace(xb(1),xb(2),evaluation);
-% end
-% 
-% curve.x0=x0;
-% curve.y0=y0;
-% curve.Lx=Lx;
-% curve.Ly=Ly;
-% 
-% % % calculate survival array
-% % S=nan(size(X));
-% % for m=1:m
-% %     L2=(Xnorm(m,:)-mean(Xnorm(m,:))).^2+(Ynorm(m,:)-mean(Ynorm(m,:))).^2;
-% %     S(m,1)=feval(object.WeightFunction,L2(:));
-% % end
-% % S(:,1)=min(S(:,1))./S(:,1);
-% % S=repmat(S(:,1),[1 N]);
-% 
-% % calculate weights and allowed directions
-% [weights,allowed]=deal(nan(size(X)));
-% for m=1:M
-%     
-% end
-% 
-% 
-% % perform iteration, in parallel if possible
-% meanXnorm=mean(Xnorm,2);
-% meanYnorm=mean(Ynorm,2);
-% Nguess=numel(guess);
-% result=nan(object.Iterations,Nguess);
-% %parfor iteration=1:object.Iterations
-% for iteration=1:object.Iterations
-%     % randomly shift clouds
-%     index=randi(N,[M 1]);
-%     index=sub2ind([M N],transpose(1:M),index);
-%     P=Xnorm(index)-meanXnorm;
-%     P=repmat(P,[1 N]);
-%     Q=Ynorm(index)-meanYnorm;
-%     Q=repmat(Q,[1 N]);
-%     % apply survival criterea
-%     H=rand(M,N);
-%     H=(H<=S);
-%     % minimize mean square orthogonal distance
-%     param=fminsearch(...
-%         @(p) residual(p,curve,bound,evaluation,Xnorm+P,Ynorm+Q,H),...
-%         guess,options);
-%     %param=optimize(curve,evaluation,Xnorm+P,Ynorm+Q,H,guess,options);
-%     % store parameter
-%     result(iteration,:)=reshape(param,[1 Nguess]);
-% end
-% 
-% result=SMASH.MonteCarlo.Cloud(result,'table');
-% label=cell(1,result.NumberVariables);
-% for k=1:result.NumberVariables
-%     label{k}=sprintf('Parameter #%d',k);
-% end
-% result.DataLabel=label;
-% 
-% end
-% 
-

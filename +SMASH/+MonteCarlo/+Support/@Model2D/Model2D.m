@@ -12,10 +12,10 @@
 %
 % Models are constructed with a function handle and an array of parameter
 % values.
-%     object=Model2D(target,guess);
+%     object=Model2D(target,param);
 % The target function must accept three inputs as described above.  The
 % second input specifies an initial parameter state, which is usually a
-% guess for the optimal values (with respect to some dataset).  The guess
+% param for the optimal values (with respect to some dataset).  The param
 % input must be a numeric array (arbitrary size/shape) understood by the
 % target function.
 %
@@ -42,24 +42,24 @@ classdef Model2D
     end
     %%
     methods (Hidden=true)
-        function object=Model2D(target,guess)
+        function object=Model2D(target,param)
             % manage input
-            assert(nargin==2,'ERROR: invalid number of inputs');
+            assert(nargin>=2,'ERROR: invalid number of inputs');
             assert(isa(target,'function_handle'),...
                 'ERROR: invalid function handle');
-            assert(isnumeric(guess),'ERROR: invalid parameter array');
+            assert(isnumeric(param),'ERROR: invalid parameter array');
             
             % assign settings
             object.Function=target;
-            object.Parameters=guess(:);
-            object.NumberParameters=numel(guess);
+            object.Parameters=param(:);
+            object.NumberParameters=numel(param);
             
             object.Bounds=repmat([-inf +inf],[object.NumberParameters 1]);
             object.SlackVariables=zeros([object.NumberParameters 1]);
             
             object.SlackFunction=cell([object.NumberParameters 1]);
             for n=1:object.NumberParameters
-                object.SlackFunction{n}=@(q) guess(n)+q;
+                object.SlackFunction{n}=@(q) param(n)+q;
             end
             
         end

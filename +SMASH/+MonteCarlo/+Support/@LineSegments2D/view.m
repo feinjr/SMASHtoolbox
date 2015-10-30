@@ -34,8 +34,12 @@ if strcmpi(object.BoundaryType,'wrapped')
     x(end+1)=x(1);
     y(end+1)=y(1);
 end
-h=line(x,y);
-apply(object.GraphicOptions,h);
+
+h=[];
+if numel(x)>0
+    h=line(x,y);
+    apply(object.GraphicOptions,h);
+end
 
 % manage output
 if nargout>0

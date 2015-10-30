@@ -1,13 +1,18 @@
 % evaluate Evaluate model function
 %
-% This method evaluates the model function at a specified state.
-% The state can be specified in terms of model parameters or the
-% corresponding slack variables (default).
-%     object=evaluate(object,slack); % evaluate slack state
-%     object=evaluate(object,slack,'slack') % same as above
-%     object=evaluate(object,param,'parameter',param); % evaluate parameter state
-% The evaluated parameter state is returned as a second output in both
-% modes.
+% This method evaluates the model function at a specified state. The state
+% is specified by an array of slack/parameter values and limiting values of
+% (x,y) for the evaluation.
+%     object=evaluate(object,slack,xb,yb);
+%     object=evaluate(object,slack,xb,yb,'slack') % same as above
+%        slack : slack variable values
+%        xb    : limiting values of x [xmin xmax]
+%        yb    : limiting values of y [ymin ymax]
+% To evaluate the model using a parameter values (instead of slack
+% variables):
+%     object=evaluate(object,param,xb,yb,parameter); 
+%
+% The evaluated parameter state is alwasy returned as a second output.
 %     [object,param]=evaluate(...);
 %
 % The model evaluation is returned in the object's Curve property as a
@@ -22,6 +27,13 @@ function [object,param]=evaluate(object,param,xspan,yspan,mode)
 
 % manage input
 assert(nargin>=4,'ERROR: insufficient input');
+
+if isempty(param)
+    param=object.Parameters;   
+    [object,param]=evaluate(object,param,xspan,yspan,'parameter');
+    return
+end
+
 assert(numel(param)==object.NumberParameters,...
     'ERROR: invalid number of parameters');
 

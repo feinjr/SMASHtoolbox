@@ -42,6 +42,7 @@ classdef CloudFit2D
         ViewOptions = processViewOptions() % Display options (structure)
         Model % 2D model object
         NumberDraws = 1 % Points drawn from each cloud for model optimization
+        Recenter = false % Recenter point(s) drawn from cloud
         DrawMode = 'standard' % Draw mode ('standard' or 'economy'?)
     end
     %%
@@ -92,6 +93,10 @@ classdef CloudFit2D
                 SMASH.General.testNumber(value,'integer','positive','notzero'),...
                 'ERROR: invalid number of draws');
             object.NumberDraws=value;
+        end
+        function object=set.Recenter(object,value)
+            assert(islogical(value),'ERROR: invalid recenter value');
+            object.Recenter=value;
         end
         function object=set.DrawMode(object,value)
             assert(ischar(value),'ERROR: invalid draw mode');

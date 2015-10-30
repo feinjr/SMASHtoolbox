@@ -5,6 +5,8 @@ if (Narg==2) && strcmpi(varargin{2},'table')
     table=varargin{1};
     assert(isnumeric(table) & ismatrix(table),'ERROR: invalid data table');
     [object.NumberPoints,object.NumberVariables]=size(table);
+    assert(object.NumberPoints>=5,...
+        'ERROR: at least 5 points needed to make a cloud');
     object.Data=table;    
     [moments,correlations]=summarize(object);
     object.Moments=moments;

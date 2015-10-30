@@ -56,7 +56,8 @@ end
 
 % display model curve (if available)
 if ~isempty(object.Model)
-    
+    object.Model=evaluate(object.Model,[],xlim(target),ylim(target));
+    view(object.Model.Curve,gca);
 end
 
 % handle output
