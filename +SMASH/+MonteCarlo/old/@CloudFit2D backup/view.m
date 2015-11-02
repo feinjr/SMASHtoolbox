@@ -55,11 +55,9 @@ if new
 end
 
 % display model curve (if available)
-if ~isempty(object.Model) && ~isempty(object.Model.Curve)
-    line(object.Model.Curve(:,1),object.Model.Curve(:,2),...
-        'Parent',target,...
-        'Color',object.ViewOptions.ModelColor,...
-        'LineStyle',object.ViewOptions.ModelLineStyle);
+if ~isempty(object.Model)
+    object.Model=evaluate(object.Model,[],xlim(target),ylim(target));
+    view(object.Model.Curve,gca);
 end
 
 % handle output

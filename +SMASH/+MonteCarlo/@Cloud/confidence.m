@@ -9,7 +9,7 @@
 %   >> result=confidence(object,0.90); % 90% confidence span (centered at 50%)
 %   >> result=confidence(object,[0.10 0.95]); % custom span from 10% to 95%
 %
-% See also Cloud, summarize
+% See also Cloud, investigate, summarize
 %
 
 % created June 29, 2013 by Daniel Dolan (Sandia National Laboratories)

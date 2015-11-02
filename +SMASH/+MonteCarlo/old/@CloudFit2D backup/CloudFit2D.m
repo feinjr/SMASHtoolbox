@@ -36,21 +36,14 @@ classdef CloudFit2D
     properties (SetAccess=protected)
         NumberClouds = 0 % Number of Cloud objects
         ActiveClouds = [] % Active cloud indices
-        CloudWeights % Cloud weights (column vector)
-        InverseElements % Inverse covariance matrix elements ([a bc d] columns)
+        CloudWeights % Array of cloud weights
     end
     properties
         ViewOptions = processViewOptions() % Display options (structure)
+        Model % 2D model object
         NumberDraws = 1 % Points drawn from each cloud for model optimization
         Recenter = false % Recenter point(s) drawn from cloud
         DrawMode = 'standard' % Draw mode ('standard' or 'economy'?)
-    end
-    properties (SetAccess=protected)
-        Model  = struct('Function',[],'Parameters',[],'Bounds',[],...
-            'Slack',[],'SlackReference',[],'Curve',[]) %      
-    end  
-    properties
-        OptimizationSettings=optimset();
     end
     %%
     methods (Hidden=true)
@@ -85,7 +78,16 @@ classdef CloudFit2D
         end
         function object=set.ViewOptions(object,value)
             object.ViewOptions=processViewOptions(value);
-        end       
+        end
+        function object=set.Model(object,value)
+            if isempty(value)
+                % do nothing
+            else
+            assert(isa(value,'SMASH.MonteCarlo.Support.Model2D'),...
+                'ERROR: invalid model');
+            end
+            object.Model=value;        
+        end
         function object=set.NumberDraws(object,value)
             assert(...
                 SMASH.General.testNumber(value,'integer','positive','notzero'),...
@@ -107,14 +109,6 @@ classdef CloudFit2D
                 otherwise
                     error('ERROR: invalid draw mode');
             end
-        end
-        function object=set.OptimizationSettings(object,value)
-            try
-                value=optimset(value);
-            catch
-                error('ERROR: invalid optmization settings');                
-            end
-            object.OptimizationSettings=value;
         end
     end
     

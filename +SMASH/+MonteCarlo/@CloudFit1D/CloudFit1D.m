@@ -8,7 +8,10 @@ classdef CloudFit1D
     properties
     end
     %%
-    methods
+    methods (Hidden=true)
+        function object=CloudFit1D(varargin)
+            error('ERROR: this class is not ready for use');
+        end
     end
     
 end

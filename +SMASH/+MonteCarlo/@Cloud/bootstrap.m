@@ -22,8 +22,8 @@ function object=bootstrap(object,numpoints,UpdateMode)
 if (nargin<2) || isempty(numpoints)
     numpoints=object.NumberPoints;    
 end
-assert(numpoints>=10*object.NumberVariables,...
-    'ERROR: ERROR: at least 10 points per variable required');
+%assert(numpoints>=10*object.NumberVariables,...
+%    'ERROR: ERROR: at least 10 points per variable required');
 
 if (nargin<3) || isempty(update)
     UpdateMode='update';

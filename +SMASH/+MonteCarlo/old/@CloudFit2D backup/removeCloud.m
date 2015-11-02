@@ -31,10 +31,7 @@ object.ActiveClouds=find(active);
 
 object.NumberClouds=numel(object.CloudData);
 
-% update weights table
+% update weights
 object=calculateWeights(object);
-
-% update inverse matrix table
-object=calculateInverses(object);
 
 end

@@ -27,7 +27,7 @@
 %
 
 
-function [result,object]=analyze(object,iterations)
+function result=analyze(object,iterations)
 
 % manage input
 if (nargin<2) || isempty(iterations)
@@ -49,34 +49,17 @@ catch
     end
 end
 
-% determine variable ranges
-xb=[+inf -inf];
-yb=[+inf -inf];
-for k=object.ActiveClouds
-    moments=object.CloudData{k}.Moments;
-    xb(1)=min(xb(1),moments(1,1));
-    xb(2)=max(xb(2),moments(1,1));
-    yb(1)=min(yb(1),moments(2,1));
-    yb(2)=max(yb(2),moments(2,1));
-end
-
-% verify model, refine guess, and setup result array
-try
-    param=fitModel(object,xb,yb);
-catch
-    error('ERROR: missing or invalid model function');
-end
-result=nan(numel(param),iterations);
-result(:,1)=param;
-
 % perform analysis
+result=nan(object.Model.NumberParameters,iterations);
 if parallel
-    parfor m=2:iterations
-        result(:,m)=fitModel(object,xb,yb);
+    parfor m=1:iterations
+        temp=fitModel(object);
+        result(:,m)=temp(:);
     end
 else
-    for m=2:iterations
-        result(:,m)=fitModel(object,xb,yb);
+    for m=1:iterations
+        temp=fitModel(object);
+        result(:,m)=temp(:);
     end
 end
 
@@ -84,38 +67,13 @@ result=transpose(result);
 
 % manage output
 result=SMASH.MonteCarlo.Cloud(result,'table');
-if nargout>=2
-    best=result.Moments(:,1);
-    object=setupModel(object,[],best,[],xb,yb);
-end
 
 end
 
-function result=fitModel(object,xb,yb)
+function result=fitModel(object)
 
-[points,weights,ielements,group]=drawPoints(object);
-
-NumberParameters=numel(object.Model.Parameters);
-result=nan(NumberParameters,1);
-    function chi2=residual(slack)
-        % update curve
-        object=evaluateModel(object,slack,xb,yb);
-        result=object.Model.Parameters;        
-        segments=curve2segments(object.Model.Curve);
-        % weighted sum of minimum Mahalanobis distances
-        chi2=0;
-        WeightSum=0;
-        for k=1:size(group,1)                        
-            index=group(k,1):group(k,2);
-            D2=calculateDistance(segments,points(index,:),ielements);
-            if any(D2<0)
-                keyboard;
-            end
-            chi2=chi2+sum(D2.*weights(k));
-            WeightSum=WeightSum+weights(k)*numel(index);
-        end
-        chi2=chi2/WeightSum;        
-    end
-fminsearch(@residual,object.Model.Slack,object.OptimizationSettings);
+[points,weights,covariance,group]=drawPoints(object);
+temp=optimize(object.Model,points,weights,covariance,group);
+result=temp.Parameters;
 
 end

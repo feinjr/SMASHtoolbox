@@ -7,7 +7,7 @@
 % window.  This information can also be returned as outputs.
 %    >> [moments,correlations]=summarize(object);
 %
-% See also Cloud, confidence
+% See also Cloud, confidence, investigate
 %
 
 %

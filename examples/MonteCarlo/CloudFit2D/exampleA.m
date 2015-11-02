@@ -26,27 +26,39 @@ line(temp(:,1),temp(:,2),'Marker','*','LineStyle','none');
 xb=[min(x) max(x)];
 yb=[min(y) max(y)];
 
-target=@(p,xb,yb) [xb(:) polyval(p,xb(:))];
-object=setModel(object,target,[1 0]);
+target=@(p,xb,yb) [xb(:) p(1)*xb(:)+p(2)];
+object=setupModel(object,target,[1 0],[],xb,yb);
 object.ViewOptions.CloudColor='r';
 view(object);
 
-%% single optimization
-temp=drawPoints(object); % ignores correlations
-object.Model=optimize(object.Model,temp);
-view(object);
-line(temp(:,1),temp(:,2),'Marker','*','LineStyle','none');
-
-%% Monte Carlo analysis
-N=1000;
+%% small-scale Monte Carlo analysis
+N=10;
 tic;
-result=analyze(object,N);
+%profile on;
+[result,new]=analyze(object,N);
+%profile report;
+%profile off;
 duration=toc;
 fprintf('Total time : %#.3g seconds \n',duration);
 fprintf('Time per iteration : %#.3g seconds\n',duration/N);
 view(result);
-summarize(result);
 
-new=result.Moments(:,1);
-object=setModel(object,target,new);
-view(object);
+summarize(result);
+investigate(result);
+
+view(new);
+
+%% large-scale Monte Carlo analysis
+N=1000;
+tic;
+[result,new]=analyze(object,N);
+duration=toc;
+fprintf('Total time : %#.3g seconds \n',duration);
+fprintf('Time per iteration : %#.3g seconds\n',duration/N);
+fprintf('Time per calculation : %#.3g seconds\n',...
+    duration/N/object.NumberClouds/object.NumberDraws/(size(object.Model.Curve,1)-1));
+
+summarize(result);
+investigate(result);
+
+view(new);

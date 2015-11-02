@@ -75,10 +75,7 @@ else % process arrays
     end    
 end  
 
-% update weights table
+% update weights
 object=calculateWeights(object);
-
-% update inverse matrix table
-object=calculateInverses(object);
 
 end
