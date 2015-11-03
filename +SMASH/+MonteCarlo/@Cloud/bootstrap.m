@@ -9,6 +9,10 @@
 % This can be changed by passing a second input.
 %    >> object=bootstrap(object,numpoints);
 %
+% By default, updated moments and correlations are calculated from the
+% bootrap results.  Faster bootstraps can be obtained if updated
+% moment/correlation information is not required.
+%      new=bootstrap(object,numpoints,'noupdate');
 % 
 % See also Cloud
 %
@@ -25,7 +29,7 @@ end
 %assert(numpoints>=10*object.NumberVariables,...
 %    'ERROR: ERROR: at least 10 points per variable required');
 
-if (nargin<3) || isempty(update)
+if (nargin<3) || isempty(UpdateMode)
     UpdateMode='update';
 end
 

@@ -59,7 +59,7 @@ classdef CloudFit2D
                 object=addCloud(object,varargin{:});
             end
         end
-        varargout=calculateWeights(varargin);
+        %varargout=calculateWeights(varargin);
     end
     %%
     methods (Static=true, Hidden=true)

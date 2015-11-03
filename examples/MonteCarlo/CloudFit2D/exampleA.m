@@ -1,13 +1,16 @@
 %% generate object
 x=[0 1 2];
-y=[0 1 2.5];
+y=[0 1 3];
 variance=2*0.1^2;
 dx2=[0.1 0.01 0.1].^2;
 dy2=variance-dx2;
+%dx2=repmat(0.1,[1 3]);
+%dy2=dx2;
 
 xtable=[x(:) dx2(:)];
 ytable=[y(:) dy2(:)];
 correlation=[0 0 -0.75];
+%correlation=[0 0 0];
 Npoints=1e4;
 
 object=SMASH.MonteCarlo.CloudFit2D(xtable,ytable,correlation,Npoints);
@@ -15,6 +18,9 @@ view(object);
 object.ViewOptions.CloudMode='ellipses';
 object.ViewOptions.CloudColor='k';
 view(object,gca);
+
+object=calculateWeights(object,100);
+object.CloudWeights
 
 %% draw cloud points
 view(object);
@@ -33,6 +39,7 @@ view(object);
 
 %% small-scale Monte Carlo analysis
 N=10;
+fprintf('iterations : %d\n',N);
 tic;
 %profile on;
 [result,new]=analyze(object,N);
@@ -49,7 +56,8 @@ investigate(result);
 view(new);
 
 %% large-scale Monte Carlo analysis
-N=1000;
+N=10000;
+fprintf('iterations : %d\n',N);
 tic;
 [result,new]=analyze(object,N);
 duration=toc;
