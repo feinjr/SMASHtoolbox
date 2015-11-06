@@ -42,6 +42,17 @@ original=which('helpwin');
 [location,~,~]=fileparts(original);
 backup=fullfile(location,'helpwin_backup.m');
 
+% make sure this isn't Windows
+if ispc
+    warning('SMASH:System','Windows will not let this command work');
+    fprintf('To manually fix documentation display:\n');
+    fprintf('\t-Open the file: \n\t\t%s\n',original);
+    fprintf('\t-Find the command "web(htmlFile, ''-helpbrowser'')"\n');
+    fprintf('\t\tThis will be near the end, in the displayFile function \n');
+    fprintf('\t-Replace the command with "web(htmlFile)"\n');    
+    return
+end
+
 % restore mode
 if strcmpi(mode,'restore')
     if exist(backup,'file')
