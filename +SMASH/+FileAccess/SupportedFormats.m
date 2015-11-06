@@ -33,7 +33,7 @@
 %   'pff'            : Portable File Format files (*.pff)
 %   'sda'            : Sanda Data Archive files (*.sda)
 %
-% See also FileAccess
+% See also SMASH.FileAccess
 %
 
 %

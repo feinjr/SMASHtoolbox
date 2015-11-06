@@ -28,7 +28,7 @@
 % The existing file is deleted before the write operation; previous records
 % in a *.sda file are discarded.
 % 
-% See also FileAccess, fprintf, SDAfile
+% See also SMASH.FileAccess, fprintf, SDAfile
 %
 
 %

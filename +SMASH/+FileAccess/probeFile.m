@@ -14,7 +14,7 @@
 %    >> report=probeFile(...);
 %
 %
-% See also FileAccess, SupportedFormats
+% See also SMASH.FileAccess, SupportedFormats
 %
 
 %

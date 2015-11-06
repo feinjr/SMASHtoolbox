@@ -4,11 +4,13 @@
 % Functions provided in this toolbox are the easiest way to access files.
 %    probeFile   - Reveal contents in a multi-record file (*.sda, *.pff, etc.)
 %    readFile    - Read data from a file
-%    mergeSplits - Merge split SDA files into a complete file
-%    splitFile   - Split file across multiple SDA files
 %    writeFile   - Write data to a file
 %
-% Classes are provided for more advanced file access.
+%    mergeSplits - Merge split SDA files into a complete file
+%    splitFile   - Split file across multiple SDA files
+%
+%
+% Classes provide more advanced file access.
 %    ColumnFile    - text files containing columns
 %    CustomFile    - custom text files
 %    DIGfile       - Nevada Test Site DIG files
