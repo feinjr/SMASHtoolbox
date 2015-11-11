@@ -15,7 +15,10 @@ for k=1:numel(variable)
 end
 
 if (nargin<3) || isempty(width)
-    width=nan(1,2);    
+    width=nan();    
+end
+if isscalar(width)
+    width=repmat(width,[1 2]);
 end
 
 % generate density functions
@@ -38,12 +41,12 @@ switch numel(variable)
     case 2
         x=object.Data(:,variable(1));
         if isnan(width(1))
-            width(1)=std(x);
+            width(1)=std(x)/2;
         end        
         xgrid=linspace(min(x)-3*width(1),max(x)+3*width(1),100);
         y=object.Data(:,variable(2));
         if isnan(width(2))
-            width(2)=std(y);
+            width(2)=std(y)/2;
         end        
         ygrid=linspace(min(y)-3*width(1),max(y)+3*width(1),100);
         [xgrid,ygrid]=meshgrid(xgrid,ygrid);
@@ -66,7 +69,8 @@ if nargout==0
         case 1
             plot(xgrid,count);
         case 2
-           imagesc(xgrid(1,:),ygrid(:,1),count);            
+           imagesc(xgrid(1,:),ygrid(:,1),count);      
+           set(gca,'YDir','normal');
     end
     figure(gcf);
 else

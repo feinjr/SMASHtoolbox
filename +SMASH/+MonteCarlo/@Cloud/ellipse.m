@@ -69,7 +69,7 @@ correlation=[1 correlation; correlation 1];
 % generate and refine ellipse
 origin=transpose(moment(:,1));
 M=size(object.Data,1); % number of cloud points
-vector=bsxfun(@minus,object.Data,origin);
+vector=bsxfun(@minus,object.Data(:,variable),origin);
 ratio=zeros(M,1);
 
 N=100; % number of ellipse points
