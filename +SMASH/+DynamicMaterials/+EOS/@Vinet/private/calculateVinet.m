@@ -73,12 +73,13 @@ G=zeros(size(P));
 d(1)=1.0; d(2)=0.0; d=[d dn];
 f=zeros(size(d));
 f(1)=1;
+f(2)=(d(1)-f(1)).*eta0./(2);
 sumZ = 0;
 for i=2:length(d)
     if i == length(d)
         f(i)=d(i);
     else
-        f(i+1)=d(i)-f(i).*eta0./(i+1);
+        f(i+1)=(d(i)-f(i)).*eta0./(i+1);
     end
     sumZ=sumZ+f(i).*z.^(i-1);
 end
