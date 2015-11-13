@@ -10,7 +10,15 @@ object.GraphicOptions.LineStyle='-';
 Narg=numel(varargin);
 assert(Narg>0,'Must Enter at least material number');
 if Narg==1 % prompt user to select file
-    defaultpath = setDataDirectory('DynamicMaterials');
+    
+    try
+        defaultpath = SMASH.System.getPreference('DMP_Directory');
+    catch
+        defaultpath = uigetdir(matlabroot,'Select DMP_Directory');
+        SMASH.System.setPreference('DMP_Directory',eospath,'session')
+    end
+    
+    
     [filename,pathname]=uigetfile({'*.*','All files'},'Select file',defaultpath);
     if isnumeric(filename)
         error('ERROR: no file selected');

@@ -8,7 +8,9 @@
 %
 %   >> object = Sesame(neos)
 % 
-% the user is prompted to select the sesame file. 
+% the user is prompted to select the sesame file. Location of the files is
+% set using SMASH.System.setPreference('DMP_Directory',location). If this
+% preference has not been set, the user is prompted to select a directory.
 %
 % The class stores the tabular points specifying density, temperature,
 % pressure, internal energy, and entropy.
