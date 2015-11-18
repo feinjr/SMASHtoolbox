@@ -20,8 +20,7 @@ Narg=numel(varargin);
 if Narg==0
     assert(nargout==0,'ERROR: output cannot be generated without inputs');   
     name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
-        'NumberBins','HistogramMode',...
-        'EllipseSpan','EllipseDistortion'};
+        'NumberBins','HistogramMode','NumberGridPoints','NumberContours'};
     for k=1:numel(name)
         fprintf('%s:\n',name{k});
         if isempty(object.(name{k}))
@@ -91,18 +90,7 @@ for k=1:2:Narg
             assert(value>=10*object.NumberVariables,...
                 'ERROR: at least 10 points per variable required');
             object.NumberPoints=value;
-            refresh=true;
-        case 'width'
-            assert(isnumeric(value),...
-                'ERROR: invalid width setting');
-            if isempty(value)
-                value=nan(1,object.NumberVariables);
-            elseif numel(value)==1
-                value=repmat(value,[1 object.NumberVariables]);
-            end
-            assert(numel(value)==object.NumberVariables,...
-                'ERROR: inconsistent width value');
-            object.Width=value;
+            refresh=true;        
         case 'seed'
             if isnumeric(value) && isscalar(value)
                 assert(value==uint32(value),...
@@ -115,9 +103,12 @@ for k=1:2:Narg
             object.Seed=value;
             refresh=true;
         case 'numberbins'
+            assert(isnumeric(value) && all(value>0),...
+                'ERROR: invalid number of bins');
+            value=round(transpose(value(:)));
             assert(...
-                SMASH.General.testNumber(value,'positive','integer')...
-                && (value>0),'ERROR: invalid number of bins');
+                isscalar(value) || (numel(value)==object.NumberVariables),...
+                'ERROR: invalid number of bins');
             object.NumberBins=value;            
         case 'histogrammode'
             assert(ischar(value),'ERROR: invalid histogram mode');
@@ -127,21 +118,23 @@ for k=1:2:Narg
                     object.HistogramMode=value;
                 otherwise
                     error('ERROR: invalid histogram mode');
-            end
-        case 'ellipsespan'
+            end        
+        case 'numbergridpoints'
+            assert(isnumeric(value) && all(value>0),...
+                'ERROR: invalid number of grid points');
+            value=round(transpose(value(:)));
             assert(...
-                SMASH.General.testNumber(value)...
-                && (value>0) && (value<1),...
-                'ERROR: invalid ellipse span');
-            object.EllipseSpan=value;
-        case 'ellipsedistortion'
-            assert(islogical(value),...
-                'ERROR: invalid ellipse distortion value');
-            object.EllipseDistortion=value;
+                isscalar(value) || (numel(value)==object.NumberVariables),...
+                'ERROR: invalid number of grid points');                      
+            object.NumberGridPoints=value;        
+        case 'numbercontours'
+            assert(...
+                SMASH.General.testNumber(value,'positive','integer')...
+                && (value>0),'ERROR: invalid number of contours');
+            object.NumberContours=value;    
         otherwise
             error('ERROR: invalid name');
-    end
-        
+    end        
 end
 
 % refresh as neccessary

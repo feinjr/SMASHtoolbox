@@ -50,14 +50,11 @@ classdef Cloud %< SMASH.General.DataClass
         Data % Cloud data table (columns represent variables)
         Source % Data soure: 'moments', 'table', 'transform', or 'bootstrap'
         Seed = []; % Random number generator seed (uint32 value or text string)          
-        NumberBins = 10 % Number of histogram bins        
+        NumberBins = 10 % Number of histogram bins
         HistogramMode = 'bar' % Histogram plot mode: 'bar' or 'line'
-        EllipseSpan = 0.90 % Bounding ellipse span (fraction of points inside)
-        EllipseDistortion = false % Allow distorted bounding ellipse
+        NumberGridPoints = 100 % Number of density grid points
+        NumberContours = 3 % Number of density contours
     end
-    %properties
-    %    Name
-    %end
     %% constructor
     methods (Hidden=true)
         function object=Cloud(varargin)
@@ -66,13 +63,11 @@ classdef Cloud %< SMASH.General.DataClass
             end
             object=create(object,varargin{:});
         end
+        varargout=ellipse(varargin);
     end
     %%
     methods (Access=protected,Hidden=true)
         varargout=create(varargin);
-        %varargout=histogram(varargin);
-        %varargout=density(varargin);
-        %varargout=ellipse(varargin);
     end
     %%
     methods (Static=true,Hidden=true)

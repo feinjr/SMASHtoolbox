@@ -14,13 +14,10 @@
 %   'density'   : density estimate plots (Gaussian kernel)
 % Cross plots (2D) can be:
 %   'histogram' : histogram plots
-%   'density'   : density estimates plots (Gaussian kernel)
-%   'ellipse'   : Bounding quasi-ellipse plots
+%   'density'   : density countours
 %   'points'    : cloud point plots
 % Histograms and density plots are based on NumberBins property; increasing
-% this number creates a finer scale representation.  Ellipse plots are
-% based on the EllipseSpan property, which controls the fraction of cloud
-% point inside the ellipse.
+% this number creates a finer scale representation.
 %
 % The default orientation of the plot array is upper triangular.  The
 % fourth input can be used to change to a lower triangular array.
@@ -50,11 +47,9 @@ assert(test,'ERROR: invalid diagonal plot setting');
 DiagonalPlots=lower(DiagonalPlots);
 
 if (nargin<3) || isempty(CrossPlots)
-    %CrossPlots='histogram';  
-    CrossPlots='ellipse';
+    CrossPlots='density';  
 end
 test=strcmpi(CrossPlots,'points')      ...
-    || strcmpi(CrossPlots,'ellipse') ...
     || strcmpi(CrossPlots,'histogram') ...
     || strcmpi(CrossPlots,'density');
 assert(test,'ERROR: invalid cross plot setting');
@@ -66,16 +61,6 @@ end
 assert(strcmpi(orientation,'lower') || strcmpi(orientation,'upper'),...
     'ERROR: invalid orientation');
 orientation=lower(orientation);
-
-% manage density widths
-width=nan(1,object.NumberVariables);
-if strcmp(DiagonalPlots,'density') || strcmp(CrossPlots,'density')
-    for m=1:object.NumberVariables
-        low=min(object.Data(:,m));
-        high=max(object.Data(:,m));
-        width(m)=(high-low)/object.NumberBins;
-    end
-end
 
 % create plots
 figure;
@@ -90,19 +75,21 @@ for m=1:N
     box on;
     switch DiagonalPlots
         case 'histogram'
-            [count,xbin]=histogram(object,m,'xbin',object.NumberBins);
-            switch object.HistogramMode
-                case 'bar'
-                    hb=bar(xbin,count,1);
-                    set(hb,'FaceColor','none');
-                case 'line'
-                    line(xbin,count,'Color','k');
-            end
-            ylabel('Counts');
+            %[count,xbin]=histogram(object,m);
+            %switch object.HistogramMode
+            %    case 'bar'
+            %        hb=bar(xbin,count,1);
+            %        set(hb,'FaceColor','none');
+            %    case 'line'
+            %        line(xbin,count,'Color','k');
+            %end
+            %ylabel('Counts');
+            histogram(object,m,gca);
         case 'density'
-            [count,xbin]=density(object,m,width(m));
-            line(xbin,count,'Color','k');
-            ylabel('Density');
+            %[count,xbin]=density(object,m,width(m));
+            %line(xbin,count,'Color','k');
+            %ylabel('Density');
+            density(object,m,gca);
     end
     temp=sprintf('%s ',object.VariableName{m});
     xlabel(temp);    
@@ -121,20 +108,17 @@ for m=1:N
                 line(object.Data(:,m),object.Data(:,n),...
                     'LineStyle','none','Marker','.','Color','k');
             case 'histogram'
-                [count,xbin,ybin]=histogram(object,[m n],...
-                    'xbin',object.NumberBins,'ybin',object.NumberBins);
-                imagesc(xbin,ybin,count);
-                set(gca,'YDir','normal');
+                %[count,xbin,ybin]=histogram(object,[m n],...
+                %    'xbin',object.NumberBins,'ybin',object.NumberBins);
+                %imagesc(xbin,ybin,count);
+                %set(gca,'YDir','normal');
+                histogram(object,[m n],gca);
             case 'density'
-                [count,xbin,ybin]=density(object,[m n],...
-                    width([m n]));
-                imagesc(xbin,ybin,count);
-                set(gca,'YDir','normal');
-            case 'ellipse'
-                [x,y]=ellipse(object,[m n],object.EllipseSpan);
-                line(x,y,'Color','k');
-                label=sprintf('Span = %.0f%%',object.EllipseSpan*100);
-                title(label);
+                %[count,xbin,ybin]=density(object,[m n],...
+                %    width([m n]));
+                %imagesc(xbin,ybin,count);
+                %set(gca,'YDir','normal');            
+                density(object,[m n],gca);
         end
         temp=sprintf('%s ',object.VariableName{m});
         xlabel(temp);

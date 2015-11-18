@@ -1,4 +1,6 @@
 % histogram Create 1D/2D histograms of Cloud data
+
+
 %
 % This method generates one- and two-dimensional histograms for variables
 % inside of a data cloud.  The choice of variable(s) is specified by the
@@ -10,6 +12,8 @@
 % the input is omitted in any other case, the user will be prompted to
 % select one or two variables before the histogram can be generatd.
 %
+
+
 % Options for controlling the histogram are specified as name/value pairs.
 %    >> histogram(object,variable,'Name',value);
 % Valid options are specified below.
@@ -26,7 +30,7 @@
 %    >> [count,bin]=histogram(object,...); % 1D histogram
 %    >> [count,xbin,ybin]=histogram(object,...); % 2D histogram
 %
-% See also Cloud, ellipse, view
+% See also Cloud, view
 %
 
 % created July 21, 2013 by Daniel Dolan (Sandia National Laboratories) 
@@ -35,98 +39,87 @@
 % revised August 8, 2014 by Daniel Dolan
 %    -changed output handling to match MATLAB hist convention
 %
-function varargout=histogram(object,variable,varargin)
+function varargout=histogram(object,variable,target)
 
 % handle input
 if (nargin<2) || isempty(variable)
     variable=selectVariables(object,2,'bound');
 end
 assert(numel(variable)<=2,'ERROR: too many plot variables');
+valid=1:object.NumberVariables;
 for k=1:numel(variable)
-    assert(SMASH.General.testNumber(variable(k),'positive','integer') & ...
-        variable(k)>0 & variable(k)<=object.NumberVariables,...
-        'ERROR: invalid variable number');
+    assert(any(variable(k)==valid),'ERROR: invalid variable number');
 end
 
-N=numel(varargin);
-if rem(N,2)==1
-    error('ERROR: unbalanced name/value pair');
-end
-xbin=10;
-ybin=10;
-target=[];
-for k=1:2:N
-    name=varargin{k};
-    value=varargin{k+1};
-    switch lower(name)
-        case {'bin','bins','xbin','hbin'}
-            xbin=value;
-        case {'ybin','vbin'}
-            ybin=value;
-        case 'target'
-            target=value;
-        otherwise
-            error('ERROR: %s is an unrecognized input name',name);
-    end
-end
-
-if isempty(target)
-    target=gca;
-elseif ishandle(target) && strcmpi(get(target,'Type'),'axes')
-    % do nothing
+NewFigure=false;
+if (nargin<3) || isempty(target)
+    target=[];
+    NewFigure=true;
 else
-      error('ERROR: invalid axes handle');
+    assert(ishandle(target) && strcmpi(get(target,'Type'),'axes'),...
+        'ERROR: invalid target axes');
+end
+
+% read data from object
+data=object.Data(:,variable);
+
+Nbin=object.NumberBins;
+if numel(Nbin)==1
+    Nbin=repmat(Nbin,[1 numel(variable)]);
+else
+    Nbin=Nbin(variable);
 end
 
 % generate histograms
 switch numel(variable)
     case 1
-        [count,xbin]=hist(object.Data(:,variable(1)),xbin);
-    case 2
-        x=object.Data(:,variable(1));
-        y=object.Data(:,variable(2));
-        if numel(xbin)==1
-            %xbin=linspace(min(x),max(x),xbin);
-            [~,xbin]=hist(x,xbin);
+        [count,xbin]=hist(data,Nbin);
+        if nargout>0
+            varargout{1}=count;
+            varargout{2}=xbin;
         end
-        if numel(ybin)==1
-            %ybin=linspace(min(y),max(y),ybin);
-            [~,ybin]=hist(y,ybin);
-        end
-        count=zeros(numel(ybin),numel(xbin));       
+    case 2        
+        xbin=linspace(min(data(:,1)),max(data(:,1)),Nbin(1));
+        ybin=linspace(min(data(:,2)),max(data(:,2)),Nbin(2));
+        count=zeros(Nbin(2),Nbin(1));       
         center=(xbin(1:end-1)+xbin(2:end))/2;
         left=[-inf center];
         right=[center +inf];
         for n=1:numel(xbin)
-            index=(x>=left(n)) & (x<right(n));
-            temp=hist(y(index),ybin); 
+            index=(data(:,1)>=left(n)) & (data(:,1)<right(n));
+            temp=hist(data(index,2),ybin); 
             count(:,n)=temp(:);
-        end              
+        end           
+        if nargout>0
+            varargout{1}=xbin;
+            varargout{2}=ybin;
+            varargout{3}=count;
+        end
 end
 
 % handle ouput
 if nargout==0
-    axes(target);
-    switch numel(variable)
-        case 1
-            bar(xbin,count,'hist');
-            %xlabel(target,object.DataLabel{1});
-            %ylabel(target,'Number of counts');
-        case 2
-            imagesc(xbin,ybin,count);
-            set(target,'YDir','normal');
-            %xlabel(target,object.DataLabel{variable(1)});
-            %ylabel(target,object.DataLabel{variable(2)});
+    if isempty(target)
+        figure;
+        target=axes('Box','on');
+    else
+        axes(target);
     end
-else
     switch numel(variable)
         case 1
-            varargout{1}=count;
-            varargout{2}=xbin;
+            h=bar(xbin,count,'hist');
+            set(h,'FaceColor','none');
+            if NewFigure
+                xlabel(target,object.VariableName{1});
+                ylabel(target,'Number of counts');
+            end
         case 2
-            varargout{1}=count;
-            varargout{2}=xbin;
-            varargout{3}=ybin;
+            imagesc(xbin,ybin,count);            
+            set(target,'YDir','normal');            
+            if NewFigure
+                xlabel(target,object.VariableName{variable(1)});
+                ylabel(target,object.VariableName{variable(2)});
+            end
     end
 end
 
