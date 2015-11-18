@@ -1,7 +1,27 @@
-% UNDER CONSTRUCTION
-% kernel density estimate
-% density(object,variable,target);
+% density Estimate probability density
+% 
+% This function estimates the probability density function for the data in
+% a cloud.  Each data point is represented by a local Gaussian kernel that
+% contributes to the overal density.  Density estimates can be generated
+% for one or two cloud variables.
+%    density(object,1); % density estimate for variable 1
+%    density(object,[1 3]); % joint density estimate for variables 1 and 3
+% When the method is called with no output, density plots are displayed in
+% a new figure.  Plots may be rendered in an exising axes by passing a
+% handle as the third input.
+%    density(object,variable,target);
+%
+% Specifying outputs suppresses plot display and returns density
+% information.
+%    [x,Px]=density(object,variable); % 1D density
+%    [Cmatrix,level]=density(object,variable); % 2D density
+%
+% See also Cloud, configure, histogram
+%
 
+%
+% created November 18, 2015 by Daniel Dolan (Sandia National Laboratories)
+%
 function varargout=density(object,variable,target)
 
 % manage input
@@ -51,13 +71,13 @@ xgrid=linspace(-width,+width,Ngrid(1));
 switch numel(variable)
     case 1            
         sigma=KernelWidth(U);
-        xgrid=xgrid(:);
+        xgrid=xgrid(:);       
         z=zeros(Ngrid,1);
         for k=1:numpoints
             if isinf(sigma(k))
                 continue
             end
-            z=z+exp(-(xgrid-U(k)).^2/(2*sigma(k)^2))/sigma(k);
+            z=z+exp(-(xgrid-U(k)).^2/(2*sigma(k)^2))/sigma(k);            
         end
         z=z/max(z(:));
         xgrid=xgrid*S*VT+center;

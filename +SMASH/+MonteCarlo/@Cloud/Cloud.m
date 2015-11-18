@@ -39,6 +39,8 @@
 %    -enabled manual object creation with a data table
 % revised July 4, 2015 by Daniel Dolan
 %    -massive cleanup in progress
+% revised November 18, 2015 by Daniel Dolan
+%    -removed ellipse, converted 2D density to contours
 classdef Cloud %< SMASH.General.DataClass
     %%
     properties (SetAccess=protected)

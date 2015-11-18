@@ -1,6 +1,4 @@
 % histogram Create 1D/2D histograms of Cloud data
-
-
 %
 % This method generates one- and two-dimensional histograms for variables
 % inside of a data cloud.  The choice of variable(s) is specified by the
@@ -12,25 +10,16 @@
 % the input is omitted in any other case, the user will be prompted to
 % select one or two variables before the histogram can be generatd.
 %
-
-
-% Options for controlling the histogram are specified as name/value pairs.
-%    >> histogram(object,variable,'Name',value);
-% Valid options are specified below.
-%    -'bin'/'xbin'/'hbin' : horizontal bin specification
-%    -'ybin'/'vbin'       : vertical bin specification (2D histograms only)
-%    -'target'            : axes handle where histogram is to be placed
-% Like MATLAB'S standard hist function, two types of binning are supported.
-%  If a single integer is specified, it is understood to mean that this is
-%  the number of bins that are to be used and the bin locations are chosen
-%  automatically.  Specific bin locations can be defined by passing an
-%  array of numbers.
+% When this function is called without inputs, histograms are displayed
+% graphically.  By default, histograms are rendered in a new figure, but an
+% existing figure can be specified as well.
+%    >> histogram(object,variable,target);
+% Specifying outputs suppresses graphical display and returns histogram
+% information.
+%    >> [xbin,count]=histogram(...); % 1D histogram
+%    >> [xbin,ybin,count]=histogram(...); % 2D histogram
 %
-% As in MATLAB's bin function, the use of outputs suppresses plot generation.
-%    >> [count,bin]=histogram(object,...); % 1D histogram
-%    >> [count,xbin,ybin]=histogram(object,...); % 2D histogram
-%
-% See also Cloud, view
+% See also Cloud, configure, density
 %
 
 % created July 21, 2013 by Daniel Dolan (Sandia National Laboratories) 

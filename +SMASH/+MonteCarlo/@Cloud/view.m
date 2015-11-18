@@ -75,20 +75,9 @@ for m=1:N
     box on;
     switch DiagonalPlots
         case 'histogram'
-            %[count,xbin]=histogram(object,m);
-            %switch object.HistogramMode
-            %    case 'bar'
-            %        hb=bar(xbin,count,1);
-            %        set(hb,'FaceColor','none');
-            %    case 'line'
-            %        line(xbin,count,'Color','k');
-            %end
-            %ylabel('Counts');
             histogram(object,m,gca);
         case 'density'
-            %[count,xbin]=density(object,m,width(m));
-            %line(xbin,count,'Color','k');
-            %ylabel('Density');
+
             density(object,m,gca);
     end
     temp=sprintf('%s ',object.VariableName{m});
@@ -107,17 +96,9 @@ for m=1:N
             case 'points'
                 line(object.Data(:,m),object.Data(:,n),...
                     'LineStyle','none','Marker','.','Color','k');
-            case 'histogram'
-                %[count,xbin,ybin]=histogram(object,[m n],...
-                %    'xbin',object.NumberBins,'ybin',object.NumberBins);
-                %imagesc(xbin,ybin,count);
-                %set(gca,'YDir','normal');
+            case 'histogram'                
                 histogram(object,[m n],gca);
-            case 'density'
-                %[count,xbin,ybin]=density(object,[m n],...
-                %    width([m n]));
-                %imagesc(xbin,ybin,count);
-                %set(gca,'YDir','normal');            
+            case 'density'                     
                 density(object,[m n],gca);
         end
         temp=sprintf('%s ',object.VariableName{m});
