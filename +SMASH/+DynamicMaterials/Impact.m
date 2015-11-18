@@ -9,6 +9,9 @@
 % toolbar to the right, 'Clear all Signals' deletes all signal objects for
 % a fresh start.
 %
+% Data location is set using SMASH.System.setPreference('DMP_Directory',location). 
+% If this preference has not been set, the user is prompted to select a directory.
+%
 %% Add Curve 
 % Hugoniot : Add a Hugoniot curve parameterized by rho0, c0, s. The
 %   EOS-Data.txt (taken from the legacy impact program) defines the
@@ -44,10 +47,6 @@ clear all; clc;
 sig = {}; 
 sig_tot = 0;
 sig_num = [];
-
-% Set system defaults
-%set(0,'DefaultAxesFontSize',14);
-%set(0,'DefaultUIControlFontSize',14);
 
 
 % create figure if not already running
@@ -136,17 +135,17 @@ uimenu(hm,'Label','Axis Limits','Callback',@SetAxis);
 
 fig.Hidden = false;
 
-% Set default data directory if it doesn't exist
-check = setDataDirectory('DynamicMaterials');
-if ~exist(check)
-    defaultpath = which('SMASH.DynamicMaterials.Impact');
-    [defaultpath,~,~] = fileparts(defaultpath);
-    setDataDirectory('DynamicMaterials',[defaultpath,'/Data'])
+
+%% Set default data directory if it doesn't exist
+try
+    eospath = SMASH.System.getPreference('DMP_Directory');
+catch
+    eospath = uigetdir(which('SMASH.DynamicMaterials.Impact'),'Select DMP_Directory');
+    SMASH.System.setPreference('DMP_Directory',eospath,'session')
 end
-eospath = setDataDirectory('DynamicMaterials');
 
 
-%Load Hugoniot data from EOS-Data.txt
+%% Load Hugoniot data from EOS-Data.txt
 fid=fopen(fullfile(eospath,'EOS-Data.txt'));
 count=0; MGdata=1;
 while MGdata > 0
