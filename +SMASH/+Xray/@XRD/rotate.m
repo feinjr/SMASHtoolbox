@@ -1,33 +1,18 @@
-% UNDER CONSTRUCTION
+% ROTATE Rotate XRD object Data along a specified angle
+%
+% Usage:
+% >> object=rotate(object,angle);
+% The "angle" may be scalar angle (in degrees) or an orientation such as 
+% "left", "right", "clockwise", or "counter-clockwise".
+%
+% See also XRD, rotate
+%
 
-function object=rotate(object,value)
+%
+% created November 17, 2015 by Tommy Ao (Sandia National Laboratories)
 
-% manage input
-if (nargin<2) || isempty(value)
-    value='auto';
-end
+function object=rotate(object,varargin)
 
-% perform rotation
-if strcmpi(value,'auto')
-    % make the long side horizontal
-    [Ly,Lx]=size(object.Measurement.Data);
-    if Ly>Lx
-        object.Measurement.Data=transpose(object.Measurement.Data);
-    end
-    % density increases to the horizontal position
-    temp=mean(object.Measurement,'Grid2');
-    param=polyfit(temp.Grid,temp.Data,1);
-    if param(1)<0
-        object.Measurement=flip(object.Measurement,'Grid1');
-    end
-    % density increases with vertical position
-    temp=mean(object.Measurement,'Grid1');
-    param=polyfit(temp.Grid,temp.Data,1);
-    if param(1)<0
-        object.Measurement=flip(object.Measurement,'Grid2');
-    end
-else
-    object.Measurement=rotate(object.Measurement,value);
-end
+object.Measurement=rotate(object.Measurement,varargin{:});
 
 end
