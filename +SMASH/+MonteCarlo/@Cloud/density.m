@@ -105,27 +105,24 @@ switch numel(variable)
         if isscalar(level)
             level=[level level];
         end        
-        Cmatrix=contourc(xgrid(1,:),ygrid(:,1),z,level);
+        Cmatrix=contourc(xgrid(1,:),ygrid(:,1),z,level); % original contours
         % map contours back to original coordinates
-        Cmatrix=transpose(Cmatrix);
-        start=1;
-        while start<size(Cmatrix,1)
-            % read header
-            M=Cmatrix(start,2);
-            start=start+1;
-            stop=start+M-1;
-            index=start:stop;
-            % transform contour data
-            temp=Cmatrix(index,:);
-            temp=temp*S*VT;
-            temp=bsxfun(@plus,temp,center);
-            Cmatrix(index,:)=temp;
-            start=stop+1;
-        end        
-        Cmatrix=transpose(Cmatrix);
+        [LineData,LevelData]=SMASH.Graphics.contours2lines(Cmatrix);
+        for m=1:numel(level)
+            %LineData{m}=smoothBoundary(LineData{m},[0 0],2); % you are here
+            LineData{m}=LineData{m}*S*VT;
+            LineData{m}=bsxfun(@plus,LineData{m},center);
+        end
+        Cmatrix=SMASH.Graphics.lines2contours(LineData,LevelData);        
         if nargout>0
             varargout{1}=Cmatrix;
             varargout{2}=level;
+        end
+        if nargout>2
+            raw.Cmatrix=Cmatrix1;
+            raw.S=S;
+            raw.VT=VT;
+            varargout{3}=raw;
         end
 end
 
@@ -164,6 +161,7 @@ temp=sort(data);
 IQR=temp(round(0.75*N))-temp(round(0.25*N));
 h=2*IQR/N^(1/3); % Freedman-Diaconis rule for ideal histogram bin width
 h=4*h; % stretch the kernel over several bins
+%h=2*h;
 width=repmat(h,size(data));
 
 end

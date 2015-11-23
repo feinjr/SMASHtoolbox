@@ -35,24 +35,15 @@ assert(ishandle(target) && strcmpi(get(target,'Type'),'axes'),...
     'ERROR: invalid target axes');
 
 % generate lines
-level=[];
-hl=[];
+[data,level]=SMASH.Graphics.contours2lines(Cmatrix);
+N=numel(level);
+hl=nan(N,1);
 
-start=1;
-while start<size(Cmatrix,2)
-    % extract individual contour
-    level(end+1)=Cmatrix(1,start); %#ok<AGROW>
-    M=Cmatrix(2,start);
-    start=start+1;
-    stop=start+M-1;
-    data=Cmatrix(:,start:stop);
-    % plot individual contour
-    hl(end+1)=line('Parent',target,...
-        'XData',data(1,:),'YData',data(2,:),...
+for n=1:N
+    hl(n)=line('Parent',target,...
+        'XData',data{n}(:,1),'YData',data{n}(:,2),...
         'UserData',struct('Level',level(end)),...
-        'Tag',sprintf('level=%.6g',level(end))); %#ok<AGROW>
-    % prepare for next contour
-    start=stop+1;
+        'Tag',sprintf('level=%.6g',level(end)));
 end
 
 % assign line colors
