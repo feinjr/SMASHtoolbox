@@ -183,11 +183,11 @@ directory(end).LENDIR=LDS;
 % terminate the file with stop words
 fseek(fid,stop+2,'bof');
 %WriteWord(fid,repmat(-2,[1 10])); 
-WriteWord(fid,repmat(-2,[1 1024])); 
-%WriteWord(fid,repmat(-2,[1 2048])); 
+%WriteWord(fid,repmat(-2,[1 1024])); 
+WriteWord(fid,repmat(-2,[1 2048])); 
 return
 
-% add directory datasets
+% add directory datasets (does not currently work)
 start=stop+2;
 fseek(fid,2,'bof');
 WriteLong(fid,start); % update file header
