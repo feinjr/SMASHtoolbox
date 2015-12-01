@@ -1,4 +1,4 @@
-function [data,config]=read_sydor(filename)
+function [data,config,back]=read_sydor(filename)
 
 if (nargin<1) || isempty(filename)
     [fname,pname]=uigetfile('*.hdf;*.HDF','Select Sydor HDF file');

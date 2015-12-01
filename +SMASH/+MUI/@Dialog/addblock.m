@@ -71,6 +71,18 @@
 % In this case, the label should be a two-element cell array; the first
 % element is the text label and the second element is the button label.
 %
+% Table blocks allow for flexible display and interaction.
+%     >> h=addblock(object,'table',label,[minwidth],[rows]);
+% The input "label" (cell array) defines the number of table columns and
+% their text labels.  For example, {'A' 'B' 'C'} generates a three-column
+% table with the labels 'A', 'B', and 'C'.  The optional input "minwidth"
+% defines the minimum character width for each column.
+%     -A scalar indicates a common mimimum width for all columns.  Passing
+%     a vector specifies a particular minimum width for each column.
+%     -Columns are always sized to fit their label.  Any minimum width
+%     smaller than the label width is ignored.
+% The optional input "rows" indicates the number of displayed table rows.
+% 
 % See also Dialog, frame, probe
 %
 

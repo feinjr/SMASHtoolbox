@@ -28,16 +28,14 @@ h=nan(1,columns+1);
 columnwidth=cell(1,columns);
 totalwidth=0;
 for n=1:columns
-    dummy=max(numel(label{n}),minwidth(n));
+    Ndummy=max(numel(label{n}),minwidth(n));
+    dummy=max(numel(label{n}),Ndummy);
     dummy=repmat('M',[1 dummy]);
     h(n)=local_uicontrol(object,'Style','text','String',dummy,...
         'HorizontalAlignment','left');
     position=get(h(n),'Position');
     if n==1
-        pushup(object);
-        pushup(object,1,object.VerticalGap);
         x0=position(1);
-        rowheight=position(4);
     end
     position(1)=x0;
     set(h(n),'Position',position);
@@ -47,20 +45,35 @@ for n=1:columns
     object.Controls(end+1)=h(n);
     totalwidth=totalwidth+columnwidth{n};
 end
+object.pushup(0,object.VerticalGap);
+position=get(h(1),'Position');
+x0=position(1);
 
 h(end)=uitable('RowName','','ColumnName','',...
-    'ColumnWidth',columnwidth);
-position=get(h(end),'Position');
+    'ColumnWidth',columnwidth,'Data',cell(rows,columns),...
+    'ColumnEditable',true);
+position(1)=x0;
+position(3)=totalwidth+columns; % add an extra pixel for each row
 extent=get(h(end),'Extent');
-position(3)=totalwidth;
-position(4)=rows*rowheight;
+position(4)=extent(4);
 set(h(end),'Position',position);
 object.pushup;
 
-object.make_room;
+% leave room for vertical slider
+ht=uicontrol('Parent',object.Handle,'Style','slider');
+position=get(ht,'Position');
+SliderThickness=position(4);
+position=get(h(end),'Position');
+position(3)=position(3)+SliderThickness*1.5;
+set(h(end),'Position',position);
+delete(ht);
 
-data=cell(rows,columns);
-set(h(end),'Data',data);
+% create empty cells
+%data=cell(rows,columns);
+%set(h(end),'Data',data);
+
+% update dialog size
+object.make_room;
 
 % handle output
 if nargout>=1
