@@ -43,7 +43,8 @@ if (nargin<3) || isempty(level)
 end
 
 if (nargin<4) || isempty(edge)
-    edge='extrapolate';
+    %edge='extrapolate';
+    edge='zero';
 end
 
 % calculate derivative
