@@ -4,10 +4,11 @@
 % This package contains customized graphic classes for user interface
 % development.
 %
-%    Figure  - Minimal figure with a special toolbar
-%    Dialog  - Dialog boxes with mixed interface controls
-%    Line    - Lines with adjustable appearance settings 
-%    Waitbar - Graphical progress display 
+%    Figure   - Minimal figure with a special toolbar
+%    Dialog   - Dialog boxes with mixed interface controls
+%    BasicGUI - Basic graphical user interface
+%    Line     - Lines with adjustable appearance settings 
+%    Waitbar  - Graphical progress display 
 %
 % Examples for each class are contained as subpackages of MUI.
 %   >> MUI.examples.DialogExampleA  % modal dialog
