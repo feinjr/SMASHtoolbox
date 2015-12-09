@@ -4,7 +4,7 @@
 %
 %
 %
-function varargout=checkSignal(filename)
+function varargout=analyzeSinusoid(filename)
 
 % manage input
 if (nargin<1) || isempty(filename)
@@ -28,8 +28,8 @@ function createGUI(filename)
 %
 dlg=SMASH.MUI.Dialog;
 dlg.Hidden=true;
-dlg.Name='Signal check';
-set(dlg.Handle,'Tag','SMASH.Z.checkSignal');
+dlg.Name='Sinusoid analysis';
+set(dlg.Handle,'Tag','SMASH.Z.analyzeSinusoid');
 
 setappdata(dlg.Handle,'SignalData',[]);
 setappdata(dlg.Handle,'SignalIndex',[]);
@@ -102,31 +102,6 @@ set(hLoad(1),'Callback',@selectFile)
 
 set(hLoad(2),'Callback',@loadFile)
 
-% active channel selection
-hActive=addblock(dlg,'edit_button',{'Active channels: ' ' Reset '},20);
-set(hActive(2),'Callback',@setActive)
-    function setActive(varargin)
-        choice=get(hActive(2),'String');
-        choice=sscanf(choice,'%g');
-        N=numel(choice);
-        keep=false(1,N);
-        valid=getappdata(dlg.Handle,'SignalIndex');        
-        for n=1:numel(choice)
-            if any(choice(n)==valid)
-                keep(n)=true;
-            end            
-        end
-        choice=choice(keep);
-        set(hActive(2),'String',sprintf('%d ',choice));
-        updateTable()
-    end
-set(hActive(3),'Callback',@resetActive)
-    function resetActive(varargin)
-         choice=getappdata(dlg.Handle,'SignalIndex');  
-        set(hActive(2),'String',sprintf('%d ',choice));
-        updateTable();
-    end
-
 % summary table
 rows=8;
 hTable=addblock(dlg,'table',...
@@ -153,73 +128,14 @@ set(hTable(end),'ColumnEditable',false,'ColumnFormat',ColumnFormat);
             value{n,1}=sprintf('%d',index(n));
             temp=SMASH.General.enprint(report.Sinusoid.Frequency,6);
             value{n,2}=temp(2:end);
-            value{n,3}=sprintf('%.4f',report.Sinusoid.Amplitude);
-            value{n,4}=sprintf('%.4f',report.Sinusoid.Noise);
-            value{n,5}=sprintf('%#.2g',report.Sinusoid.Fraction*100);
+            value{n,3}=sprintf('%.5f',report.Sinusoid.Amplitude);
+            value{n,4}=sprintf('%.5f',report.Sinusoid.Noise);
+            value{n,5}=sprintf('%#.3g',report.Sinusoid.Fraction*100);
         end
        if ishandle(hm)
             delete(hm);
        end
         set(hTable(end),'Data',value);
-    end
-
-% visualization
-hPlot=addblock(dlg,'button',{' View signals ' ' View spectra '});
-set(hPlot(1),'Callback',@viewSignals);
-    function viewSignals(varargin)
-        index=sscanf(get(hActive(2),'String'),'%g');
-        N=numel(index);
-        if N==0
-            return
-        end
-        SMASH.MUI.Figure('Name','Digitizer signals','NumberTitle','off');
-        data=getappdata(dlg.Handle,'SignalData');        
-        color=lines(N);               
-        for n=1:N
-            subplot(N,1,n);
-            h=view(data{index(n)},gca);
-            set(h,'Color',color(n,:));       
-            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
-            title(temp,'Interpreter','none')
-            ylabel('Signal (V)');
-            if n==N
-                xlabel('Time (s)');
-            end
-        end
-        xlabel('Time');
-        ylabel('Signal');
-    end
-
-set(hPlot(2),'Callback',@viewSpectra)
-    function viewSpectra(varargin)
-        index=sscanf(get(hActive(2),'String'),'%g');
-        N=numel(index);
-        if N==0
-            return
-        end
-        SMASH.MUI.Figure('Name','Power spectra','NumberTitle','off');
-        data=getappdata(dlg.Handle,'SignalData');
-        color=lines(N);
-        for n=1:N
-            subplot(N,1,n);      
-            [f,P]=fft(data{index(n)},...
-                'RemoveDC',true,'NumberFrequencies',1e6);            
-            h=plot(f,P);
-            set(h,'Color',color(n,:));
-            %title(sprintf('Channel %d',index(n)));
-            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
-            title(temp,'Interpreter','none');
-            ylabel('Spectral power (arb)');
-            set(gca,'YScale','log');
-            if n==N
-                xlabel('Frequency (Hz)');
-            end
-            yb(1)=min(P(2:end));
-            yb(2)=max(P);
-            ylim(yb);
-        end
-        xlabel('Time');
-        ylabel('Signal');
     end
 
 % frequency bounding
@@ -335,6 +251,89 @@ set(hBound(1),'Callback',@setBounds)
         locate(subdlg,'center',dlg.Handle);
         subdlg.Hidden=false;       
         subdlg.Modal=true;
+    end
+
+% view channel selection
+hActive=addblock(dlg,'edit_button',{'View channels: ' ' Reset '},20);
+set(hActive(2),'Callback',@setActive)
+    function setActive(varargin)
+        choice=get(hActive(2),'String');
+        choice=sscanf(choice,'%g');
+        N=numel(choice);
+        keep=false(1,N);
+        valid=getappdata(dlg.Handle,'SignalIndex');        
+        for n=1:numel(choice)
+            if any(choice(n)==valid)
+                keep(n)=true;
+            end            
+        end
+        choice=choice(keep);
+        set(hActive(2),'String',sprintf('%d ',choice));
+        %updateTable()
+    end
+set(hActive(3),'Callback',@resetActive)
+    function resetActive(varargin)
+        choice=getappdata(dlg.Handle,'SignalIndex');
+        set(hActive(2),'String',sprintf('%d ',choice));       
+    end
+
+% visualization
+hPlot=addblock(dlg,'button',{' View signals ' ' View spectra '});
+set(hPlot(1),'Callback',@viewSignals);
+    function viewSignals(varargin)
+        index=sscanf(get(hActive(2),'String'),'%g');
+        N=numel(index);
+        if N==0
+            return
+        end
+        SMASH.MUI.Figure('Name','Digitizer signals','NumberTitle','off');
+        data=getappdata(dlg.Handle,'SignalData');        
+        color=lines(N);               
+        for n=1:N
+            subplot(N,1,n);
+            h=view(data{index(n)},gca);
+            set(h,'Color',color(n,:));       
+            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
+            title(temp,'Interpreter','none')
+            ylabel('Signal (V)');
+            if n==N
+                xlabel('Time (s)');
+            end
+        end
+        xlabel('Time');
+        ylabel('Signal');
+    end
+
+set(hPlot(2),'Callback',@viewSpectra)
+    function viewSpectra(varargin)
+        index=sscanf(get(hActive(2),'String'),'%g');
+        N=numel(index);
+        if N==0
+            return
+        end
+        SMASH.MUI.Figure('Name','Power spectra','NumberTitle','off');
+        data=getappdata(dlg.Handle,'SignalData');
+        color=lines(N);
+        for n=1:N
+            subplot(N,1,n);      
+            [f,P]=fft(data{index(n)},...
+                'RemoveDC',true,'NumberFrequencies',1e6);            
+            h=plot(f,P);
+            set(h,'Color',color(n,:));
+            %title(sprintf('Channel %d',index(n)));
+            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
+            title(temp,'Interpreter','none');
+            ylabel('Spectral power (arb)');
+            set(gca,'YScale','log');
+            if n==N
+                xlabel('Frequency (Hz)');
+            end
+            yb(1)=min(P(2:end));
+            yb(2)=max(P);
+            ylim(yb);
+        end
+        xlabel('Time');
+        ylabel('Signal');
     end
 
 % control exit

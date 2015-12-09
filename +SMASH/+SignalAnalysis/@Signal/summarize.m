@@ -70,29 +70,27 @@ nyquist=1/(2*dt);
 fmax=nyquist/4;
 if isempty(FrequencyBound)
     FrequencyBound=[0 fmax];
-end
-FrequencyBound(2)=min(FrequencyBound(2),fmax);
-    function [f,P]=restrict(f,P)
-        keep=(f>=FrequencyBound(1)) & (f<=FrequencyBound(2));
-        f=f(keep);
-        P=P(keep);
-    end
+end    
 if sinusoid
-    % locate peak
+    % characterize peak
     options.RemoveDC=true;
     options.NumberFrequencies=1e6;
     [f,P]=fft(object,options);
-    [f,P]=restrict(f,P);
-    [Pmax,index]=max(P);
-    f0=f(index);
-    report.Sinusoid.Frequency=f0;
-    Pnoise=median(P);
+    keep=(f>=FrequencyBound(1)) & (f<=FrequencyBound(2));
+    f1=f(keep);
+    P1=P(keep);  
+    [Pmax,index]=max(P1);
+    f0=f1(index);
+    report.Sinusoid.Frequency=f0;   
+    % characterize noise
+    keep=(f>=0) & (f<=fmax);   
+    P1=P(keep);
+    Pnoise=median(P1);    
     % calibrate peak amplitude
     [t,~]=limit(object);
     s=cos(2*pi*f0*t);
     temp=SMASH.SignalAnalysis.Signal(t,s);
-    [f,P]=fft(temp,options);
-    [f,P]=restrict(f,P);
+    [f,P]=fft(temp,options);    
     Pref=interp1(f,P,f0);
     report.Sinusoid.Amplitude=sqrt(Pmax/Pref);
     % calibrate noise amplitude
@@ -104,8 +102,9 @@ if sinusoid
     s=s/std(s);
     temp=reset(temp,[],s);
     [f,P]=fft(temp,options);
-    [f,P]=restrict(f,P); %#ok<ASGLU>
-    Pref=median(P);
+    keep=(f>=0) & (f<=fmax);   
+    P1=P(keep);
+    Pref=median(P1);
     report.Sinusoid.Noise=sqrt(Pnoise/Pref);
     report.Sinusoid.Fraction=...
         report.Sinusoid.Noise/report.Sinusoid.Amplitude;
