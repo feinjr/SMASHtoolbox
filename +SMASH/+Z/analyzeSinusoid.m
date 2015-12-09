@@ -26,10 +26,11 @@ end
 function createGUI(filename)
 
 %
-dlg=SMASH.MUI.Dialog;
+dlg=SMASH.MUI.Dialog('FontSize',12);
 dlg.Hidden=true;
 dlg.Name='Sinusoid analysis';
-set(dlg.Handle,'Tag','SMASH.Z.analyzeSinusoid');
+%set(dlg.Handle,'Tag','SMASH.Z.analyzeSinusoid',...
+%    'DefaultUIControlFontSize',12);
 
 setappdata(dlg.Handle,'SignalData',[]);
 setappdata(dlg.Handle,'SignalIndex',[]);
