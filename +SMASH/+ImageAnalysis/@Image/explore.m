@@ -1,22 +1,17 @@
 % EXPLORE Interactive slice exploring tool for Image objects
 %
 % Usage:
-%   >> explore(object,target); % interactively explore slices
+%   >> explore(object); % interactively explore slices
 %
 % See also IMAGE, detail, profile, show, slice, view
 
 % created November 14, 2012 by Daniel Dolan (Sandia National Laboratories)
 % modified October 16, 2013 by Tommy Ao (Sandia National Laboratories)
 %
-function varargout=explore(object,target)
-
-% handle input
-if (nargin<2) || isempty(target) || isnan(target)
-    target=[];
-end
+function varargout=explore(object)
 
 % create graphical interface
-h=basic_figure(target,'full');
+%h=basic_figure(target,'full');
 
 % create axes
 x0=0.15;
@@ -29,47 +24,49 @@ Lx2=Lx-Lx1;
 Ly1=0.75*Ly;
 Ly2=Ly-Ly1;
 
-h.axes(1)=axes('Parent',h.panel,'Units','normalized','Position',[x0 y0+Ly2 Lx1 Ly1],...
+fig=figure;
+
+haxes(1)=axes('Parent',fig,'Units','normalized','Position',[x0 y0+Ly2 Lx1 Ly1],...
     'Tag','ImageAxes','XTickLabel','','YTickLabel','','Box','on',...
     'YDir',object.GraphicOptions.YDir);
-temp=show(object,h.axes(1));
+temp=show(object,haxes(1));
 himage=temp.image;
-colormap(h.figure,object.GraphicOptions.ColorMap);
-caxis(h.axes(1),object.DataLim);
-axis(h.axes(1),'tight');
-hcrosshair=line('Parent',h.axes(1),...
+colormap(fig,object.GraphicOptions.ColorMap);
+caxis(haxes(1),object.DataLim);
+axis(haxes(1),'tight');
+hcrosshair=line('Parent',haxes(1),...
     'Color',object.GraphicOptions.LineColor,...
     'UserData',[],'Tag','crosshair');
-title(h.axes(1),object.GraphicOptions.Title);
+title(haxes(1),object.GraphicOptions.Title);
 
 hc=findobj(gcf,'Tag','Colorbar');
 delete(hc);
 
-h.axes(2)=axes('Parent',h.panel,'Units','normalized','Position',[x0+Lx1 y0+Ly2 Lx2 Ly1],...
+haxes(2)=axes('Parent',fig,'Units','normalized','Position',[x0+Lx1 y0+Ly2 Lx2 Ly1],...
     'Tag','VerticalSliceAxes','Box','on',...
     'XAxisLocation','top','YAxisLocation','right',...
     'YDir',object.GraphicOptions.YDir);
-xlabel(h.axes(2),object.DataLabel);
-ylabel(h.axes(2),object.Grid2Label);
-hliney=line('Parent',h.axes(2),'Color','k','Tag','VerticalSliceLine');
+xlabel(haxes(2),object.DataLabel);
+ylabel(haxes(2),object.Grid2Label);
+hliney=line('Parent',haxes(2),'Color','k','Tag','VerticalSliceLine');
 
-h.axes(3)=axes('Parent',h.panel,'Units','normalized','Position',[x0 y0 Lx1 Ly2],...
+haxes(3)=axes('Parent',fig,'Units','normalized','Position',[x0 y0 Lx1 Ly2],...
     'Tag','HorizontalSliceAxes','Box','on');
-xlabel(h.axes(3),object.Grid1Label);
-ylabel(h.axes(3),object.DataLabel);
-hlinex=line('Parent',h.axes(3),'Color','k','Tag','HorizontalSliceLine');
+xlabel(haxes(3),object.Grid1Label);
+ylabel(haxes(3),object.DataLabel);
+hlinex=line('Parent',haxes(3),'Color','k','Tag','HorizontalSliceLine');
 
-h.axes(4)=axes('Parent',h.figure,'Units','normalized','Position',[x0+Lx1 y0 Lx2 Ly2],...
+haxes(4)=axes('Parent',fig,'Units','normalized','Position',[x0+Lx1 y0 Lx2 Ly2],...
     'Tag','InformationAxes');
-axis(h.axes(4),'off');
-hlabel=text('Parent',h.axes(4),'Units','data','Position',[1 0],...
+axis(haxes(4),'off');
+hlabel=text('Parent',haxes(4),'Units','data','Position',[1 0],...
     'HorizontalAlignment','right','VerticalAlignment','bottom',...
     'Tag','InformationText');
 
-hlink=linkprop(h.axes([1 2]),'YLim');
-setappdata(h.axes(2),'hlink',hlink);
-hlink=linkprop(h.axes([1 3]),'XLim');
-setappdata(h.axes(3),'hlink',hlink);
+hlink=linkprop(haxes([1 2]),'YLim');
+setappdata(haxes(2),'hlink',hlink);
+hlink=linkprop(haxes([1 3]),'XLim');
+setappdata(haxes(3),'hlink',hlink);
 
 % local functions and callbacks
 UpdateLines;
@@ -77,8 +74,8 @@ UpdateLines;
         % cross hair
         data=get(hcrosshair,'UserData');
         if isempty(data)
-             x=mean(xlim(h.axes(1)));
-             y=mean(ylim(h.axes(1)));
+             x=mean(xlim(haxes(1)));
+             y=mean(ylim(haxes(1)));
         else
             x=data(1);
             y=data(2);
@@ -110,14 +107,14 @@ UpdateLines;
 set(himage,'ButtonDownFcn',@MoveCrosshair);
 set(hcrosshair,'ButtonDownFcn',@MoveCrosshair);
     function MoveCrosshair(varargin)
-        position=get(h.axes(1),'CurrentPoint');
+        position=get(haxes(1),'CurrentPoint');
         x=position(1,1);       
         y=position(1,2);
         set(hcrosshair,'UserData',[x y]);
         UpdateLines;
     end
 
-set(h.figure,'WindowKeyPressFcn',@StepCrosshair)
+set(fig,'WindowKeyPressFcn',@StepCrosshair)
     function StepCrosshair(~,eventdata)
         key=eventdata.Key;
         data=get(hcrosshair,'UserData');        
@@ -143,11 +140,11 @@ set(h.figure,'WindowKeyPressFcn',@StepCrosshair)
         UpdateLines;
     end
 
-figure(h.figure);
+figure(fig);
 
 % handle output
 if nargout>=1
-    varargout{1}=h;
+    varargout{1}=haxes;
 end
 
 end

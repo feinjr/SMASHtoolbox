@@ -11,7 +11,7 @@
 % When this command is executed, MATLAB creates a small, empty dialog box
 % named 'Custom dialog' that is linked to the variable 'object'.  Deleting
 % the object:
-%    >> delete(object); 
+%    >> delete(object);
 % causes the dialog box to deleted immediately.  Closing the dialog box
 % automatically deletes the object as well: the variable will still exist
 % in memory but is no longer functional.
@@ -27,7 +27,7 @@
 %    >> set(h,'Callback',@my_function);
 % Additional control and access to the dialog box is provided by the
 % "locate" and "probe" methods, each of which is documented separately.
-% 
+%
 % Some properties of a custom dialog object can be changed directly.  For
 % example:
 %    >> object.Name='My dialog box'; % change dialog name
@@ -61,10 +61,10 @@ classdef Dialog < handle
         Modal = false % Prohibit access to other windows
         Hidden = false % Visibility setting
     end
-    properties (SetAccess=private)     
+    properties (SetAccess=private)
         Handle % Graphic handle
         Controls = [] % Graphic handles
-    end    
+    end
     properties (SetAccess=immutable,Hidden=true)
         FontName = get(0,'DefaultUIControlFontName');
         FontUnits = get(0,'DefaultUIControlFontUnits');
@@ -92,7 +92,7 @@ classdef Dialog < handle
                     object.(name)=value;
                 catch
                     fprintf('Ignoring unrecogized name ''%s''\n',name);
-                end 
+                end
             end
             % create dialog and probe uicontrol size
             object.Handle=figure('Toolbar','none','MenuBar','none',...
@@ -118,11 +118,17 @@ classdef Dialog < handle
             position(4)=2*object.VerticalMargin;
             set(object.Handle,'Position',position,'UserData',object);
             % link object and dialog box
-            addlistener(object,'ObjectBeingDestroyed',@destroy);
-            uicontrol('Parent',object.Handle,'Visible','off',...
-                'UserData',object,'DeleteFcn',@destroy); % this handles figure delete and close!                        
+            addlistener(object,'ObjectBeingDestroyed',@closeDialog);
+            function closeDialog(varargin)
+                delete(object.Handle);
+            end
+            setappdata(object.Handle,'CleanupObject',...
+                onCleanup(@deleteObject));
+            function deleteObject(varargin)
+                delete(object); %#ok<MOCUP>
+            end
         end
-    end    
+    end
     %% hide class methods from casual users
     methods (Hidden=true)
         %varargout=addlistener(varargin);
@@ -142,10 +148,10 @@ classdef Dialog < handle
         function show(object)
             % Make Dialog visible and active
             %     >> show(object);
-            figure(object.Handle);        
+            figure(object.Handle);
         end
     end
-    methods (Access=protected,Hidden=true)     
+    methods (Access=protected,Hidden=true)
         %%
         function pushup(obj,Nfreeze,shift)
             children=get(obj.Handle,'Children');
@@ -160,6 +166,10 @@ classdef Dialog < handle
                 end
             end
             for n=(Nfreeze+1):numel(children)
+                switch get(children(n),'Type')
+                    case 'uimenu'
+                        continue
+                end
                 pos=get(children(n),'Position');
                 pos(2)=pos(2)+shift;
                 set(children(n),'Position',pos);
@@ -171,6 +181,10 @@ classdef Dialog < handle
             Lx=obj.MinimumFigureWidth;
             Ly=obj.VerticalMargin;
             for n=1:numel(h)
+                switch get(h(n),'Type')
+                    case 'uimenu'
+                        continue
+                end
                 pos=get(h(n),'Position');
                 Lx=max(Lx,pos(1)+pos(3)+obj.HorizontalMargin);
                 Ly=max(Ly,pos(2)+pos(4)+obj.VerticalMargin);
@@ -204,7 +218,7 @@ classdef Dialog < handle
                 error('ERROR: setting must a logical value')
             end
             if object.Modal
-                object.Hidden=false;
+                %object.Hidden=false;
                 set(object.Handle,'WindowStyle','modal') %#ok<MCSUP>
             else
                 set(object.Handle,'WindowStyle','normal') %#ok<MCSUP>

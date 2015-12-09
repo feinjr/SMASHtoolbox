@@ -28,7 +28,8 @@ function varargout=summarize(object,varargin)
 
 % manage input
 sinusoid=false;
-FrequencyBound=[-inf +inf];
+%FrequencyBound=[-inf +inf];
+FrequencyBound=[];
 while numel(varargin) > 0
     if strcmpi(varargin{1},'sinusoid')
         sinusoid=true;
@@ -54,6 +55,7 @@ report.Grid.Min=min(Grid);
 report.Grid.Max=max(Grid);
 report.Grid.Range=report.Grid.Max-report.Grid.Min;
 report.Grid.Mean=mean(Grid);
+dt=report.Grid.Range/(numel(Grid)-1);
 
 % summarize Data
 report.Data.Min=min(Data);
@@ -64,6 +66,12 @@ report.Data.Std=std(Data);
 report.Data.Median=median(Data);
 
 % sinusoid analysis
+nyquist=1/(2*dt);
+fmax=nyquist/4;
+if isempty(FrequencyBound)
+    FrequencyBound=[0 fmax];
+end
+FrequencyBound(2)=min(FrequencyBound(2),fmax);
     function [f,P]=restrict(f,P)
         keep=(f>=FrequencyBound(1)) & (f<=FrequencyBound(2));
         f=f(keep);

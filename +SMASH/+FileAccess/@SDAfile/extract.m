@@ -14,7 +14,7 @@ function [data,metadata]=extract(archive,label)
 
 % handle input
 if (nargin<2) || isempty(label)
-    label=select(archive);
+    label=select(archive);    
 end
 
 % verify label

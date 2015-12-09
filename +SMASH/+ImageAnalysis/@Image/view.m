@@ -76,7 +76,7 @@ if ~isreal(object.Data)
 elseif strcmp(mode,'show')
         h=show(object,target);
 elseif strcmp(mode,'explore')
-        h=explore(object,target);
+        h=explore(object);
 elseif strcmp(mode,'detail')
         h=detail(object,target);    
 end

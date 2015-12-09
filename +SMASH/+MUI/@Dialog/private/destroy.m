@@ -1,3 +1,4 @@
+% note: this function may be obsolete (12/7/2015)
 function destroy(object,~)
 
 try

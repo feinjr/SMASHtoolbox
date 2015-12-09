@@ -13,15 +13,18 @@ end
 if (nargin<3) || isempty(minwidth)
     minwidth=0;
 end
+if isscalar(minwidth)
+    minwidth(2)=0;
+end
 
 % error checking
 verify(object);
 
 % create block
-[h,temp]=text(object,label{1},minwidth);
-minwidth=max(minwidth,temp);
+[h,temp]=text(object,label{1},minwidth(1));
+minwidth(1)=max(minwidth(1),temp);
 object.pushup(1,object.VerticalGap);
-dummy=repmat('M',[1 minwidth]);
+dummy=repmat('M',[1 minwidth(1)]);
 h(end+1)=local_uicontrol(object,'Style','edit','HorizontalAlignment','left',...
     'String',dummy);
 object.Controls(end+1)=h(end);
@@ -29,7 +32,8 @@ set(h(end),'String','');
 pos=get(h(end),'Position');
 x0=pos(1)+pos(3)+object.HorizontalGap;
 ym=pos(2)+pos(4)/2;
-dummy=repmat('M',[1 numel(label{2})]);
+minwidth(2)=max(numel(label{2}),minwidth(2));
+dummy=repmat('M',[1 minwidth(2)]);
 h(end+1)=local_uicontrol(object,'Style','pushbutton','String',dummy,...
     'HorizontalAlignment','center');
 object.Controls(end+1)=h(end);

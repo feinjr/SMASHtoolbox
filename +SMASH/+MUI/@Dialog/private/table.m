@@ -16,7 +16,7 @@ if numel(minwidth)==1
 end
 assert(numel(minwidth)==columns,'ERROR: inconsistent input sizes');
 
-if (nargin<3) || isempty(rows)
+if (nargin<4) || isempty(rows)
     rows=10;
 end
 
@@ -36,6 +36,7 @@ for n=1:columns
     position=get(h(n),'Position');
     if n==1
         x0=position(1);
+        Ly=position(4);
     end
     position(1)=x0;
     set(h(n),'Position',position);
@@ -45,7 +46,7 @@ for n=1:columns
     object.Controls(end+1)=h(n);
     totalwidth=totalwidth+columnwidth{n};
 end
-object.pushup(0,object.VerticalGap);
+pushup(object,columns,object.VerticalGap+Ly);
 position=get(h(1),'Position');
 x0=position(1);
 
