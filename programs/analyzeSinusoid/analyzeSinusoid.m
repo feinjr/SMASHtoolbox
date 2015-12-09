@@ -1,8 +1,21 @@
-% checkSignal
+% analyzeSinusoid Analyze sinusoidal signal(s)
+%
+% This program analyzed sinusoidal measurements acquired on
+% Agilent/Keysight and Tektronix digitizers.  Running the program:
+%   analyzeSinusoid;
+% initiates a graphical user interface for loading digitizer files (*.bin,
+% *.h5, and *.wfm).  All measurement channels stored in the file are loaded
+% simultaneously; function records (Fourier transforms, etc.) are ignored .
+% Sinusoid analysis on each channel generates the following results.
+%   -Sinusoid frequency
+%   -Sinusoid amplitude
+%   -RMS noise amplitude
+%   -Noise fraction
+% Signal and spectrum visualization are also provided.
 %
 
 %
-%
+% created December 9, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function varargout=analyzeSinusoid(filename)
 
@@ -49,6 +62,7 @@ set(hFile(2),'String',filename,'Callback',@loadFile);
             return
         elseif exist(filename,'file') ~= 2
             errordlg('Requested file does not exist','File error');
+            return
         end       
         [~,shortname,ext]=fileparts(filename);
         switch lower(ext)
@@ -96,6 +110,9 @@ hLoad=addblock(dlg,'button',{' Select file ' 'Load file '});
 set(hLoad(1),'Callback',@selectFile)
     function selectFile(varargin)       
         [filename,pathname]=uigetfile('*.*','Select signal file');
+        if isnumeric(filename)
+            return
+        end
         filename=fullfile(pathname,filename);
         set(hFile(2),'String',filename);
         loadFile;
@@ -294,15 +311,13 @@ set(hPlot(1),'Callback',@viewSignals);
             subplot(N,1,n);
             h=view(data{index(n)},gca);
             set(h,'Color',color(n,:));       
-            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
-            title(temp,'Interpreter','none')
+            temp=sprintf('"%s" (channel %d)',[shortname ext],index(n));
+            title(temp,'Interpreter','none','FontWeight','normal')
             ylabel('Signal (V)');
             if n==N
                 xlabel('Time (s)');
             end
         end
-        xlabel('Time');
-        ylabel('Signal');
     end
 
 set(hPlot(2),'Callback',@viewSpectra)
@@ -315,15 +330,15 @@ set(hPlot(2),'Callback',@viewSpectra)
         SMASH.MUI.Figure('Name','Power spectra','NumberTitle','off');
         data=getappdata(dlg.Handle,'SignalData');
         color=lines(N);
+        table=get(hTable(end),'Data');
         for n=1:N
             subplot(N,1,n);      
             [f,P]=fft(data{index(n)},...
                 'RemoveDC',true,'NumberFrequencies',1e6);            
             h=plot(f,P);
-            set(h,'Color',color(n,:));
-            %title(sprintf('Channel %d',index(n)));
-            temp=sprintf('%s (channel %d)',[shortname ext],index(n));
-            title(temp,'Interpreter','none');
+            set(h,'Color',color(n,:));            
+            temp=sprintf('"%s" (channel %d)',[shortname ext],index(n));
+            title(temp,'Interpreter','none','FontWeight','normal');
             ylabel('Spectral power (arb)');
             set(gca,'YScale','log');
             if n==N
@@ -332,16 +347,34 @@ set(hPlot(2),'Callback',@viewSpectra)
             yb(1)=min(P(2:end));
             yb(2)=max(P);
             ylim(yb);
+            %                                      
+            label={'frequency' 'amplitude' 'noise' 'fraction'};
+            unit={' Hz' ' V' ' V' '%'};
+            width=[0 0 0];
+            for m=1:4
+                width(1)=max(width(1),numel(label{m}));
+                width(2)=max(width(2),numel(table{n,m+1}));
+                width(3)=max(width(3),numel(unit{m}));
+            end
+            format=sprintf('%%%ds = %%%ds%%-%ds',width);
+            for m=1:4
+                label{m}=sprintf(format,label{m},table{n,m+1},unit{m});
+            end            
+            text('String',label,...
+                'Units','normalized','Position',[0.95 0.95],...
+                'FontName','fixedwidth',...
+                'HorizontalAlignment','right',...
+                'VerticalAlignment','top')
         end
-        xlabel('Time');
-        ylabel('Signal');
     end
 
 % control exit
-hDone=addblock(dlg,'button',' Done ');
-set(hDone,'Callback',@done);
+%hDone=addblock(dlg,'button',' Done ');
+%set(hDone,'Callback',@done);
+hm=uimenu('Label','Program');
+uimenu(hm,'Label','Exit','Callback',@done)
     function done(varargin)        
-        choice=questdlg('Are you finished?','Done',' Yes ',' No ', ' No ');
+        choice=questdlg('Are you finished?','Exit',' Yes ',' No ', ' No ');
         if ischar(choice)
             choice=strtrim(lower(choice));
         end
@@ -352,9 +385,33 @@ set(hDone,'Callback',@done);
     end
 set(dlg.Handle,'CloseRequestFcn',@done);
 
+% online documentation
+hm=uimenu('Label','Help');
+uimenu(hm,'Label','About this program','Callback',@AboutProgram);
+uimenu(hm,'Label','Using this program','Callback',@ProgramHelp,...
+    'Enable','off');
+
 % finish dialog
 set(dlg.Handle,'HandleVisibility','callback');
 locate(dlg,'center');
 dlg.Hidden=false;
+
+end
+
+%%
+function AboutProgram(varargin)
+
+message={};
+message{end+1}='Sinusoid analysis program';
+message{end+1}='Version 1.0';
+message{end+1}='December 2015';
+
+h=msgbox(message,'','modal');
+uiwait(h);
+
+end
+
+%%
+function ProgramHelp(varargin)
 
 end
