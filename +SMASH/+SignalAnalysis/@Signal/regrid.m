@@ -47,7 +47,7 @@ x=x(:);
     function testSpacing()
         value=abs(dx/spacing)-1;
         if any(value>1e-6)
-             warning('WARNING: using a coarser grid may cause aliasing');
+             warning('Mapping to a coarser grid may cause aliasing');
         end
     end
 

@@ -1,12 +1,13 @@
 % analyzeSinusoid Analyze sinusoidal signal(s)
 %
 % This program analyzed sinusoidal measurements acquired on
-% Agilent/Keysight and Tektronix digitizers.  Running the program:
+% Agilent/Keysight, LeCroy, and Tektronix digitizers.  Running the program:
 %   analyzeSinusoid;
 % initiates a graphical user interface for loading digitizer files (*.bin,
-% *.h5, and *.wfm).  All measurement channels stored in the file are loaded
-% simultaneously; function records (Fourier transforms, etc.) are ignored .
-% Sinusoid analysis on each channel generates the following results.
+% *.h5, *.trc, and *.wfm).  All measurement channels stored in the file are
+% loaded simultaneously; function records (Fourier transforms, etc.) are
+% ignored . Sinusoid analysis on each channel generates the following
+% results.
 %   -Sinusoid frequency
 %   -Sinusoid amplitude
 %   -RMS noise amplitude
@@ -77,9 +78,14 @@ set(hFile(2),'String',filename,'Callback',@loadFile);
                     end
                 end       
                 index=find(keep);
-            case {'.wfm'}
+            case '.trc'
+                format='lecroy';
+                index=1;
+            case {'.wfm' '.isf'}
                 format='tektronix';
                 index=1;
+            otherwise
+                format='column';
         end
         % read signal(s)        
         N=numel(index);
@@ -372,6 +378,14 @@ set(hPlot(2),'Callback',@viewSpectra)
 %hDone=addblock(dlg,'button',' Done ');
 %set(hDone,'Callback',@done);
 hm=uimenu('Label','Program');
+uimenu(hm,'Label','Change directory','Callback',@changeDirectory);
+    function changeDirectory(varargin)
+        directory=uigetdir(pwd,'Choose directory');
+        if isempty(directory)
+            return
+        end
+        cd(directory);
+    end
 uimenu(hm,'Label','Exit','Callback',@done)
     function done(varargin)        
         choice=questdlg('Are you finished?','Exit',' Yes ',' No ', ' No ');
