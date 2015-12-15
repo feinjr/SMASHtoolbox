@@ -20,14 +20,20 @@ end
 set(fig,'Position',position,'Units',old);
 
 % deal with button panel
-set(object.ButtonPanel,'Units','pixels');
-position=get(object.ButtonPanel,'Position');
-position(4)=object.BPheight;
-set(object.ButtonPanel,'Position',position,'Units','normalized');
+if object.BPheight>0
+    % probe button panel
+    set(object.ButtonPanel,'Units','pixels');
+    position=get(object.ButtonPanel,'Position');
+    position(4)=object.BPheight;    
+    set(object.ButtonPanel,'Position',position,'Units','normalized');    
+    position=get(object.ButtonPanel,'Position');
+    % deal with axes panel
+    position(2)=position(4);
+    position(4)=1-position(2);    
+    set(object.AxesPanel,'Position',position);
+else
+    set(object.AxesPanel,'Position',[0 0 1 1]);
+end
 
-position=get(object.ButtonPanel,'Position');
-position(2)=position(4);
-position(4)=1-position(2);
-set(object.AxesPanel,'Position',position);
 
 end

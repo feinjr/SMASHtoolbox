@@ -13,7 +13,11 @@
 % characterization pulse; pressing the "Done" button launches an automatic
 % refinment of pulse location.
 %
-% See also PDVtiming, characterizeTrigger
+% Passing fourth input directly assigns the calculated delay to a
+% particular digitizer.
+%   [...]=characterizeDigitizer(object,measurement,offset,index);
+%
+% See also PDVtiming, characterizeTrigger, setupDigitizer
 %
 
 %
@@ -21,9 +25,16 @@
 %
 
 function varargout=...
-    characterizeDigitizer(object,measurement,offset)
+    characterizeDigitizer(object,measurement,offset,index)
 
 % manage input
+if (nargin<4) || isempty(index)
+    index=[];
+else
+    assert(isscalar(index) && any(index==object.Digitizer),...
+        'EROR: invalid digitizer index');
+end
+
 if (nargin<2) || isempty(measurement)
     [filename,pathname]=uigetfile('*.*','Select diagnostic measurement file');
     assert(ischar(filename),'ERROR: no file selected');
@@ -56,8 +67,13 @@ else
     varargout{2}=measurement;
 end
 
+if ~isempty(index)    
+    object.DigitizerDelay(index==object.Digitizer)=delay;
 end
 
+end
+
+%%
 function result=processFile(object,varargin)
 
 % read measurement
@@ -69,11 +85,11 @@ measurement=scale(measurement,object.DigitizerScaling);
 parameters(1)=1; % smoothing order
 t=measurement.Grid;
 dt=(max(t)-min(t))/(numel(t)-1);
-parameters(2)=ceil(object.SmoothDuration/dt);
+parameters(2)=ceil(object.DerivativeSmoothing/dt);
 if parameters(2)<3
     parameters(2)=3;
     warning('SMASH:PDVtiming',...
-        'Smooth duration is too small--automatically smoothing over three points');
+        'Automatically smoothing over three points');
 end
 
 derivative=differentiate(measurement,parameters);
@@ -81,7 +97,8 @@ derivative=derivative/max(abs(derivative.Data));
 derivative.GraphicOptions.LineColor='r';
 
 % ask user for help
-gui=SMASH.MUI.BasicGUI('Name','Digitizer trigger location');
+gui=SMASH.MUI.BasicGUI('Name','Digitizer trigger location',...
+    'IntegerHandle','off');
 ha=addAxes(gui);
 set(ha(1),'Box','on')
 hb=addButton(gui,' Done ');
@@ -95,6 +112,7 @@ ylabel('Signal');
 hz=zoom(gui.Figure.Handle);
 hz.Motion='horizontal';
 hz.Enable='on';
+
 title(ha,'Locate the trigger pulse','FontWeight','normal');
 waitfor(hb);
 
@@ -130,7 +148,7 @@ setappdata(ha(1),'PositionLink',hlink);
 [x,y]=limit(derivative);
 [~,index]=max(y);
 x0=x(index);
-keep=abs(x-x0) <= (object.SmoothDuration/2);
+keep=abs(x-x0) <= (object.DerivativeSmoothing/2);
 result=sum(x(keep).*y(keep))/sum(y(keep));
 
 y0=lookup(measurement,x0);
@@ -142,8 +160,15 @@ title(ha(1),label);
 
 set(ha(2),'Visible','on');
 
-% wait for use
+% wait for user
 hb=ContinueButtons(gui);
+set(gui.Figure.Handle,'WindowStyle','modal');
 waitfor(hb(1));
+try
+    set(gui.Figure.Handle,'WindowStyle','normal');
+    refresh(gui);
+catch
+    % figure was deleted
+end
 
 end

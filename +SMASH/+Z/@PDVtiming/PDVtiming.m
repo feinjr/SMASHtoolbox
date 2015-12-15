@@ -1,78 +1,99 @@
-classdef PDVtiming < handle       
-    properties (SetAccess=protected)
-        Experiment % Experiment label
-        Measurement % Measurement labels
-        Probe % Probe numbers
-        Diagnostic = 1:8 % Diagnostic channel number
-        Digitizer = [1 2] % Digitizer numbers
-        DigitizerChannel = [1 2 3 4] % Digitizer channel numbers
-        ConnectionTable % Connection table (four columns)
-        DigitizerScaling = 1e9 % Digitizer time scaling factor (conversion to nanoseconds)
-        SmoothDuration = 1 % Derivative smoothing duration [nanoseconds]
-        OBRwidth = 2 ; % OBR analysis width [nanoseconds]        
+% This class...
+
+%
+%
+%
+classdef PDVtiming < handle
+    properties
+        Experiment = 'Z????' % Experiment label                   
     end
     properties (SetAccess=protected)
-        ProbeDelay % Probe delays
+        Comment = '' % Experiment comments
+        Probe % Probe numbers
+        ProbeDelay % Probe delays        
+        Diagnostic % Diagnostic channel number
         DiagnosticDelay % Diagnostic delays
+        Digitizer % Digitizer numbers
         DigitizerDelay % Digititizer output trigger delays
-        DigitizerTrigger % Digitizer trigger times
-    end    
-    properties (Access=protected,Hidden=true)
+        DigitizerChannel % Digitizer channel numbers
+        DigitizerChannelDelay % Digitizer channel delays (relative)
+        DigitizerTrigger % Digitizer trigger times        
+        MeasurementConnection = [] % Measurement connections
+        MeasurementLabel = {} % Measurment label
+    end
+    properties
+        DigitizerScaling % Digitizer time scaling [s -> ns]
+        DerivativeSmoothing  % Derivative smoothing duration [ns]
+        FiducialRange % Optical fiducial search range [ns]
+        OBRwidth % OBR analysis width [ns]
+        OBRreference % OBR reference times [ns] 
+    end
+    properties (Access=protected,Hidden=true)        
         DialogHandle
     end
     methods (Hidden=true)
-        function object=PDVtiming(name,choice)
+        function object=PDVtiming(filename,mode)
+            applyDefaults(object);
             % manage input
-            if (nargin<1) || isempty(name)
-                name='Z????';
+            if (nargin<1) || isempty(filename)
+                % do nothing
+            else
+                loadSession(object,filename);
             end
-            assert(ischar(name),'ERROR: invalid experiment name');
-            object.Experiment=name;
-            if (nargin<2) || isempy(choice)
-                choice='';
+            if (nargin<2) || isempty(mode)
+                %mode='gui';
+                mode='developer';
             end
-            assert(ischar(choice),'ERROR: invalid input');
-            % process choice
-            switch lower(choice)
+            assert(ischar(mode),'ERROR: invalid mode');                  
+            % process mode
+            switch lower(mode)
+                case 'gui'
+                    runGUI(object);
                 case 'silent'
                     % do nothing
                 otherwise
-                    message{1}='This clas is meant for devleopers';
-                    message{2}='(message under construction)x';
+                    message={};
+                    message{end+1}='This mode is meant for devlopers';                
                     warning('SMASH:PDVtiming','%s\n',message{:});
-            end
+            end                           
         end
-        varargout=restore(varargin);
+        varargout=applyDefaults(varargin);
+        varargout=runGUI(varargin);
+    end
+     %% hide class methods from casual users
+    methods (Hidden=true)
+        %varargout=addlistener(varargin);
+        varagout=eq(varargin);
+        varargout=findobj(varargin);
+        varargout=findprop(varargin);
+        varagout=ge(varargin);
+        varagout=gt(varargin);
+        %varagout=isvalid(varargin);
+        varagout=le(varargin);
+        varagout=lt(varargin);
+        varagout=ne(varargin);
+        varagout=notify(varargin);
+    end
+    %% setters
+    methods
+        function set.Experiment(object,value)
+            assert(ischar(value),'ERROR: invalid Experiment value');
+            object.Experiment=value;
+        end        
+        function set.DigitizerScaling(object,value)
+            test=SMASH.General.testNumber(value,'positive','notzero');
+            assert(test,'ERROR: invalid digitizer scaling value');
+            object.DigitizerScaling=value;
+        end
+        function set.DerivativeSmoothing(object,value)
+            test=SMASH.General.testNumber(value,'positive','notzero');
+            assert(test,'ERROR: invalid deritivate smoothing value');
+            object.DerivativeSmoothing=value;
+        end
+        function set.OBRwidth(object,value)
+            test=SMASH.General.testNumber(value,'positive','notzero');
+            assert(test,'ERROR: invalid OBR width width');
+            object.OBRwidth=value;
+        end
     end
 end
-
-% 
-% % manage input
-% 
-% % create dialog box
-% dlg=SMASH.MUI.Dialog;
-% label={'Measurement' 'Probe' 'PDV' 'Dig' 'Ch'};
-% widths=[20 0 0 0 0];
-% h=addblock(dlg,'table',label,widths,10);
-% set(h(1),'TooltipString','Measurement label');
-% set(h(2),'ToolTipString','Probe ID');
-% set(h(3),'TooltipString','PDV channel');
-% set(h(4),'TooltipString','Digitizer number');
-% set(h(5),'TooltipString','Digitizer channel');
-% 
-% locate(dlg,'northeast');
-% 
-% % dummy data
-% data=cell(6,4);
-% 
-% 
-% 
-% %    function forceInteger(source,EventData)
-% %        value=sscanf(EventData.EditData,'%g',1);        
-% %        row=EventData.Indices(1);
-% %        column=EventData.Indices(2);
-% %        %source.Data{row,column}=sprintf('%.0f',value);
-% %        source.Data{row,column}=round(value);
-% %    end
-% 
-% %end

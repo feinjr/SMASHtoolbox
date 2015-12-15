@@ -1,19 +1,53 @@
 % characterizeProbe Characterize probe delay
 %
-% UNDER CONSTRUCTION
+% This method characterizes the delay for a PDV probe digitizer.  Two
+% pieces of information are needed for this calculation:
+%   -Transit time for the probe [measurement], including the optical
+%   switch.
+%   -Transit time for the optical switch only [reference].
+% These times describe round-trip transits within a consistent time base,
+% such as a optical backscatter reflectometer (OBR).
 %
-% See also PDVtiming
+% To use this method:
+%    delay=characterizeProbe(object,measurement,reference); 
+% The "measurement" and "reference" inputs may be numeric values or names
+% of OBR scan files.  If no output is specified, the delay value is printed
+% in the command window.
+%
+% When file names are passed, measurement/reference times are calculated
+% from the reflections selected by the user.  Scan files may be in the text
+% or binary (*.obr) format used by LUNA system. Archived LUNA objects
+% (stored in a *.sda file) can also be used in conjunction with record
+% label.  For example:
+%    characterizeProbe(object,{filename label},reference); 
+% loads the probe measurement from an archived LUNA object.
+%
+% Passing fourth input directly assigns the calculated delay to a
+% particular digitizer.
+%   characterizeProbe(object,measurement,reference,index);
+%
+% See also PDVtiming, setupProbe
 %
 
 %
+% created December 14, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 %
-function varargout=characterizeProbe(object,measurement,reference)
+function varargout=characterizeProbe(object,measurement,reference,index)
 
 % manage input
+if (nargin<4) || isempty(index)
+    index=[];
+else
+    assert(isscalar(index) && any(index==object.Probe),...
+        'EROR: invalid probe index');
+end
+
 if (nargin<2) || isempty(measurement)
     [filename,pathname]=uigetfile('*.*','Select probe scan file');
-    assert(ischar(filename),'ERROR: no file selected');
+    if isnumeric(filename)
+        return
+    end
     measurement=fullfile(pathname,filename);
 end
 if ischar(measurement)
@@ -28,7 +62,7 @@ end
 
 if (nargin<3) || isempty(reference)
     [filename,pathname]=uigetfile('*.*','Select reference scan file');
-    assert(ischar(fileme),'ERROR: no file selected');
+    assert(ischar(filename),'ERROR: no file selected');
     reference=fullfile(pathname,filename);
 end
 if ischar(reference)
@@ -53,8 +87,13 @@ else
     varargout{3}=reference;
 end
 
+if ~isempty(index)
+    object.ProbeDelay(index==object.Probe)=delay;
 end
 
+end
+
+%%
 function [result,RL]=processFile(object,label,filename,record)
 
 % load scan
@@ -63,11 +102,7 @@ switch lower(ext)
     case '.obr'
         scan=SMASH.Velocimetry.LUNA(filename);
     case '.sda'
-        %try
-            scan=SMASH.FileAccess.readFile(filename,'sda',record);
-        %catch
-        %    return
-        %end        
+        scan=SMASH.FileAccess.readFile(filename,'sda',record);
     otherwise % treat as text file
         scan=SMASH.Velocimetry.LUNA(filename);
 end

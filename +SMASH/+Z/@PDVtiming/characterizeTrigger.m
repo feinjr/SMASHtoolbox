@@ -13,15 +13,26 @@
 % assist the characterization.  Pressing the "Next" button shows the
 % characterization results.
 %
-% See also PDVtiming, characterizeDigitizer
+% Passing fourth input directly assigns the calculated delay to a
+% particular digitizer.
+%   [...]=characterizTrigger(object,measurement,offset,index);
+%
+% See also PDVtiming, characterizeDigitizer, setupDigitizer
 %
 
 %
 % created December 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=characterizeTrigger(object,filename,record)
+function varargout=characterizeTrigger(object,filename,record,index)
 
 % manage input
+if (nargin<4) || isempty(index)
+    index=[];
+else
+    assert(isscalar(index) && any(index==object.Digitizer),...
+        'EROR: invalid digitizer index');
+end
+
 if (nargin<2) || isempty(filename)
     [filename,pathname]=uigetfile('*.*','Select digitizer trigger file');
     assert(ischar(fileme),'ERROR: no file selected');
@@ -65,8 +76,13 @@ else
     varargout{1}=trigger;
 end
 
+if ~isempty(index)
+    object.DigitizerTrigger(index==object.Digitizer)=trigger;
 end
 
+end
+
+%%
 function result=processFile(object,varargin)
 
 % read measurement
@@ -78,7 +94,7 @@ measurement=scale(measurement,object.DigitizerScaling);
 parameters(1)=1; % smoothing order
 t=measurement.Grid;
 dt=(max(t)-min(t))/(numel(t)-1);
-parameters(2)=ceil(object.SmoothDuration/dt);
+parameters(2)=ceil(object.DerivativeSmoothing/dt);
 if parameters(2)<3
     parameters(2)=3;
     warning('SMASH:PDVtiming',...
@@ -139,7 +155,7 @@ setappdata(ha(1),'PositionLink',hlink);
 [x,y]=limit(derivative);
 [~,index]=max(y);
 x0=x(index);
-keep=abs(x-x0) <= (object.SmoothDuration/2);
+keep=abs(x-x0) <= (object.DerivativeSmoothing/2);
 result=sum(x(keep).*y(keep))/sum(y(keep));
 
 y0=lookup(measurement,x0);
@@ -154,5 +170,12 @@ set(ha(2),'Visible','on');
 % wait for user
 hb=ContinueButtons(gui);
 waitfor(hb(1));
+waitfor(hb(1));
+try
+    set(gui.Figure.Handle,'WindowStyle','normal');
+    refresh(gui);
+catch
+    % figure was deleted
+end
 
 end

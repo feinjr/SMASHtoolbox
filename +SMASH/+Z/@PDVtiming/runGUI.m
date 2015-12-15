@@ -1,15 +1,9 @@
-function showDialog(object,filename)
+function runGUI(object)
 
 %% see if dialog already exists
 if ishandle(object.DialogHandle)
     figure(object.DialogHandle);
     return
-end
-
-%% manage input
-if nargin==2
-    assert(ischar(filename),'ERROR: invalid session file');
-    % load previous session
 end
 
 %% create dialog

@@ -5,8 +5,9 @@
 % to the electrical input at the digitizer.  Three pieces of information
 % are needed for this calculation:
 %   -Optical pulse time through the PDV channel (measurement).
-%   -Electrical pulse time through a reference detector (reference).
-%   -Group delay for the reference detector (offset).
+%   -Optical pulse time through a reference detector (reference).
+%   -Group delay for the reference detector (offset).  This delay includes
+%   internal and external cabling (optical and/or electrical).
 % Pulse times must be obtained from a common time base, i.e. the digitizer.
 %  NOTE: offset is combination of optical/electrical transit (fiber,
 %  detector/cable) and cannot be negative.
@@ -19,16 +20,27 @@
 % characterization pulse; pressing the "Done" button launches an automatic
 % refinment of pulse location.
 %
-% See also PDVtiming
+% Passing fifth input directly assigns the calculated delay to a
+% particular diagnostic channel.
+%   [...]=characterizeDiagnostic(object,measurement,reference,offset,index);
+%
+% See also PDVtiming, setupDiagnostic
 %
 
 %
 % created December 3, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function varargout=...
-    characterizeDiagnostic(object,measurement,reference,offset)
+    characterizeDiagnostic(object,measurement,reference,offset,index)
 
 % manage input
+if (nargin<5) || isempty(index)
+    index=[];
+else
+    assert(isscalar(index) && any(index==object.Diagnostic),...
+        'EROR: invalid diagnostic index');
+end
+
 if (nargin<2) || isempty(measurement)
     [filename,pathname]=uigetfile('*.*','Select diagnostic measurement file');
     assert(ischar(filename),'ERROR: no file selected');
@@ -49,7 +61,7 @@ end
 
 if (nargin<3) || isempty(reference)
     [filename,pathname]=uigetfile('*.*','Select diagnostic reference file');
-    assert(ischar(fileme),'ERROR: no file selected');
+    assert(ischar(filename),'ERROR: no file selected');
     reference=fullfile(pathname,filename);
 end
 if ischar(reference)
@@ -82,8 +94,13 @@ else
     varargout{3}=ReferenceReport;
 end
 
+if ~isempty(index)    
+    object.DiagnosticDelay(index==object.Diagnostic)=delay;
 end
 
+end
+
+%%
 function [result,report]=processFile(object,label,varargin)
 
 % read file
@@ -111,12 +128,17 @@ waitfor(hb);
 
 Mxb=xlim(ha);
 measurement=limit(measurement,Mxb);
-report=locate(measurement);
+[xf,yf]=limit(measurement);
+[~,k]=max(abs(yf));
+xb=xf(k)+[-1 +1]*object.FiducialRange/2;
+temp=limit(measurement,xb);
+report=locate(temp);
+[xf,~]=limit(temp);
 
 % display the results
 [x,y]=limit(measurement);
 set(hl,'XData',x,'YData',y);
-line(x,report.Fit,'Color','k','LineStyle','--');
+line(xf,report.Fit,'Color','r');
 axis(ha,'auto');
 
 result=report.Location;

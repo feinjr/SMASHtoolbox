@@ -86,19 +86,27 @@ if refreshButton
         object.BPheight=object.BPheight+2*object.BPmargin;
     end
     %  
-    set(object.ButtonPanel,'Units','pixels');
-    position=get(object.ButtonPanel,'Position');
-    position(4)=object.BPheight;   
-    set(object.ButtonPanel,'Position',position);
-    %
-    set(object.ButtonPanel,'Units','normalized');
-    position=get(object.ButtonPanel,'Position');
-    position(3)=1;
-    set(object.ButtonPanel,'Position',position);
-    %
-    position(2)=position(4);
-    position(4)=1-position(2);
-    set(object.AxesPanel,'Position',position);
+    if object.BPheight>0
+        %
+        set(object.ButtonPanel,'Units','pixels');
+        position=get(object.ButtonPanel,'Position');
+        position(4)=object.BPheight;
+        set(object.ButtonPanel,'Position',position);
+        %
+        set(object.ButtonPanel,'Units','normalized');
+        position=get(object.ButtonPanel,'Position');
+        position(3)=1;
+        set(object.ButtonPanel,'Position',position);
+        %
+        position(2)=position(4);
+        position(4)=1-position(2);
+        set(object.AxesPanel,'Position',position);
+        %
+        set(object.ButtonPanel,'Visible','on');
+    else
+        set(object.AxesPanel,'Position',[0 0 1 1]);
+        set(object.ButtonPanel,'Visible','off');
+    end
 end
 
 % update GUI size
