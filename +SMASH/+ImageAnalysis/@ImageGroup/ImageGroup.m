@@ -19,7 +19,7 @@
 % See also ImageAnalysis, Image
 %
 % created December 16, 2015 by Tommy Ao (Sandia National Laboratories)
-%
+% modified December 16, 2015 by Sean Grant (Sandia National Laboratories)
 
 classdef ImageGroup < SMASH.ImageAnalysis.Image
     %%
