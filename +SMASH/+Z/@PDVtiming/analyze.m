@@ -23,7 +23,7 @@ for k=1:N
     digitizer=object.MeasurementConnection(k,3);
     m=find(object.Digitizer==digitizer);
     channel=object.MeasurementConnection(k,4);
-    n=find(object.DigitizerChannel{k}==channel);
+    n=find(object.DigitizerChannel{m}==channel);
     trigger=object.DigitizerTrigger(m);
     SystemDelay=object.DigitizerDelay(m);
     ChannelDelay=object.DigitizerChannelDelay{m}(n);
@@ -42,7 +42,15 @@ end
 
 % manage output
 if nargout==0
-    % print results
+    fprintf('%10s  %10s  %10s  %10s  %10s  %-20s\n',...
+        'Probe','Diagnostic','Digitizer','Channel','Correction','Measurement');
+    %fprintf('\tProbe\tDiagnostic\tDigitizer\tChannel\tCorrection\tLabel\n');   
+    N=numel(correction);
+    for n=1:N
+        fprintf('%10d  %10d  %10d  %10d  ',object.MeasurementConnection(n,:));
+        fprintf('%10.3f  ',correction(n));
+        fprintf('%-20s\n',object.MeasurementLabel{n});
+    end    
 else
     varargout{1}=correction;
     varargout{2}=object.MeasurementConnection;

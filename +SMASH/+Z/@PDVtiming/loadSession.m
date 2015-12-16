@@ -1,5 +1,7 @@
 % loadSession Load timing information from a session file
 %
+% This method is meant for use in the constructor only!
+%
 
 %
 % created December 15, 2015 by Daniel Dolan (Sandia National Laboratories)

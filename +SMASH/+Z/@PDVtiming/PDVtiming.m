@@ -5,19 +5,19 @@
 %
 classdef PDVtiming < handle
     properties
-        Experiment = 'Z????' % Experiment label                   
+        Experiment = 'Z????' % Experiment label
     end
     properties (SetAccess=protected)
         Comment = '' % Experiment comments
         Probe % Probe numbers
-        ProbeDelay % Probe delays        
+        ProbeDelay % Probe delays
         Diagnostic % Diagnostic channel number
         DiagnosticDelay % Diagnostic delays
         Digitizer % Digitizer numbers
         DigitizerDelay % Digititizer output trigger delays
         DigitizerChannel % Digitizer channel numbers
         DigitizerChannelDelay % Digitizer channel delays (relative)
-        DigitizerTrigger % Digitizer trigger times        
+        DigitizerTrigger % Digitizer trigger times
         MeasurementConnection = [] % Measurement connections
         MeasurementLabel = {} % Measurment label
     end
@@ -26,9 +26,9 @@ classdef PDVtiming < handle
         DerivativeSmoothing  % Derivative smoothing duration [ns]
         FiducialRange % Optical fiducial search range [ns]
         OBRwidth % OBR analysis width [ns]
-        OBRreference % OBR reference times [ns] 
+        OBRreference % OBR reference times [ns]
     end
-    properties (Access=protected,Hidden=true)        
+    properties (Access=protected,Hidden=true)
         DialogHandle
     end
     methods (Hidden=true)
@@ -41,10 +41,10 @@ classdef PDVtiming < handle
                 loadSession(object,filename);
             end
             if (nargin<2) || isempty(mode)
-                %mode='gui';
-                mode='developer';
+                mode='gui';
+                %mode='developer';
             end
-            assert(ischar(mode),'ERROR: invalid mode');                  
+            assert(ischar(mode),'ERROR: invalid mode');
             % process mode
             switch lower(mode)
                 case 'gui'
@@ -53,14 +53,18 @@ classdef PDVtiming < handle
                     % do nothing
                 otherwise
                     message={};
-                    message{end+1}='This mode is meant for devlopers';                
+                    message{end+1}='This mode is meant for devlopers';
                     warning('SMASH:PDVtiming','%s\n',message{:});
-            end                           
+            end
         end
         varargout=applyDefaults(varargin);
         varargout=runGUI(varargin);
     end
-     %% hide class methods from casual users
+    %%
+    methods (Access=protected,Hidden=true)
+        varargout=loadSession(varargin);
+    end
+    %% hide class methods from casual users
     methods (Hidden=true)
         %varargout=addlistener(varargin);
         varagout=eq(varargin);
@@ -79,7 +83,7 @@ classdef PDVtiming < handle
         function set.Experiment(object,value)
             assert(ischar(value),'ERROR: invalid Experiment value');
             object.Experiment=value;
-        end        
+        end
         function set.DigitizerScaling(object,value)
             test=SMASH.General.testNumber(value,'positive','notzero');
             assert(test,'ERROR: invalid digitizer scaling value');

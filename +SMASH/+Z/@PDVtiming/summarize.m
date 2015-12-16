@@ -16,7 +16,7 @@
 function varargout=summarize(object)
 
 report={};
-
+report{end+1}=sprintf('Experiment: %s',object.Experiment);
 report{end+1}=['Available probes: ' sprintf('%d ',object.Probe)];
 report{end+1}=['Available diagnostic channels: ' sprintf('%d ',object.Diagnostic)];
 report{end+1}=['Available digitizers: ' sprintf('%d ',object.Digitizer)];
