@@ -2,6 +2,8 @@
 % from the user.
 function applyDefaults(object)
 
+object.MaxConnections=16;
+
 % general parameters
 object.DigitizerScaling=1e9;
 object.DerivativeSmoothing=1;
@@ -18,8 +20,8 @@ setupDigitizerChannel(object,[1 2 3 4]);
 % probes
 setupProbe(object,1:8);
 
-N=10;
-index=transpose(1:10);
+N=36;
+index=transpose(1:N);
 transit=nan(N,1);
 object.OBRreference=[index transit];
 

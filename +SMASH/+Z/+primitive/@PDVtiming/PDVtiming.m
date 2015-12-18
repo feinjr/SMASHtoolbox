@@ -22,6 +22,7 @@ classdef PDVtiming < handle
         MeasurementLabel = {} % Measurment label
     end
     properties
+        MaxConnections = 0 % Maximum number of measurement connections
         DigitizerScaling % Digitizer time scaling [s -> ns]
         DerivativeSmoothing  % Derivative smoothing duration [ns]
         FiducialRange % Optical fiducial search range [ns]
@@ -40,21 +41,16 @@ classdef PDVtiming < handle
             else
                 loadSession(object,filename);
             end
-            if (nargin<2) || isempty(mode)
-                mode='gui';
-                %mode='developer';
+            if (nargin<2) || isempty(mode)                
+                mode='developer';
             end
             assert(ischar(mode),'ERROR: invalid mode');
             % process mode
             switch lower(mode)
                 case 'gui'
-                    runGUI(object);
-                case 'silent'
-                    % do nothing
+                    runGUI(object);                
                 otherwise
-                    message={};
-                    message{end+1}='This mode is meant for devlopers';
-                    warning('SMASH:PDVtiming','%s\n',message{:});
+                    % do nothing
             end
         end
         varargout=applyDefaults(varargin);
@@ -83,6 +79,11 @@ classdef PDVtiming < handle
         function set.Experiment(object,value)
             assert(ischar(value),'ERROR: invalid Experiment value');
             object.Experiment=value;
+        end
+        function set.MaxConnections(object,value)
+            assert(SMASH.General.testNumber(value,'integer','positive','notzero'),...
+                'ERROR: invalid number of maximum connections');
+            object.MaxConnections=value;
         end
         function set.DigitizerScaling(object,value)
             test=SMASH.General.testNumber(value,'positive','notzero');
