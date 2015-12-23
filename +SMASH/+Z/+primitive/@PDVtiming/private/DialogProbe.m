@@ -123,7 +123,7 @@ set(hDelay(3),'Callback',@calculateDelay);
             reference={reference get(hReferenceLabel(2),'String')};
         else
             index=get(hReference(2),'Value');                   
-            reference=sscanf(reference{index},'%#s %g');
+            reference=sscanf(reference{index},'%*s %g');
             index=object.OBRreference(:,1)==reference;
             reference=object.OBRreference(index,2);           
         end

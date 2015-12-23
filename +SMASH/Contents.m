@@ -18,6 +18,7 @@
 %    Spectroscopy      - spectroscopy analysis (UNDER CONSTRUCTION)
 %    Velocimetry       - velocimetry analysis (UNDER CONSTRUCTION)
 %    Xray              - x-ray analysis (UNDER CONSTRUCTION)
+%    Z                 - tools related to the Sandia Z machine
 %
 % To learn more about these package, press the links above or use the "doc"
 % command.

@@ -31,7 +31,11 @@ setappdata(dlg.Handle,'PDVtiming',object);
 %% create menus
 hm=uimenu(dlg.Handle,'Label','Program');
 hsub=uimenu(hm,'Label','Load previous session');
-set(hsub,'Callback',@(~,~) loadSession(object));
+set(hsub,'Callback',@loadPrevious);
+    function loadPrevious(varargin)
+        loadSession(object)
+        set(hExperiment(2),'String',object.Experiment);
+    end
 hsub=uimenu(hm,'Label','Save current session');
 set(hsub,'Callback',@(~,~) saveSession(object));
 hsub=uimenu(hm,'Label','Exit','Separator','on');
@@ -62,8 +66,8 @@ uimenu(hm,'Label','Timing corrections','Enable','off');
 uimenu(hm,'Label','Analysis overview','Enable','off');
 
 %%
-h=addblock(dlg,'edit_button',{'Experiment:' ' Comments '},[20 0]);
-set(h(2),'String',object.Experiment,'UserData',object.Experiment,...
+hExperiment=addblock(dlg,'edit_button',{'Experiment:' ' Comments '},[20 0]);
+set(hExperiment(2),'String',object.Experiment,'UserData',object.Experiment,...
     'Tag','ExperimentName','Callback',@changeName);
     function changeName(src,varargin)
         temp=strtrim(get(src,'String'));
@@ -73,7 +77,7 @@ set(h(2),'String',object.Experiment,'UserData',object.Experiment,...
         object.Experiment=temp;
         set(src,'String',temp,'UserData',temp);
     end
-set(h(3),'Callback',@setComment);
+set(hExperiment(3),'Callback',@setComment);
     function setComment(varargin)
         object=comment(object);
     end

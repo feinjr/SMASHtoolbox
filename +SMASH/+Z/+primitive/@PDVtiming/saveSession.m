@@ -49,6 +49,7 @@ for n=1:N
 end
 
 fprintf(fid,'\n\tNOTE: All times are in nanoseconds\n');
+fprintf(fid,'\tSession saved %s\n',datestr(now));
 fprintf(fid,'\n');
 
 % connections

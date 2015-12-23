@@ -1,7 +1,9 @@
-% This class...
+% This class analyzes timing for PDV measurements at the Sandia Z machine.
+% It is meant for developers, not general users.
+%
 
 %
-%
+% created December 22, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef PDVtiming < handle
     properties
