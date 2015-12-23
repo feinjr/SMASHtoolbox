@@ -76,11 +76,11 @@ dlg.Hidden=false;
 dlg.Modal=true;
 waitfor(hbutton(1));
 
-if ishandle(dlg.Handle)
+if isvalid(dlg) && ishandle(dlg.Handle)
     choice=label{choice};
     delete(dlg);
 else
-    choice='';
+    choice=0;
 end
 
 end

@@ -4,7 +4,7 @@
 % 'label' is a cell array of strings (label + check box)
 % minwidth defines the minimum block width in characters (optional)
 
-function varargout=edit_check(object,label,minwidth)
+function varargout=edit_check(object,label,minwidth,SkipLabel)
 
 % handle input
 if (nargin<2) || isempty(label)
@@ -15,13 +15,26 @@ if (nargin<3) || isempty(minwidth)
     minwidth=0;
 end
 
+if nargin<4
+     SkipLabel='';
+end
+if strcmpi(SkipLabel,'SkipLabel')
+    SkipLabel=true;
+else
+    SkipLabel=false;
+end
+
 % error checking
 verify(object);
 
 % create block
-[h,temp]=text(object,label{1},minwidth);
-minwidth=max(minwidth,temp);
-pushup(object,1,object.VerticalGap);
+if SkipLabel
+    h=[];
+else
+    [h,temp]=text(object,label{1},minwidth);
+    minwidth=max(minwidth,temp);
+    pushup(object,1,object.VerticalGap);
+end
 dummy=repmat('M',[1 minwidth]);
 h(end+1)=local_uicontrol(object,'Style','edit','HorizontalAlignment','left',...
     'String',dummy);

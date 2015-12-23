@@ -174,7 +174,7 @@ set(h(1),'Callback',@done)
     function done(varargin)
         [flag,table,label]=verifyConnections;
         if ~flag
-            verifyConnection;
+            verifyConnections;
             return
         end
         keep=~any(isnan(table),2);        
@@ -192,5 +192,7 @@ locate(dlg,'center',object.DialogHandle);
 dlg.Hidden=false;
 dlg.Modal=true;
 uiwait(dlg.Handle);
+
+figure(object.DialogHandle);
 
 end

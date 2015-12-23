@@ -132,9 +132,11 @@ xb=xlim(ha);
 y0=interp1(scan.Time,scan.LinearAmplitude,result);
 line(result,y0,'Marker','o','Color','k');
 
-label=sprintf('%s%s transit pulse: %.3f ns',...
+temp={};
+temp{end+1}=sprintf('%s%s transit pulse: %.3f ns',...
     upper(label(1)),label(2:end),result);
-title(ha(1),label);
+temp{end+1}=sprintf('Return loss: %.1f dB',RL);
+title(ha(1),temp);
 
 % wait for user
 hb=ContinueButtons(gui);

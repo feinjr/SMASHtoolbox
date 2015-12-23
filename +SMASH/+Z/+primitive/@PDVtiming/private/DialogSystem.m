@@ -37,9 +37,30 @@ set(h(1),'Callback',@done)
     function done(varargin)
         value=probe(dlg);
         object.Probe=sscanf(value{1},'%d');
+        N=numel(object.Probe);
+        if object.ProbeDelay ~= N
+            object.ProbeDelay=zeros(1,N);
+        end
         object.Diagnostic=sscanf(value{2},'%d');
-        object.Digitizer=sscanf(value{3},'%d');
+        N=numel(object.Diagnostic);
+        if numel(object.DiagnosticDelay) ~= N
+            object.DiagnosticDelay=zeros(1,N);
+        end
+        object.Digitizer=sscanf(value{3},'%d');        
+        N=numel(object.Digitizer);
         object.DigitizerChannel=getappdata(hConfig,'DigitizerChannel');
+        if numel(object.DigitizerChannel) ~= N
+            object.DigitizerDelay=zeros(1,N);
+            object.DigitizerTrigger=zeros(1,N);
+            channel=cell(N,1);
+            delay=cell(N,1);
+            for n=1:N
+                channel{n}=1:4;
+                delay{n}=zeros(1,4);
+            end          
+            object.DigitizerChannel=channel;
+            object.DigitizerChannelDelay=delay;
+        end
         object.MaxConnections=sscanf(value{4},'%d');        
         delete(dlg);
     end

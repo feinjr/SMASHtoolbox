@@ -18,11 +18,17 @@ function saveSession(object,filename)
 
 % manage input
 if (nargin<2) || isempty(filename)
-    [filename,pathname]=uiputfile('*.*','Select session file');
+    if isempty(object.SessionFile)
+        [filename,pathname]=uiputfile('*.*','Select session file');
+    else
+        [filename,pathname]=uiputfile('*.*','Select session file',...
+            object.SessionFile);
+    end
     if isnumeric(filename)
         return
     end
     filename=fullfile(pathname,filename);
+    object.SessionFile=filename;
 end
 assert(ischar(filename),'ERROR: invalid session file name');
 

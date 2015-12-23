@@ -1,4 +1,4 @@
-function varargout=edit(object,label,minwidth)
+function varargout=edit(object,label,minwidth,SkipLabel)
 
 % handle input
 if (nargin<2) || isempty(label)
@@ -9,13 +9,27 @@ if (nargin<3) || isempty(minwidth)
     minwidth=0;
 end
 
+if nargin<4
+     SkipLabel='';
+end
+if strcmpi(SkipLabel,'SkipLabel')
+    SkipLabel=true;
+else
+    SkipLabel=false;
+end
+
 % error checking
 verify(object);
 
 % create block
-[h,temp]=text(object,label,minwidth);
-minwidth=max(temp,minwidth);
-object.pushup(1,object.VerticalGap);
+if SkipLabel
+    h=nan;
+    
+else
+    [h,temp]=text(object,label,minwidth);
+    minwidth=max(temp,minwidth);
+    object.pushup(1,object.VerticalGap);
+end
 
 dummy=repmat('M',[1 minwidth]);
 h(end+1)=local_uicontrol(object,...

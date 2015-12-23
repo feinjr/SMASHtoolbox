@@ -1,7 +1,11 @@
+% This method launches a graphical interface for PDV timing analysis.
+%    runGUI(object);
+%
+% See also PDVtiming
 %
 
 %
-%
+% created December 18, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 function runGUI(object)
 
@@ -11,9 +15,8 @@ for n=1:numel(fig)
     h=findall(fig(n),'Tag','ExperimentName');
     name=get(h,'String');
     if strcmp(name,object.Experiment)
-        message{1}='ERROR: conflicting experiment labels detected.';
-        message{2}='       Resolve conflict and try again.';
-        error('%s\n',message{:});
+        figure(fig);
+        return
     end
 end
 
@@ -23,6 +26,7 @@ dlg.Hidden=true;
 dlg.Name='PDV timing analysis';
 set(dlg.Handle,'Tag','SMASH:PDVtiming');
 object.DialogHandle=dlg.Handle;
+setappdata(dlg.Handle,'PDVtiming',object);
 
 %% create menus
 hm=uimenu(dlg.Handle,'Label','Program');
@@ -74,20 +78,22 @@ set(h(3),'Callback',@setComment);
         object=comment(object);
     end
 
-label={'Define connections' 'Locate triggers' 'Measure probes' 'Analyze'};
+label={' Connections ' ' Digitizer triggers ' ' Probe delays ' ' Analyze '};
 dummy=repmat('M',[1 max(cellfun(@numel,label))]);
 
 h=addblock(dlg,'button',dummy);
 set(h,'String',label{1},'Callback',{@DialogConnection,object})
 
 h=addblock(dlg,'button',dummy);
-set(h,'String',label{2},'Callback',{@DialogTrigger,object},'Enable','off')
+set(h,'String',label{2},'Callback',{@DialogTrigger,object},...
+    'TooltipString','Digitizer trigger times');
 
 h=addblock(dlg,'button',dummy);
-set(h,'String',label{3},'Callback',{@DialogProbe,object},'Enable','off');
+set(h,'String',label{3},'Callback',{@DialogProbe,object},...
+    'TooltipString','Probe delays');
 
 h=addblock(dlg,'button',dummy);
-set(h,'String',label{4},'Callback',{@DialogAnalysis,object},'Enable','off');
+set(h,'String',label{4},'Callback',{@DialogAnalysis,object});
 
 %%
 locate(dlg,'center');

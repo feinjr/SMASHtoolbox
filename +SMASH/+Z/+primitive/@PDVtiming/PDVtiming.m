@@ -31,6 +31,7 @@ classdef PDVtiming < handle
     end
     properties (Access=protected,Hidden=true)
         DialogHandle
+        SessionFile = ''
     end
     methods (Hidden=true)
         function object=PDVtiming(filename,mode)

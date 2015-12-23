@@ -30,7 +30,7 @@ function varargout=addConnection(object,map,label)
 
 message{1}='ERROR: maximum number of connections reached';
 message{2}='       Increase the "MaxConnections" property to add more';
-assert(size(MeasurementConnection,1) < object.MaxConnections,...
+assert(size(object.MeasurementConnection,1) <= object.MaxConnections,...
     '%s\n',message{:});
 
 % manage input

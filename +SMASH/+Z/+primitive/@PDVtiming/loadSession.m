@@ -15,6 +15,7 @@ if (nargin<2) || isempty(filename)
         return
     end
     filename=fullfile(pathname,filename);
+    object.SessionFile=filename;
 end
 
 % open session file
@@ -127,6 +128,7 @@ if ~isempty(DigitizerChannelTable)
     setupDigitizerChannel(object,index,delay);
 end
 
+removeConnection(object,'all');
 for n=1:numel(MeasurementLabel)
     addConnection(object,MeasurementConnection(n,:),MeasurementLabel{n});
 end

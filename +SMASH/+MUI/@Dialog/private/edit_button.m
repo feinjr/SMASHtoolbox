@@ -3,7 +3,7 @@
 % label is a cell array of strings (label + button)
 % minwidth defines the minimum button width in characters (optional).
 
-function varargout=edit_button(object,label,minwidth)
+function varargout=edit_button(object,label,minwidth,SkipLabel)
 
 % handle input
 if (nargin<2) || isempty(label)
@@ -17,13 +17,26 @@ if isscalar(minwidth)
     minwidth(2)=0;
 end
 
+if nargin<4
+     SkipLabel='';
+end
+if strcmpi(SkipLabel,'SkipLabel')
+    SkipLabel=true;
+else
+    SkipLabel=false;
+end
+
 % error checking
 verify(object);
 
 % create block
-[h,temp]=text(object,label{1},minwidth(1));
-minwidth(1)=max(minwidth(1),temp);
-object.pushup(1,object.VerticalGap);
+if SkipLabel
+    h=nan;
+else
+    [h,temp]=text(object,label{1},minwidth(1));
+    minwidth(1)=max(minwidth(1),temp);
+    object.pushup(1,object.VerticalGap);
+end
 dummy=repmat('M',[1 minwidth(1)]);
 h(end+1)=local_uicontrol(object,'Style','edit','HorizontalAlignment','left',...
     'String',dummy);

@@ -56,8 +56,7 @@
 % {'A' 'B' 'C'}.  Like all other blocks, a minimum width can be specified
 % as the final input.
 %
-% Composite blocks are provided for more situations requiring an edit box
-% adjacent to a button.
+% Composite blocks provide an edit box next to a control.
 %    >> addblock(object,'edit_button',label,[minwidth]);
 %    >> h=addblock(object,'edit_check',label,[minwidth]);
 % These blocks contain a text label, an empty edit box below the label, and
@@ -82,7 +81,15 @@
 %     -Columns are always sized to fit their label.  Any minimum width
 %     smaller than the label width is ignored.
 % The optional input "rows" indicates the number of displayed table rows.
-% 
+%
+% NOTE: single-line edit blocks support a fourth input that omits the text
+% label above the edit box.
+%    >> addblock(object,'edit','',minwidth,'skiplabel');
+%    >> h=addblock(object,'edit','',minwidth,'skiplabel');
+% In the second example, the first element of the output "h" is NaN,
+% indicating that no text box was created.  Labels can also be suppressed
+% in composite text boxes (button/check).
+%
 % See also Dialog, frame, probe
 %
 

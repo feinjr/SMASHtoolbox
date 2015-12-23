@@ -4,10 +4,11 @@ data=get(src,'Data');
 row=eventdata.Indices(1);
 column=eventdata.Indices(2);
 
-value=sscanf(eventdata.EditData,'%g',1);
-if numel(value)==1
+try
+    value=eval(sprintf('[%s]',eventdata.EditData));
+    assert(isnumeric(value) && isscalar(value),'ERROR');
     data{row,column}=sprintf('%.3f',value);
-else    
+catch
     data{row,column}=eventdata.PreviousData;
 end
 
