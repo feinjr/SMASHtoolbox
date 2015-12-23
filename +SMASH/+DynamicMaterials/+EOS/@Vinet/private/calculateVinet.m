@@ -72,17 +72,28 @@ E=zeros(size(P));
 G=zeros(size(P));
 d(1)=1.0; d(2)=0.0; d=[d dn];
 f=zeros(size(d));
-f(1)=1;
-f(2)=(d(1)-f(1)).*eta0./(2);
+f(end)=d(end);
+for i = 1:length(d)-1;
+    j = length(d)-i;
+    f(j)=d(j) - f(j+1).*(j+1)./eta0;
+end
+
 sumZ = 0;
-for i=2:length(d)
-    if i == length(d)
-        f(i)=d(i);
-    else
-        f(i+1)=(d(i)-f(i)).*eta0./(i+1);
-    end
+for i = 2:length(d)
     sumZ=sumZ+f(i).*z.^(i-1);
 end
+
+
+% f(2)=(d(1)-f(1)).*eta0./(2);
+% sumZ = f(2).*z;
+% for i=2:length(d)
+%     if i == length(d)
+%         f(i)=d(i);
+%     else
+%         f(i+1)=(d(i)-f(i)).*eta0./(i+1);
+%     end
+%     sumZ=sumZ+f(i).*z.^(i-1);
+% end
 
 %Internal
 %U = 9.*B0./(rho0.*(eta0.^2)).*(1-exp(eta0.*(1-((rho0./rho).^(1./3)))).*(1-eta0.*(1-((rho0./rho).^(1/3)))))+cv0.*(T-T0)+a0.*B0*T0.*(1./rho-1./rho0)+e0;
