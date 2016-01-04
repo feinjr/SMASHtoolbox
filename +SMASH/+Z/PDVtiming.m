@@ -22,7 +22,11 @@ object=SMASH.Z.primitive.PDVtiming(filename,'gui');
 
 % manage output
 if nargout>0
-    varargout{1}=object;
+    if isdeployed
+        varargout{1}=0;
+    else
+        varargout{1}=object;
+    end
 end
 
 end

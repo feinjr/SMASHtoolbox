@@ -266,6 +266,8 @@ if nargout==0
     end    
     xlabel('Frequency')
     title(label);
+elseif nargout==1
+    varargout{1}=SMASH.SignalAnalysis.Signal(frequency,transform);
 else
     varargout{1}=frequency;
     varargout{2}=transform;

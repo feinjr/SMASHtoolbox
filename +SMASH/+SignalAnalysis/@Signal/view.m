@@ -53,12 +53,14 @@ axes(target);
 % create line with object's properties
 [time,value]=limit(object);
 h=line(time,value);
-apply(object.GraphicOptions,h);
 
 % fill out new figure
 if new
     xlabel(target,object.GridLabel);
     ylabel(target,object.DataLabel);
+    apply(object.GraphicOptions,h);
+else
+    apply(object.GraphicOptions,h,'noparent');
 end
 
 figure(fig);
