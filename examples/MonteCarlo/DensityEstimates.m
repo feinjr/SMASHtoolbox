@@ -26,10 +26,10 @@ t2=t1;
 for m=1:numel(M);
     xm=randn(M(m),1);
     tic;
-    SMASH.MonteCarlo.estimateDensity(xm);
+    [~,~]=SMASH.MonteCarlo.estimateDensity(xm);
     t1(m)=toc;
     tic;
-    SMASH.MonteCarlo.estimateDensityDirect(xm);
+    [~,~]=SMASH.MonteCarlo.estimateDensityDirect(xm);
     t2(m)=toc;
 end
 
