@@ -26,6 +26,9 @@ classdef ImageGroup < SMASH.ImageAnalysis.Image
     properties (SetAccess=?SMASH.General.DataClass)
         NumberImages = 0 % Number of Images
     end
+    properties
+        Legend={};
+    end
     %% hidden methods
     methods (Hidden=true)
         function object=ImageGroup(varargin)
@@ -37,6 +40,13 @@ classdef ImageGroup < SMASH.ImageAnalysis.Image
         varargout=create(varargin);
         varargout=import(varargin);
     end
-    
+    %% set methods
+    methods
+        function object=set.Legend(object,value)
+            assert(iscell(value),'ERROR: invalid Legend');
+                object.Legend=value;
+        end
+    end
+       
     
 end
