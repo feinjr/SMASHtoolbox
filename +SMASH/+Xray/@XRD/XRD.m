@@ -16,7 +16,7 @@
 
 %
 % created August 25, 2015 by Tommy Ao (Sandia National Laboratories)
-%
+% %
 classdef XRD
     %%
     properties
