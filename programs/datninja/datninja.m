@@ -92,7 +92,8 @@ uimenu(hsub,'Label','Vertically',...
 uimenu(hsub,'Label','Horizontally',...
     'Callback',{@FlipImage,'horizontal'});
 uimenu(hmenu,'Label','Project line',...
-    'Callback',@ProjectLine);
+    'Callback',@ProjectLine,...
+    'Enable','off');
 
 hmenu=uimenu('Label','Options');
 hsub=uimenu(hmenu,'Label','Horizontonal scale');
@@ -473,7 +474,7 @@ end
 set(data.handles.MainImage,'CData',cdata);
 set(data.handles.DetailImage,'CData',cdata);
 
-function ProjectLine(varargin)
+%function ProjectLine(varargin)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
