@@ -38,4 +38,9 @@ end
 assert(numel(object.Grid2)==N,...
     'ERROR: incompatible Grid2/Data arrays');
 
+label=cell(1,object.NumberImages);
+for k=1:object.NumberImages
+    label{k}=sprintf('image %d',k);
+end
+object.Legend=label;
 end
