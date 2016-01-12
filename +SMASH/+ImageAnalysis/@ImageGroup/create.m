@@ -6,6 +6,22 @@ object.GraphicOptions.Title='ImageGroup object';
 object.GraphicOptions.YDir='reverse';
 
 Narg=numel(varargin);
+
+% manage object input
+if isa(varargin{1},'SMASH.ImageAnalysis.Image')
+    if isa(varargin{1},'SMASH.ImageAnalysis.ImageGroup')
+        object=varargin{1};
+    else
+        object=SMASH.ImageAnalysis.ImageGroup...
+            (varargin{1}.Grid1,varargin{1}.Grid2,varargin{1}.Data);
+    end
+    if Narg>1
+        object=gather(object,varargin{2:end});
+    end    
+    return
+end
+
+% manage numeric input
 assert(Narg==3,'ERROR: invalid number of inputs');
 assert(isnumeric(varargin{1}) & isnumeric(varargin{2}) & isnumeric(varargin{3}), ...
     'ERROR: invalid input');

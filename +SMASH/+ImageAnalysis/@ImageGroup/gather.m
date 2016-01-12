@@ -1,6 +1,4 @@
 % GATHER Combine objects into a ImageGroup
-%
-% UNDER CONSTRUCTION
 % 
 % This method combines ImageGroup (and Image) objects into a new ImageGroup
 % object with a common Grid.
