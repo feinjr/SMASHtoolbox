@@ -3,7 +3,12 @@
 % Usage:
 %   >> object=smooth(object,choice,value);
 % "choice" can be 'mean', 'median', or 'kernel' (advanced users only)
-% "value" is the smoothing neighborhood (e.g., [3 3]) or kernel weights
+% "value" is the smoothing neighborhood (e.g., [3 3]) or kernel weights.
+%
+% NOTE: neighborhoods and kernel arrays follow MATLAB image conventions.
+% For example, the first column of a neighboard array refers to the
+% *vertical* vertical smoothing: [11 5] indicates smoothing over 11
+% vertical points and 5 horizontal points.
 %
 % See also IMAGE, bin, sharpen
 
