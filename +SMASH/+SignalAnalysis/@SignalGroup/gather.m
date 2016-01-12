@@ -14,13 +14,20 @@ function object=gather(varargin)
 
 temp={};
 label={};
+xmin =+inf;
+xmax=-inf;
+dx=inf;
 for n=1:nargin
     assert(isa(varargin{n},'SMASH.SignalAnalysis.Signal'),...
         'ERROR: non-gatherable object detected')
     source=varargin{n};
     for m=1:size(source.Data,2)
         temp{end+1}=SMASH.SignalAnalysis.Signal(...
-            source.Grid,source.Data(:,m)); %#ok<AGROW>                
+            source.Grid,source.Data(:,m)); %#ok<AGROW>  
+        x=temp{end}.Grid;
+        xmin=min(xmin,min(x));
+        xmax=max(xmax,max(x));
+        dx=min(dx,abs(min(diff(x))));        
         switch class(source)
             case 'SMASH.SignalAnalysis.Signal'
                 label{end+1}=source.Name; %#ok<AGROW>
@@ -29,19 +36,18 @@ for n=1:nargin
         end
     end
 end
-
 N=numel(temp);
-[temp{:}]=register(temp{:});
+x=xmin:dx:xmax;
+Data=nan(numel(x),N);
 
-Data=nan(numel(temp{1}.Data),N);
 for n=1:N
+    temp{n}=regrid(temp{n},x); %#ok<AGROW>
     Data(:,n)=temp{n}.Data;
 end
-object=SMASH.SignalAnalysis.SignalGroup(temp{1}.Grid,Data);
-object.Source='Signal merge';
+object=SMASH.SignalAnalysis.SignalGroup(x,Data);
+object.Source='Signal gather';
 object.GridLabel=varargin{1}.GridLabel;
 object.DataLabel=varargin{1}.DataLabel;
-object.NumberSignals=size(object.Data,2);
 object.Legend=label;
 
 end

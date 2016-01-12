@@ -3,6 +3,23 @@ function object=create(object,varargin)
 object.Name='SignalGroup object';
 
 Narg=numel(varargin);
+assert(Narg>0,'ERROR: insufficient input');
+
+% manage object input
+if isa(varargin{1},'SMASH.SignalAnalysis.Signal')
+    if isa(varargin{1},'SMASH.SignalAnalysis.SignalGroup')
+        object=varargin{1};
+    else
+        object=SMASH.SignalAnalysis.SignalGroup...
+            (varargin{1}.Grid,varargin{1}.Data);
+    end
+    if Narg>1
+        object=gather(object,varargin{2:end});
+    end    
+    return
+end
+
+% manage numeric input
 assert(Narg==2,'ERROR: invalid number of inputs');
 assert(isnumeric(varargin{1}) && isnumeric(varargin{2}),...
     'ERROR: invalid input');

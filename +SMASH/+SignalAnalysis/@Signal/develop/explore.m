@@ -4,7 +4,7 @@
 % provides interactive manipulation.
 %    >> explore(object); 
 %
-% See also Signal, register, conv, crop, limit, locate, map, scale, shift,
+% See also Signal, conv, crop, limit, locate, map, scale, shift,
 % smooth, store, transform, view
 %
 

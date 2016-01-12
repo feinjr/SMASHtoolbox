@@ -53,14 +53,14 @@ classdef DataClass
             elseif (nargin==1) && isstruct(varargin{1})
                 object=restore(object,varargin{1});
                 object.Source='Restored object';
-            elseif (nargin==1) && isobject(varargin{1}) % object transfer (undocumented)
-                name=properties(varargin{1});
-                for k=1:numel(name)
-                    if isprop(object,name{k})
-                        object.(name{k})=varargin{1}.(name{k});
-                    end
-                end
-                object.Source='Object transfer';
+            %elseif (nargin==1) && isobject(varargin{1}) % object transfer (undocumented)
+            %    name=properties(varargin{1});
+            %    for k=1:numel(name)
+            %        if isprop(object,name{k})
+            %            object.(name{k})=varargin{1}.(name{k});
+            %        end
+            %    end
+            %    object.Source='Object transfer';
             else
                 object=create(object,varargin{:});
                 object.Source='Numeric input';

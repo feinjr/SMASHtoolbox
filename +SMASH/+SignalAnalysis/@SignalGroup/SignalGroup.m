@@ -34,10 +34,9 @@ classdef SignalGroup < SMASH.SignalAnalysis.Signal
         end
         varargout=convolve(varargin)
         varargout=fft(varargin)
-        varargout=register(varargin)
     end
     %% protected methods
-    methods (Access=protected)
+    methods (Access=protected,Hidden=true)
         varargout=create(varargin);
         varargout=import(varargin);
     end
