@@ -13,14 +13,14 @@
 
 function varargout=split(object)
 
-assert(nargout<=object.NumberSignals,...
+assert(nargout<=object.NumberImages,...
     'ERROR: too many outputs requested');
-varargout=cell(1,object.NumberSignals);
+varargout=cell(1,object.NumberImages);
 
 [bound1,bound2]=limit(object);
 bound1=[min(bound1) max(bound1)];
 bound2=[min(bound2) max(bound2)];
-for n=1:object.NumberSignals
+for n=1:object.NumberImages
     varargout{n}=SMASH.ImageAnalysis.Image(object.Grid1,object.Grid2,object.Data(:,:,n));
     varargout{n}=limit(varargout{n},bound1,bound2);
     varargout{n}.Source='ImageGroup split';    
