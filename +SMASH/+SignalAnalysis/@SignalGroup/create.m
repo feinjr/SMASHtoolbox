@@ -1,6 +1,9 @@
 function object=create(object,varargin)
 
 object.Name='SignalGroup object';
+object.GraphicOptions=SMASH.General.GraphicOptions;
+object.GraphicOptions.Marker='none';
+object.GraphicOptions.LineStyle='-';
 
 Narg=numel(varargin);
 assert(Narg>0,'ERROR: insufficient input');

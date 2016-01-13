@@ -61,13 +61,11 @@ switch lower(get(target,'Type'))
 end
 axes(target);
 
-% create line with object's properties
+% create lines
 [time,value]=limit(object);
 h=nan(object.NumberSignals,1);
-color=lines(object.NumberSignals);
 for n=index
     h(n)=line(time,value(:,n));
-    set(h(n),'Color',color(n,:));
 end
 h=h(~isnan(h));
 
@@ -75,10 +73,20 @@ h=h(~isnan(h));
 if new
     xlabel(target,object.GridLabel);
     ylabel(target,object.DataLabel);
+    apply(object.GraphicOptions,h);
     if ~isempty(object.Legend)
-        legend(object.Legend(index),'Location','best');       
+        legend(object.Legend(index),'Location','best');
     end
-    box on;    
+    box on;
+else
+    apply(object.GraphicOptions,h,'noparent')
+end
+
+% 
+N=numel(h);
+color=lines(N);
+for n=1:N
+    set(h(n),'Color',color(n,:));
 end
 
 figure(fig);
