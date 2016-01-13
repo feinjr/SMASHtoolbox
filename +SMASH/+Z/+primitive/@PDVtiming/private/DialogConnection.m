@@ -40,12 +40,21 @@ for n=1:N
     ColumnFormat{2}{n+1}=sprintf('%d',object.Diagnostic(n));
 end
 N=numel(object.Digitizer);
+channel=[];
 ColumnFormat{3}=cell(1,N+1);
 ColumnFormat{3}{1}=' ';
 for n=1:N
     ColumnFormat{3}{n+1}=sprintf('%d',object.Digitizer(n));
+    channel=[channel object.DigitizerChannel{n}(:)];
 end
-ColumnFormat{4}='char';
+channel=unique(channel);
+N=numel(channel);
+ColumnFormat{4}=cell(1,N+1);
+ColumnFormat{4}{1}=' ';
+for n=1:N
+    ColumnFormat{4}{n+1}=sprintf('%d',channel(n));
+end
+%ColumnFormat{4}='char';
 ColumnFormat{5}='char';
 set(h(6),'ColumnFormat',ColumnFormat);
 
