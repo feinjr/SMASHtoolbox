@@ -24,7 +24,7 @@ classdef PDVtiming < handle
         MeasurementLabel = {} % Measurment label
     end
     properties
-        MaxConnections = 0 % Maximum number of measurement connections
+        MaxConnections % Maximum number of measurement connections
         DigitizerScaling % Digitizer time scaling [s -> ns]
         DerivativeSmoothing  % Derivative smoothing duration [ns]
         FiducialRange % Optical fiducial search range [ns]
