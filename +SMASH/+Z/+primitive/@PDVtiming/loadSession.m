@@ -129,7 +129,9 @@ if ~isempty(DigitizerChannelTable)
 end
 
 removeConnection(object,'all');
-for n=1:numel(MeasurementLabel)
+M=numel(MeasurementLabel);
+object.MaxConnections=M;
+for n=1:M
     addConnection(object,MeasurementConnection(n,:),MeasurementLabel{n});
 end
 

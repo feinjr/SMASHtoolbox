@@ -28,9 +28,9 @@ hConfig=addblock(dlg,'button',' Configure digitizer(s)');
 set(hConfig,'Callback',{@configureDigitizers,object,dlg});
 setappdata(hConfig,'DigitizerChannel',object.DigitizerChannel);
 
-h=addblock(dlg,'edit','Max. connections:');
-value=sprintf('%d',object.MaxConnections);
-set(h(end),'Callback',@readEditInteger,'String',value,'UserData',value);
+%h=addblock(dlg,'edit','Max. connections:');
+%value=sprintf('%d',object.MaxConnections);
+%set(h(end),'Callback',@readEditInteger,'String',value,'UserData',value);
 
 h=addblock(dlg,'button',{' Done ' ' Cancel '});
 set(h(1),'Callback',@done)
@@ -61,7 +61,7 @@ set(h(1),'Callback',@done)
             object.DigitizerChannel=channel;
             object.DigitizerChannelDelay=delay;
         end
-        object.MaxConnections=sscanf(value{4},'%d');        
+        %object.MaxConnections=sscanf(value{4},'%d');        
         delete(dlg);
     end
 set(h(2),'Callback',@cancel);

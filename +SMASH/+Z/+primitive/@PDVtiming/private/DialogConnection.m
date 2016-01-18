@@ -8,23 +8,66 @@ width=30;
 addblock(dlg,'text','Experiment:',width);
 addblock(dlg,'text',['   ' object.Experiment],width);
 
-h=addblock(dlg,'table',...
+MaxConnections=object.MaxConnections;
+data={};
+hMaxConnect=addblock(dlg,'edit_button',{'Max. connections:',' Apply '});
+value=sprintf('%d',object.MaxConnections);
+set(hMaxConnect(2),'Callback',@readEditInteger,'String',value,'UserData',value);
+set(hMaxConnect(3),'Callback',@applyMaxConnections);
+    function applyMaxConnections(varargin)               
+        MaxConnections=sscanf(get(hMaxConnect(2),'String'),'%d');
+        data=get(hTable(end),'Data');            
+        %
+        if InitializeData
+            M=numel(object.MeasurementLabel);
+            data=cell(M,5);
+            for mm=1:M
+                for nn=1:4
+                    data{mm,nn}=sprintf('%d',object.MeasurementConnection(mm,nn));
+                end
+                data{mm,5}=object.MeasurementLabel{mm};
+            end         
+            InitializeData=false;
+        end        
+        Mdata=size(data,1);
+        if Mdata < MaxConnections
+            data{MaxConnections,5}='';
+             for mm=(Mdata+1):MaxConnections
+                for nn=1:5
+                    data{mm,nn}=' ';
+                end
+             end
+        elseif Mdata > MaxConnections
+            LastEntry=nan;
+            for mm=1:Mdata
+                temp=data(mm,:);
+                temp=strtrim(sprintf('%s ',temp{:}));
+                if ~isempty(temp)
+                    LastEntry=mm;
+                end
+            end
+            if LastEntry>MaxConnections
+                choice=questdlg('This setting will drop connection input',...
+                    'Drop inputs?',' Proceed ',' Cancel ',' Cancel ');
+                choice=strtrim(choice);
+                if strcmpi(choice,'proceed')
+                    % continue
+                else
+                    value=size(get(hTable(end),'Data'),1);
+                    set(hMaxConnect(2),'String',value,'UserData',value);
+                    return
+                end           
+            end
+            data=data(1:MaxConnections,:);
+        end                  
+        set(hTable(end),'Data',data);
+    end
+
+hTable=addblock(dlg,'table',...
     {'Probe' 'Diagnostic' 'Digitizer' 'Channel' 'Measurement'},...
     [5 5 5 5 20],10);
-data=cell(object.MaxConnections,5);
-for n=1:object.MaxConnections
-    if n <= numel(object.MeasurementLabel)
-        for m=1:4
-            data{n,m}=sprintf('%d',object.MeasurementConnection(n,m));
-        end
-        data{n,5}=object.MeasurementLabel{n};
-    else
-        for m=1:5
-            data{n,m}=' ';
-        end
-    end
-end
-set(h(end),'Data',data);
+InitializeData=true;
+applyMaxConnections();
 
 ColumnFormat=cell(1,5);
 N=numel(object.Probe);
@@ -45,7 +88,7 @@ ColumnFormat{3}=cell(1,N+1);
 ColumnFormat{3}{1}=' ';
 for n=1:N
     ColumnFormat{3}{n+1}=sprintf('%d',object.Digitizer(n));
-    channel=[channel object.DigitizerChannel{n}(:)];
+    channel=[channel object.DigitizerChannel{n}(:)]; %#ok<AGROW>
 end
 channel=unique(channel);
 N=numel(channel);
@@ -54,19 +97,10 @@ ColumnFormat{4}{1}=' ';
 for n=1:N
     ColumnFormat{4}{n+1}=sprintf('%d',channel(n));
 end
-%ColumnFormat{4}='char';
 ColumnFormat{5}='char';
-set(h(6),'ColumnFormat',ColumnFormat);
+set(hTable(6),'ColumnFormat',ColumnFormat);
 
-N=numel(object.Digitizer);
-message=cell(1,N);
-for n=1:N
-    message{n}=[sprintf('Digitizer %d:',n) sprintf(' %d',object.DigitizerChannel{n})];   
-end
-message=sprintf('%s\n',message{:});
-set(h(4),'TooltipString',message);
-
-set(h(end),'CellEditCallback',@editTable)
+set(hTable(end),'CellEditCallback',@editTable)
     function editTable(src,eventdata)
         row=eventdata.Indices(1);
         column=eventdata.Indices(2);            
@@ -81,13 +115,13 @@ set(h,'Callback',@verifyConnections);
     function varargout=verifyConnections(varargin)
         message={'Connection problem(s) detected:'};
         data=probe(dlg);
-        data=data{1};
+        data=data{2};       
         % complete test
-        table=nan(object.MaxConnections,4);
-        label=cell(object.MaxConnections,1);
-        missing=zeros(object.MaxConnections,1);
-        keep=true(object.MaxConnections,1);
-        for nc=1:object.MaxConnections
+        table=nan(MaxConnections,4);
+        label=cell(MaxConnections,1);
+        missing=zeros(MaxConnections,1);
+        keep=true(MaxConnections,1);
+        for nc=1:MaxConnections
             for k=1:4
                 temp=sscanf(data{nc,k},'%d');
                 if isempty(temp)
@@ -110,7 +144,7 @@ set(h,'Callback',@verifyConnections);
             elseif (missing(nc)==5)
                 keep(nc)=false;
             else
-                message{end+1}='     -Incomplete connection(s)';
+                message{end+1}='     -Incomplete connection(s)'; %#ok<AGROW>
                 break
             end           
         end
@@ -121,13 +155,13 @@ set(h,'Callback',@verifyConnections);
         for nc=1:N
             m=[1:(nc-1) (nc+1):N];
             if any(table(nc,1)==table(m,1))
-                message{end+1}='     -Repeated connection(s)';
+                message{end+1}='     -Repeated connection(s)'; %#ok<AGROW>
                 break
             elseif any(table(nc,2)==table(m,2))
-                message{end+1}='     -Repeated connection(s)';
+                message{end+1}='     -Repeated connection(s)'; %#ok<AGROW>
                 break
             elseif any((table(nc,3)==table(m,3)) & (table(nc,4)==table(m,4)))
-                message{end+1}='     -Repeated connection(s)';;
+                message{end+1}='     -Repeated connection(s)'; %#ok<AGROW>
                 break
             end
         end        
@@ -137,26 +171,26 @@ set(h,'Callback',@verifyConnections);
             if isnan(table(nc,1)) || any(table(nc,1)==object.Probe)
                 % do nothing
             else
-                message{end+1}=sprintf('     -Invalid connection(s)');
+                message{end+1}=sprintf('     -Invalid connection(s)'); %#ok<AGROW>
                 break
             end
             if isnan(table(nc,2)) || any(table(nc,2)==object.Diagnostic)
                 % do nothing
             else
-                message{end+1}=sprintf('     -Invalid connection(s)');
+                message{end+1}=sprintf('     -Invalid connection(s)'); %#ok<AGROW>
                 break
             end
             if isnan(table(nc,3)) || any(table(nc,3)==object.Digitizer)
                 % do nothing
             else
-                message{end+1}=sprintf('     -Invalid connection(s)');
+                message{end+1}=sprintf('     -Invalid connection(s)'); %#ok<AGROW>
                 break
             end
             if isnan(table(nc,4)) || ...
                     any(table(nc,4)==object.DigitizerChannel{find(object.Digitizer==table(nc,3))})
                 % do nothing
             else
-                message{end+1}=sprintf('     -Invalid connection(s)');
+                message{end+1}=sprintf('     -Invalid connection(s)'); %#ok<AGROW>
                 break
             end
         end
@@ -189,6 +223,7 @@ set(h(1),'Callback',@done)
         keep=~any(isnan(table),2);        
         object.MeasurementConnection=table(keep,:);
         object.MeasurementLabel=label;        
+        object.MaxConnections=MaxConnections;
         delete(dlg);
     end
 set(h(2),'Callback',@cancel);
