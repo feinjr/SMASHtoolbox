@@ -41,7 +41,8 @@ else
     fitData = crop(good ,fitLims);
     W = sigma./sqrt(fitData.Data-baseline+1);
     
-    norm = max(sgolayfilt(fitData.Data-baseline,5,25));
+    fitData = smooth(fitData,'mean',5);
+    norm = max(fitData.Data-baseline);
     
     Data = [fitData.Grid, (fitData.Data-baseline)/norm, W];
     good = good-baseline;
