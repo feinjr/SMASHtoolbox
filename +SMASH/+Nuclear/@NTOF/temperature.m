@@ -1,24 +1,19 @@
 % analyze: Analyze an nTOF object to determine the ion temperature
 %
-% This method analyzes the step wedge image to determine how
-% measured optical density maps to film exposure.
-%     >> object=analyze(object);
-% Analysis must be performed before the apply method can be used.
+% This method analyzes the nTOF object to determine an ion temperature.  A
+% candidate neutron spectrum is generated using a suitable model.  This is
+% propagated through the nTOF instrument model and compared to the data in
+% the nTOF object.  Currently, the neutron spectrum is calculated using the
+% Ballabio analytic formula (see propagatemodel.m for reference).  We plan
+% to support other models in the future.
 %
-% Step wedge analysis several intermediate steps.
-%   -The user is prompted to crop the measurement (if not already done).
-%   -Automatic rotation is applied to orient the measurement.
-%   -Constant regions are identified by transitions of peak slope.
-%   -Median values from each constant region are associated with total
-%   optical density (step value plus offset)
-% Analysis is controlled by various settings (derivative parameters, etc.).
-%  These settings may be adjusted using the "configure" method.
+% Planned improvements:
+%       Enhanced fitting options and statistics
+%       Baseline options (flat, polynomial, exponential, double exp., etc)
+%       Scattering and shielding models
+%       Bias dependent throughput delays
 %
-% See also StepWedge, apply, configure, clean, crop, rotate
-%
-
-%
-% created August 28, 2015 by Daniel Dolan (Sandia National Laboratories)
+% created January 18, 2016 by Patrick Knapp (Sandia National Laboratories)
 %
 function varargout=temperature(object,options)
 %
@@ -46,7 +41,8 @@ else
     fitData = crop(good ,fitLims);
     W = sigma./sqrt(fitData.Data-baseline+1);
     
-    norm = max(sgolayfilt(fitData.Data-baseline,5,25));
+    fitData = smooth(fitData,'mean',5);
+    norm = max(fitData.Data-baseline);
     
     Data = [fitData.Grid, (fitData.Data-baseline)/norm, W];
     good = good-baseline;
