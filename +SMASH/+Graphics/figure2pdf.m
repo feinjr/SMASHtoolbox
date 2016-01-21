@@ -2,6 +2,10 @@
 % figure2pdf 
 function figure2pdf(varargin)
 
+warning('SMASH:Graphics',...
+    'This function is obosete and will be removed in the future');
+fprintf('Use the printFigure function instead\n');
+
 % handle input
 assert(nargin>0,'ERROR: no file name specified');
 filename=varargin{end};
