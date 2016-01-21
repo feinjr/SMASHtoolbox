@@ -59,7 +59,8 @@ if nargout==0
     if isnan(object.Settings.FitSignal)
         
     else
-        disp(cfit)
+        fprintf('Ion Temperature = %f keV\n',cfit.Parameter{1}(2))
+        fprintf('Bang time = %f ns\n',1e9*cfit.Parameter{1}(1))
         figure
         set(gca,'YScale','lin')
         hold all
@@ -69,7 +70,8 @@ if nargout==0
 else
     varargout{1}=object;
     if ~isnan(object.Settings.FitSignal)
-        disp(cfit)
+        fprintf('Ion Temperature = %f keV\n',cfit.Parameter{1}(2))
+        fprintf('Bang time = %f ns\n',1e9*cfit.Parameter{1}(1))
         figure
         set(gca,'YScale','lin')
         hold all

@@ -6,8 +6,8 @@ function [ dNdt ] = propagatemodel( bangtime, temperature , t, options)
 %               Detector - label determining which nTOF location to use
 %               InstrumentResponse - Signal object containing the IRF
 %               BurnWidth - burn duration in seconds
-%               Earray - [Emin, Emax, num. pts] in MeV, for calculating 
-%                        neutron spectrum    
+%               Earray - [Emin, Emax, num. pts] in MeV, for calculating
+%                        neutron spectrum
 %               LightOutput - Signal object containing LO curve vs. energy
 %               Reaction - string to tell what reaction to calc. 'DDn' or
 %               'DT'
@@ -28,17 +28,26 @@ end
 dt = t(2)-t(1);
 % Import IRF
 IRF = options.InstrumentResponse;
-[~,I] = max(IRF.Data);
-IRF = shift(IRF,-IRF.Grid(I));
-
-IRF = scale(IRF,1e-9);
-tIRF = -max(IRF.Grid):dt:max(IRF.Grid);
-IRF_interp = interp1(IRF.Grid,IRF.Data,tIRF,'linear',0);
+if isempty(IRF)
+    tIRF = -10e-9:dt:10e-9;
+    IRF_interp = zeros(size(tIRF));
+    IRF_interp(round(length(tIRF)/2)) = 1;
+else
+    [~,I] = max(IRF.Data);
+    IRF = shift(IRF,-IRF.Grid(I));
+    IRF = scale(IRF,1e-9);
+    tIRF = -max(IRF.Grid):dt:max(IRF.Grid);
+    IRF_interp = interp1(IRF.Grid,IRF.Data,tIRF,'linear',0);
+end
 
 % Define burn history
 BW = options.BurnWidth;
-sigma = BW/2.35482;
-history = exp(-tIRF.^2/2/sigma^2);
+if isempty(BW)
+    history = IRF_interp;
+else
+    sigma = BW/2.35482;
+    history = exp(-tIRF.^2/2/sigma^2);
+end
 
 % Calculate Spectrum
 [Io, Ebin] = Ballabio(temperature,options.Earray,'DDn');
@@ -55,7 +64,11 @@ Energy = cL^2*mn*(gamma-1);
 
 % import LO vs. neutron energy
 LO = options.LightOutput;
-LOI = interp1(1.6022e-13*LO.Grid,LO.Data,Energy);
+if isempty(LO)
+    LOI = ones(size(Energy));
+else
+    LOI = interp1(1.6022e-13*LO.Grid,LO.Data,Energy);
+end
 
 fE = interp1(Ebin*1.6022e-13,Io,Energy,'linear',0);
 temp = conv(fE.*abs(Jacobian).*LOI,IRF_interp,'same');
