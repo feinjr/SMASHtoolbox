@@ -1,13 +1,15 @@
-%% LOOKUP Look up XRD data values at specific grid locations
+% LOOKUP Look up Diffraction data values at specific grid locations
 %
 % This method returns interpolated data values for specified grid
 % locations.
 %    >> z=lookup(object,x,y);
-% See also XRD
+%
+% See also Xray, Diffraction
 %
 
 %
 % created August 27, 2015 by Tommy Ao (Sandia National Laboratories)
+% modified January 21, 2016 by Tommy Ao
 %
 function z=lookup(object,varargin)
 
