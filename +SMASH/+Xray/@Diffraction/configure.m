@@ -1,6 +1,6 @@
-% configure Configure XRD analysis settings
+% configure Configure Diffraction analysis settings
 %
-% This method configures analysis settings in a XRD object.
+% This method configures analysis settings in a Diffraction object.
 % To see the current settings:
 %     >> configure(object); % reveal settings
 % Settings are changed by passing name/value pairs into the method and
@@ -8,11 +8,12 @@
 %     >> object=configure(object,name,value,...); % modify settings in current object
 %     >> new=configure(object,name,value,...); % modified settings stored in new object
 %
-% See also XRD
+% See also Xray, Diffraction
 %
 
 %
 % created August 27, 2015 by Tommy Ao (Sandia National Laboratories)
+% modified January 21, 2016 by Tommy Ao
 %
 function varargout=configure(object,varargin)
 
@@ -21,7 +22,7 @@ Narg=numel(varargin);
 % reveal configuration
 if nargout==0
     if Narg>0
-        warning('SMASH:XRD','Configuration changes ignored in reveal mode');
+        warning('SMASH:Diffraction','Configuration changes ignored in reveal mode');
     end
     % determine label format
     name=fieldnames(object.Settings);
@@ -30,7 +31,7 @@ if nargout==0
     L=max(L,max(cellfun(@numel,name)));
     format=sprintf('\t%%%ds : ',L);
     % print XRD settings
-    fprintf('*** XRD analysis settings ***\n');
+    fprintf('*** Diffraction analysis settings ***\n');
     name=fieldnames(object.Settings);
     name=sort(name);
     for k=1:numel(name);

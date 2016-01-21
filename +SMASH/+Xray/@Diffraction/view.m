@@ -1,18 +1,18 @@
-% view View XRD object graphically
+% view View Diffraction object graphically
 %
-% This method displays XRD objects as Image and Signal plots.  
+% This method displays Diffraction objects as Image and Signal plots.  
 % The default view is the measured Image.
 %     >> view(object);
 %     >> view(object,'Measurement'); % same as above
 % Results can be viewed *after* the analysis method has been used.
 %     >> view(object,'AngularProfile');
-%
 % 
-% See also XRD
+% See also Xray, Diffraction
 %
 
 % 
 % created September 14, 2015 by Tommy Ao (Sandia National Laboratories)
+% modified January 21, 2016 by Tommy Ao
 %
 function varargout=view(object,choice,varargin)
 

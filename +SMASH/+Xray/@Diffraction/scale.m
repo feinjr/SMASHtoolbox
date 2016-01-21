@@ -1,14 +1,15 @@
-% SCALE Multiply an XRD object by a scalar value
+% SCALE Multiply a Diffraction object by a scalar value
 %
 % Usage:
 %   >> object=scal(object,coordinate,value)
 % The "coordinate" input may be 'Grid1' or 'Grid2'.
 %
-% See also XRD, shift
+% See also Xray, Diffraction, shift
 %
 
 %
 % created August 27, 2015 by Tommy Ao (Sandia National Laboratories)
+% modified January 21, 2016 by Tommy Ao
 %
 function object=scale(object,varargin)
 
