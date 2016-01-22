@@ -19,14 +19,14 @@ if ~isempty(SignalLimits)
 end
 
 % create Times menu
-hm=uimenu(fig.Handle,'Label','Times');
+hm=uimenu(fig.Handle,'Label','Signal');
 uimenu(hm,'Label','Save Signal','Callback',@SaveCallback);
 
 Nsig = size(object.Measurement.Data,2);
 hl = zeros(Nsig,1);
 cmap = colormap(lines);
 for i = 1:Nsig
-    hl(i) = line(object.Measurement.Grid,object.Measurement.Data(:,i),'Color',cmap(i,:));
+    hl(i) = line(object.Measurement.Grid,-1*object.Measurement.Data(:,i),'Color',cmap(i,:));
     set(hl(i),'ButtonDownFcn',@SelectCallback)
 end
 
@@ -54,6 +54,7 @@ end
 
 function SaveCallback(src,evnt)
     SignalIndex = temp;
+    object = configure(object,'FitSignal',SignalIndex);
     close(fig.Handle)
 end
 

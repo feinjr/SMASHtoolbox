@@ -92,6 +92,10 @@ for n=1:2:Narg
             assert(isnumeric(value) && numel(value)==2,...
                 'ERROR: Fit limits must have 2 numeric values: [tmin, tmax]');
             object.Settings.FitLimits=value;
+        case 'fitsignal'
+            assert(isnumeric(value),...
+                'ERROR: Fit Signal must be an integer value');
+            object.Settings.FitSignal=value;
     end
  
 end

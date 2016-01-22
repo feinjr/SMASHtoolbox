@@ -29,7 +29,7 @@ classdef NTOF
             p.SignalLimits = [];        %   Limits of entire signal of interest
             p.NoiseLimits = [];         %   Limits to use for analyzing signal noise and baseline
             p.FitLimits = [];           %   Limits to use for fitting of signal
-            p.FitSignal = 1;            %   index telling which signal to use for fitting
+            p.FitSignal = [];            %   index telling which signal to use for fitting
             p.Fit = [];                 %   fit object containing bets fit
             p.Reaction = 'DDn';         %   Nuclear reaction to be modeled
             p.Earray = [1.5, 3, 500];   %   Emin, Emax and Num pts for calculating the neutron spectrum

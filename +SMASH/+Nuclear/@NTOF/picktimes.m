@@ -19,7 +19,7 @@ ylabel('Signal');
 xlabel('Time')
 
 if ~isnan(SignalLimits)
-   set(ax1,'XLim',SignalLimits) 
+    set(ax1,'XLim',SignalLimits)
 end
 
 % create Times menu
@@ -29,10 +29,14 @@ uimenu(hm,'Label','Select Noise Limits','Callback',@SelectNoise);
 uimenu(hm,'Label','Select Fit Limits','Callback',@SelectFit);
 uimenu(hm,'Label','Save Limits','Callback',@SaveTimes);
 
-Nsig = size(object.Measurement.Data,2);
-cmap = colormap(lines);
-for i = 1:Nsig
-    line(object.Measurement.Grid,-1*object.Measurement.Data(:,i),'Color',cmap(i,:));
+if isempty(object.Settings.FitSignal)
+    Nsig = size(object.Measurement.Data,2);
+    cmap = colormap(lines);
+    for i = 1:Nsig
+        line(object.Measurement.Grid,-1*object.Measurement.Data(:,i),'Color',cmap(i,:));
+    end
+else
+    line(object.Measurement.Grid,-1*object.Measurement.Data(:,object.Settings.FitSignal),'Color','b'); 
 end
 y = get(ax1,'YLim');
 
@@ -50,48 +54,48 @@ fig.Hidden = false;
 waitfor(fig.Handle)
 
 object = configure(object,  'SignalLimits',SignalLimits,...
-                            'NoiseLimits',NoiseLimits,...
-                            'FitLimits',FitLimits);
+    'NoiseLimits',NoiseLimits,...
+    'FitLimits',FitLimits);
 %% Callbacks
-function SelectSignal(src,varargin)
-    
-    axes(ax1);
-    y = get(ax1,'YLim');
-    [xw, ~] = ginput(2);
-    set(hS1,'XData',[xw(1) xw(1)]);
-    set(hS2,'XData',[xw(2) xw(2)]);
-    
-    SignalLimits = xw';
+    function SelectSignal(src,varargin)
+        
+        axes(ax1);
+        y = get(ax1,'YLim');
+        [xw, ~] = ginput(2);
+        set(hS1,'XData',[xw(1) xw(1)]);
+        set(hS2,'XData',[xw(2) xw(2)]);
+        
+        SignalLimits = xw';
+        
+    end
+    function SelectNoise(src,varargin)
+        
+        axes(ax1);
+        y = get(ax1,'YLim');
+        [xw, ~] = ginput(2);
+        set(hN1,'XData',[xw(1) xw(1)]);
+        set(hN2,'XData',[xw(2) xw(2)]);
+        
+        NoiseLimits = xw';
+        
+    end
+    function SelectFit(src,varargin)
+        
+        axes(ax1);
+        y = get(ax1,'YLim');
+        [xw, ~] = ginput(2);
+        set(hF1,'XData',[xw(1) xw(1)]);
+        set(hF2,'XData',[xw(2) xw(2)]);
+        
+        FitLimits = xw';
+        
+    end
 
-end
-function SelectNoise(src,varargin)
-    
-    axes(ax1);
-    y = get(ax1,'YLim');
-    [xw, ~] = ginput(2);
-    set(hN1,'XData',[xw(1) xw(1)]);
-    set(hN2,'XData',[xw(2) xw(2)]);
-    
-    NoiseLimits = xw';
-
-end
-function SelectFit(src,varargin)
-    
-    axes(ax1);
-    y = get(ax1,'YLim');
-    [xw, ~] = ginput(2);
-    set(hF1,'XData',[xw(1) xw(1)]);
-    set(hF2,'XData',[xw(2) xw(2)]);
-    
-    FitLimits = xw';
-
-end
-
-function SaveTimes(src,varargin)
-    SignalLimits = sort(SignalLimits);
-    NoiseLimits = sort(NoiseLimits);
-    FitLimits = sort(FitLimits);
-    close(fig.Handle)
-end
+    function SaveTimes(src,varargin)
+        SignalLimits = sort(SignalLimits);
+        NoiseLimits = sort(NoiseLimits);
+        FitLimits = sort(FitLimits);
+        close(fig.Handle)
+    end
 
 end

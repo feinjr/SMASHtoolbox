@@ -35,7 +35,7 @@ cfit = SMASH.CurveFit.Curve;
 basis = @(p,t) propagatemodel( p(1), p(2) , t, options);
 cfit = add(cfit,basis,InitialGuess,'lower',[3.1e-6, 0.5],'upper',[3.13e-6, 4],'scale',1.0,'fixscale',false);
 
-if isnan(object.Settings.FitSignal)
+if isempty(object.Settings.FitSignal)
     %do nothing
 else
     good = SMASH.SignalAnalysis.Signal(object.Measurement.Grid,object.Measurement.Data(:,sigIdx)/min(object.Measurement.Data(:,sigIdx)));
@@ -67,7 +67,7 @@ if nargout==0
         
     else
         fprintf('Ion Temperature = %f keV\n',cfit.Parameter{1}(2))
-        fprintf('Bang time = %f ns\n',1e9*cfit.Parameter{1}(1))
+        fprintf('Bang time = %f ns\n\n',1e9*cfit.Parameter{1}(1))
         figure
         set(gca,'YScale','lin')
         hold all
@@ -78,7 +78,7 @@ else
     varargout{1}=object;
     if ~isnan(object.Settings.FitSignal)
         fprintf('Ion Temperature = %f keV\n',cfit.Parameter{1}(2))
-        fprintf('Bang time = %f ns\n',1e9*cfit.Parameter{1}(1))
+        fprintf('Bang time = %f ns\n\n',1e9*cfit.Parameter{1}(1))
         figure
         set(gca,'YScale','lin')
         hold all
