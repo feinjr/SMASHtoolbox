@@ -99,7 +99,7 @@ for n=1:2:Narg
         case {'ybound' 'ylim'}
             object.YBound=value;
         case 'position'
-            object.Posiiton=value;
+            object.Position=value;
         otherwise
             fprintf('Ignoring unrecognized name "%s"\n',name);
     end
