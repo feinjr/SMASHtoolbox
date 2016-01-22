@@ -15,7 +15,7 @@
 %
 % created January 18, 2016 by Patrick Knapp (Sandia National Laboratories)
 %
-function varargout=temperature(object,options)
+function varargout=measureTemperature(object,InitialGuess)
 %
 p = object.Settings;
 
@@ -23,8 +23,14 @@ signalLims = p.SignalLimits;        %   Limits of entire signal of interest
 noiseLims = p.NoiseLimits;         %   Limits to use for analyzing signal noise and baseline
 fitLims = p.FitLimits;           %   Limits to use for fitting of signal
 sigIdx = p.FitSignal;            %   index telling which signal to use for fitting
-InitialGuess = options.Guess;
 
+options = struct(   'InstrumentResponse',   p.InstrumentResponse,...
+                    'LightOutput',          p.LightOutput,...
+                    'BurnWidth',            p.BurnWidth,...
+                    'Earray',               p.Earray,...
+                    'Reaction',             p.Reaction,...
+                    'Location',             p.Location...
+                    );                
 cfit = SMASH.CurveFit.Curve;
 basis = @(p,t) propagatemodel( p(1), p(2) , t, options);
 cfit = add(cfit,basis,InitialGuess,'lower',[3.1e-6, 0.5],'upper',[3.13e-6, 4],'scale',1.0,'fixscale',false);

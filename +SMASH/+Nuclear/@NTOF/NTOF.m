@@ -28,9 +28,11 @@ classdef NTOF
             p.BurnWidth = [];           %   Burn width in seconds (estimate from x-rays)
             p.SignalLimits = [];        %   Limits of entire signal of interest
             p.NoiseLimits = [];         %   Limits to use for analyzing signal noise and baseline
-            p.FitLimits = [];           %   Limits to use for fitting of signal   
+            p.FitLimits = [];           %   Limits to use for fitting of signal
             p.FitSignal = 1;            %   index telling which signal to use for fitting
             p.Fit = [];                 %   fit object containing bets fit
+            p.Reaction = 'DDn';         %   Nuclear reaction to be modeled
+            p.Earray = [1.5, 3, 500];
             object.Settings=p;
             
             % manage input
@@ -78,7 +80,14 @@ classdef NTOF
                         temp = GrabSignals(fileName,{'NTFBTA02MSH ','NTFBTB02MSH ','NTFBTA03MSH ','NTFBTB03MSH ','NTFBTC03MSH '});
                         p.Distance = 786;
                         p.Location = 'Bottom, 8 m';
-                        
+                    case '8 m 1'
+                        temp = GrabSignals(fileName,{'NTFBTA02MSH ','NTFBTB02MSH '});
+                        p.Distance = 786;
+                        p.Location = 'Bottom, 8 m 1';
+                    case '8 m 2'
+                        temp = GrabSignals(fileName,{'NTFBTA03MSH ','NTFBTB03MSH ','NTFBTC03MSH '});
+                        p.Distance = 786;
+                        p.Location = 'Bottom, 8 m 2';
                 end
                 object.Measurement = temp;
             else
@@ -94,7 +103,6 @@ classdef NTOF
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
-        varargout=store(varargin);
     end
     %% setters
     methods
@@ -105,7 +113,7 @@ classdef NTOF
         end
         function object=set.Settings(object,value)
             assert(isstruct(value),...
-                'ERROR: Measurement property must be a Signal or SignalGroup object');
+                'ERROR: Settings must be a Structure');
             object.Settings=value;
         end
     end

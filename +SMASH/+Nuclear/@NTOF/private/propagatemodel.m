@@ -12,16 +12,16 @@ function [ dNdt ] = propagatemodel( bangtime, temperature , t, options)
 %               Reaction - string to tell what reaction to calc. 'DDn' or
 %               'DT'
 %%
-switch options.Detector
-    case '7 m'
+switch options.Location
+    case 'Bottom, 7 m'
         d = 6.896;
-    case '8 m'
+    case 'Bottom, 8 m'
         d = 7.86;
-    case '9 m'
+    case 'LOS270, 9 m'
         d = 9.44;
-    case '11 m'
+    case 'LOS270, 11 m'
         d = 11.46;
-    case '25 m'
+    case 'LOS50, 25 m'
         d = 25.1;
 end
 
@@ -50,14 +50,14 @@ else
 end
 
 % Calculate Spectrum
-[Io, Ebin] = Ballabio(temperature,options.Earray,'DDn');
+[Io, Ebin] = Ballabio(temperature,options.Earray,options.Reaction);
 
 % detector properties
 cL = 2.99792458e8; %speed of light
 tL = d/cL;
 mn = 1.6749286e-27; %neutron mass in kg
 
-beta = tL./(t-bangtime-0*25e-9);
+beta = tL./(t-bangtime);
 gamma = 1./sqrt(1-beta.^2);
 Jacobian = (mn/tL)*gamma.^3.*beta.^3;
 Energy = cL^2*mn*(gamma-1);
