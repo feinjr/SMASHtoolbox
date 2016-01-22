@@ -66,11 +66,18 @@ for n=1:2:Narg
             assert(ischar(value),...
                 'ERROR: invalid file name for light output data');
             LO = SMASH.SignalAnalysis.Signal(value,'column');
+            LO.GridLabel = 'Neutron Energy [MeV]';
+            LO.DataLabel = 'Relative Light Yield';
+            LO.GraphicOptions.Title = 'Scintillator Light Output';
+            
             object.Settings.LightOutput=LO;
         case 'instrumentresponse'
             assert(ischar(value),...
                 'ERROR: invalid file name for instrument response function');
             irf = SMASH.SignalAnalysis.Signal(value,'column');
+            irf.GridLabel = 'Time [ns]';
+            irf.DataLabel = 'Response';
+            irf.GraphicOptions.Title = 'Instrument Response Function';
             object.Settings.InstrumentResponse=irf;
         case 'reaction'
             assert(ischar(value),...
@@ -97,7 +104,7 @@ for n=1:2:Narg
                 'ERROR: Fit Signal must be an integer value');
             object.Settings.FitSignal=value;
     end
- 
+    
 end
 varargout{1}=object;
 

@@ -79,11 +79,6 @@ else
     if ~isnan(object.Settings.FitSignal)
         fprintf('Ion Temperature = %f keV\n',cfit.Parameter{1}(2))
         fprintf('Bang time = %f ns\n\n',1e9*cfit.Parameter{1}(1))
-        figure
-        set(gca,'YScale','lin')
-        hold all
-        plot(good.Grid,good.Data)
-        plot(t,evaluate(cfit,t))
     end
 end
 

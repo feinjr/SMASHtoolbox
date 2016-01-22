@@ -42,6 +42,10 @@ function SelectCallback(src,evnt)
       case 'normal'
          set(src,'Selected','on','LineWidth',2)    
          temp = find(hl == src);
+         nottemp = find(hl~=src);
+         for j = 1:numel(nottemp)
+            set(hl(nottemp(j)),'Selected','off','LineWidth',0.5)     
+         end
       case 'extend'
          set(src,'Selected','off','LineWidth',0.5)
          temp = SignalIndex;

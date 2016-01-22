@@ -36,7 +36,7 @@ elseif Narg == 1
 end
 
 if nargout>=1
-    varargout{1}=h;
+    varargout{1}=gca;
 end
 
 end
