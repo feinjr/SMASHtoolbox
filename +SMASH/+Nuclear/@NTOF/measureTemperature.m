@@ -52,12 +52,13 @@ else
     
     Data = [fitData.Grid, (fitData.Data-baseline)/norm, W];
     good = good-baseline;
-    good = good/max(good.Data);
+    good = good/norm;
     
     t = linspace(signalLims(1),signalLims(2),1e4);
     cfit=fit(cfit,Data);
     object.Settings.BangTime = cfit.Parameter{1}(1);
     object.Settings.Fit = cfit;
+    object.Settings.FinalSignal = good;
 end
 
 % handle output

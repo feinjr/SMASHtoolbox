@@ -17,6 +17,10 @@ switch options.Location
         d = 6.896;
     case 'Bottom, 8 m'
         d = 7.86;
+    case 'Bottom, 8 m 1'
+        d = 7.86;
+    case 'Bottom, 8 m 2'
+        d = 7.86;
     case 'LOS270, 9 m'
         d = 9.44;
     case 'LOS270, 11 m'
