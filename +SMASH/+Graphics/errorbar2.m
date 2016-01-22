@@ -1,7 +1,38 @@
-% errorbar2     : Two dimensional error bar generator
-% errobar2(x,y,dx,dy,hx,hy,options)
+% errorbar2 Generate two-dimensional error bars
+%
+% This function generates two dimensional error bars.
+%    errorbar2(x,y,dx,dy,hx,hy)
+% The first four inputs ("x", "y", "dx", and "dy") are needed to define the
+% error bar location and sizes.  Option inputs "hx" and "hy" control the
+% fractional size of the boudnaries, e.g. the horizontal/vertical exent of
+% the line orthogonal to the vertical/horizontal error bar. 
+%
+% Line options may be passed as name/value pairs at the
+% end of the above inputs.  For exapmle, line color may be changed as
+% follows.
+%    errorbar(...,'Color','k');
+% All line properties can be changed in a error bar, but the marker
+% property should be left at 'none'.  Data markers should be generated
+% separately from the error bar.
+%    plot(x,y);
+%    errorbar(x,y,dx,dy);
+% Error bars are generated in the current axes without clearning---it is
+% not necessary to "hold" the axes beforehand.
+%
+% Specifying an output:
+%    h=errorbar(...);
+% returns a graphic handle to the error bar.  Although error bars appear as
+% separate entitiies for each (x,y) value, they are actually rendered as a
+% single line with NaN separators.
+%
+% See also Graphics
 % 
-function errorbar2(x,y,dx,dy,hx,hy,varargin)
+
+%
+% created January 22, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
+function varargout=errorbar2(x,y,dx,dy,hx,hy,varargin)
+
 if nargin<3
    error('Invalid number of arguments')
 end
@@ -62,4 +93,17 @@ xerr(jj+16)=x(ii)+dx(ii);yerr(jj+16)=y(ii)-hy(ii);
 xerr(jj+17)=NaN;yerr(jj+17)=NaN;
 
 % plot 2D error bars
-plot(xerr,yerr,varargin{:});
+%h=plot(xerr,yerr,varargin{:});
+h=line(xerr,yerr,'Color','k');
+try
+    if numel(varargin)>0
+        set(h,varargin{:});
+    end
+catch
+    error('ERROR: invalid line setting(s)');
+end
+
+% manage output
+if nargout>0
+    varargout{1}=h;
+end

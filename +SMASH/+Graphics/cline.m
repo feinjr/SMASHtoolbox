@@ -4,13 +4,18 @@
 % Two-dimensional lines are created
 %     >> cline(x,y,color);
 %     >> cline(x,y,color,name,value,...);
+% The third input ("z") must either be a scalar or an array with the same
+% number of elements as "x" and "y".  
 %
-% Three dimensional lines
+% Three dimensional lines are also suported
 %     >> cline(x,y,z,color);
 %     >> cline(x,y,z,color,name,value,...);
+%
+% See also Graphics
+%
 
 %
-%
+% created January 22, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 function varargout=cline(x,y,varargin)
 

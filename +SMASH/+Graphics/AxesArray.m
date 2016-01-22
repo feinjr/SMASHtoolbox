@@ -51,22 +51,21 @@ y0=pos(2);
 delete(gca);
 
 % create axes
-kk=1;
+ha=nan(M,N);
 for ii=1:M
     yk=y0+(M-ii)*Ly;
     xk=x0;
     for jj=1:N
-        ha(kk)=axes('Position',[xk yk Lx Ly],'Box','on',...
+        ha(ii,jj)=axes('Position',[xk yk Lx Ly],'Box','on',...
             'XTickLabel','','XTickLabelMode','manual',...
             'YTickLabel','','YTickLabelMode','manual');
         if jj==1
-            set(ha(kk),'YTickLabelMode','auto');
+            set(ha(ii,jj),'YTickLabelMode','auto');
         end
         if ii==M
-            set(ha(kk),'XTickLabelMode','auto');
+            set(ha(ii,jj),'XTickLabelMode','auto');
         end
-        xk=xk+Lx;
-        kk=kk+1;
+        xk=xk+Lx;  
     end
 end
 
