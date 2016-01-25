@@ -12,22 +12,7 @@ function [ dNdt ] = propagatemodel( bangtime, temperature , t, options)
 %               Reaction - string to tell what reaction to calc. 'DDn' or
 %               'DT'
 %%
-switch options.Location
-    case 'Bottom, 7 m'
-        d = 6.896;
-    case 'Bottom, 8 m'
-        d = 7.86;
-    case 'Bottom, 8 m 1'
-        d = 7.86;
-    case 'Bottom, 8 m 2'
-        d = 7.86;
-    case 'LOS270, 9 m'
-        d = 9.44;
-    case 'LOS270, 11 m'
-        d = 11.46;
-    case 'LOS50, 25 m'
-        d = 25.1;
-end
+d = 1e-2*options.Distance;
 
 dt = t(2)-t(1);
 % Import IRF
@@ -57,7 +42,7 @@ end
 [Io, Ebin] = Ballabio(temperature,options.Earray,options.Reaction);
 
 % detector properties
-cL = 2.99792458e8; %speed of light
+cL = 2.99792458e8; %speed of light in m/s
 tL = d/cL;
 mn = 1.6749286e-27; %neutron mass in kg
 

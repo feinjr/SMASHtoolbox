@@ -9,7 +9,7 @@ classdef NTOF
     properties
         Measurement % nTOF measurement (SignalGroup object)
     end
-    properties %(SetAccess=protected)
+    properties (SetAccess=protected)
         Settings % Analysis settings (structure)d
     end
     %%
