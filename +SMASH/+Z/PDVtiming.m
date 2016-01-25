@@ -10,19 +10,17 @@
 %
 % created December 22, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=PDVtiming(filename,fontsize)
+function varargout=PDVtiming(filename)
 
 % manage input
 if nargin<1
     filename='';
 end
 
-if nargin<2
-    fontsize=12;
-end
-SMASH.System.setDefaultFontSize(fontsize);
-
 % create object
+if isdeployed
+    SMASH.Graphics.setFontSize(1/60);
+end
 object=SMASH.Z.primitive.PDVtiming(filename,'gui');
 
 % manage output
