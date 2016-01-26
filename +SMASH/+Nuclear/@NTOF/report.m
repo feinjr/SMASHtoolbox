@@ -64,6 +64,12 @@ if Narg == 6
     
     Tstats = PlotMeanStd(Tion,ax2);
     BTstats = PlotMeanStd(bangtime-3000,ax3);
+    
+    text(3.66e-6, 0.8,sprintf('$T_i=%3.1f~+/- %3.1f$ keV',Tstats(1),Tstats(2)),...
+    'Interpreter','latex','Parent',ax1,'FontSize',12)
+    text(3.66e-6, 0.7,sprintf('$t_{bang}=%3.1f~+/- %3.1f$ ns',BTstats(1)+3000,BTstats(2)),...
+    'Interpreter','latex','Parent',ax1,'FontSize',12)
+
 end
 if nargout == 2
    varargout{1} = Tstats;

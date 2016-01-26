@@ -103,6 +103,10 @@ for n=1:2:Narg
             assert(isnumeric(value),...
                 'ERROR: Fit Signal must be an integer value');
             object.Settings.FitSignal=value;
+        case 'finalsignal'
+            assert(isobject(value),...
+                'ERROR: Final Signal must be a signal object');
+            object.Settings.FinalSignal=value;
     end
     
 end
