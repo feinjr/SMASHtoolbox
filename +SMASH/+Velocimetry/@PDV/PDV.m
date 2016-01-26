@@ -77,7 +77,7 @@ classdef PDV
                 'ERROR: Measurement property must be a STFT object');
             object.Measurement=value;
         end
-        function object=set.Preview(object,value)
+        function object=set.Preview(object,value)   
             assert(isa(value,'SMASH.ImageAnalysis.Image'),...
                 'ERROR: Preview property must be an Image object');
             object.Preview=value;
