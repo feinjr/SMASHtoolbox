@@ -1,9 +1,15 @@
 %
 %   This class is used to grab signals from ZDAS files and put them in a
-%   signalgroup object.
-%
-%
-%
+%   signalgroup object stored in object.Measurement.  The 
+%   Measurement.Legend property contains a cell array of the signal names as
+%   stored in the DAS file.
+%   
+%   Call ZSignals using the following syntax
+%   
+%   obj = SMASH.Z.ZSignals(shotNum, signalType, ...);
+%       signalType can be 'PCD','SID','NTOF','Current'
+%       the first variable input is a format string '.pff' or '.hdf'.  If
+%       no string is supplied it will assume .pff
 % created January 25, 2016 by Patrick Knapp (Sandia National Laboratories)
 %
 classdef ZSignals
@@ -16,7 +22,7 @@ classdef ZSignals
         function object=ZSignals(shot,varargin)
             % manage input
             if (nargin==1)
-                % Need to prompt to choose a signal
+                % Need to prompt to choose a signal.  Under development
             elseif ( nargin>2 ) && ischar(varargin{1})  && ischar(varargin{2})
                 signal = varargin{1};
                 format = varargin{2};

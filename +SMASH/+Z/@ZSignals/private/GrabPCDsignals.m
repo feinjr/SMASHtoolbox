@@ -7,6 +7,8 @@ switch LOS
         sName = 'PCD05';
     case '210'
         sName = 'PCD21';
+    otherwise
+        sName = 'PCD';
 end
 switch format
     case '.pff'

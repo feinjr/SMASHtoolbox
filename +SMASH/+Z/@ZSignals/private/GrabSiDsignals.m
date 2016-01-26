@@ -7,6 +7,8 @@ switch LOS
         sName = 'SID05';
     case '210'
         sName = 'SID21';
+    otherwise
+        sName = 'SID';
 end
 switch format
     case '.pff'

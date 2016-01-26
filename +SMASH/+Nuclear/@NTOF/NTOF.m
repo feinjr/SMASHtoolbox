@@ -29,7 +29,7 @@ classdef NTOF
             p.SignalLimits = [];        %   Limits of entire signal of interest
             p.NoiseLimits = [];         %   Limits to use for analyzing signal noise and baseline
             p.FitLimits = [];           %   Limits to use for fitting of signal
-            p.FitSignal = [];            %   index telling which signal to use for fitting
+            p.FitSignal = [];           %   index telling which signal to use for fitting
             p.Fit = [];                 %   fit object containing bets fit
             p.Reaction = 'DDn';         %   Nuclear reaction to be modeled
             p.Earray = [1.5, 3, 500];   %   Emin, Emax and Num pts for calculating the neutron spectrum
@@ -55,7 +55,7 @@ classdef NTOF
             % Pass a shot number, and a detector ID, NTOF will create the
             % object from PFF file
             elseif ( nargin>0 ) && isnumeric(varargin{1})  && ischar(varargin{2})
-                temp = SMASH.Z.ZSignals(varargin{1}, 'NTF', '.pff',varargin{2});
+                temp = SMASH.Z.ZSignals(varargin{1}, 'NTOF', '.pff',varargin{2});
                 switch varargin{2}
                     case {'25 m', '25m', 'LOS50'}
                         p.Distance = 2510;

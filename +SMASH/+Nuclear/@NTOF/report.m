@@ -62,13 +62,21 @@ if Narg == 6
             'Parent',ax1)
     end
     
-    PlotMeanStd(Tion,ax2);
-    PlotMeanStd(bangtime-3000,ax3);
+    Tstats = PlotMeanStd(Tion,ax2);
+    BTstats = PlotMeanStd(bangtime-3000,ax3);
 end
-if numel(varargout) == 1
-    varargout = gcf;
+if nargout == 2
+   varargout{1} = Tstats;
+   varargout{2} = BTstats + 3000;
+else
+if nargout == 3
+   varargout{1} = Tstats;
+   varargout{2} = BTstats + [3000, 0];
+   varargout{3} = [ax1, ax2, ax3];
+    
 end
-    function PlotMeanStd(vals, ax)
+end
+    function stats = PlotMeanStd(vals, ax)
         meanval = mean(vals);
         sigmaval = std(vals);
         xvals = get(ax,'XLim');
@@ -77,5 +85,7 @@ end
         line(xvals,[meanval meanval],'Color','k','Parent',ax)
         line(xvals,[meanval+sigmaval meanval+sigmaval],'Color','k','LineStyle','--','Parent',ax)
         line(xvals,[meanval-sigmaval meanval-sigmaval],'Color','k','LineStyle','--','Parent',ax)
+        
+        stats = [meanval sigmaval];
     end
 end
