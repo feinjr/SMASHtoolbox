@@ -6,13 +6,13 @@
 % internal parameters are determined via iterative optimization.  External
 % parameters are determined with non-iterative, linear least=squares method
 % or left fixed.
-% 
+%
 % Curve objects are created with no input arguments.
 %     >> object=Curve;
 % Basis functions in the object are controlled with the add, edit, and
 % remove methods.  The summarize and evaluate methods describe the current
 % object state.  Parameter optimization is provided with the fit method.
-% 
+%
 % See also CurveFit, makeBackground, makePeak, makeStep
 %
 
@@ -32,5 +32,9 @@ classdef Curve
     methods (Hidden=true)
         function object=Curve(varargin)
         end
+    end
+    %%
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
     end
 end
