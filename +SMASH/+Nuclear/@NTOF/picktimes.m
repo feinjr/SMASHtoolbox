@@ -13,7 +13,7 @@ fig.Name = 'pickTimes GUI';
 set(fig.Handle,'Tag','pickTimesGUI');
 set(fig.Handle,'Units','normalized');
 set(fig.Handle,'Position',[0.05 0.05 .75 .8]);
-set(fig.Handle,'Toolbar','figure');
+% set(fig.Handle,'Toolbar','figure');
 ax1=axes('Parent',fig.Handle,'Units','normalized','OuterPosition',[0.1 0.1 0.8 0.8]);
 ylabel('Signal');
 xlabel('Time')
