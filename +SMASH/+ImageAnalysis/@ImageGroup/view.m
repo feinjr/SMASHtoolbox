@@ -1,30 +1,90 @@
-% VIEW View ImageGroup Data
+% VIEW ImageGroup visualization
 %
-% This is a temporary method that opens the designated individual Image from the
-% provided ImageGroup in a separate window.
+% This method provides several types of visualization for ImageGroup objects.
+% By default:
+%    >> view(object);
+% the objected is displayed as a mosaic of images in a new figure; a graphic
+% handle can be passed to render the image in a specific location.
+%    >> view(object,mode,gca); % show in current axes
+% The standard view shows the image with a colorbar and uses labels
+% specified in the object.
 %
-% view(object,ImageNumber);
+% A single image from the group can be selected
+% by passing that image number in the 'mode' field.
+%    >> view(object,imageNumber); % create new figure
+%    >> view(object,imageNumber,fig); % draw in exiting figure
+% The detail region can be moved by clicking on the full image or by
+% pressing the direction keys.  To change the size of this region, press a
+% direction key while holding down the shift key.
+%
+%
+% In all cases, graphic handles created by the method are
+% returned as a structure.
+%    >> h=view(...);
 % 
 % See also ImageGroup
-%
 
 %
-% created January 12, 2016 by Sean Grant (Sandia National Laboratories/UT)
+% created November 25 2013 by Daniel Dolan (Sandia National Laboratories)
+% created January 28, 2016 by Sean Grant (Sandia Natinal Laboratories/UT)
 %
-function varargout=view(object,varargin)
+%function varargout=view(object,mode,varargin)
+function varargout=view(object,mode,target)
 
 % verify uniform grid
-% object=makeGridUniform(object);
+object=makeGridUniform(object);
 
-% assert(1<=varargin{1}&&varargin{1}<=object.NumberImages,'invalid Image number selection')
-
-if(nargin<2)
-    temp=SMASH.ImageAnalysis.Image(object.Grid1,object.Grid2,object.Data(:,:,1));
-else
-    assert(1<=varargin{1}&&varargin{1}<=object.NumberImages,'invalid Image number selection')
-    temp=SMASH.ImageAnalysis.Image(object.Grid1,object.Grid2,object.Data(:,:,varargin{1}));
+% handle input
+frameNumber=1;
+if (nargin<2) || isempty(mode)
+    mode='mosaic';
+elseif isnumeric(mode)
+    frameNumber=mode;
+    mode='single';
 end
 
-varargout=view(temp);
+assert(ischar(mode),'ERROR: invalid mode');
+mode=lower(mode);
+switch mode
+    case {'mosaic','single','detail'}
+        % do nothing
+    otherwise
+        error('ERROR: invalid view mode');
+end
+
+if nargin<3
+    target=[];
+end
+
+% call the appropriate method
+if ~isreal(object.Data)
+    assert(strcmp(mode,'show'),'ERROR: %s mode requires real Data',mode);
+    object.DataScale='linear';
+    object.DataLim='auto';
+    name=object.GraphicOptions.Title;
+    data=object.Data;
+    h=basic_figure;
+    set(h.figure,'Name','Complex Image view');
+    ha(1)=subplot(1,2,1);
+    object.Data=real(data);   
+    object.GraphicOptions.Title=sprintf('Real part of "%s"',name);
+    show(object,ha(1));
+    ha(2)=subplot(1,2,2);
+    object.Data=imag(data);
+    object.GraphicOptions.Title=sprintf('Imaginary part of "%s"',name);
+    show(object,ha(2));   
+    linkaxes(ha,'xy');
+elseif strcmp(mode,'mosaic')
+        h=showMosaic(object,target);
+elseif strcmp(mode,'single')
+        h=showSingle(object,frameNumber);
+elseif strcmp(mode,'detail')
+        h=detail(object,target);    
+end
+
+% handle output
+if nargout>=1
+    varargout{1}=h;
+end
 
 end

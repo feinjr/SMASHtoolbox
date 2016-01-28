@@ -54,7 +54,7 @@ N=numel(temp);
 x1=grid1Min:dt1:grid1Max;
 x2=grid2Min:dt2:grid2Max;
 
-Data=nan(numel(x1),numel(x2),N);
+Data=nan(numel(x2),numel(x1),N);
 for n=1:N
     temp{n}=regrid(temp{n},x1,x2); %#ok<AGROW>
     Data(:,:,n)=temp{n}.Data;

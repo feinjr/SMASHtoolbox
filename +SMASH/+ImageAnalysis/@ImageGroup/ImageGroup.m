@@ -36,10 +36,15 @@ classdef ImageGroup < SMASH.ImageAnalysis.Image
         end
     end
     %% protected methods
+     methods (Access=protected,Hidden=true)
+        varargout=showSingle(varargin);
+        varargout=showMosaic(varargin);
+    end
     methods (Access=protected)
         varargout=create(varargin);
         varargout=import(varargin);
     end
+    
     %% set methods
     methods
         function object=set.Legend(object,value)

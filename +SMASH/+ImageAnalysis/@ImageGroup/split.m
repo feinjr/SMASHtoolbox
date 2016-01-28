@@ -4,7 +4,7 @@
 % objects.
 %    >> [object1,object2,...]=split(object)
 %
-% See also SignalGroup, gather
+% See also ImageGroup, gather
 %
 
 %
