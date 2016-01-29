@@ -26,7 +26,7 @@ switch data.Format
             object.Grid=data(:,1);
             object.Data=data(:,2:end);
         end             
-    case {'agilent','keysight','lecroy','tektronix','yokogawa'}
+    case {'agilent','keysight','lecroy','tektronix','yokogawa','zdas'}
         object.Grid=data.Time;
         object.Data=data.Signal;
     case 'dig'

@@ -75,7 +75,8 @@ if new
     ylabel(target,object.DataLabel);
     apply(object.GraphicOptions,h);
     if ~isempty(object.Legend)
-        legend(object.Legend(index),'Location','best');
+        legend(object.Legend(index),...
+            'Interpreter','none','Location','best');
     end
     box on;
 else

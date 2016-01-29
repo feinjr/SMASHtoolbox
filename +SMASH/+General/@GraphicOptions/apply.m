@@ -66,7 +66,15 @@ switch type
         set(target,'Box',object.Box);
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
-        title(target,object.Title);
+        if ~isempty(object.Title)
+            title(target,object.Title);
+            % this is apparently quite slow in 2015a if there are lots of
+            % objects, so we might as well skip it if possible
+            %ht=get(target,'Title');
+            %set(ht,'String',object.Title);
+            %text('Parent',target,'Units','normalized','Position',[0.5 1],...
+            %    'String',object.Title);            
+        end       
     case 'uipanel'
         set(target,'BackgroundColor',object.PanelColor);
     case 'figure'
