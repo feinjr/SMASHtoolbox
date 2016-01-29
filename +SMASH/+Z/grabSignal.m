@@ -66,15 +66,14 @@ assert(iscellstr(varargin),'ERROR: invalid signal label(s)');
 tempfile=sprintf('.tempfileZ%d%s',shot,extension);
 tempfile=fullfile(pwd,tempfile);
 sourcefile=sprintf('pbfa2z_%d%s',shot,extension);
-switch lower(computer)
-    case 'pcwin'
-        sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
-        copyfile(sourcefile,tempfile);
-    otherwise
-        sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
-        commandwindow;
-        command=sprintf('scp %s %s',sourcefile,tempfile);
-        system(command);
+if ispc
+    sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
+    copyfile(sourcefile,tempfile,'f');
+else
+    sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
+    commandwindow;
+    command=sprintf('scp %s %s',sourcefile,tempfile);
+    system(command);
 end
 
 % read signals and delete temporary local file
