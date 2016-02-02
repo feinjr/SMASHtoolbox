@@ -27,6 +27,9 @@ elseif Narg == 1
             plot(X,evaluate(object.Settings.Fit,X),'Color','r','LineWidth',2,'LineStyle','--')
             plot(X,object.Settings.FinalSignal.Data,'Color','b')
             
+            %X1 = linspace(object.Settings.FitLimits(1),object.Settings.FitLimits(2),500);
+            %plot(X1,evaluate(object.Settings.Fit,X1),'Color','g','LineWidth',2,'LineStyle','--')
+            
             xlabel('Time [s]')
             ylabel('Normalized Signal')
             title(sprintf('Measured Signal and Fit: %s',object.Settings.Location))
