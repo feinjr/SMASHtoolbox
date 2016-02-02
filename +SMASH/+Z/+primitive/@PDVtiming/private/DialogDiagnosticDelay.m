@@ -115,12 +115,14 @@ set(hButton(1),'Callback',@apply);
         delay=get(hDelay(2),'String');
         if isempty(sscanf(delay,'%g'))
             return
-        end        
-        index=get(hDiagnostic(2),'Value');    
+        end  
+        current=get(hDiagnostic(2),'String');
+        index=get(hDiagnostic(2),'Value');  
+        current=strtrim(current{index});
         data=get(table,'Data');
-        for row=1:size(data,1)
-            temp=sscanf(data{row,1},'%d');
-            if temp==index
+        for row=1:size(data,1) 
+            temp=strtrim(data{row,1});            
+            if strcmp(current,temp);
                 data{row,2}=delay;
                 break
             end
