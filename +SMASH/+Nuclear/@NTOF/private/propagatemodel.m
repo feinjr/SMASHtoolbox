@@ -14,7 +14,16 @@ function [ dNdt ] = propagatemodel( bangtime, temperature , t, options)
 %%
 d = 1e-2*options.Distance;
 
+if isfield(options,'SignalLimits')
+    Slims = options.SignalLimits;
+else
+    Slims = [min(t), max(t)];
+end
+
 dt = t(2)-t(1);
+
+ttemp = Slims(1):dt:Slims(2);
+
 % Import IRF
 IRF = options.InstrumentResponse;
 if isempty(IRF)
@@ -46,7 +55,7 @@ cL = 2.99792458e8; %speed of light in m/s
 tL = d/cL;
 mn = 1.6749286e-27; %neutron mass in kg
 
-beta = tL./(t-bangtime);
+beta = tL./(ttemp-bangtime);
 gamma = 1./sqrt(1-beta.^2);
 Jacobian = (mn/tL)*gamma.^3.*beta.^3;
 Energy = cL^2*mn*(gamma-1);
@@ -61,8 +70,10 @@ end
 
 fE = interp1(Ebin*1.6022e-13,Io,Energy,'linear',0);
 temp = conv(fE.*abs(Jacobian).*LOI,IRF_interp,'same');
-dNdt = conv(temp,history,'same');
-dNdt = dNdt/max(dNdt);
+dNdt_temp = conv(temp,history,'same');
+dNdt_temp = dNdt_temp/max(dNdt_temp);
+
+dNdt = interp1(ttemp,dNdt_temp,t);
 
 end
 

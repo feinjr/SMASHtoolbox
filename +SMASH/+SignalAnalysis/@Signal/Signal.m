@@ -1,20 +1,31 @@
+
 % This class creates objects for analysis and visualization of
 % one-dimensional scalar information.  The dependent variable is stored as
 % the "Data" property; the independent variable is stored in the "Grid"
 % property.
 %
 % Signal objects may be constructed from two numerical inputs.
-%    >> object=Signal(x,y);
+%    object=Signal(x,y);
 % The first input is the grid (independent) array, while the second input
 % is the data (dependent) array.  Typically, inputs "x" and "y" have the
 % same number of elements.  Input "x" can be empty, in which case the
 % object's Grid property is assigned to set of ascending integers (starting
 % at 1).  Input "x" can also be a scaler, which is interpreted
-% as the step size for the object's Grid property (starting from 0).
+% as the step size for the object's Grid property (starting from 0).  
+%
+% Local smoothing is invoked by a third input argumen:
+%    object=Signal(x,y,order);
+%    object=Signal(x,y,[order nhood])
+%    object=Signal(x,y,[order nhood],Ngrid); % default grid is 100 points
+% that defines the polynomial order (1 or 2) and neighborhood size
+% (optional).  The smoothed signal is evaluated on a uniformly spaced grid.
+% Smoothing is useful for irregularly sampling, overlapping measurements,
+% and non-monotonic grids.  NOTE: signals generarated in this manner may
+% not pass exactly through the input data due to smoothing!
 %
 % Signal objects can also be created by importing file data.
-%    >> object=Signal(); % interactive file selection
-%    >> object=Signal(filename,[format],[record]);
+%    object=Signal(); % interactive file selection
+%    object=Signal(filename,[format],[record]);
 % File arguments ("format" and "record") are passed to the
 % FileAccess.readFile function.  These inputs should be used when the
 % file's extension corresponds to multiple formats or the file contains
