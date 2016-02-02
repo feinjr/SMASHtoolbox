@@ -100,11 +100,13 @@ set(hButton(1),'Callback',@apply);
         if isempty(sscanf(delay,'%g'))
             return
         end        
+        current=get(hDigitizer(2),'String');
         index=get(hDigitizer(2),'Value');    
+        current=strtrim(current{index});
         data=get(table,'Data');
         for row=1:size(data,1)
-            temp=sscanf(data{row,1},'%d');
-            if temp==index
+            temp=strtrim(data{row,1});
+            if strcmp(current,temp)
                 data{row,2}=delay;
                 break
             end

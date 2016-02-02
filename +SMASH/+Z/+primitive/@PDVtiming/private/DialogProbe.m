@@ -137,12 +137,16 @@ set(hButton(1),'Callback',@apply);
         delay=get(hDelay(2),'String');
         if isempty(sscanf(delay,'%g'))
             return
-        end        
-        index=get(hProbe(2),'Value');    
+        end      
+        current=get(hProbe(2),'String');
+        index=get(hProbe(2),'Value');   
+        current=strtrim(current{index});
         data=get(table,'Data');
         for row=1:size(data,1)
-            temp=sscanf(data{row,1},'%d');
-            if temp==index
+            %temp=sscanf(data{row,1},'%d');
+            temp=strtrim(data{row,1});            
+            %if temp==index
+            if strcmp(current,temp)
                 data{row,2}=delay;
                 break
             end
