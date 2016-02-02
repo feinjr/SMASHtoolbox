@@ -46,7 +46,7 @@ end
 assert(ischar(mode),'ERROR: invalid mode');
 mode=lower(mode);
 switch mode
-    case {'mosaic','single','detail'}
+    case {'mosaic','single','snapshot'}
         % do nothing
     otherwise
         error('ERROR: invalid view mode');
@@ -78,8 +78,8 @@ elseif strcmp(mode,'mosaic')
         h=showMosaic(object,target);
 elseif strcmp(mode,'single')
         h=showSingle(object,frameNumber);
-elseif strcmp(mode,'detail')
-        h=detail(object,target);    
+elseif strcmp(mode,'snapshot')
+        h=showSnapshot(object,target);    
 end
 
 % handle output
