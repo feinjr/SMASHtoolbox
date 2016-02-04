@@ -1239,7 +1239,15 @@ function newsig = MHDScale(n)
         s = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename),'column');
     end
    
-    [newsig,s] = register(newsig,s);
+    %[newsig,s] = register(newsig,s);
+    %Regrid to common time base
+    tmin = max([min(s.Grid),min(newsig.Grid)]);
+    tmax = min([max(s.Grid),max(newsig.Grid)]);
+    dt = mean(diff(newsig.Grid))
+    t = tmin:dt:tmax; t=t';
+    s = regrid(s,t);
+    newsig = regrid(newsig,t);
+    
     
     switch value{3}
         case choices{1}

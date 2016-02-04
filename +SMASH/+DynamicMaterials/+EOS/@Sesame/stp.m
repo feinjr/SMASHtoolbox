@@ -27,6 +27,9 @@ dguess = mean(object.Density);
 if nargin > 1
     dguess = varargin{2};
 end
+if nargin > 2
+    t0 = varargin{3};
+end
 
 conv_check = 0;
 while ~conv_check
