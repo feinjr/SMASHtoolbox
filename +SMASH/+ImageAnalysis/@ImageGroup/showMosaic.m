@@ -22,7 +22,7 @@ temp=cell(object.NumberImages,1);
 
 NImages=object.NumberImages;
 size1=round(sqrt(NImages)+.4999);
-size2=fix(NImages./size1);
+size2=ceil(NImages./size1);
 for n=1:NImages
     subplot(size1,size2,n)
     view(temp{n},[],gca);

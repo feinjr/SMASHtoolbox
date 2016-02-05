@@ -33,7 +33,7 @@ end
 % create scrollable panel for mini-view
 h.panel = uipanel(h.figure,'Title','Frame Selection',...
              'Position',[0 .1 NImages*.2+.4 .2]);
-h.slider=uicontrol(h.figure,'Style','slider','Min',0,'Max',NImages*.2-.6,...
+h.slider=uicontrol(h.figure,'Style','slider','Min',0,'Max',max(NImages*.2-.6,0),...
     'Units','normalized','Position',[.1 .05 .8 .03]);
 set(h.slider,'Callback', @(hObject,eventdata) set(h.panel,...
     'Position',[-get(hObject,'Value') .1 NImages*.2+.4 .2]));
@@ -66,6 +66,13 @@ ylabel(cb.Handle,object.DataLabel);
 
 % create axes within the scroll panel
 h.panAx=axes('Parent',h.panel);
+
+%resize thumbnail data
+xThumb=x(1):((x(2)-x(1))*4):x(end);
+yThumb=y(1):((y(2)-y(1))*4):y(end);
+frameGrid=1:NImages;
+zThumb=interp3(x,y,frameGrid,z,xThumb,transpose(yThumb),frameGrid);
+    
 sub=cell(NImages,1);
 img=cell(NImages,1);
 for n=1:NImages
@@ -74,7 +81,7 @@ for n=1:NImages
     
     % plot each image within a given supblot
     img{n}=imagesc('Parent',sub{n},...
-        'XData',x,'YData',y,'CData',z(:,:,n));
+        'XData',xThumb,'YData',yThumb,'CData',zThumb(:,:,n));
     apply(object.GraphicOptions,sub{n});
     axis(sub{n},'tight');
 
