@@ -7,18 +7,17 @@ object.Measurement.GraphicOptions.Title='Step wedge';
 
 % set up settings structure
 settings=struct();
+  
+settings.ID='AI-11-0004';
 
-settings.ID=object.DefaultID;
+settings.StepLevels = [0.08 0.20 0.35 0.51 0.64 0.78 0.94 ...
+            1.12 1.25 1.39 1.54 1.67 1.82 1.98 ...
+            2.15 2.29 2.43 2.59 2.76 2.91 3.02];
+settings.StepOffsets = [0 2];
 
-settings.StepLevels = object.DefaultStepLevels;
-settings.StepOffsets = object.DefaultStepOffsets;
-
-settings.DerivativeParams= object.DefaultDerivativeParams; % [order nhood]
-settings.HorizontalMargin=object.DefaultHorizontalMargin; % fractional
-settings.VerticalMargin=object.DefaultVerticalMargin; % fraction
-
-settings.AnalysisRange=object.DefaultAnalysisRange; % [min max] (fractional)
-settings.PolynomialOrder=object.DefaultPolynomialOrder; % polynomial fit order
+settings.DerivativeParams= [1 9]; % [order nhood]
+settings.HorizontalMargin=0.20; % fractional
+settings.VerticalMargin=0.10; % fraction
 
 object.Settings=settings;
 

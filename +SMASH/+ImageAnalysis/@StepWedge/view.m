@@ -53,26 +53,26 @@ switch lower(choice)
             line(x(keep),y(keep),...
                 'LineStyle','none','Color',color(k,:),'Marker','o');
         end
-        line(object.Results.TransferTable(:,2),object.Results.TransferTable(:,1),...
+        line(object.Results.ForwardTable(:,1),object.Results.ForwardTable(:,2),...
             'Color','k');
         xlabel('Relative exposure');        
         ylabel('Density');
         set(gca,'XScale','log');
-        min_y=min(y);
-        max_y=max(y);
-        Ly=max_y-min_y;
-        y1=min_y+object.Settings.AnalysisRange(1)*Ly;
-        y2=min_y+object.Settings.AnalysisRange(2)*Ly;
-        line(xlim,repmat(y1,[1 2]),'Color','k','LineStyle','--');
-        line(xlim,repmat(y2,[1 2]),'Color','k','LineStyle','--');
+        %min_y=min(y);
+        %max_y=max(y);
+        %Ly=max_y-min_y;
+        %y1=min_y+object.Settings.AnalysisRange(1)*Ly;
+        %y2=min_y+object.Settings.AnalysisRange(2)*Ly;
+        %line(xlim,repmat(y1,[1 2]),'Color','k','LineStyle','--');
+        %line(xlim,repmat(y2,[1 2]),'Color','k','LineStyle','--');
         % reverse transfer
         ha(3)=subplot(3,1,3); %#ok<NASGU>
-        plot(object.Results.TransferTable(:,1),object.Results.TransferTable(:,2),'k');
+        plot(object.Results.ReverseTable(:,1),object.Results.ReverseTable(:,2),'k');
         xlabel('Density');
         ylabel('Relative exposure');
         set(gca,'YScale','log');
-        line(repmat(y1,[1 2]),ylim,'Color','k','LineStyle','--');
-        line(repmat(y2,[1 2]),ylim,'Color','k','LineStyle','--');
+        %line(repmat(y1,[1 2]),ylim,'Color','k','LineStyle','--');
+        %line(repmat(y2,[1 2]),ylim,'Color','k','LineStyle','--');
     otherwise
         error('ERROR: invalid view choice');
 end

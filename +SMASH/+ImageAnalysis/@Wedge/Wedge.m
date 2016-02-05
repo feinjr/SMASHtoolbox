@@ -1,5 +1,8 @@
 % Create Wedge objects
 %
+% WARNING: this class is obsolete and will be removed in the future.  Use
+% the StepWedge class instead.
+%
 % Wedge objects are a special type of Image objects designed for
 % characterizing and removing nonlinear response such as film exposure.
 %
@@ -36,7 +39,11 @@ classdef Wedge < SMASH.ImageAnalysis.Image
     %% constructor
     methods (Hidden=true)
         function object=Wedge(varargin)
-            object=object@SMASH.ImageAnalysis.Image(varargin{:});            
+            object=object@SMASH.ImageAnalysis.Image(varargin{:}); 
+            message={};
+            message{end+1}='This class is obsolete and will be removed in the future';
+            message{end+1}='Use the StepWedge class instead';
+            warning('SMASH:Wedge','%s\n',message{:});
         end
     end
     %%

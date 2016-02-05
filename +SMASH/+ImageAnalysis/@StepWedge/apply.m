@@ -28,7 +28,7 @@ assert(object.Analyzed,...
     'ERROR: object must be analyzed before it can be applied');
 
 % prepare table
-table=object.Results.TransferTable;
+table=object.Results.ReverseTable;
 table=sortrows(table,1);
 
 % identify values outside the transfer table

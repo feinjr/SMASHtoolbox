@@ -11,6 +11,8 @@
 % The object proves methods for
 %     -Viewing for quality and orientation verification.
 %     -Rotating for alignment with the horizontal axes.
+% *NOTE* : auto rotate*
+%
 %     -Cleaning local artifacts.
 %     -Cropping regions outside the wedge.
 % Almost all step wedge files require some degree of cropping; the other
@@ -41,18 +43,7 @@ classdef StepWedge
         Settings % Analysis settings (structure)
         Results % Analysis results (structure)       
     end
-    properties (Access=protected,Hidden=true)
-        DefaultID  = 'AI-11-0004';
-        DefaultStepLevels = ...
-            [0.08 0.20 0.35 0.51 0.64 0.78 0.94 ...
-            1.12 1.25 1.39 1.54 1.67 1.82 1.98 ...
-            2.15 2.29 2.43 2.59 2.76 2.91 3.02];
-        DefaultStepOffsets = [0 2];
-        DefaultDerivativeParams=[1 9]; 
-        DefaultHorizontalMargin=0.20;
-        DefaultVerticalMargin=0.10;
-        DefaultAnalysisRange=[0.025 0.975];
-        DefaultPolynomialOrder=4;
+    properties (Access=protected,Hidden=true)        
         Cropped=false;
         Analyzed=false;
     end
@@ -81,6 +72,7 @@ classdef StepWedge
                     case 'SMASH.ImageAnalysis.Image'
                         object.Measurement=varargin{1};
                         object=create(object);                                
+                        object=rotate(object,'auto');
                     case 'SMASH.ImageAnalysis.StepWedge'
                         object=varargin{1};
                     otherwise
@@ -88,18 +80,19 @@ classdef StepWedge
                 end
             else
                 error('ERROR: unable to contruct object from this input');
-            end
+            end           
         end
     end
     %% controlled methods
     methods (Access=protected,Hidden=true)
-        varargout=create(varargin);
+        varargout=create(varargin);        
     end
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
     end 
-    methods (Hidden=true)
+    methods (Hidden=true)        
         varargout=locate(varargin);
+        varargout=generate(varargin);
     end
     %% setters
     methods
