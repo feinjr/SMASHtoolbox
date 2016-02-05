@@ -89,12 +89,18 @@ if numel(h)>0
     for m=1:numel(h)
         units=get(h(m),'Units');
         set(h(m),'Units',TargetUnits);
-        pos=get(h(m),'OuterPosition');       
-        set(h(m),'Units',units);
-        xc=pos(1)+pos(3)/2;
-        yc=pos(2)+pos(4)/2;
-        if (xc<xb(1)) || (xc>xb(2)) || (yc<yb(1)) || (yc>yb(2))
-            continue % no match
+        try
+            pos=get(h(m),'OuterPosition'); % pre-2014b MATLAB
+            set(h(m),'Units',units);
+            xc=pos(1)+pos(3)/2;
+            yc=pos(2)+pos(4)/2;
+            if (xc<xb(1)) || (xc>xb(2)) || (yc<yb(1)) || (yc>yb(2))
+                continue % no match
+            end
+        catch
+           if getappdata(h,'TargetAxes') ~= target % post-2014b MATLAB
+               continue
+           end
         end
         % create matching colorbar
         location=get(h(m),'Location');
