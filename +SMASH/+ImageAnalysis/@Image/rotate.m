@@ -42,6 +42,8 @@ end
 if isnumeric(argument)
     object=verifyGrid(object);
     object=twist(object,argument);
+elseif strcmpi(argument,'gui')
+    object=rotateGUI(object);
 else
     x=object.Grid1;
     y=object.Grid2;
