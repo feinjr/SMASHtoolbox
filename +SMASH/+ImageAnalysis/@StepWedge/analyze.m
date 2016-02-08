@@ -190,7 +190,7 @@ for n=1:2:Narg
         case 'fogtolerance'
             assert(isnumeric(value) && isscalar(value) && (value>0),...
                 'ERROR: invalid density tolerance');
-            option.DensityTolerance=value;
+            option.FogTolerance=value;
         case 'optimization'
             try
                 option.Optimization=optimset(value);
