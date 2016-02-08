@@ -26,16 +26,13 @@
 %   -major revision to continuous rotation algorithm (twist)
 % modified February 7, 2016 by Daniel Dolan
 %   -added interactive rotation
+% modified February 8, 2016 by Daniel Dolan
+%   -interactive rotation is now the default case
 function object=rotate(object,argument)
 
 % handle input
-if (nargin<2) || isempty(argument)
-    argument=questdlg('Choose rotation direction','Rotate direction',...
-        ' left ',' right ',' cancel ',' left ');
-    argument=strtrim(argument);
-    if strcmp(argument,'cancel')
-        return
-    end   
+if (nargin<2) || isempty(argument)  
+    argument='gui';
 end
 
 % apply rotation
