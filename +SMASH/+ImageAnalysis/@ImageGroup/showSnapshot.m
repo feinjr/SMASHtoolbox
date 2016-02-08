@@ -66,6 +66,7 @@ ylabel(cb.Handle,object.DataLabel);
 
 % create axes within the scroll panel
 h.panAx=axes('Parent',h.panel);
+h.Zoom=zoom(h.figure);
 
 %resize thumbnail data
 xThumb=x(1):((x(2)-x(1))*4):x(end);
@@ -78,6 +79,7 @@ img=cell(NImages,1);
 for n=1:NImages
     % create subplots within scroll panel
     sub{n}=subplot(1,NImages,n);
+    setAllowAxesZoom(h.Zoom,sub{n},false); % turn off zoom for thumbnails
     
     % plot each image within a given supblot
     img{n}=imagesc('Parent',sub{n},...

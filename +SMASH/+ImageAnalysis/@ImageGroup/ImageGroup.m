@@ -35,10 +35,15 @@ classdef ImageGroup < SMASH.ImageAnalysis.Image
             object=object@SMASH.ImageAnalysis.Image(varargin{:}); % call superclass constructor
         end
     end
+    
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
     %% protected methods
      methods (Access=protected,Hidden=true)
         varargout=showSingle(varargin);
         varargout=showMosaic(varargin);
+        varargout=showSnapshot(varargin);
     end
     methods (Access=protected)
         varargout=create(varargin);
