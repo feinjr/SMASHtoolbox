@@ -111,7 +111,7 @@ delete(figRadiography.Handle);
         RData = get(hData,'CData');
         xData = get(hData,'XData');
         yData = get(hData,'YData');
-        obj_Rot = SMASH.Xray.Radiography(xData,yData,RData);
+        obj_Rot = SMASH.ImageAnalysis.Image(xData,yData,RData);
         setappdata(figRadiography.Handle, 'obj_Rotate', obj_Rot);
     end
 
