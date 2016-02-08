@@ -1,7 +1,7 @@
 % ROTATE Rotate an Image object
 %
 % This method rotates the data and grid in an Image object.
-%   >> object=rotate(object,angle); 
+%     object=rotate(object,angle); 
 % The angle theta (in degrees) is positive for counter-clockwise rotations.
 % NOTE:
 %     -Cumulative operations should be avoided.  For example, a 45 degree
@@ -10,14 +10,12 @@
 %     produces a slightly different result than the original image.
 %
 % Exact 90 degree rotations can also be specified.
-%   >> object=rotate(object,'left'); % counter-clockwise
-%   >> object=rotate(object,'right'); % clockwise
+%    object=rotate(object,'left'); % counter-clockwise
+%    object=rotate(object,'right'); % clockwise
 % These rotations can be used cumaltively and are reversible.
 %
-
-% 
+% See also Image, flip
 %
-% See also IMAGE, flip
 
 % created July 27, 2012 by Daniel Dolan (Sandia National Laboratories)
 % revised December 28, 2012 by Daniel Dolan
@@ -26,6 +24,8 @@
 %   -fixed Grids to match left and right rotations 
 % modified August 21, 2015 by Daniel Dolan
 %   -major revision to continuous rotation algorithm (twist)
+% modified February 7, 2016 by Daniel Dolan
+%   -added interactive rotation
 function object=rotate(object,argument)
 
 % handle input
