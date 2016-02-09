@@ -205,26 +205,35 @@ end
 % estimate fog region
 threshold=y(1)+option.FogTolerance;
 k=find(y>threshold,1,'first');
-xfog=x(k-1);
-yfog=mean(y(x<=xfog));
+xfog0=x(k-1);
 
 % identify saturation region (if present)
 temp=(y(end:-1:1) ~= y(end));
 k=find(temp,1,'first');
 xsat=x(end-(k-2));
 
-% perform optimization
+% set up residual function
 b=ones(1,option.Order+1);
+b(end-1)=0;
 fit=[];
 vector=[];
 matrix=ones(numpoints,1);
-    function chi2=residual(param)                 
+FixFog=true;
+    function chi2=residual(param)             
+        if FixFog
+            xfog=xfog0;
+        else
+            xfog=xfog0+param(1);
+            param=param(2:end);
+        end
+        %yfog=mean(y(x<=xfog));
+        yfog=median(y(x<=xfog));
         u=(x-xfog)./(xsat-xfog);              
-        b(1:end-1)=param;
+        b(1:end-2)=param;
         basis=zeros(numpoints,1);
         k=(x>xfog) & (x<xsat);
         c=conv(b,b);
-        c=conv([1 0],c);
+        %c=conv([1 0],c);
         c=polyint(c);
         basis(k)=polyval(c,u(k))-polyval(c,0);
         k=(x>=xsat);
@@ -234,8 +243,17 @@ matrix=ones(numpoints,1);
         fit=matrix*vector+yfog;
         chi2=mean((y-fit).^2);
     end
+
+% initial optimization
+FixFog=true;
+guess=zeros(1,option.Order-1);
+result=fminsearch(@residual,guess,option.Optimization);
+
+% revised optimization
+FixFog=false;
 guess=zeros(1,option.Order);
-fminsearch(@residual,guess,option.Optimization);
+guess(2:end)=result;
+result=fminsearch(@residual,guess,option.Optimization);
 
 %xs=linspace(min(x),max(x),1000);
 %ys=interp1(x,fit,xs);
