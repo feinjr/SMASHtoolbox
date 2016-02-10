@@ -54,7 +54,7 @@ classdef Cloud %< SMASH.General.DataClass
         Seed = []; % Random number generator seed (uint32 value or text string)          
         NumberBins = 10 % Number of histogram bins
         HistogramMode = 'bar' % Histogram plot mode: 'bar' or 'line'
-        NumberGridPoints = 100 % Number of density grid points
+        NumberGridPoints = 128 % Number of density grid points
         NumberContours = 3 % Number of density contours
     end
     %% constructor
