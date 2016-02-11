@@ -16,15 +16,16 @@
 %
 % Created May 27, 2014 by Patrick Knapp (Sandia National Laboratories)
 
-function [object, varargout] = BackgroundSubtraction(object,varargin)
+function [object, varargout] = subtractBackground(object,varargin)
 %% Set default values
 poly_order = 1;
 X = []; Y = []; Z = [];
 getzonepts = 1;
 showplot = false;
-title = object.GraphicOptions.Title;
-object.Name='Choose Region for Background Subtraction';
-object.GraphicOptions.Title = 'Choose Region for Background Subtraction';
+
+temp = object.Measurement;
+title = temp.GraphicOptions.Title;
+temp.GraphicOptions.Title = 'Choose Region for Background Subtraction';
 %% Unpack variable inputs
 for i=1:length(varargin)
     if strcmp(varargin{i},'poly_order'); poly_order=varargin{i+1};
@@ -37,20 +38,31 @@ end
 
 %% If no points supplied promt user to select regions
 if isempty(X) || isempty(Y) || isempty(Z)
+    diaReg=SMASH.MUI.Dialog;
+    diaReg.Hidden=true;
+    diaReg.Name='Select Region of Background Exposure';
+    
+    hReg=addblock(diaReg,'button',{' OK ', '  Exit  '});
+    set(hReg(1),'Callback',@callbackOK);
+    set(hReg(2),'Callback',@callbackExit);
+    
+    diaDone.Hidden=false;
+    uiwait
+    
     while getzonepts==1
-        object.GraphicOptions.LineColor = 'm';
-        reg = region(object);
+        temp.GraphicOptions.LineColor = 'm';
+        reg = region(temp);
         [X1,Y1] = meshgrid(reg.x,reg.y);
         
         X = [X; X1(:)];
         Y = [Y; Y1(:)];
         Z = [Z; reg.z(:)];
-                
+        
         diaDone=SMASH.MUI.Dialog;
         diaDone.Hidden=true;
-        diaDone.Name='Continue?';
+        diaDone.Name='Select Another Region?';
         
-        hDone=addblock(diaDone,'button',{' Yes ', '  No  '});        
+        hDone=addblock(diaDone,'button',{' Yes ', '  No  '});
         set(hDone(1),'Callback',@callback1);
         set(hDone(2),'Callback',@callback2);
         
@@ -75,7 +87,6 @@ if isempty(poly_order) % if no poly_order specified create dialog box
     diaPoly.Name='Choose Order of Fitting Polynomial';
     set(diaPoly.Handle,'Tag','guiFit');
     
-    
     hPO=addblock(diaPoly,'edit',' Polynomial Order [0,1,2,...]',20); % Edit box to input rotation angle
     
     hUpdate=addblock(diaPoly,'button',' Update '); % update figure
@@ -97,12 +108,12 @@ if isempty(poly_order) % if no poly_order specified create dialog box
     delete(figSurface);
     
 else % use specified poly_order to fit surface
-    fbkg = svd_surface(object,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
+    fbkg = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
     
     if showplot
         figure
         hold on
-        surf(object.Grid1,object.Grid2,fbkg);
+        surf(temp.Grid1,temp.Grid2,fbkg);
         view(-45,45)
         shading flat
         plot3(X(mask),Y(mask),Z(mask),'LineStyle','none','Marker','.')
@@ -110,8 +121,9 @@ else % use specified poly_order to fit surface
     end
     
 end
-object = object-fbkg;
-object.GraphicOptions.Title = title;
+temp = temp-fbkg;
+temp.GraphicOptions.Title = title;
+object.Measurement = temp;
 
 nout = max(nargout,1)-1;
 if nout == 3
@@ -125,15 +137,15 @@ end
     function UpdateCallback(varargin)
         value=probe(diaPoly);
         poly_order=sscanf(value{1},'%g');
-        SurfaceFit = svd_surface(object,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
+        SurfaceFit = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
         
         axes(ax1);
         hold off
-        surf(object.Grid1,object.Grid2,SurfaceFit,'Parent',ax1);
+        surf(temp.Grid1,temp.Grid2,SurfaceFit,'Parent',ax1);
         hold on
         shading flat
         view(45,45)
-        plot3(X(mask),Y(mask),Z(mask),'LineStyle','none','Marker','.','Parent',ax1)        
+        plot3(X(mask),Y(mask),Z(mask),'LineStyle','none','Marker','.','Parent',ax1)
     end
 
     function DoneCallback(varargin)
@@ -144,6 +156,15 @@ end
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for region selection
+    function callbackOK(varargin)
+        getzonepts = 1;
+        delete(diaReg);
+    end
+    function callbackExit(varargin)
+        getzonepts = 0;
+        delete(diaReg);
+        return
+    end
     function callback1(varargin)
         getzonepts = 1;
         delete(diaDone);

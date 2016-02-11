@@ -2,7 +2,7 @@
 %
 % Created May 28, 2014 by Patrick Knapp (Sandia National Laboratories)
 
-function rho_object = AbelInvert(object,varargin)
+function object = abelInvert(object,varargin)
 
 % Default parameters
 minTransmission = 1e-3;
@@ -19,10 +19,10 @@ if length(varargin)>1
    end
 end
 
-K = object.Opacity; %opacity in cm^2/g
-Tx = object.Data;
-R = object.Grid1;
-Z = object.Grid2;
+K = object.Settings.Opacity; %opacity in cm^2/g
+Tx = object.Transmission.Data;
+R = object.Transmission.Grid1;
+Z = object.Transmission.Grid2;
 
 Tx(Tx<minTransmission) = minTransmission;
 
@@ -34,4 +34,8 @@ switch method
         rho=abel(R/10,Tau);
 end
 
-rho_object = SMASH.Xray.Radiography(R,Z,rho);
+object.Density = SMASH.ImageAnalysis.Image(R,Z,rho);
+object.Density.GraphicOptions.Title = 'Abel Inverted Density';
+object.Density.Grid1Label = 'Radius [mm]';
+object.Density.Grid2Label = 'Height [mm]';
+object.Density.DataLabel = 'Density [g/cm^3]';
