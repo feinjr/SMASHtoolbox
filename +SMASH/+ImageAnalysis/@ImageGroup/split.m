@@ -24,6 +24,11 @@ for n=1:object.NumberImages
     varargout{n}=SMASH.ImageAnalysis.Image(object.Grid1,object.Grid2,object.Data(:,:,n));
     varargout{n}=limit(varargout{n},bound1,bound2);
     varargout{n}.Source='ImageGroup split';    
+    varargout{n}.Name=object.Legend{n};
+    varargout{n}.Grid1Label=object.Grid1Label;
+    varargout{n}.Grid2Label=object.Grid2Label;
+    varargout{n}.DataLabel=object.DataLabel;
+    varargout{n}.GraphicOptions=object.GraphicOptions;
 end
 
 end
