@@ -33,12 +33,19 @@ diaRotate.Hidden=true;
 diaRotate.Name='Interactive rotation';
 set(diaRotate.Handle,'Tag','guiRotate');
 
-h=addblock(diaRotate,'text','Image rotation');
-set(h,'FontWeight','bold');
+%h=addblock(diaRotate,'text','Image rotation');
+%set(h,'FontWeight','bold');
 hARB=addblock(diaRotate,'edit_button',{'Angle (degrees):',' Apply '}); % Edit box to input rotation angle
+%set(hARB(1),'FontWeight','bold');
 set(hARB(3),'Callback',@RotCallback);
 %hRot=addblock(diaRotate,'button',' Update '); % update figure
 %set(hRot,'Callback',@RotCallback); % rotates image by value in edit box and updates the figure
+%addblock(diaRotate,'text','90 degree rotation');
+%hR=addblock(diaRotate,'button',{'Right' 'Left'});
+
+addblock(diaRotate,'text',' ');
+h=addblock(diaRotate,'text','90 degree rotations:');
+%set(h,'FontWeight','bold');
 hR=addblock(diaRotate,'button',{'Right' 'Left'});
 set(hR(1),'Callback',@CWcallback,...
     'TooltipString','90 degrees clockwise'); % button rotates image clockwise
@@ -46,8 +53,8 @@ set(hR(2),'Callback',@CCWcallback,...
     'TooltipString','90 degrees counter-clockwise'); % button rotates image counter-clockwise
 
 addblock(diaRotate,'text',' ');
-h=addblock(diaRotate,'text','Image flip');
-set(h,'FontWeight','bold');
+h=addblock(diaRotate,'text','180 degree flips:');
+%set(h,'FontWeight','bold');
 hF=addblock(diaRotate,'button',{'Vertical' 'Horizontal'}); % clockwise rotation button block
 set(hF(1),'Callback',@UDcallback); % button rotates image clockwise
 %hFlr=addblock(diaRotate,'button',' Flip L/R '); % clockwise rotation button block

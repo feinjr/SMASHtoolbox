@@ -20,7 +20,7 @@ function object=rotate(object,theta,value)
 
 % manage input
 if (nargin<2) || isempty(theta)
-    theta='auto';
+    theta='gui';
 end
 
 if nargin<3
