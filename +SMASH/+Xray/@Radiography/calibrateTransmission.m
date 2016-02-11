@@ -17,14 +17,13 @@
 %
 % Created May 27, 2014 by Patrick Knapp (Sandia National Laboratories)
 
-function [object, varargout] = Transmission(object,varargin)
-object.GraphicOptions.LineColor = 'm';
+function [object, varargout] = calibrateTransmission(object,varargin)
 %% Set default values
 poly_order = 2;
 X = []; Y = []; Z = [];
 getzonepts = 1;
 
-object.Name='Choose Region for Transmission Correction';
+temp = object.Measurement;
 
 %% Unpack variable inputs
 for i=1:length(varargin)
@@ -38,8 +37,19 @@ end
 
 %% If no points supplied promt user to select regions
 if isempty(X) && isempty(Y) && isempty(Z)
+    diaReg=SMASH.MUI.Dialog;
+    diaReg.Hidden=true;
+    diaReg.Name='Select Region of 100% Transmission';
+    set(diaReg.Handle,'Position',[1000, 918, 1200,  20])
+    
+    hReg=addblock(diaReg,'button',{' OK ', '  Exit  '});
+    set(hReg(1),'Callback',@callbackOK);
+    set(hReg(2),'Callback',@callbackExit);
+    
+    diaDone.Hidden=false;
+    uiwait
     while getzonepts==1
-        reg = region(object);
+        reg = region(temp);
         [X1,Y1] = meshgrid(reg.x,reg.y);
         
         X = [X; X1(:)];
@@ -48,7 +58,7 @@ if isempty(X) && isempty(Y) && isempty(Z)
 
         diaDone=SMASH.MUI.Dialog;
         diaDone.Hidden=true;
-        diaDone.Name='Continue?';
+        diaDone.Name='Select Another Region?';
         
         hDone=addblock(diaDone,'button',{' Yes ', '  No  '});        
         set(hDone(1),'Callback',@callback1);
@@ -56,44 +66,8 @@ if isempty(X) && isempty(Y) && isempty(Z)
         
         diaDone.Hidden=false;
         uiwait
-
-%         binary_input_received=0;      
-%         while ~binary_input_received
-%             user_input=input('Define another zone? Enter 1 or 0:');
-%             if isempty(user_input) || ~isnumeric(user_input) || ...
-%                     ~isscalar(user_input) || (user_input~=1 && user_input~=0)
-%                 disp('Message to user: your input must be a numeric scalar 1 or 0')
-%             elseif user_input==1 || user_input==0
-%                 binary_input_received=1;
-%             end
-%         end
-%         getzonepts=user_input;
     end
 end
-
-% if isempty(Z)
-%     while getzonepts==1
-%         reg = region(object);
-%         [X1,Y1] = meshgrid(reg.x,reg.y);
-%         
-%         X = [X; X1(:)];
-%         Y = [Y; Y1(:)];
-%         Z = [Z; reg.z(:)];
-%         
-%         binary_input_received=0;
-%         
-%         while ~binary_input_received
-%             user_input=input('Define another zone? Enter 1 or 0:');
-%             if isempty(user_input) || ~isnumeric(user_input) || ...
-%                     ~isscalar(user_input) || (user_input~=1 && user_input~=0)
-%                 disp('Message to user: your input must be a numeric scalar 1 or 0')
-%             elseif user_input==1 || user_input==0
-%                 binary_input_received=1;
-%             end
-%         end
-%         getzonepts=user_input;
-%     end
-% end
 
 mask = ~isnan(Z);
 
@@ -134,20 +108,21 @@ if isempty(poly_order)
     delete(figSurface);
     
 else
-    ftx = svd_surface(object,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
+    ftx = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
     
     if showplot
         figure
         hold on
-        surf(object.Grid1,object.Grid2,ftx);
+        surf(temp.Grid1,temp.Grid2,ftx);
         shading flat
         view(-45,45)
         plot3(X(mask),Y(mask),Z(mask),'LineStyle','none','Marker','.')
         
     end
 end
-object = object./ftx;
+temp = temp./ftx;
 
+object.Transmission = temp;
 nout = max(nargout,1)-1;
 if nout == 3
     varargout(1) = {X(mask)};
@@ -159,11 +134,11 @@ end
     function UpdateCallback(varargin)
         value=probe(diaPoly);
         poly_order=sscanf(value{1},'%g');
-        SurfaceFit = svd_surface(object,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
+        SurfaceFit = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
         
         axes(ax1);
         hold off
-        surf(object.Grid1,object.Grid2,SurfaceFit,'Parent',ax1);
+        surf(temp.Grid1,temp.Grid2,SurfaceFit,'Parent',ax1);
         hold on
         shading flat
         view(45,45)
@@ -179,6 +154,15 @@ end
         setappdata(figSurface, 'SurfaceFit', SurfaceFit);
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for region selection
+    function callbackOK(varargin)
+        getzonepts = 1;
+        delete(diaReg);
+    end
+    function callbackExit(varargin)
+        getzonepts = 0;
+        delete(diaReg);
+        return
+    end
     function callback1(varargin)
         getzonepts = 1;
         delete(diaDone);
