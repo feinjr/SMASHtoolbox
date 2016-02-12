@@ -131,8 +131,9 @@ switch method
         error('ERROR: invalid method');
 end
 
-% map results to original coordinate
-grid=grid*S*VT+center;
+% map result to original coordinate
+grid=grid*S*VT;
+grid=bsxfun(@plus,grid,center);
 
 % normalize density
 weight=weight/trapz(grid,weight);
