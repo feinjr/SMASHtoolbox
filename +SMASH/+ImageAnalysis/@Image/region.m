@@ -33,18 +33,23 @@
 %   -Move boundary point by shift-click
 % modified October 17, 2013 by Tommy Ao (Sandia National Laboratories)
 %
-function varargout=region(object,mode)
+function varargout=region(object,mode,label)
 %% handle input
 if (nargin<2) || isempty(mode)
     mode='standard';
 end
+
+if (nargin<3) || isempty(label)
+    label='Use mouse to select region of interest';
+end
+assert(ischar(label) || iscellstr(label),'ERROR: invalid label')
 
 %% prompt user
 %hbf=basic_figure('Name','Select region of interest');
 %h=basic_figure;
 %himage=image(object,h.axes);
 h=view(object,'show');
-title('Use mouse to select region of interest')
+title(label)
 
 boundary=line('Parent',h.axes,'XData',[],'YData',[]);
 set(boundary,'Color',object.GraphicOptions.LineColor,...
