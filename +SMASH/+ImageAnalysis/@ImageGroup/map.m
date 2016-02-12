@@ -1,4 +1,3 @@
-function object=map(object,coordinate,method,argument)
 %MAP Map ImageGroup coordinate to a new representation
 %
 % This method applies a mapping function to one or both coordinate
@@ -26,6 +25,7 @@ function object=map(object,coordinate,method,argument)
 
 % Note: as of making this, the Image function will work on ImageGroups
 % directly without this.
+function object=map(object,coordinate,method,argument)
 
 % split up ImageGroup
 temp=cell(object.NumberImages,1);

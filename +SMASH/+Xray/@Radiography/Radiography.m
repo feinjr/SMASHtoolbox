@@ -45,6 +45,10 @@ classdef Radiography
         end
     end
     %%
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
+    end
+  
     methods (Hidden=false)
         varargout=calibrateTransmission(varargin)
         varargout=subtractBackground(varargin)

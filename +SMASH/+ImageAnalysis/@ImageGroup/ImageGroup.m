@@ -1,5 +1,3 @@
-% UNDER CONSTRUCTION
-%
 % This class creates multiple-image objects on common Grid1 and Grid2 bases.  These
 % object are similar to Image objects, but the "Data" property is a
 % three-dimensional array.  Each 2-D plane of this array represents the data for
