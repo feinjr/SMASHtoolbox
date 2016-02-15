@@ -1,9 +1,5 @@
 # Welcome to the SMASH toolbox 
 
-This is a markdown file for use with GitHub
-
-![SMASH logo](./misc/SMASH LOGO 64 x 64.png)
-
 ## What is SMASH?
 
 SMASH stands for Sandia Matlab AnalysiS Hierarchy. It's a fancy way of saying "a collection of MATLAB code". The acronym and logo are inspired by dynamic compression research, where experiments involve literal smashing. The goals of the toolbox are: 
@@ -27,7 +23,7 @@ Ideally, you should set up Git to pull down updates incrementally.
 
 Git can be used at the command line or through a graphical client. For Mac and Windows users, I recommend the SourceTree graphical client. In either case, configure Git to see the SMASH repository at git@github.com:SMASHtoolbox/SMASHtoolbox.git.  See this [page](https://help.github.com/articles/generating-an-ssh-key/) for help with generating an SSH key to allow your machine to communicate with GitHub.
 
-Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit [git-scm.com](http://git-scm.com).
+Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit http://git-scm.com.
 
 ## How do I configure MATLAB to use SMASH?
 
@@ -37,7 +33,16 @@ Add the "SMASHtoolbox" directory to your MATLAB path. The "Set Path" button on t
 
 ## Do I really need a MATLAB startup file
 
-Startup files aren't strictly required, but they turn out to be incredibly useful. You should really use them to tailor MATLAB to your needs.
+Startup files aren't strictly required, but they turn out to be incredibly useful. You should really use them to tailor MATLAB to your needs.  Here's a very basic startup file that places the toolbox and its programs on the MATLAB path.
+
+```matlab
+function startup()
+
+addpath('~/SMASHtoolbox/');
+loadSMASH -program *;
+
+end
+```
 
 ## How do I use SMASH?
 
