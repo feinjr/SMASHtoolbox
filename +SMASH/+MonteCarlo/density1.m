@@ -1,149 +1,114 @@
-% density1 Probability density estimate for one-dimensional data
+% density1 One-dimensional probability density estimate
 %
-% This function estimates the underlying probability density for a
-% one-dimensional data set.  Several types of density estimate are
-% supported, but in each case the function returns two outputs.
-%    [weight,grid]=density1(...);
-% The output "weight" approximates probability density at discrete
-% locations ("grid").  When no outputs are specified, the normalized
-% density is plotted in the current MATLAB axes.
+% This function estimates the underlying probability density from a
+% one-dimensional data set.
+%    [grid,weight]=density1(data); % return density
+%    density(data);                % plot density
+% Density calculation is performed with Gaussian kernels using an
+% automatically determined width.
 %
-% Basic density estimatation uses binning: data values are sorted into
-% uniform bins centered on N grid points.
-%    [...]=density1('bin',data,N); % N=10 by default
-% Density can also be estimated by direct summation of Gaussian kernels. In
-% this approach, each data value is represented as a distribution of
-% weights on the grid.
-%    [...]=density1('direct',data,N); % N=100 by default
-% Kernel width (standard deviation) is determined automatically but can be
-% modified through a smoothing factor.
-%    [...]=density1('direct',data,N,smooth); % smooth > 0
-% The default smoothing factor is 1: larger values reduce local variations,
-% possibly obscuring real features.
-% NOTE: Direct summation can be *very* slow for large data sets or finely
-% spaced grids.
+% Calculation options are specified by name/value pairs
+%    [...]=density1(data,name,value,...);
+% Valid option names are:
+%    -'GridPoints'   : number of grid points (default = 100)
+%    -'SmoothFactor' : kernel smoothing factor (default = 1)
 %
-% A faster implementation of the Gaussian kernel approach is available
-% through Fast Fourier transforms.
-%    [...]=density1('fft',data,N,smooth); % N=128 by default
-% The 'fft' approach supports the same input options as 'direct'; the
-% number of grid points is rounded to the next power of two as needed.
-% Local differences between the direct and FFT aproach are about 0.1% or
-% less (RMS) for adequately sampled grids.
-%
-% See also MonteCarlo, density2
+% See also MonteCarlo
 %
 
 %
-% created January 6, 2016 by Daniel Dolan (Sandia National Laboratories)
-% revised Februay 9, 2016 by Daniel Dolan
-%    -changed to SVD approach for consistency with density
-%    -updated documentation
+% created February 15, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=density1(method,data,Ngrid,smooth)
+function varargout=density1(data,varargin)
 
 % manage input
-assert(nargin>=2,'ERROR: insufficient input');
+assert(nargin>=1,'ERROR: insufficient input');
+assert(all(isreal(data)),'ERROR: data table must be real');
 
-if isempty(method)
-    method='bin';
-end
-assert(ischar(method),'ERROR: invalid method');
-method=lower(method);
-
-assert(isnumeric(data) && ismatrix(data) && any(size(data)==1),...
-    'ERROR: invalid data');
+assert(ismatrix(data),'ERROR: invalid data table');
 data=data(:);
-Ndata=numel(data);
+DataPoints=numel(data);
 
-if (nargin<3) || isempty(Ngrid)
-    switch method
-        case 'bin'
-            Ngrid=10;
-        case 'direct'
-            Ngrid=100;
+import SMASH.General.testNumber;
+Narg=numel(varargin);
+assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
+setting=struct('GridPoints',100,'SmoothFactor',1);
+for n=1:2:Narg
+    name=varargin{n};
+    assert(ischar(name),'ERROR: invalid setting name');
+    value=varargin{n+1};
+    switch lower(name)
+        case 'gridpoints'
+            assert(...
+                testNumber(value,'integer','positive','notzero'),...
+                'ERROR: invalid number of grid points');
+            setting.GridPoints=value;
+        case 'smoothfactor'
+            assert(...
+                testNumber(value,'positive','notzero'),...
+                'ERROR: invalid smooth factor');
+            setting.SmoothFactor=value;        
         otherwise
-            Ngrid=128;           
-    end   
-end
-assert(isnumeric(Ngrid) && isscalar(Ngrid) && (Ngrid>1) && (Ngrid==round(Ngrid)),...
-    'ERROR: invalid number of grid points');
-if strcmpi(method,'fft')
-    N2=pow2(nextpow2(Ngrid));
-    if Ngrid<N2
-        fprintf('Grid changed from %d to %d points for FFT\n',Ngrid,N2);
-        Ngrid=N2;      
+            error('ERROR: invalid setting name');
     end
 end
 
-if (nargin<4) || isempty(smooth)
-    smooth=1;
-end
-assert(isnumeric(smooth) && isscalar(smooth) && (smooth>0),...
-    'ERROR: invalid smoothing factor');
-
-% SVD reduction
+% SVD transformation
 center=mean(data,1);
 data=bsxfun(@minus,data,center);
 
 [data,S,V]=svd(data,0);
-VT=V';
-width=smooth*KernelWidth(data);
+%Sinv=diag(1./diag(S));
+Vinv=transpose(V);
 
-% generate grid
-sigma=std(data);
-grid=linspace(-5*sigma,+5*sigma,Ngrid);
+% create normalized grid(s)
+width=std(data)/DataPoints^(1/5); % Silverman's rule
+width=width*setting.SmoothFactor;
+span=max(abs(data))+5*width;
+normgrid=linspace(-span,+span,setting.GridPoints);
+normgrid=normgrid(:);
+dngrid=(normgrid(end)-normgrid(1))/(setting.GridPoints-1);
 
-dx=(grid(end)-grid(1))/(Ngrid-1);
-grid=grid(:);
+% bin data into a discrete array
+table=round((data-(normgrid(1)))/dngrid)+1;
+index=(table<1);
+table(index)=1;
+index=(table>setting.GridPoints);
+table(index)=setting.GridPoints;
 
-% calculate density as requested
-switch method
-    case 'bin'       
-        data=round(data(:)/dx-grid(1)/dx)+1;
-        data(data<1)=1;
-        data(data>Ngrid)=Ngrid;        
-        weight=accumarray(data,1,[Ngrid 1]);
-    case 'direct'
-        weight=zeros(Ngrid,1);
-        L=2*width^2;
-        if SMASH.System.isParallel();
-            parfor m=1:Ndata
-                weight=weight+exp(-(grid-data(m)).^2/L);
-            end
-        else
-            for m=1:Ndata
-                weight=weight+exp(-(grid-data(m)).^2/L);
-            end
-        end
-    case 'fft'
-        start=-Ngrid/2;
-        stop=Ngrid/2-1;
-        k=(start:stop)/(Ngrid*dx);
-        k=ifftshift(k);  
-        k=k(:);
-        Q=SMASH.MonteCarlo.density1('bin',data,Ngrid);
-        Q=fft(Q);        
-        P=exp(-2*pi^2*width^2*k.^2).*Q;
-        weight=ifft(P,'symmetric');
-        weight(weight<0)=0;
-    otherwise
-        error('ERROR: invalid method');
-end
+Q=accumarray(table,1,[setting.GridPoints 1]);
 
-% map result to original coordinate
-grid=grid*S*VT;
-grid=bsxfun(@plus,grid,center);
+% estimate density
+N2=pow2(nextpow2(setting.GridPoints));
+start=-N2/2;
+stop=+N2/2-1;
+k=(start:stop)/(N2*dngrid);
+k=ifftshift(k(:));
+Q(N2)=0; % zero padding
+P=fft(Q);
+P=P.*exp(-2*pi^2*width^2*k.^2);
 
-% normalize density
-weight=weight/trapz(grid,weight);
+weight=ifft(P,'symmetric');
+weight=weight(1:setting.GridPoints);
+weight(weight<0)=0;
+
+% map results to original coordinates
+temp=normgrid*S*Vinv;
+grid=linspace(min(temp),max(temp),setting.GridPoints);
+weight=interp1(temp,weight,grid);
+
+weight=weight/trapz(grid,weight); % normalization
 
 % manage output
 if nargout==0
+    figure;
     plot(grid,weight);
+    xlabel('Data value');
+    ylabel('Probability density');
 else
-    varargout{1}=weight;
-    varargout{2}=grid;
+    varargout{1}=grid;
+    varargout{2}=weight;
+    varargout{3}=struct('NormGrid',normgrid,'S',S,'Vinv',Vinv);
 end
 
 end
