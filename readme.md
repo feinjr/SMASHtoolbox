@@ -9,9 +9,9 @@ SMASH stands for Sandia Matlab AnalysiS Hierarchy. It's a fancy way of saying "a
 - To serve as a unified distribution method for new ideas and concepts. 
 The toolbox contains a "+SMASH" directory where most of the functions and class definitions are located. MATLAB treats this directory as a package, where the contents are accessed with dot notation. The toolbox also contains standard (non-package) directories for programs, documentation and examples.
 
-## Who can use SMASH
+## Who can use SMASH?
 
-Licensed users...
+SMASH is currently licensed for government-use only.  If you have access to this webpage, you must have been granted access through an existing license.  You can download SMASH onto any computer owned by the organization (national laboratory, university, etc.) that holds this license.  Copies of SMASH may be shared between users within an organization but should *not* be shared between organizations.  This site is the best way of accessing the SMASH toolbox---copies shared between users may be out of date.
 
 ## How do I get SMASH?
 
@@ -25,15 +25,19 @@ Git can be used at the command line or through a graphical client. For Mac and W
 
 Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit http://git-scm.com.
 
+## What does SMASH require?
+
+SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we in the process of migrating to release 2015a.
+
 ## How do I configure MATLAB to use SMASH?
 
 Make sure your copy of SMASH is located in a safe place on your machine. Subdirectories of your user directory or a documents directory are fine; the default download directory is probably not a good location.  If you downloaded a ZIP file, the directory may be named "smash.git"; you should rename this to "SMASHtoolbox". 
 
-Add the "SMASHtoolbox" directory to your MATLAB path. The "Set Path" button on the MATLAB tool strip can usually do this for you. Use the "Add folder" button in the "Set Path" dialog box, not the "Add with Subfolders" button. The toolbox  can also be manually added to the path using `addpath(location)`. I generally do this in a startup file "startup.m" located in a directory on the MATLAB path.
+Add the "SMASHtoolbox" directory to your MATLAB path. The "Set Path" button on the MATLAB tool strip can usually do this for you. Use the "Add folder" button in the "Set Path" dialog box, not the "Add with Subfolders" button. The toolbox  can also be manually added to the path using `addpath(location)`. I generally do this in a startup file located on the MATLAB path.
 
 ## Do I really need a MATLAB startup file
 
-Startup files aren't strictly required, but they turn out to be incredibly useful. You should really use them to tailor MATLAB to your needs.  Here's a very basic startup file that places the toolbox and its programs on the MATLAB path.
+Startup files aren't strictly required, but they turn out to be incredibly useful. You should really use them to tailor MATLAB to your needs.  Here's a very basic startup file (which must be named "startup.m") that places the toolbox and its programs on the MATLAB path.
 
 ```matlab
 function startup()
