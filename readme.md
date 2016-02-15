@@ -7,10 +7,10 @@ This is a markdown file for use with GitHub
 ## What is SMASH?
 
 SMASH stands for Sandia Matlab AnalysiS Hierarchy. It's a fancy way of saying "a collection of MATLAB code". The acronym and logo are inspired by dynamic compression research, where experiments involve literal smashing. The goals of the toolbox are: 
--To reduce development time in data analysis programs. 
--To standardize analysis techniques across dynamic compression and high-energy density researchers. 
--To promote and encourage collaborate analysis of complicated measurements. 
--To serve as a unified distribution method for new ideas and concepts. 
+- To reduce development time in data analysis programs. 
+- To standardize analysis techniques across dynamic compression and high-energy density researchers. 
+- To promote and encourage collaborate analysis of complicated measurements. 
+- To serve as a unified distribution method for new ideas and concepts. 
 The toolbox contains a "+SMASH" directory where most of the functions and class definitions are located. MATLAB treats this directory as a package, where the contents are accessed with dot notation. The toolbox also contains standard (non-package) directories for programs, documentation and examples.
 
 ## Who can use SMASH
@@ -42,8 +42,8 @@ Startup files aren't strictly required, but they turn out to be incredibly usefu
 ## How do I use SMASH?
 
 SMASH does lots of things, so this question has no simple answer. There are several ways to learn more.
--Online documentation is available in MATLAB by typing `doc SMASH`. Hyperlinks allow you to navigate down and up the package hierarchy. 
--Check out the "documentation" folder inside the toolbox for SAND reports on specific topics. 
--Some demonstrations are available in the "examples" folder. 
--Stop by one of the monthly meetings to talk to other users and developers.
--Contact the package developer(s) as necessary.
+- Online documentation is available in MATLAB by typing `doc SMASH`. Hyperlinks allow you to navigate down and up the package hierarchy. 
+- Check out the "documentation" folder inside the toolbox for SAND reports on specific topics. 
+- Some demonstrations are available in the "examples" folder. 
+- Stop by one of the monthly meetings to talk to other users and developers.
+- Contact the package developer(s) as necessary.
