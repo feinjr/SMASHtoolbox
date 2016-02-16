@@ -105,7 +105,7 @@ if isempty(poly_order)
     uiwait;
     
     ftx = getappdata(figSurface, 'SurfaceFit');
-    delete(figSurface);
+    close(figSurface.Handle);
     
 else
     ftx = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
@@ -129,6 +129,7 @@ if nout == 3
     varargout(2) = {Y(mask)};
     varargout(3) = {Z(mask)};
 end
+delete(diaPoly)
 
 %% Callback functions for dialog box
     function UpdateCallback(varargin)
