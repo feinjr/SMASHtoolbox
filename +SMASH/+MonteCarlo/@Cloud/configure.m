@@ -20,7 +20,7 @@ Narg=numel(varargin);
 if Narg==0
     assert(nargout==0,'ERROR: output cannot be generated without inputs');   
     name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
-        'NumberBins','HistogramMode','NumberGridPoints','NumberContours'};
+        'GridPoints','SmoothFactor','NumberContours'};
     for k=1:numel(name)
         fprintf('%s:\n',name{k});
         if isempty(object.(name{k}))
@@ -101,37 +101,29 @@ for k=1:2:Narg
                 error('ERROR: invalid seed value');
             end
             object.Seed=value;
-            refresh=true;
-        case 'numberbins'
-            assert(isnumeric(value) && all(value>0),...
-                'ERROR: invalid number of bins');
-            value=round(transpose(value(:)));
+            refresh=true;       
+        case 'gridpoints'
+            assert(isnumeric(value) ...
+                && all(value>0) && all(value==round(value)),...
+                'ERROR: invalid number of grid points');       
             assert(...
                 isscalar(value) || (numel(value)==object.NumberVariables),...
-                'ERROR: invalid number of bins');
-            object.NumberBins=value;            
-        case 'histogrammode'
-            assert(ischar(value),'ERROR: invalid histogram mode');
-            value=lower(value);
-            switch value
-                case {'bar','line'}
-                    object.HistogramMode=value;
-                otherwise
-                    error('ERROR: invalid histogram mode');
-            end        
-        case 'numbergridpoints'
-            assert(isnumeric(value) && all(value>0),...
                 'ERROR: invalid number of grid points');
-            value=round(transpose(value(:)));
-            assert(...
-                isscalar(value) || (numel(value)==object.NumberVariables),...
-                'ERROR: invalid number of grid points');                      
-            object.NumberGridPoints=value;        
-        case 'numbercontours'
-            assert(...
-                SMASH.General.testNumber(value,'positive','integer')...
-                && (value>0),'ERROR: invalid number of contours');
-            object.NumberContours=value;    
+            object.GridPoints=value;        
+        case 'smoothfactor'
+             assert(isnumeric(value) && isscalar(value) && (value>0),...
+                'ERROR: invalid smooth factor');                                
+            object.SmoothFactor=value;    
+        case 'contourlevel'
+            assert(isnumeric(value),'ERROR: invalid contour level(s)');
+            if isscalar(value) && (value>1) && (value==round(value))
+                value=linspace(0,1,value+2);
+                value=value(2:end-1);
+            end
+            assert(all(value>0) && all(value<1),...
+                'ERROR: invalid contour level(s)');
+            value=unique(value);
+            object.ContourLevel=value;    
         otherwise
             error('ERROR: invalid name');
     end        

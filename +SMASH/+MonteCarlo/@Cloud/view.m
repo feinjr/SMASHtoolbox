@@ -1,11 +1,15 @@
 % view Display cloud data
 %
+% UNDER CONSTRUCTION...
+
 % This method graphical displays cloud data in a triangular array of plots.
 % Plots showing variation within individual variables are on the diagonal,
 % while off-diagonal plots show mutual variations betwen variable pairs.
 % Standard use of this method:
 %     view(object);
-% generates 1D and 2D histograms.
+% generates 1D and 2D histograms. 
+
+
 %
 % Additional views can be created with the following settings.
 %     view(object,DiagonalPlots,CrossPlots);
@@ -35,27 +39,10 @@
 % created August 5, 2014 by Daniel Dolan (Sandia National Laboratories)
 % revised July 6, 2015 by Daniel Dolan
 %   -changed to a triangular plot array
-function varargout=view(object,DiagonalPlots,CrossPlots,orientation)
+function varargout=view(object,orientation)
 
 % manage input
-if (nargin<2) || isempty(DiagonalPlots)
-    DiagonalPlots='histogram';
-end
-test=strcmpi(DiagonalPlots,'histogram') ...
-    || strcmpi(DiagonalPlots,'density');
-assert(test,'ERROR: invalid diagonal plot setting');
-DiagonalPlots=lower(DiagonalPlots);
-
-if (nargin<3) || isempty(CrossPlots)
-    CrossPlots='density';  
-end
-test=strcmpi(CrossPlots,'points')      ...
-    || strcmpi(CrossPlots,'histogram') ...
-    || strcmpi(CrossPlots,'density');
-assert(test,'ERROR: invalid cross plot setting');
-CrossPlots=lower(CrossPlots);
-
-if (nargin<4) || isempty(orientation)
+if (nargin<2) || isempty(orientation)
     orientation='upper';
 end
 assert(strcmpi(orientation,'lower') || strcmpi(orientation,'upper'),...
@@ -72,16 +59,11 @@ for m=1:N
     % single variable plots (diagonal)
     index=sub2ind([N N],m,m);
     hdiagonal(end+1)=subplot(N,N,index); %#ok<AGROW>
-    box on;
-    switch DiagonalPlots
-        case 'histogram'
-            histogram(object,m,gca);
-        case 'density'
-
-            density(object,m,gca);
-    end
+    [dgrid,value]=density(object,m);    
+    plot(dgrid{1},value);
     temp=sprintf('%s ',object.VariableName{m});
-    xlabel(temp);    
+    xlabel(temp); 
+    ylabel('Probability density');
     % cross variable plots
     for n=(m+1):N
         switch orientation
@@ -91,22 +73,13 @@ for m=1:N
                 index=sub2ind([N N],n,m); % upper triangle
         end
         hcross(end+1)=subplot(N,N,index); %#ok<AGROW>
-        box on;
-        switch CrossPlots
-            case 'points'
-                line(object.Data(:,m),object.Data(:,n),...
-                    'LineStyle','none','Marker','.','Color','k');
-            case 'histogram'                
-                histogram(object,[m n],gca);
-            case 'density'                     
-                density(object,[m n],gca);
-        end
+        [dgrid,value]=density(object,[m n]);
+        contour(dgrid{:},value);
+        box on;               
         temp=sprintf('%s ',object.VariableName{m});
         xlabel(temp);
         temp=sprintf('%s ',object.VariableName{n});
-        ylabel(temp);       
-        %daspect([1 1 1]);
-        %pbaspect([1 1 1]);
+        ylabel(temp);    
     end
 end
 
