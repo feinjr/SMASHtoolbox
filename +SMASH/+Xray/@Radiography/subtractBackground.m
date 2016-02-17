@@ -105,13 +105,13 @@ if isempty(poly_order) % if no poly_order specified create dialog box
     uiwait;
     
     fbkg = getappdata(figSurface, 'SurfaceFit');
-    delete(figSurface);
+    close(figSurface.Handle);
     
-else % use specified poly_order to fit surface
+elseif ~isempty(poly_order) % use specified poly_order to fit surface
     fbkg = svd_surface(temp,X(mask),Y(mask),Z(mask),'polynomial',poly_order);
     
     if showplot
-        figure
+        figure;
         hold on
         surf(temp.Grid1,temp.Grid2,fbkg);
         view(-45,45)
@@ -131,7 +131,7 @@ if nout == 3
     varargout(2) = {Y(mask)};
     varargout(3) = {Z(mask)};
 end
-
+delete(diaPoly)
 %% Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for dialog box
     function UpdateCallback(varargin)
