@@ -114,16 +114,21 @@ for k=1:2:Narg
              assert(isnumeric(value) && isscalar(value) && (value>0),...
                 'ERROR: invalid smooth factor');                                
             object.SmoothFactor=value;    
-        case 'contourlevel'
-            assert(isnumeric(value),'ERROR: invalid contour level(s)');
+        case 'numbercontours'
+            assert(isnumeric(value) && isscalar(value)...
+                && (value>0) && (value==round(value)),...
+                'ERROR: invalid number of contours');
+            object.NumberContours=value;
+        case 'boundlevel'
+            assert(isnumeric(value),'ERROR: invalid bound level(s)');
             if isscalar(value) && (value>1) && (value==round(value))
                 value=linspace(0,1,value+2);
                 value=value(2:end-1);
             end
             assert(all(value>0) && all(value<1),...
-                'ERROR: invalid contour level(s)');
+                'ERROR: invalid bound level(s)');
             value=unique(value);
-            object.ContourLevel=value;    
+            object.BoundLevel=value;    
         otherwise
             error('ERROR: invalid name');
     end        

@@ -1,17 +1,29 @@
 % density Estimate probability density
 % 
 % This function estimates the probability density with a summation of local
-% Gaussians centered on each cloud point.  Density can be calculated for
-% all or specified variables in the cloud:
-%    [dgrid,value]=density(object); % all variables
-%    [dgrid,value]=density(object,variable); % specified variables
-% The first output is a cell array of grid values for each
-% variable.  The second ouput is an array of density values at
-% these grid locations.  The size of "dgrid" and dimensionality of "value"
-% depend on the number of density variables.
+% Gaussians centered on each cloud point.  
+%    [...]=density(object);
+% Density can be calculated for 1-2 cloud variables at a time.  If the
+% cloud contains more than 2 variables, the user is prompted to select
+% variables for the density calculation.  Specific variables can also be
+% selected with a second input.
+%    [...]=density(object,var1); % select one variable
+%    [...]=density(object,[var1 var2]); % select two variables
+%
+% For 1D calculations, this method has two outputs.
+%    [dgrid,value]=density(object,var1); % calculation
+%    plot(dgrid,value); % visualization
+% "dgrid" is an array of grid locations where density values are evaluated.
+%
+% For 2D calculations, this method has three outputs.
+%    [dgrid1,dgrid2,value]=density(object,[var1 var2]); % calculation
+%    imagesc(dgrid1,dgrid2,value); % visualization
+%    contour(dgrid1,dgrid2,value); % alternate visualization
+% "dgrid1" and "dgrid2" are arrays of grid locations wehre density values
+% are evaluated.
 %
 % Density calculations are controlled by the GridPoints and SmoothFactor
-% properties.  The modify these properties, see the configure method.
+% properties.  The modify these properties, use the configure method.
 %
 % See also Cloud, configure
 %
@@ -20,6 +32,14 @@
 % created February 16, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 function varargout=density(object,variable)
+
+%
+% NOTE: this method *should* work for 3D calculations and higher, but there
+% are some bugs to work out.  Also, memory restrictions start to become an
+% issue.  For example, a 1000 x 1000 x 1000 density array requires ~7 GB of
+% RAM.  I may return to this issue in the future, but for now only 1-2
+% calculations are supported.   -Dan
+%
 
 % manage input
 if (nargin<2) || isempty(variable)
@@ -57,8 +77,7 @@ width=nan(1,Ndim); % kernel width
 for n=1:Ndim
     temp=std(data(:,n))/Npoints^(1/5); % Silverman's rule
     width(n)=temp*object.SmoothFactor;
-    %span=max(abs(data(:,n)))+5*width(n);
-    span=max(abs(data(:,n)))+3*width(n);
+    span=max(abs(data(:,n)))+5*width(n);
     temp=linspace(-span,span,GridPoints(n));
     normgrid{n}=temp(:);
     spacing(n)=(normgrid{n}(end)-normgrid{n}(1))/(object.GridPoints-1);    
@@ -169,7 +188,8 @@ end
 weight=weight/mass;
 
 % manage output
-varargout{1}=dgrid;
-varargout{2}=weight;
+varargout=cell(1,Ndim+1);
+varargout(1:Ndim)=dgrid;
+varargout{end}=weight;
 
 end

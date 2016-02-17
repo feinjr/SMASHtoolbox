@@ -51,10 +51,11 @@ classdef Cloud %< SMASH.General.DataClass
         NumberPoints = 1000 % Number of cloud points
         Data % Cloud data table (columns represent variables)
         Source % Data soure: 'moments', 'table', 'transform', or 'bootstrap'
-        Seed = []; % Random number generator seed (uint32 value or text string)                  
+        Seed = [] % Random number generator seed (uint32 value or text string)                  
         GridPoints = 100 % Number of density grid points (integer)
-        SmoothFactor = 1 % Kernel smoothing factor (>0)
-        BoundLevel = [0.25 0.50 0.75]; % Fractional containment levels
+        SmoothFactor = 2 % Kernel smoothing factor (>0)
+        NumberContours = 5 % Contour levels used by the view method
+        BoundLevel = [0.25 0.50 0.75] % Fractional containment levels
     end
     %% constructor
     methods (Hidden=true)
