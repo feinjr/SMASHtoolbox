@@ -21,7 +21,7 @@ Ideally, you should set up Git to pull down updates incrementally.
 
 ## How do I setup and use Git?
 
-Git can be used at the command line or through a graphical client. For Mac and Windows users, I recommend the SourceTree graphical client. In either case, configure Git to see the SMASH repository at git@github.com:SMASHtoolbox/SMASHtoolbox.git.  See this [page](https://help.github.com/articles/generating-an-ssh-key/) for help with generating an SSH key to allow your machine to communicate with GitHub.
+Git can be used at the command line or through a graphical client. For Mac and Windows users, I recommend the SourceTree graphical client. In either case, configure Git to see the SMASH repository at `git@github.com:SMASHtoolbox/SMASHtoolbox.git`.  See this [page](https://help.github.com/articles/generating-an-ssh-key/) for help with generating an SSH key to allow your machine to communicate with GitHub.
 
 Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit http://git-scm.com.
 
