@@ -1,4 +1,4 @@
-![logo](./misc/SMASH LOGO medium.png | width=100) 
+![logo](./misc/SMASH LOGO medium.png) 
 
 Welcome to the distribution site for the SMASH toolbox.  The repository you see above contains the current version, which is available for download or Git clone/pull.  Some frequently asked questions are answered below.
 
