@@ -1,4 +1,5 @@
-# Welcome to the SMASH toolbox 
+![alt text](./misc/SMASH LOGO 64 x 64.png)
+This the distribution site for the SMASH toolbox.  The repository you see above contains the current version, which is available for download or Git clone/pull.  Some frequently asked questions are answered below.
 
 ## What is SMASH?
 
