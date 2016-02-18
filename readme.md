@@ -27,7 +27,7 @@ Once you've configured Git (or your Git client), clone the remote repository to 
 
 ## What does SMASH require?
 
-SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we in the process of migrating to release 2015a.
+SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we are gradually migrating to release 2015a.
 
 ## How do I configure MATLAB to use SMASH?
 
