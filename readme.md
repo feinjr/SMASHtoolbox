@@ -56,3 +56,23 @@ SMASH does lots of things, so this question has no simple answer. There are seve
 - Some demonstrations are available in the "examples" folder. 
 - Stop by one of the monthly meetings to talk to other users and developers.
 - Contact the package developer(s) as necessary.
+
+## What's inside SMASH?
+
+SMASH composed of packages and programs.  Packages contain functions and classes for general use, while programs are self-contained collections of code.  To illustrate the difference, consider the Signal class in the SignalAnalysis package.
+```matlab
+object=SMASH.SignalAnalysis.Signal();
+```
+This command tells MATLAB to create a Signal object, which is based on a class in the SignalAnalysis package; package/sub-package names are separated by dots.  The Signal class proves general-purpose tools for all kinds of signal analysis.  There is another class in the same package called SignalGroup that provides a slightly different set of tools.  
+```matlab
+object=SMASH.SignalAnalysis.Signal();
+```
+All classes and functions in a package can be accessed in this fashion.
+
+Programs are more specific collections of MATLAB code.  For example, the SIRHEN program was designed to analyze PDV data, making it poorly suited to general-purpose signal analysis.  SIRHEN sits inside the "programs" directly, which is not on the MATLAB path by default.  The utility "loadSMASH" manages this for you.
+```matlab
+loadSMASH -program SIRHEN % add SIRHEN to the path
+SIRHEN % launch the program
+```
+Programs usually involve lots of functions, but only a few of them (usually one) are available to end user.  In this example, that function is defined in the file "SIRHEN.m".
+
