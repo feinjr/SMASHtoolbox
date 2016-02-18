@@ -154,6 +154,7 @@ stop=max(table,[],1);
 [dgrid,final]=deal(cell(1,Ndim));
 for n=1:Ndim
     dgrid{n}=linspace(start(n),stop(n),GridPoints(n));
+    dgrid{n}=dgrid{n}(:);
 end
 [final{:}]=ndgrid(dgrid{:});
 

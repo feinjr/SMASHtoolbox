@@ -73,6 +73,13 @@ delete(ht);
 %data=cell(rows,columns);
 %set(h(end),'Data',data);
 
+% automatically store current indices
+setappdata(h(end),'CurrentCell',[1 1]);
+set(h(end),'CellSelectionCallback',@selectCell);
+    function selectCell(~,EventData)
+        setappdata(h(end),'CurrentCell',EventData.Indices);
+    end
+
 % update dialog size
 object.make_room;
 
