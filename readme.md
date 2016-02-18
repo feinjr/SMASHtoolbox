@@ -1,4 +1,5 @@
-# Welcome to the SMASH toolbox 
+![alt text](./misc/SMASH LOGO 64 x 64.png)
+Welcome to the distribution site for the SMASH toolbox.  The repository you see above contains the current version, which is available for download or Git clone/pull.  Some frequently asked questions are answered below.
 
 ## What is SMASH?
 
@@ -21,13 +22,13 @@ Ideally, you should set up Git to pull down updates incrementally.
 
 ## How do I setup and use Git?
 
-Git can be used at the command line or through a graphical client. For Mac and Windows users, I recommend the SourceTree graphical client. In either case, configure Git to see the SMASH repository at git@github.com:SMASHtoolbox/SMASHtoolbox.git.  See this [page](https://help.github.com/articles/generating-an-ssh-key/) for help with generating an SSH key to allow your machine to communicate with GitHub.
+Git can be used at the command line or through a graphical client. For Mac and Windows users, I recommend the SourceTree graphical client. In either case, configure Git to see the SMASH repository at `git@github.com:SMASHtoolbox/SMASHtoolbox.git`.  See this [page](https://help.github.com/articles/generating-an-ssh-key/) for help with generating an SSH key to allow your machine to communicate with GitHub.
 
 Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit http://git-scm.com.
 
 ## What does SMASH require?
 
-SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we in the process of migrating to release 2015a.
+SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we are gradually migrating to release 2015a.
 
 ## How do I configure MATLAB to use SMASH?
 
@@ -56,3 +57,23 @@ SMASH does lots of things, so this question has no simple answer. There are seve
 - Some demonstrations are available in the "examples" folder. 
 - Stop by one of the monthly meetings to talk to other users and developers.
 - Contact the package developer(s) as necessary.
+
+## What's inside SMASH?
+
+SMASH composed of packages and programs.  Packages contain functions and classes for general use, while programs are self-contained collections of code.  To illustrate the difference, consider the Signal class in the SignalAnalysis package.
+```matlab
+object=SMASH.SignalAnalysis.Signal();
+```
+This command tells MATLAB to create a Signal object, which is based on a class in the SignalAnalysis package; package/sub-package names are separated by dots.  The Signal class proves general-purpose tools for all kinds of signal analysis.  There is another class in the same package called SignalGroup that provides a slightly different set of tools.  
+```matlab
+object=SMASH.SignalAnalysis.Signal();
+```
+All classes and functions in a package can be accessed in this fashion.
+
+Programs are more specific collections of MATLAB code.  For example, the SIRHEN program was designed to analyze PDV data, making it poorly suited to general-purpose signal analysis.  SIRHEN sits inside the "programs" directly, which is not on the MATLAB path by default.  The utility "loadSMASH" manages this for you.
+```matlab
+loadSMASH -program SIRHEN % add SIRHEN to the path
+SIRHEN % launch the program
+```
+Programs usually involve lots of functions, but only a few of them (usually one) are available to end user.  In this example, that function is defined in the file "SIRHEN.m".
+
