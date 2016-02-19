@@ -1,12 +1,27 @@
+% The SMASH toolbox is a collection of MATLAB packages, programs, and
+% utilties.
+%
 % To learn more about the SMASH package, type "doc SMASH" in the command
 % window or click below.
-%   SMASH - SMASH packages (low level)
-% You can also type "SMASH" at the command prompt, highlight the 
-% name and then press the F1 key (or right-click the command 
-% and select "Help on Selection"). 
+%   SMASH - SMASH packages 
 %
-% Several programs and utility functions are distributed with this
-% toolbox...(UNDER CONSTRUCTION).
+% The toolbox also comes with the several programs.
+%    -analyzeSinusoid
+%    -convertLUNA
+%    -datninja
+%    -fringen
+%    -PointVISAR
+%    -pyrosim
+%    -SIRHEN
+%    -THRIVE
+% Programs must be added to the MATLAB path before they can be used.  This
+% can be done manually or through the loadSMASH utility (see below).
+%
+% The tooblbox provides the following utilities.
+%    aboutSMASH - Display toolbox information
+%    loadSMASH  - Add programs to the MATLAB path
+%
 %
 
 % last updated December 8, 2014
+% updated February 18, 2016
