@@ -70,12 +70,18 @@ This command tells MATLAB to create a Signal object, which is based on a class i
 ```matlab
 object=SMASH.SignalAnalysis.Signal();
 ```
-All classes and functions in a package can be accessed in this fashion.
+All classes and functions in a package can be accessed with dot notation (shown above) or by importing.
+```matlab
+import SMASH.SignalAnalysis.*; % import everything from the SignalAnalysis package
+objectA=Signal();
+objectB=SignalAnalysis();
+```
+Note that imports are specfific to a particular workspace, e.g. packages imported in the command window aren't automatially availble inside a function.  The command `clear all` removes all package imports.
 
 Programs are more specific collections of MATLAB code.  For example, the SIRHEN program was designed to analyze PDV data, making it poorly suited to general-purpose signal analysis.  SIRHEN sits inside the "programs" directly, which is not on the MATLAB path by default.  The utility "loadSMASH" manages this for you.
 ```matlab
 loadSMASH -program SIRHEN % add SIRHEN to the path
 SIRHEN % launch the program
 ```
-Programs usually involve lots of functions, but only a few of them (usually one) are available to end user.  In this example, that function is defined in the file "SIRHEN.m".
+Programs usually involve many function files, but only a few of them (usually one) are available to end user;  in this example, that function is defined in the file "SIRHEN.m".
 
