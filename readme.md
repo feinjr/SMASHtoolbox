@@ -77,5 +77,5 @@ Programs are more specific collections of MATLAB code.  For example, the SIRHEN 
 loadSMASH -program SIRHEN % add SIRHEN to the path
 SIRHEN % launch the program
 ```
-Programs usually involve lots of functions, but only a few of them (usually one) are available to end user.  In this example, that function is defined in the file "SIRHEN.m".
+Programs usually involve many function files, but only a few of them (usually one) are available to end user.  In this example, that function is defined in the file "SIRHEN.m".
 
