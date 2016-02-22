@@ -41,7 +41,7 @@ classdef Radiography
             end
             object.Measurement.GraphicOptions.LineColor = 'm';
             object.Measurement.GraphicOptions.LineStyle = '--';
-            
+            object.Measurement.GraphicOptions.YDir = 'normal';
         end
     end
     %%
