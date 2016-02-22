@@ -80,7 +80,7 @@ for n=1:Ndim
     span=max(abs(data(:,n)))+5*width(n);
     temp=linspace(-span,span,GridPoints(n));
     normgrid{n}=temp(:);
-    spacing(n)=(normgrid{n}(end)-normgrid{n}(1))/(object.GridPoints-1);    
+    spacing(n)=(normgrid{n}(end)-normgrid{n}(1))/(GridPoints(n)-1);    
 end
 
 % bin data
@@ -123,7 +123,8 @@ for n=1:Ndim
     end
     temp=reshape(temp,index);
     if Ndim>1
-        index=repmat(N2(n),[1 Ndim]);
+        %index=repmat(N2(n),[1 Ndim]);
+        index=N2;
         index(n)=1;
         temp=repmat(temp,index);
     end  
@@ -189,6 +190,10 @@ end
 weight=weight/mass;
 
 % manage output
+if Ndim==2
+    dgrid{1}=transpose(dgrid{1});
+    weight=transpose(weight);
+end
 varargout=cell(1,Ndim+1);
 varargout(1:Ndim)=dgrid;
 varargout{end}=weight;
