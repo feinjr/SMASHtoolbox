@@ -55,7 +55,9 @@ classdef Cloud %< SMASH.General.DataClass
         GridPoints = 100 % Number of density grid points (integer)
         SmoothFactor = 2 % Kernel smoothing factor (>0)
         NumberContours = 5 % Contour levels used by the view method
-        BoundLevel = [0.25 0.50 0.75] % Fractional containment levels
+    end
+    properties
+        GraphicOptions % Graphic options
     end
     %% constructor
     methods (Hidden=true)
@@ -64,6 +66,10 @@ classdef Cloud %< SMASH.General.DataClass
                 return
             end
             object=create(object,varargin{:});
+            if isempty(object.GraphicOptions)
+                object.GraphicOptions=SMASH.General.GraphicOptions;
+                object.GraphicOptions.Marker='none';
+            end
         end
         varargout=ellipse(varargin);
     end

@@ -40,10 +40,11 @@ for m=1:N
     index=sub2ind([N N],m,m);
     hdiagonal(end+1)=subplot(N,N,index); %#ok<AGROW>
     [dgrid,value]=density(object,m);    
-    plot(dgrid,value);
+    h=plot(dgrid,value);
     temp=sprintf('%s ',object.VariableName{m});
     xlabel(temp); 
     ylabel('Probability density');
+    apply(object.GraphicOptions,h);
     % cross variable plots
     for n=(m+1):N
         switch orientation
@@ -60,6 +61,7 @@ for m=1:N
         xlabel(temp);
         temp=sprintf('%s ',object.VariableName{n});
         ylabel(temp);    
+        apply(object.GraphicOptions,hcross(end));
     end
 end
 
