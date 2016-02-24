@@ -3,7 +3,7 @@
 % This function slices an Image object at a specified grid location.
 %    >> result=slice(object,coordinate,value);
 % The input "coordinate"  should be 'Grid1' or 'Grid2'; "value" can only be
-% one locations within that grid (at the moment).  If these inputs are omitted,
+% one location within that grid (at the moment).  If these inputs are omitted,
 % the user will be prompted to select them.  The output of this method is a
 % SignalGroup object; slices are plotted in a new figure when no output is
 % specified.

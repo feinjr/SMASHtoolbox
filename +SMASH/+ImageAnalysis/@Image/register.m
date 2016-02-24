@@ -17,6 +17,10 @@
 % corresponding registration tables must be passed as a cell array of the
 % same size.
 % 
+% Passing an ImageGroup as a target will apply the register to all the
+% Images within that group. Only one target table needs to be submitted,
+% the same one will be used on all the Images.
+% 
 % By default, this method uses translation, shifting, and rotation for
 % image registration.  Shear can be added with final input arguement.
 %     >> [...]=register(...,'shear'); % default is 'noshear'
@@ -33,6 +37,8 @@
 
 %
 % created November 5, 2014 by Daniel Dolan (Sandia National Laboratories)
+% modified February 19, 2016 by Sean Grant (Sandia National Laboratories)
+%   -Included ImageGroup functionality.
 %
 function varargout=register(varargin)
 
@@ -55,6 +61,16 @@ else
 end
 assert(strcmpi(mode,'shear') | strcmpi(mode,'noshear'),...
     'ERROR: invalid mode');
+
+% Handle ImageGroup target input
+if isa(Target,'SMASH.ImageAnalysis.ImageGroup')
+    temp=cell(object.NumberImages,1);
+    [temp{:}]=split(Target);
+    Target=temp;
+    
+    % Handle TargetTable
+    TargetTable=repmat({TargetTable},object.NumberImages,1);
+end
 
 if ~iscell(Target)
     Target={Target};

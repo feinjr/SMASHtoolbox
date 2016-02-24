@@ -4,6 +4,9 @@
 % objects.
 %    >> [object1,object2,...]=split(object)
 %
+% A call for specific Image numbers can also be made:
+%   >> [object1,object2,...]=split(object,[imageNumbers])
+%
 % See also ImageGroup, gather
 %
 
@@ -11,8 +14,24 @@
 % created January 7, 2016 by Sean Grant (Sandia National Laboratories/UT)
 %
 
-function varargout=split(object)
+function varargout=split(object,imageNumbers)
 
+% handle selective image call
+if nargin>1
+    assert(nargout<=(numel(imageNumbers)),...
+    'ERROR: too many outputs requested');
+    
+    temp=cell(object.NumberImages,1);
+    [temp{:}]=split(object);
+    varargout=cell(1,numel(imageNumbers));
+    for n=1:(numel(imageNumbers))
+        assert(rem(imageNumbers(n),1)==0,'Image selections must be an integer');
+        varargout{n}=temp{imageNumbers(n)};
+    end
+    return
+end
+    
+    
 assert(nargout<=object.NumberImages,...
     'ERROR: too many outputs requested');
 varargout=cell(1,object.NumberImages);
