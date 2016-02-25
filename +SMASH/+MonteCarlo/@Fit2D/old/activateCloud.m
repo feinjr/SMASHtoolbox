@@ -34,7 +34,4 @@ end
 active=unique(active);
 object.ActiveClouds=active;
 
-% update weights
-object=calculateWeights(object);
-
 end

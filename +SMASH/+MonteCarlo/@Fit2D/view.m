@@ -22,7 +22,7 @@ end
 assert(ishandle(target),'ERROR: invalid target axes');
 
 % display active clouds
-clouds=object.CloudData(object.ActiveClouds);
+clouds=object.Measurement(object.ActiveClouds);
 N=numel(clouds);
 h=nan(1,N);
 for n=1:N

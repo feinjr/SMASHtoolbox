@@ -20,7 +20,7 @@ Narg=numel(varargin);
 if Narg==0
     assert(nargout==0,'ERROR: output cannot be generated without inputs');   
     name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
-        'GridPoints','SmoothFactor','NumberContours','BoundLevel'};    
+        'GridPoints','SmoothFactor','NumberContours'};    
     for k=1:numel(name)
         fprintf('%s:\n',name{k});
         if isempty(object.(name{k}))
