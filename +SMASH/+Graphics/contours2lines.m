@@ -2,8 +2,10 @@
 %
 % This function extracts line data from a contour matrix (as generated from
 % contourc).
-%    data=contours2lines(Cmatrix)
-% The output is a cell array containing two-column numeric arrays ([x y]).
+%    [data,level]=contours2lines(Cmatrix)
+% The output "data" is a cell array containing two-column numeric arrays
+% ([x y]).  The output "level" is a corresponding array of contour levels
+% for each (x,y) data set.
 %
 % See also Graphics, plotContourMatrix, contourc
 %

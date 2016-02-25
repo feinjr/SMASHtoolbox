@@ -57,6 +57,8 @@ if numel(varargin)>1
     object=add(object,varargin{:});
 end
 
+object.Processed=false;
+
 end
 
 %%
@@ -65,7 +67,7 @@ function object=processCloud(object,new)
 assert(new.NumberVariables==2,'ERROR: only 2D clouds are permited');
 object.Measurement{end+1}=new;
 object.NumberMeasurements=object.NumberMeasurements+1;
-object.IsProcessed(end+1)=false;
+object.Processed(end+1)=false;
 
 end
 

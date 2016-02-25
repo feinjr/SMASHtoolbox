@@ -1,15 +1,16 @@
 function object=create(object,varargin)
 
-% probability density estimation
-param=struct();
-param.GridPoints=100;
-param.SmoothFactor=2;
-param.PadFactor=5;
-param.NumberContours=5;
-object.DensitySettings=param;
-
 % optimization
 object.OptimizationSettings=optimset;
+
+% graphical display
+param=struct();
+param.XLabel='X';
+param.YLabel='Y';
+object.DisplaySettings=param;
+
+object.ModelSettings = struct('Function',[],'Parameters',[],'Bounds',[],...
+            'Slack',[],'SlackReference',[],'Curve',[]); 
 
 % add measurements as necessary
 if numel(varargin)>0

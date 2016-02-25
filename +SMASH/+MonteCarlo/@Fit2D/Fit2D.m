@@ -25,26 +25,21 @@
 %
 classdef Fit2D
     %%
-    properties
-        XLabel = 'X' % horizontal axes label
-        YLabel = 'Y' % vertical axes label
-    end
     properties (SetAccess=protected)
         Measurement = {} % Cell array of Cloud objects
         NumberMeasurements = 0 % Number of Cloud objects
-        DensitySettings  % Probability density settings   
     end
     properties (SetAccess=protected) % PROTECT ME
-        IsProcessed = [] % Processed measurement flags
-        ProcessedData = {} %                
+        Processed = false % Processed measurement flags
+        ProcessedResult = {} %                
     end    
     properties
         Iterations = 100 % Monte Carlo iterations
     end
     properties (SetAccess=protected)
-        OptimizationSettings % Optimization settings
-        Model  = struct('Function',[],'Parameters',[],'Bounds',[],...
-            'Slack',[],'SlackReference',[],'Curve',[]) %      
+        ModelSettings % Model settings
+        OptimizationSettings % Optimization settings  
+        DisplaySettings % Display settings (used by view method)
     end  
     properties
 
@@ -65,17 +60,6 @@ classdef Fit2D
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
-    end
-    %% property setters
-    methods        
-%         function object=set.OptimizationSettings(object,value)
-%             try
-%                 value=optimset(value);
-%             catch
-%                 error('ERROR: invalid optmization settings');                
-%             end
-%             object.OptimizationSettings=value;
-%         end
-    end
+    end    
     
 end
