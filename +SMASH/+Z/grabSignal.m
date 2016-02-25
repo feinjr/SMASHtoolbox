@@ -17,16 +17,37 @@
 % machine, so it is faster to grab several signals at once rather than
 % calling this function for individual signals.
 %
+% Calling this function with no record labels and no output copies the
+% archive file (without reading it) to the local machine.
+%    grabSignal(shotnumber); % copy *.pff archive
+%    grabSignal(shotnumber,'pff'); % copy *.pff archive
+%    grabSignal(shotnumber,'hdf'); % copy *.hdf archive
+% Local archives are named "ZDAS" followed by the shot number and the
+% extension *.pff/*.hdf.
+% 
+%
 % See also Z, SMASH.Signal.SignalGroup
 % 
 
 %
 % created January 29, 2016 by Daniel Dolan (Sandia National Laboratories)
+% updated February 25, 2016 by Daniel Dolan
+%    -added copy-only mode
 %
 function varargout=grabSignal(varargin)
 
 % manage input
-assert(nargin >= 2,'ERROR: insufficient input');
+assert(nargin >= 1,'ERROR: insufficient input');
+
+if (nargout==0) % copy-only mode
+    if nargin<2
+        varargin{2}='pff';
+    end
+    assert(strcmpi(varargin{2},'pff') || strcmpi(varargin{2},'hdf'),...
+        'ERROR: invalid archive format');
+else
+    assert(nargin >= 2,'ERROR: insufficient input');
+end
 
 if isnumeric(varargin{1}) || isscalar(varargin{1})
     shot=varargin{1};
@@ -40,7 +61,11 @@ end
 
 % manage output
 if nargout==0
-    view(object);
+    if isempty(object)
+        % do nothing
+    else
+        view(object);
+    end
 else
     varargout{1}=object;
 end
@@ -48,6 +73,15 @@ end
 end
 
 function object=grabRemote(shot,varargin)
+
+object=[];
+
+CopyOnly=false;
+if numel(varargin)==1
+    if strcmpi(varargin{1},'pff') || strcmpi(varargin{1},'hdf')
+        CopyOnly=true;
+    end
+end
 
 % determine file extension
 subdir='pff_data';
@@ -61,6 +95,20 @@ elseif strcmpi(varargin{1},'hdf')
 end
 
 assert(iscellstr(varargin),'ERROR: invalid signal label(s)');
+
+if CopyOnly
+    final=sprintf('ZDAS%d%s',shot,extension);
+    if exist(final,'file')
+        fprintf('Local archive found--overwrite exisiting file?\n');
+        result=input('   (y)es or [no]: ','s');
+        switch result
+            case {'y','yes'}
+                % continue
+            otherwise
+                return;
+        end
+    end
+end
 
 % copy remote file to a temporary local file
 tempfile=sprintf('.tempfileZ%d%s',shot,extension);
@@ -76,9 +124,13 @@ else
     system(command);
 end
 
+if CopyOnly    
+    movefile(tempfile,final,'f')
+    return
+end
+
 % read signals and delete temporary local file
 object=grabLocal(tempfile,varargin{:});
-
 delete(tempfile);
 
 end
