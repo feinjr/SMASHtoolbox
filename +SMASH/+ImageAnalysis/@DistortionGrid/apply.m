@@ -74,11 +74,13 @@ for n=1:(N-1)
 end
 
 % apply transformation to the target object
-target.Data=interp2(target.Grid1,target.Grid2,target.Data,X,Y);
-%target.Data=target.Data.*jacobian;
-target.Grid1=p;
-target.Grid2=transpose(q);
+target=reset(target,p,transpose(q),...
+    interp2(target.Grid1,target.Grid2,target.Data,X,Y));
+%target.Data=interp2(target.Grid1,target.Grid2,target.Data,X,Y);
+%%target.Data=target.Data.*jacobian;
+%target.Grid1=p;
+%target.Grid2=transpose(q);
 
-target.ObjectHistory{end+1}='Distortion.apply';
+%target.ObjectHistory{end+1}='Distortion.apply';
 
 end
