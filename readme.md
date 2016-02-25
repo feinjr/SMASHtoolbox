@@ -28,6 +28,13 @@ Git can be used at the command line or through a graphical client. For Mac and W
 
 Once you've configured Git (or your Git client), clone the remote repository to your machine with the name SMASHtoolbox. When changes are made to the gitlab repository, you call pull the latest version directly from the remote repository to your machine. In SourceTree, this operation is literally a single button click. If you make changes to SMASH, they must be added and committed to your local repository and then pushed to gitlab. The gitlab repository will only accept revisions from approved developers. To learn more about Git, visit http://git-scm.com.
 
+## Why can't I get SourceTree to work?
+
+Configuring SourceTree can be a little tricky, especially on Windows (which lacks a native bash terminal).  Here are some suggestions:
+- Use the "Terminal" button on toolbar at the top of the SourceTree window.
+- Follow the instructions at https://help.github.com/articles/generating-an-ssh-key to set up a SSH key and associate it with your GitHub account.
+- Make sure SourceTree is looking for your SSH key files in the right place.  This seems to be automatic on Macs, but not for Windows.  Under the "Tools" menu there is an item called "Options".  Clicking on this item shows various tabs for configuring SourceTree.  The "General" tab has a section for SSH client configuration.  The popup menu should be set to OpenSSH (not Putty!).  When OpenSSH is selected, the SSH key location should automatically be set to a *_rsa.pub file.
+
 ## What does SMASH require?
 
 SMASH runs within MATLAB on Mac, Linux, and Windows machines.  Although some features may work in much older releases, users are encouraged to use MATLAB release 2013a or later.  SMASH is ~99% compatible with the new graphics system introduced in the release 2014b, and we are gradually migrating to release 2015a.

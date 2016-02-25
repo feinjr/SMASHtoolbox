@@ -1,8 +1,19 @@
-function varargout = viewproperties( object,varargin )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+function varargout = exploreproperties( object,varargin )
+% This function is used to explore images of the various properties.  IT is
+% similar to viewproperties except it opens an explore window, allowing the
+% user to specify the caxis limits and the number of pixels in the x- and
+% y-directions to average over for a lineout
+%
+%   Input Arguments:
+%       varargin{1}: viewing option.  Specify which property to view
+%       varargin{2}: Color axis limits
+%       varargin{3}: 2x1 array specifying the No. of x and y pixels for
+%       averaging of lineouts.  If none specified, 0 is used, which is the
+%       same as slice.
 Narg=numel(varargin);
 clims = [];
+xOff = 0;
+yOff = 0;
 
 if Narg == 0
     view(object.Measurement)
@@ -11,6 +22,12 @@ elseif Narg == 1
 elseif Narg == 2
     option = varargin{1};
     clims = varargin{2};
+elseif Narg == 3
+    option = varargin{1};
+    clims = varargin{2};
+    xOff = varargin{3}(1);
+    yOff = varargin{3}(2);
+
 end
 switch option
     case 'Data'
@@ -20,7 +37,7 @@ switch option
         obj.DataLabel = 'Exposure';
         obj.GraphicOptions.Title = 'Raw Radiograph';
         obj.GraphicOptions.YDir = 'normal';
-        view(obj)
+        LineoutWidth(obj,xOff,yOff,clims)
     case 'Transmission'
         obj = object.Transmission;
         obj.Grid1Label = 'Radial Distance [mm]';
@@ -31,8 +48,7 @@ switch option
         if isempty(clims)
             clims = [-0.1 1.1];
         end
-        view(obj)
-        set(gca,'CLim',clims)
+        LineoutWidth(obj,xOff,yOff,clims)
     case 'Optical Depth'
         temp = object.Transmission.Data;
         temp(temp<1e-3) = 1e-3;
@@ -47,8 +63,7 @@ switch option
         if isempty(clims)
             clims = [-0.1 5];
         end
-        view(obj)
-        set(gca,'CLim',clims)
+        LineoutWidth(obj,xOff,yOff,clims)
     case 'Opacity'
         temp = object.Transmission.Data;
         temp(temp<1e-3) = 1e-3;
@@ -63,8 +78,7 @@ switch option
          if isempty(clims)
             clims = [-0.1 2.5];
         end
-        view(obj)
-        set(gca,'CLim',clims)
+        LineoutWidth(obj,xOff,yOff,clims)
         
     case 'Density'
         obj = object.Density;
@@ -76,8 +90,7 @@ switch option
         if isempty(clims)
             clims = [-0.1 10];
         end
-        view(obj)
-        set(gca,'CLim',clims)        
+        LineoutWidth(obj,xOff,yOff,clims)
         
 end
 

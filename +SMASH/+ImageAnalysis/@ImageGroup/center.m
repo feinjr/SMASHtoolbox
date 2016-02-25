@@ -15,14 +15,14 @@
 
 % created January 29, 2016 by Sean Grant (Sandia National Laboratories/UT)
 
-function [object,x0,y0,params]=center(object,frame,mode,varargin)
+function [object,x0,y0,params]=center(object,imageNumber,mode,varargin)
 
 % handle input
-if isempty(frame)
+if isempty(imageNumber)
     sprintf('Defaulting to Image #1 for selection')
-    frame=1;
+    imageNumber=1;
 end
-assert(rem(frame,1)==0,'Frame slection must be an integer')
+assert(rem(imageNumber,1)==0,'Frame slection must be an integer')
 
 if (nargin<3) || isempty(mode)
     mode='ellipse';
@@ -33,7 +33,7 @@ temp=cell(object.NumberImages,1);
 [temp{:}]=split(object);
 
 % call indicated frame
-[~,x0,y0,params]=center(temp{frame},mode,varargin{:});
+[~,x0,y0,params]=center(temp{imageNumber},mode,varargin{:});
 
 % Perform shifts given from center function to the ImageGroup
 object=shift(object,'Grid1',-x0);
