@@ -54,6 +54,7 @@ classdef Cloud %< SMASH.General.DataClass
         Seed = [] % Random number generator seed (uint32 value or text string)                  
         GridPoints = 100 % Number of density grid points (integer)
         SmoothFactor = 2 % Kernel smoothing factor (>0)
+        PadFactor = 5 % Density estimation padding factor (>1)
         NumberContours = 5 % Contour levels used by the view method
     end
     properties
