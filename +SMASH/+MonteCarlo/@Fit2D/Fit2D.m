@@ -26,6 +26,7 @@
 classdef Fit2D
     %%
     properties (SetAccess=protected)
+        DensityEstimates % Cell array of dens
         Measurement = {} % Cell array of Cloud objects
         NumberMeasurements = 0 % Number of Cloud objects
     end

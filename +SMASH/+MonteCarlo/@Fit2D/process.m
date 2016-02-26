@@ -35,20 +35,20 @@ for m=1:object.NumberMeasurements
     % prepare data
     data=object.Measurement{m}.Data; % [x y]
     Npoints=size(data,1);
-    center=mean(data,1);
-    data=bsxfun(@minus,data,center);
+    result.OriginalMean=mean(data,1);
+    data=bsxfun(@minus,data,result.OriginalMean);
     % singular value decomposition
     [data,D,C]=svd(data,0);
-    result.Table=data; % [u v]
+    %result.FinalTable=data; % [u v]
     result.BackwardMatrix=D*transpose(C); % principle to actual coordinates
     Dinv=diag(1./diag(D));
     result.ForwardMatrix=C*Dinv; % actual to principle coordinates
     % normal distribution parameters
-    result.Mean=mean(data,1);
-    result.Std=std(data,[],1);
-    result.Var=var(data,[],1);
+    result.FinalMean=mean(data,1);
+    result.FinalStd=std(data,[],1);
+    result.FinalVar=var(data,[],1);
     % density estimation
-    width=result.Std/Npoints^(1/5); % Silverman's rule
+    width=result.FinalStd/Npoints^(1/5); % Silverman's rule
     width=width*SmoothFactor;
     normgrid=cell(1,2);
     table=nan(Npoints,2);
@@ -95,21 +95,38 @@ for m=1:object.NumberMeasurements
     density=density/mass;
     % interpolant
     [u,v]=ndgrid(normgrid{1},normgrid{2});
-    result.DensityLookup=griddedInterpolant(u,v,density);
+    result.FinalDensityLookup=griddedInterpolant(u,v,density,'linear','none');
     % density image and boundary
-    density=transpose(density);
-    result.DensityImage=SMASH.ImageAnalysis.Image(...
+    density=transpose(density);    
+    temp=SMASH.ImageAnalysis.Image(...
         normgrid{1},normgrid{2},density);
-    result.DensityImage.GraphicOptions.AspectRatio='equal';
+    temp.GraphicOptions.AspectRatio='equal';
+    result.FinalDensityImage=temp;
     threshold=max(density(:))*exp(-2^2/2);
     temp=contourc(normgrid{1},normgrid{2},density,...
         [threshold threshold]);
     temp=SMASH.Graphics.contours2lines(temp);
-    result.Boundary=temp{1};
+    temp=temp{1}*result.BackwardMatrix;
+    result.OriginalBoundary=bsxfun(@plus,temp,result.OriginalMean);
     % store results
+    result=orderfields(result);
     object.ProcessedResult{m}=result;
 end
 
 object.Processed=true;
 
 end
+
+% YOU ARE HERE
+%
+% We don't really need to keep the cloud points around, do we?
+% Points can be converted to a Density structure
+%   -FowardMatrix (original to final coordinates)
+%   -ReverseMatrix (final to original coordinates)
+%   -OriginalMean
+%   -OriginalBoundary (one contour)
+%   -Mean
+%   -Std
+%   -Var
+%   -Table
+%   -Image
