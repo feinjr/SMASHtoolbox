@@ -1,5 +1,7 @@
 % This class manages models of two variables (x and y) with an arbitrary
-% number of parameters.  Given a set of parameters, the model function
+% number of parameters.  
+
+%Given a set of parameters, the model function
 % generates a two-column table ([x y]).
 %     table=model(param,xspan,yspan);
 %        param : vector array of model parameters

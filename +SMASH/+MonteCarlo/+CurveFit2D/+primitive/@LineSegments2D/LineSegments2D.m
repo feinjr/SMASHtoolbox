@@ -4,8 +4,7 @@
 %
 % LineSegments2D objects are created with a points array.
 %     >> object=LineSegments2D(array);
-% At present, the class supports to two-dimensional curves only.  The
-% points array of an object can be read from the Points property:
+% The points array of an object can be read from the Points property:
 %     >> data=object.Point;
 % but cannot be changed directly.  Modifications may be performed through
 % the add, remove, and reset methods.

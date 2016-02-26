@@ -4,18 +4,6 @@
 % UNDER CONSTRUCTION
 
 
-
-% Individual data points are represented by virtual cloud
-% distributed about the nominal center.  This distribution is represented
-% by statistical moment (mean, variance, skewness, and excess kurtosis) in
-% (x,y) and correlation between each variable.
-%
-% Objects from this class can be created with or without data points.
-%    >> object=CloudFitXY(); % empty object
-% UNDER CONSTRUCTION...
-%
-
-
 %
 % See also MonteCarlo, Cloud
 %
@@ -26,14 +14,9 @@
 classdef Fit2D
     %%
     properties (SetAccess=protected)
-        DensityEstimates % Cell array of dens
-        Measurement = {} % Cell array of Cloud objects
+        Measurement = {} % Cell array of Density2D objects
         NumberMeasurements = 0 % Number of Cloud objects
     end
-    properties (SetAccess=protected) % PROTECT ME
-        Processed = false % Processed measurement flags
-        ProcessedResult = {} %                
-    end    
     properties
         Iterations = 100 % Monte Carlo iterations
     end
