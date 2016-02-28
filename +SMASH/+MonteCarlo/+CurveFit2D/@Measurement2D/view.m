@@ -1,20 +1,19 @@
-function varargout=view(object,mode,target)
+% view Display measurements
+%
+% This method ...
+
+%
+%
+%
+function varargout=view(object,target)
 
 % manage input
-if (nargin<2) || isempty(mode)
-    mode='original';
-end
-assert(ischar(mode),'ERROR: invalid view mode');
-mode=lower(mode);
-assert(strcmp(mode,'original') || strcmp(mode,'final'),...
-    'ERROR: invalid view mode');
-
-if (nargin<3) || isempty(target)
+if (nargin<2) || isempty(target)
     figure;
     NewFigure=true;
     target=axes('Box','on');
     xlabel(object.XLabel);
-    ylabel(object.YLabel);    
+    ylabel(object.YLabel);
 else
     assert(ishandle(target) && strcmpi(get(target,'Type'),'axes'),...
         'ERROR: invalid target axes');
@@ -22,34 +21,29 @@ else
 end
 
 % plot original boundary curve
-switch mode
-    case 'original'
-        h{1}=line('Parent',target,...
-            'XData',object.Original.Boundary(:,1),...
-            'YData',object.Original.Boundary(:,2),...
-            'Color','k','LineWidth',0.5);
-        h{2}=line('Parent',target,...
-            'XData',object.Original.Mode(1),...
-            'YData',object.Original.Mode(2),...
-            'Color','k','Marker','+');
-    case 'final'
-        h{1}=view(object.Final.Image,'show',target);        
-        h{2}=line('Parent',target,...
-            'XData',object.Final.Boundary(:,1),...
-            'YData',object.Final.Boundary(:,2),...
-            'Color','k','LineWidth',0.5);
-        h{3}=line('Parent',target,...
-            'XData',object.Final.Mode(1),...
-            'YData',object.Final.Mode(2),...
-            'Color','k','Marker','+');
+N=object.NumberMeasurements;
+hbound=nan(1,N);
+hmode=nan(1,N);
+for n=1:N
+    temp=object.ProbabilityDensity{n}.Original.Boundary;
+    hbound(n)=line('Parent',target,...
+        'XData',temp(:,1),'YData',temp(:,2));
+    apply(object.GraphicOptions,hbound(n),'noparent');
+    set(hbound(n),'Marker','none');
+    temp=object.ProbabilityDensity{n}.Original.Mode;
+    hmode(n)=line('Parent',target,...
+        'XData',temp(1),'YData',temp(2));
+    apply(object.GraphicOptions,hmode(n),'noparent');
 end
+
 if NewFigure
     axis(target,'auto');
 end
 
 % manage output
 if nargout>0
-    varargout{1}=h;
+    varargout{1}=hbound;
+    varargout{2}=hmode;
 end
 
 end

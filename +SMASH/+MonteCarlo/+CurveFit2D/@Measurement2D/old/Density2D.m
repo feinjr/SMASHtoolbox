@@ -24,10 +24,12 @@
 %
 classdef Density2D
     %%
+    properties
+        AssumeNormal = false % Assume normal distributions (true/false)
+    end
     properties (SetAccess=protected)
         Original % Density information in the original coordinates
         Final % Density information in the final (principle) coordinates
-        Jacobian % Area density ratio (Auv/Axy)
         Matrix % Coordinate transformation matrices
         Setting % Density calculation settings (read only)
     end
@@ -44,5 +46,12 @@ classdef Density2D
     %%
     methods (Static=true,Hidden=true)
         varargout=restore(varargin);
+    end
+    %%
+    methods
+        function object=set.AssumeNormal(object,value)
+            assert(islogical(value),'ERROR: invalid AssumeNormal value');
+            object.AssumeNormal=value;
+        end
     end
 end

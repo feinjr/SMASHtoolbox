@@ -18,7 +18,7 @@
 %
 
 %
-% created ?
+% created February 26, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 function object=estimate(object,source,varargin)
 
@@ -36,7 +36,6 @@ assert(isa(source,'SMASH.MonteCarlo.Cloud'),'ERROR: invalid density source');
 assert(source.NumberVariables==2,'ERROR: source cloud must have two variables');
 
 setting=struct();
-setting.IsNormal=false;
 setting.GridPoints=[100 100];
 setting.SmoothFactor=2;
 setting.PadFactor=5;
@@ -48,11 +47,7 @@ for n=1:2:Narg
     name=varargin{n};
     assert(ischar(name),'ERROR: invalid name');
     value=varargin{n+1};
-    switch lower(name)
-        case 'isnormal'
-            assert(islogical(value) && isscalar(value),...
-                'ERROR: invalid IsNormal value');
-            setting.IsNormal=value;
+    switch lower(name)       
         case 'gridpoints'   
             assert(isnumeric(value),'ERROR: invalid GridPoints value');
             if isscalar(value)
@@ -149,6 +144,8 @@ density=density/mass;
 % interpolating object
 [u,v]=ndgrid(normgrid{1},normgrid{2});
 object.Final.Lookup=griddedInterpolant(u,v,density,'linear','none');
+object.Final.ubound=[u(1) u(end)];
+object.Final.vbound=[v(1) v(end)];
 
 % density image and boundary
 density=transpose(density);
@@ -179,12 +176,14 @@ object.Final.Mode=temp;
 temp=temp*object.Matrix.Reverse;
 object.Original.Mode=bsxfun(@plus,temp,object.Original.Mean);
 
-% calculate Jacobian
-temp=object.Original.Boundary;
-areaXY=polyarea(temp(:,1),temp(:,2));
-temp=object.Final.Boundary;
-areaUV=polyarea(temp(:,1),temp(:,2));
+%% calculate Jacobian
+areaUV=1;
+table=[1 0; 0 1]; % (u,v) plane
+table=table*object.Matrix.Reverse;
+table(:,3)=0;
+areaXY=cross(table(1,:),table(2,:));
+areaXY=abs(areaXY(3));
 
-object.Jacobian=areaUV/areaXY;
+object.Matrix.Jacobian=areaUV/areaXY;
 
 end

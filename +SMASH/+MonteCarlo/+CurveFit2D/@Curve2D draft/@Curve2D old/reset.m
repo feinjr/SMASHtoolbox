@@ -1,7 +1,7 @@
 % reset Reset points array
 %
 % This method resets the points array in an existing LineSegments object.  
-%     >> object=resent(object,array);
+%     >> object=reset(object,array);
 % Segment information is automatically updated to match the revised Points
 % property.
 %
@@ -14,26 +14,39 @@
 function object=reset(object,data)
 
 % manage input
-if nargin==1
-    data=object.Points;
-end
-if isempty(data)
-    data=zeros(0,2);
-end
-%assert(nargin==2,'ERROR: invalid number of inputs');
+assert(nargin==2,'ERROR: invalid number of inputs');
 
-if isa(data,'SMASH.MonteCarlo.Support.LineSegments')
-    object=data;
-    return
-elseif isnumeric(data) && ismatrix(data)
-    assert(size(data,2)==2,'ERROR: invalid points array');
-    object.NumberPoints=size(data,1);
-    object.Points=data;
-else
-    error('ERROR: invalid input');
+assert(isnumeric(data) && ismatrix(data) && size(data,2)==2,...
+    'ERROR: invalid points table');
+while true
+    if any(isnan(data(1,:)))
+        data=data(2:end,:);
+        continue
+    elseif any(isnan(data(end,:)))
+        data=data(1:end-1,:);
+        continue
+    else
+        break
+    end
+end
+object.NumberPoints=size(data,1);
+object.Points=data;
+% very that first two and last two enties aren't NaN?
+
+
+%%
+MaxSegments=object.NumberPoints+1;
+object=struct();
+object.Origin=nan(1,MaxSegments);
+object.Direction=nan(1,MaxSegments);
+object.Length=nan(1,MaxSegments);
+index=0;
+for k=1:object.NumberPoints
+    
 end
 
 
+% THIS NEEDS TO BE REDONE!
 % segment processing
 object.Segments=nan(object.NumberPoints+1,2,3);
 index=0;

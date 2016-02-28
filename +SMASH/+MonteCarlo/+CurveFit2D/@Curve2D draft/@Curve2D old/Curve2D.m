@@ -1,12 +1,12 @@
-% This class describes curves as a sequence of line segments.  In this
-% context, a "curve" is any ordered group of points in a two-column array
-% ([x y]).  Each row of the array corresponds to one point on the curve.
+% This class describes curves as a sequence of line segments between points
+% on a two-dimensional plane. These points are specified in a two-column
+% table ([x y]).  Each row of the array defines one point on the curve.
 %
-% LineSegments2D objects are created with a points array.
-%     >> object=LineSegments2D(array);
-% The points array of an object can be read from the Points property:
+% Curve2D objects are created with a points table.
+%     >> object=Curve2D(array);
+% The points array can be read from the Points property:
 %     >> data=object.Point;
-% but cannot be changed directly.  Modifications may be performed through
+% but cannot be changed directly.  Modifications can be performed through
 % the add, remove, and reset methods.
 %
 % Curves are single-valued functions of one independent variable.  This
@@ -46,7 +46,7 @@
 %
 % created October 22, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef LineSegments2D
+classdef Curve2D
     %%
     properties (SetAccess=protected)
         Points % Point coordiantes (two-column array)
@@ -62,7 +62,7 @@ classdef LineSegments2D
     end
     %%
     methods (Hidden=true)
-        function object=LineSegments2D(varargin)
+        function object=Curve2D(varargin)
             object=reset(object,varargin{:});
         end
         varargout=create(varargin);
@@ -85,7 +85,7 @@ classdef LineSegments2D
     %% restore method allows objects to be restored from SDA files
      methods (Static=true, Hidden=true)
         function object=restore(data)
-            object=SMASH.MonteCarlo.Support.LineSegments2D();
+            object=SMASH.MonteCarlo.CurveFit2D.Curve2D();
             name=fieldnames(data);
             for n=1:numel(name)
                 if isprop(object,name{n})
