@@ -1,6 +1,14 @@
+% UNDER CONSTRUCTION
+%
+%   object=Curve2D(model,param,domain)
+% Model function is evalutated in the specified domain (xmin/xmax and
+% ymin/ymax)
+%
+
 % This class describes curves as a sequence of line segments between points
 % on a two-dimensional plane. These points are specified in a two-column
 % table ([x y]).  Each row of the array defines one point on the curve.
+
 %
 % Curve2D objects are created with a points table.
 %     >> object=Curve2D(array);
@@ -49,39 +57,20 @@
 classdef Curve2D
     %%
     properties (SetAccess=protected)
-        Points % Point coordiantes (two-column array)
-        Segments % Segment data (three dimensional array)
+        Parameter
+        BoundaryType='projected' % Boundary type: ['projected'], 'closed', or 'wrapped'
+        Points % Evaluation point coordinates [x y] (two-column table)
     end
     properties
-        GraphicOptions=SMASH.General.GraphicOptions('Marker','none') % Graphic options object
-        BoundaryType='projected' % Boundary type: ['projected'], 'closed', or 'wrapped'
-    end
-    properties (SetAccess=protected,Hidden=true)
-        NumberPoints
-        NumberSegments      
-    end
+        GraphicOptions=SMASH.General.GraphicOptions('Marker','none') % Graphic options object        
+    end    
     %%
     methods (Hidden=true)
         function object=Curve2D(varargin)
             object=reset(object,varargin{:});
         end
-        varargout=create(varargin);
-    end
-    %%
-    methods 
-        function object=set.BoundaryType(object,value)
-            assert(ischar(value),'ERROR: invalid BoundaryType setting');
-            value=lower(value);
-            switch value
-                case {'closed','projected','wrapped'}
-                    % valid choices
-                otherwise
-                    error('ERROR: invalid BoundaryType setting');
-            end
-            object.BoundaryType=value;
-            object=reset(object);
-        end
-    end
+        varargout=reset(varargin);
+    end   
     %% restore method allows objects to be restored from SDA files
      methods (Static=true, Hidden=true)
         function object=restore(data)

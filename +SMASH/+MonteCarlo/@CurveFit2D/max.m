@@ -1,9 +1,9 @@
 % max Determine maximum density value/location
 %
-% line segments defined by two-colum matrix
-% NaN indicates breaks, Inf indicates extrapolation
+% line segments defined by a five-column table: [x0 y0 Lx Ly theta]
 %
 
+% ADD INDEX!!!e
 function [value,location]=max(object,mode,table)
 
 %% manage input
@@ -30,7 +30,7 @@ if (nargin<3)
 end
 assert(isnumeric(table) && ismatrix(table),...
     'ERROR: invalid segment table');
-[row,cols]=size(table);
+[rows,cols]=size(table);
 assert(cols==2,'ERROR: invalid segment table');
 
 % transform coordinates as necessary
@@ -64,5 +64,9 @@ switch mode
     case 'original'
         value=value*object.Matrix.Jacobian;
 end
+
+end
+
+function segment=points2segments(point)
 
 end

@@ -35,8 +35,11 @@ while numel(varargin)>0
             numpoints=[];
             varargin=varargin(2:end);
         end
+        % there is a risk here that truly normal data is only approximately
+        % normal in the scaled coordinate system.  Perhaps this should be
+        % addresed in the future?
         for n=1:size(table,1)
-            [new,temp]=SMASH.MonteCarlo.CurveFit2D.createCloud2D(...
+            [new,temp]=createCloud2D(...
                 table(n,:),numpoints);
             source{end+1}=new; %#ok<AGROW>
             isnormal(end+1)=temp; %#ok<AGROW>
@@ -51,13 +54,13 @@ end
 % convert source cloud(s) to probability density
 M=numel(source);
 start=object.NumberMeasurements;
-object.ProbabilityDensity{end+M}=[];
+object.MeasurementDensity{end+M}=[];
 for m=1:M
-    object.ProbabilityDensity{start+m}=convert(...
-        source{m}.Data,object.DensityOptions);    
-    object.ProbabilityDensity{end}.IsNormal=isnormal(m);
+    object.MeasurementDensity{start+m}=convert(...
+        source{m}.Data,object.DensitySettings);    
+    object.MeasurementDensity{start+m}.IsNormal=isnormal(m);
 end
-object.NumberMeasurements=start+M;
+object.NumberMeasurements=object.NumberMeasurements+M;
 
 end
 

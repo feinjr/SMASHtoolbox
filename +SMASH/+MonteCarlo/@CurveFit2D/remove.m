@@ -10,7 +10,7 @@ function object=remove(object,index)
 assert(nargin>1,'ERROR: insufficient number of inputs');
 
 if strcmpi(index,'all')
-    object.ProbabilityDensity={};
+    object.MeasurementDensity={};
     object.NumberMeasurements=0;
     return    
 end
@@ -23,7 +23,7 @@ for k=1:numel(index)
     keep(index)=false;
 end
 
-object.ProbabilityDensity=object.ProbabilityDensity(keep);
+object.MeasurementDensity=object.MeasurementDensity(keep);
 object.NumberMeasurements=sum(keep);
 
 end
