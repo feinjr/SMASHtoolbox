@@ -58,11 +58,18 @@ end
                 u=u0+eta*Lu;
                 v=v0+eta*Lv;
                 temp=lookup(object,m,'scaled',[u v]);
-                temp=max(temp)*measurement.Matrix.Jacobian;
-                maxdensity(m)=max(maxdensity(m),temp);
+                [temp,index]=max(temp);
+                temp=temp*measurement.Matrix.Jacobian;
+                if temp > maxdensity(m)
+                    maxdensity(m)=temp;
+                    u=u(index);
+                    v=v(index);
+                end                
                 % non-normal analysis
-                if isnormal(n)
-                   continue
+                if isnormal(n) ...
+                        || (u<ubound(1)) || (u>ubound(2)) ...
+                        || (v<vbound(1)) || (v>vbound(2))
+                   continue                  
                 end
                 % look up density
             end

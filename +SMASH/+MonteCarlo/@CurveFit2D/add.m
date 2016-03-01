@@ -77,7 +77,7 @@ end
 object.NumberMeasurements=object.NumberMeasurements+M;
 
 object.XDomain=xdomain;
-object.YDomain=ydomain;
+object.XDomain=ydomain;
 
 end
 
@@ -167,22 +167,54 @@ result.Scaled.Lookup=griddedInterpolant(u,v,density,'linear','none');
 result.Scaled.ubound=[u(1) u(end)];
 result.Scaled.vbound=[v(1) v(end)];
 
-% Image store removed to conserve memory
+% Stored Image removed to conserve memory
 %temp=SMASH.ImageAnalysis.Image(...
 %    normgrid{1},normgrid{2},density);
+%temp=SMASH.ImageAnalysis.Image(...
+%    normgrid{1},normgrid{2},density/max(density(:)));
 %temp.GraphicOptions.AspectRatio='equal';
 %result.Scaled.Image=temp;
 
 % density boundary
 density=transpose(density);
-threshold=max(density(:))*setting.ContourFraction;
-temp=contourc(normgrid{1},normgrid{2},density,...
+u=transpose(u);
+v=transpose(v);
+% theta=atan2(v,u);
+% distance2=u.^2+v.^2;
+% %coverage=setting.BoundaryCoverage;
+% boundary=[];
+%     function value=BoundaryMatch(slack)
+%         level=0.5+0.5*sin(slack);
+%         level=level*result.Scaled.MaxDensity;
+%         boundary=contourc(normgrid{1},normgrid{2},density,...
+%             [level level]);
+%         boundary=SMASH.Graphics.contours2lines(boundary);
+%         boundary=boundary{1};
+%         
+%         
+%         %inside=inpolygon(data(:,1),data(:,2),...
+%             boundary(:,1),boundary(:,2));
+%         inside=sum(inside)/size(inside,1);
+%         value=abs(inside-setting.BoundaryCoverage);
+%     end
+% fminsearch(@BoundaryMatch,0);
+threshold=result.Scaled.MaxDensity*setting.BoundaryDensityFraction;
+boundary=contourc(normgrid{1},normgrid{2},density,...
     [threshold threshold]);
-temp=SMASH.Graphics.contours2lines(temp);
-temp=temp{1};
-result.Scaled.Boundary=temp;
-temp=temp*result.Matrix.Reverse;
-result.Original.Boundary=bsxfun(@plus,temp,result.Original.Mean);
+boundary=SMASH.Graphics.contours2lines(boundary);
+boundary=boundary{1};
+result.Scaled.Boundary=boundary;
+%phi=atan2(boundary(:,2),boundary(:,1));
+%R2=sum(boundary.^2,2);
+boundary=boundary*result.Matrix.Reverse;
+result.Original.Boundary=bsxfun(@plus,boundary,result.Original.Mean);
+
+%theta=atan2(v,u);
+%distance2=u.^2+v.^2;
+%[phi,index]=sort(phi);
+%R2=R2(index);
+%ratio=distance2./interp1(phi,R2,theta);
+
 
 % approximate mode locations (assumes single mode!)
 [u,v]=meshgrid(normgrid{1},normgrid{2});

@@ -13,7 +13,8 @@ object.DensitySettings.GridPoints=[100 100];
 object.DensitySettings.SmoothFactor=2;
 object.DensitySettings.PadFactor=5;
 object.DensitySettings.MinDensityFactor=1e-9;
-object.DensitySettings.ContourFraction=exp(-2^2/2);
+%object.DensitySettings.BoundaryDensityFraction=exp(-1^2/2);
+object.DensitySettings.BoundaryDensityFraction=exp(-2^2/2);
 
 Narg=numel(varargin);
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');

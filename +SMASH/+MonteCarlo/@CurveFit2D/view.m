@@ -12,7 +12,7 @@ target=axes('Box','on');
 xlabel(object.XLabel);
 ylabel(object.YLabel)
 
-% plot measurement boundary curves
+% plot measurement boundaries
 N=object.NumberMeasurements;
 assert(N>0,'ERROR: no measurements added yet');
 hbound=nan(1,N);
