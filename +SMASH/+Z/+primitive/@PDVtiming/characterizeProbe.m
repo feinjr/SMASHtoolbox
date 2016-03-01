@@ -52,8 +52,10 @@ if (nargin<2) || isempty(measurement)
 end
 if ischar(measurement)
     measurement=processFile(object,'probe',measurement,'');
+    measurement=measurement/2;
 elseif iscell(measurement)
     measurement=processFile(object,'probe',measurement{:});
+    measurement=measurement/2;
 elseif isnumeric(measurement)
     assert(isscalar(measurement),'ERROR: invalid measurement transit');
 else
@@ -66,9 +68,11 @@ if (nargin<3) || isempty(reference)
     reference=fullfile(pathname,filename);
 end
 if ischar(reference)
-    reference=processFile(object,'reference',reference,'');    
+    reference=processFile(object,'reference',reference,'');   
+    reference=reference/2;
 elseif iscell(reference)
     reference=processFile(object,'reference',reference{:}); 
+    reference=reference/2;
 elseif isnumeric(reference)
     assert(isscalar(reference),'ERROR: invalid reference transit');
 else
@@ -76,7 +80,8 @@ else
 end
 
 % perform calculation
-delay=(measurement-reference)/2;
+%delay=(measurement-reference)/2;
+delay=measurement-reference;
 
 % manage output
 if nargout==0
