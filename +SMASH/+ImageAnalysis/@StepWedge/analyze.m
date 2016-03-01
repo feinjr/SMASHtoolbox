@@ -144,13 +144,13 @@ ys=polyval(p,xs);
 
 pd=polyder(p);
 slope=polyval(pd,xs(end));
-y0=mean(y(y>y2));
+y0=mean(y(y>=y2));
 x0=xs(end)-(ys(end)-y0)/slope; % project curve to upper bound
 xs(end+1)=x0;
 ys(end+1)=y0;
 
 slope=polyval(polyder(p),xs(1));
-y0=mean(y(y<y1));
+y0=mean(y(y<=y1));
 x0=xs(1)-(ys(1)-y0)/slope; % project curve to lower bound
 xs(end+1)=x0;
 ys(end+1)=y0;
