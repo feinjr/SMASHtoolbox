@@ -52,15 +52,32 @@ while numel(varargin)>0
 end
 
 % convert source cloud(s) to probability density
+xdomain=object.XDomain;
+if isempty(xdomain)   
+    xdomain=[+inf -inf];
+end
+ydomain=object.YDomain;
+if isempty(ydomain)
+    ydomain=[+inf -inf];
+end
+
 M=numel(source);
 start=object.NumberMeasurements;
 object.MeasurementDensity{end+M}=[];
 for m=1:M
+    data=source{m}.Data;
+    xdomain(1)=min(xdomain(1),min(data(:,1)));
+    xdomain(2)=max(xdomain(2),max(data(:,1)));
+    ydomain(1)=min(ydomain(1),min(data(:,2)));
+    ydomain(2)=max(ydomain(2),max(data(:,2)));
     object.MeasurementDensity{start+m}=convert(...
-        source{m}.Data,object.DensitySettings);    
+        data,object.DensitySettings);    
     object.MeasurementDensity{start+m}.IsNormal=isnormal(m);
 end
 object.NumberMeasurements=object.NumberMeasurements+M;
+
+object.XDomain=xdomain;
+object.YDomain=ydomain;
 
 end
 

@@ -1,4 +1,12 @@
+% create Create object
+%
+% This protected method is used during object creation to fill out default
+% properties and manage density settings
+%
 
+%
+% created February 29, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=create(object,varargin)
 
 object.DensitySettings.GridPoints=[100 100];

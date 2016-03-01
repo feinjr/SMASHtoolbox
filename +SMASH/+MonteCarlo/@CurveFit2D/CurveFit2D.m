@@ -1,26 +1,34 @@
+% UNDER CONSTRUCTION
+%
+% object=CurveFit2D();
+% Density options set at creation
+%
+
+%
+% created ??? by Daniel Dolan (Sandia National Laboratories)
+%
 classdef CurveFit2D
     %%
     properties
         XLabel = 'X' % Horizontal axes label (string)
-        YLabel % Vertical axes label (string)
+        YLabel = 'Y'% Vertical axes label (string)
         AssumeNormal = false % Ignore non-normal density (logical)
         OptimizationSettings = optimset(); % Optimization parameters
     end
     properties (SetAccess=protected)
         NumberMeasurements = 0 % Number of measurements (integer)
         MeasurementDensity % Probability densities (cell array of structures)
-        DensitySettings % Calculation settings for probability density (immutable structure)
+        DensitySettings % Density calculation settings (immutable structure)
         XDomain % Horizontal domain ([xmin xmax]) for all measurements
         YDomain % Vertical domain ([ymin ymax]) for all measurements
-        Model % Model function handle
+        Model % Model function handle   
         Parameter % Model parameters
         Bound % Parameter bounds
         CurvePoints % Model evaluation points (two-column array)
-        CurveSegments % Model segments (five-column array)
+        %CurveSegments % Model segments (five-column array)
     end
     properties (SetAccess=protected) % eventually make hidden
         Slack % Model slack parameters       
-        BoundType % Parameter bound type
     end
     %%
     methods (Hidden=true)
@@ -32,10 +40,10 @@ classdef CurveFit2D
         end
     end    
     %%
-    methods (Access=protected)
+    methods (Access=protected, Hidden=true)
         varargout=create(varargin);
         %varargout=max(varargin);
-        varargout=evaluate(varargin);
+        %varargout=evaluate(varargin);
     end
     %% allow saved objects to be restored from a SDA file
     methods (Static=true,Hidden=true)
