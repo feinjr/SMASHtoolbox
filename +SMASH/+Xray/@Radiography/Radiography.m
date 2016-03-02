@@ -1,3 +1,4 @@
+
 % This class creates Radiography objects from ZBL backlighter image plate
 % records.  It is a subclass of SMASH.ImageAnalysis.Image
 %

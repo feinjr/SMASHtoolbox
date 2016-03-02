@@ -6,6 +6,8 @@ classdef TiGHER
     %% properties
     properties % core data
         Measurement % image object
+        Linearized
+        frames % Cell array of image objects
     end
     properties
         Settings    % structure containing pertinent information
@@ -33,7 +35,7 @@ classdef TiGHER
                 varargin{1}=varargin{1};
                 object.Measurement=varargin{1};
             elseif (nargin == 2) && ischar(varargin{1}) && ischar(varargin{2})
-                object=SMASH.ImageAnalysis.Image(varargin{1},varargin{2});
+                object.Measurement=SMASH.ImageAnalysis.Image(varargin{1},varargin{2});
             end
         end
     end
