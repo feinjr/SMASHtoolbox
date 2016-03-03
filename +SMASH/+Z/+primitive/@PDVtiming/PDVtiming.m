@@ -83,9 +83,12 @@ classdef PDVtiming < handle
             assert(ischar(value),'ERROR: invalid Experiment value');
             object.Experiment=value;
         end
-        function set.MaxConnections(object,value)
-            assert(SMASH.General.testNumber(value,'integer','positive','notzero'),...
+        function set.MaxConnections(object,value)            
+            assert(SMASH.General.testNumber(value,'integer','positive'),...
                 'ERROR: invalid number of maximum connections');
+            if value==0
+                value=16;
+            end
             object.MaxConnections=value;
         end
         function set.DigitizerScaling(object,value)
