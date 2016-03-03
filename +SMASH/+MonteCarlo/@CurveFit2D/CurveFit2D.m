@@ -17,15 +17,14 @@ classdef CurveFit2D
     end
     properties (SetAccess=protected)
         NumberMeasurements = 0 % Number of measurements (integer)
-        MeasurementDensity % Probability densities (cell array of structures)
-        DensitySettings % Density calculation settings (immutable structure)
+        MeasurementDensity % Probability densities (cell array of Density2D objects)
+        DensitySettings % Density calculation settings (structure)
         XDomain % Horizontal domain ([xmin xmax]) for all measurements
         YDomain % Vertical domain ([ymin ymax]) for all measurements
         Model % Model function handle   
         Parameter % Model parameters
         Bound % Parameter bounds
-        CurvePoints % Model evaluation points (two-column array)
-        %CurveSegments % Model segments (five-column array)
+        CurvePoints % Model evaluation points (two-column array)      
     end
     properties (SetAccess=protected) % eventually make hidden
         Slack % Model slack parameters       
@@ -36,26 +35,17 @@ classdef CurveFit2D
             if (nargin==1) && strcmpi(varargin{1},'-empty')
                 return % provided for SDA restore
             end
-            object=create(object,varargin{:});
+            object=create(object,varargin{:});          
         end
     end    
     %%
     methods (Access=protected, Hidden=true)
-        varargout=create(varargin);
-        %varargout=max(varargin);
+        varargout=create(varargin);   
         %varargout=evaluate(varargin);
     end
     %% allow saved objects to be restored from a SDA file
     methods (Static=true,Hidden=true)
-        function object=restore(data)
-            object=SMASH.MonteCarlo.CurveFit2D('-empty');
-            name=fieldnames(data);
-            for n=1:numel(name)
-                if isprop(object,name{n})
-                    object.(name{n})=data.(name{n});
-                end
-            end
-        end
+        varargout=restore(varargin);
     end
     %%
     methods

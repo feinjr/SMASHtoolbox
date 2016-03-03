@@ -179,42 +179,43 @@ result.Scaled.vbound=[v(1) v(end)];
 density=transpose(density);
 u=transpose(u);
 v=transpose(v);
-% theta=atan2(v,u);
-% distance2=u.^2+v.^2;
-% %coverage=setting.BoundaryCoverage;
-% boundary=[];
-%     function value=BoundaryMatch(slack)
-%         level=0.5+0.5*sin(slack);
-%         level=level*result.Scaled.MaxDensity;
-%         boundary=contourc(normgrid{1},normgrid{2},density,...
-%             [level level]);
-%         boundary=SMASH.Graphics.contours2lines(boundary);
-%         boundary=boundary{1};
-%         
-%         
-%         %inside=inpolygon(data(:,1),data(:,2),...
-%             boundary(:,1),boundary(:,2));
-%         inside=sum(inside)/size(inside,1);
-%         value=abs(inside-setting.BoundaryCoverage);
-%     end
-% fminsearch(@BoundaryMatch,0);
+
 threshold=result.Scaled.MaxDensity*setting.BoundaryDensityFraction;
 boundary=contourc(normgrid{1},normgrid{2},density,...
     [threshold threshold]);
 boundary=SMASH.Graphics.contours2lines(boundary);
 boundary=boundary{1};
-result.Scaled.Boundary=boundary;
-%phi=atan2(boundary(:,2),boundary(:,1));
-%R2=sum(boundary.^2,2);
+%result.Scaled.Boundary=boundary;
+
+theta=atan2(boundary(:,2),boundary(:,1));
+distance=sqrt(sum(boundary.^2,2));
+order=3;
+basis=ones(size(boundary,1),1+2*order);
+for n=1:order
+    column=2*n;
+    basis(:,column)=cos(n*theta);
+    basis(:,column+1)=sin(n*theta);
+end
+coefficient=basis\distance;
+
+theta=atan2(data(:,1),data(:,2));
+basis=ones(numel(theta),1+2*order);
+for n=1:order
+    column=2*n;
+    basis(:,column)=cos(n*theta);
+    basis(:,column+1)=sin(n*theta);
+end
+fit=basis*coefficient;
+distance=sqrt(sum(data.^2,2));
+inside=(distance<=fit);
+coverage=sum(inside)/numel(inside);
+result.Scaled.Coverage=coverage;
+result.Original.Coverage=coverage;
+
+%result.Scaled.Boundary=boundary;
+result.Scaled.Boundary=fit;
 boundary=boundary*result.Matrix.Reverse;
 result.Original.Boundary=bsxfun(@plus,boundary,result.Original.Mean);
-
-%theta=atan2(v,u);
-%distance2=u.^2+v.^2;
-%[phi,index]=sort(phi);
-%R2=R2(index);
-%ratio=distance2./interp1(phi,R2,theta);
-
 
 % approximate mode locations (assumes single mode!)
 [u,v]=meshgrid(normgrid{1},normgrid{2});

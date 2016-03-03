@@ -18,7 +18,7 @@
 % requested.
 %    hline=plotContourMatrix(...);
 %
-% See also Graphics, contourc
+% See also SMASH.Graphics, contourc
 %
 
 %
