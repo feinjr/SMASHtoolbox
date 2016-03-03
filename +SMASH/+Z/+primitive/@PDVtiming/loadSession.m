@@ -46,7 +46,7 @@ while ~feof(fid)
     end
     switch lower(name)
         case 'experiment:'            
-            Experiment=content{1};           
+            Experiment=strtrim(content{1});           
             Comment=content(2:end);            
         case 'connections:'
             content=content(2:end); % skip column labels
@@ -178,11 +178,16 @@ while ~feof(fid)
     if isempty(scan)
         break
     end
-    first=scan(1);
-    scan=strtrim(scan);
-    if isempty(scan) || strcmp(scan(1),first)    
-        break   
-    end
+    if isempty(strtrim(scan))
+        if strcmp(scan(1),sprintf('\t'))
+            scan=' ';
+            % keep empty lines that begin with a tab (usually comment gaps)
+        else
+            break
+        end
+    else
+        scan=strtrim(scan);
+    end        
     content{end+1}=scan; %#ok<AGROW>
 end
 
