@@ -6,8 +6,8 @@ object=SMASH.MonteCarlo.CurveFit2D(...
 
 % xmean ymean xvar yvar xycorr xskew yskew
 table=[];
-table(1,:)=[0 0 0.01 0.01];
-table(2,:)=[1 1 0.01 0.01];
+table(1,:)=[0 0 0.01 0.01 0 0.0 0];
+table(2,:)=[1 1 0.01 0.01 0 0.75 0];
 object=add(object,table);
 
 view(object);

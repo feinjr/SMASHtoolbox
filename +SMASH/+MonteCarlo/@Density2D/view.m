@@ -1,8 +1,8 @@
 % view Display object
 %
 % This method generates a graphical display of Density2D object.  Density
-% contours are shown as black lines.  A black "+" sign indicates the
-% approximate location of peak density (the mode).
+% contours are shown as black lines.  The asterisk (*) indicates mean
+% location
 %    view(object); % generate plot in a new figure
 %    view(object,target); % plot in an existing target axes
 %    h=view(...); % return graphic handles
@@ -32,12 +32,12 @@ h=hggroup('Tag','Density2D plot');
 hc=SMASH.Graphics.plotContourMatrix(object.Original.ContourMatrix,target);
 set(hc,'Parent',h,'Color','k','LineStyle','--','Tag','DensityContour');
 
-hmode=line(object.Original.Mode(1),object.Original.Mode(2),...
-    'Color','k','Marker','+','Tag','Mode');
-set(hmode,'Parent',h);
+%hmode=line(object.Original.Mode(1),object.Original.Mode(2),...
+%    'Color','k','Marker','+','Tag','Mode');
+%set(hmode,'Parent',h);
 
 hmean=line(object.Original.Mean(1),object.Original.Mean(2),...
-    'Color','k','Marker','o','Tag','Mean');
+    'Color','k','Marker','*','Tag','Mean');
 set(hmean,'Parent',h);
 
 % manage output

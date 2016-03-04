@@ -28,6 +28,17 @@ in=SMASH.General.structure2list(data);
 data=list2structure(in{:});
 object.DensitySettings=data;
 
+% graphic options
+option=struct();
+option.MeasurementColor='k';
+option.MeasurementStyle='--';
+
+option.ModelColor='k';
+option.ModelStyle='-';
+option.ModelWidth=1;
+
+object.GraphicOptions=option;
+
 end
 
 function data=list2structure(varargin)

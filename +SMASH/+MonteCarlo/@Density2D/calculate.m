@@ -145,19 +145,6 @@ object.Scaled.vbound=[v(1) v(end)];
 object.Scaled.vrange=v(end)-v(1);
 object.Scaled.vinc=(v(end)-v(1))/object.GridPoints(2);
 
-% estimate peak location
-z=object.Scaled.Lookup(data(:,1),data(:,2));
-threshold=object.Scaled.MaxDensity*object.ModeFraction;
-keep=(z >= threshold);
-w=z(keep);
-w=w/sum(w);
-w=repmat(w,[1 2]);
-location=sum(w.*data(keep,:),1);
-object.Scaled.Mode=location;
-
-location=location*object.Matrix.Reverse+object.Original.Mean;
-object.Original.Mode=location;
-
 % density image
 density=transpose(density);
 if thrifty

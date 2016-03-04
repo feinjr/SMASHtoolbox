@@ -14,6 +14,7 @@ classdef CurveFit2D
         YLabel = 'Y'% Vertical axes label (string)
         AssumeNormal = false % Ignore non-normal density (logical)
         OptimizationSettings = optimset(); % Optimization parameters
+        GraphicOptions; % Graphic options used by view method (structure)
     end
     properties (SetAccess=protected)
         NumberMeasurements = 0 % Number of measurements (integer)
@@ -37,6 +38,7 @@ classdef CurveFit2D
             end
             object=create(object,varargin{:});          
         end
+        varargout=recenter(varargin);
     end    
     %%
     methods (Access=protected, Hidden=true)
@@ -67,6 +69,17 @@ classdef CurveFit2D
                 error('ERRO: invalid OptimizationSettings value');
             end
             object.OptimizationSettings=value;
+        end
+        function object=set.GraphicOptions(object,value)
+            assert(isstruct(value),'ERROR: invalid GraphicOptions value');            
+            if ~isempty(object.GraphicOptions)
+                name=fieldnames(value);
+                for n=1:numel(name)
+                    assert(isfield(object.GraphicOptions,name{n}),...
+                        'ERROR: unrecognized graphic option');
+                end
+            end
+            object.GraphicOptions=value;
         end
     end
 end

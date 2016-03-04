@@ -5,44 +5,36 @@ if (nargin<2) || isempty(iterations)
     iterations=100;
 end
 
-% determine draw regions
-
-% parallelization?
-center=draw(object);
-
+% Monte Carlo simulations  
+if object.AssumeNormal
+    mode='normal';
+else
+    mode='general';
 end
 
-% rejection sampling
-function [center,trials]=draw(object)
-
-M=object.NumberMeasurements;
-center=nan(M,2);
-
-% YOU ARE HERE
-
-trials=0;
-for m=1:M;
-    measurement=object.MeasurementDensity{m};    
-    Pmax=measurement.Scaled.MaxDensity;    
-    ubound=measurement.Scaled.ubound;
-    u0=ubound(1);
-    Lu=ubound(2)-ubound(1);    
-    vbound=measurement.Scaled.vbound;
-    v0=vbound(1);
-    Lv=vbound(2)-vbound(1);
-    while true
-        trials=trials+1;
-        temp=rand(1,3);
-        pos=[u0 v0]+[Lu Lv].*temp(1:2);
-        P=measurement.Scaled.Lookup(pos(1),pos(2));
-        if (temp(3) <= P/Pmax)           
-            break
-        end
+result=nan(numel(object.Parameter),iterations);
+if SMASH.System.isParallel
+    parfor k=1:iterations
+        temp=process(object,mode);
+        result(:,k)=temp(:);
     end
-    pos=pos*measurement.Matrix.Reverse;
-    pos=pos+measurement.Original.Mean;
-    center(m,:)=pos;
+else
+    for k=1:iterations
+        temp=process(object,mode);
+        result(:,k)=temp(:);
+    end
 end
-trials=trials/M; % average trials per measurement
+
+% generate results
+result=transpose(result);
+result=SMASH.MonteCarlo.Cloud(result,'table');
+
+end
+
+function parameter=process(object,mode)
+
+object=recenter(object,mode);
+object=optimize(object);
+parameter=object.Parameter;
 
 end
