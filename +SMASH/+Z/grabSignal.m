@@ -50,11 +50,28 @@ else
 end
 
 if isnumeric(varargin{1}) || isscalar(varargin{1})
-    shot=varargin{1};
+    shot=varargin{1};       
     object=grabRemote(shot,varargin{2:end});
 elseif ischar(varargin{1})
-    file=varargin{1};   
-    object=grabLocal(file,varargin{2:end});    
+    file=varargin{1};
+    if logical(exist(file,'file'))
+        object=grabLocal(file,varargin{2:end});
+    else
+        shot=findNumber(file);
+        assert(~isempty(shot),...
+            'ERROR: unable to find requested file or extract shot number');
+        commandwindow
+        warning('SMASH:grabSignal','Unable to find requested file');
+        fprintf('Look for shot %d on the remote server?\n',shot);
+        answer=input('   (y)es or (n)o? : ','s');
+        assert(strcmpi(answer,'y') || strcmpi(answer,'yes'),...
+            'ERROR: no signals were grabbed');       
+        try
+            object=grabRemote(shot,varargin{2:end});
+        catch
+            error('ERROR: unable to find shot %d',shot);
+        end
+    end    
 else
     error('ERROR: invalid input');
 end
@@ -201,5 +218,22 @@ function result=ismatch(value,pattern)
 
 pattern=regexptranslate('wildcard',pattern);
 result=regexpi(value,pattern);
+
+end
+
+function shot=findNumber(label)
+
+shot=[];
+
+label=strtrim(label);
+while numel(label)>0
+    temp=sscanf(label,'%d',1);
+    if isempty(temp)
+        label=label(2:end);
+    else
+        shot=temp;
+        break
+    end
+end
 
 end
