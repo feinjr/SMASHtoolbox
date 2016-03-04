@@ -13,12 +13,14 @@ center=draw(object);
 end
 
 % rejection sampling
-function [center,iteration]=draw(object)
+function [center,trials]=draw(object)
 
 M=object.NumberMeasurements;
 center=nan(M,2);
 
-iteration=0;
+% YOU ARE HERE
+
+trials=0;
 for m=1:M;
     measurement=object.MeasurementDensity{m};    
     Pmax=measurement.Scaled.MaxDensity;    
@@ -29,7 +31,7 @@ for m=1:M;
     v0=vbound(1);
     Lv=vbound(2)-vbound(1);
     while true
-        iteration=iteration+1;
+        trials=trials+1;
         temp=rand(1,3);
         pos=[u0 v0]+[Lu Lv].*temp(1:2);
         P=measurement.Scaled.Lookup(pos(1),pos(2));
@@ -38,9 +40,9 @@ for m=1:M;
         end
     end
     pos=pos*measurement.Matrix.Reverse;
-    pos=pos+measurement.Original.Mode;
+    pos=pos+measurement.Original.Mean;
     center(m,:)=pos;
 end
-iteration=iteration/M; % average iterations per measurement
+trials=trials/M; % average trials per measurement
 
 end

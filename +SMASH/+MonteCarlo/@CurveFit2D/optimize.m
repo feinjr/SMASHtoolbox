@@ -13,66 +13,26 @@ catch
 end
 
 % check normal status
-M=object.NumberMeasurements;
-isnormal=false(1,M);
-for k=1:M
-    isnormal(k)=object.MeasurementDensity{k}.IsNormal;
-end
 if object.AssumeNormal
-    isnormal(:)=true;
+    type='normal';
+else
+    type='general';
 end
 
 % perform optimization
+M=object.NumberMeasurements;
     function value=likelihood(slack)
         object=evaluate(object,'slack',slack);        
         maxdensity=zeros(1,M);
+        maxlocation=nan(M,2);
         for m=1:M % iterate over measurements
-            measurement=object.MeasurementDensity{m};
-            points=bsxfun(@minus,object.CurvePoints,measurement.Original.Mode);
-            points=points*measurement.Matrix.Forward;
-            points(isinf(object.CurvePoints))=inf;
-            try
-                segments=points2segments(points);
-            catch
-                error('ERROR: model returned invalid curve point(s)');
-            end
-            N=size(segments,1);
-            for n=1:N % iterate over segments
-                % normal density analysis
-                u0=segments(n,1);
-                v0=segments(n,2);
-                Lu=segments(n,3);
-                Lv=segments(n,4);
-                etamax=segments(n,5);
-                uc=measurement.Scaled.Mode(1);
-                vc=measurement.Scaled.Mode(2);
-                uvar=measurement.Scaled.Var(1);
-                vvar=measurement.Scaled.Var(2);
-                eta_peak=(u0-uc)*Lu/uvar+(v0-vc)*Lv/vvar;
-                eta_peak=-eta_peak/(Lu^2/uvar+Lv^2/vvar);
-                if (eta_peak>0) && (eta_peak<etamax)
-                    eta=[0; eta_peak; 1];
-                else
-                    eta=[0; 1];
-                end
-                u=u0+eta*Lu;
-                v=v0+eta*Lv;
-                temp=lookup(object,m,'scaled',[u v]);
-                [temp,index]=max(temp);
-                temp=temp*measurement.Matrix.Jacobian;
-                if temp > maxdensity(m)
-                    maxdensity(m)=temp;
-                    u=u(index);
-                    v=v(index);
-                end                
-                % non-normal analysis
-                if isnormal(n) ...
-                        || (u<ubound(1)) || (u>ubound(2)) ...
-                        || (v<vbound(1)) || (v>vbound(2))
-                   continue                  
-                end
-                % look up density
-            end
+            measurement=object.MeasurementDensity{m};            
+            [temp,location]=findmax(measurement,'original',...
+                object.CurvePoints,type);
+            if temp > maxdensity(m)
+                maxdensity(m)=temp;
+                maxlocation(m,:)=location;
+            end            
         end
         value=-sum(log(maxdensity))/M; % sign flip converts minimization to maximization                        
     end

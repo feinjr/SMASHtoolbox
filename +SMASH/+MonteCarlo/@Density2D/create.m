@@ -4,8 +4,6 @@ function object=create(object,varargin)
 Narg=numel(varargin);
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 
-%list={'GridPoints' 'SmoothFactor' 'PadFactor' ...
-%    'MinDensityFraction' 'ModeFraction' 'ContourFraction'};
 list=properties(object);
 M=numel(list);
 

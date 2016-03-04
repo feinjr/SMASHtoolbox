@@ -4,7 +4,11 @@ function object=create(object,varargin)
 Narg=numel(varargin);
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 
+% default settings
 data=list2structure();
+data.GridPoints=500;
+data.ContourFraction=exp(-2^2/2);
+
 list=fieldnames(data);
 for n=1:2:Narg
     name=varargin{n};

@@ -36,7 +36,9 @@ elseif isnumeric(varargin{1})
     table=varargin{1};
     numpoints=1e6;
     if (Narg>1) && isnumeric(varargin{2})
-        numpoints=varargin{2};
+        if ~isempty(varargin{2})
+            numpoints=varargin{2};        
+        end
         varargin=varargin([1 3:end]);
         Narg=numel(varargin);
     end
@@ -147,7 +149,10 @@ object.Scaled.vinc=(v(end)-v(1))/object.GridPoints(2);
 z=object.Scaled.Lookup(data(:,1),data(:,2));
 threshold=object.Scaled.MaxDensity*object.ModeFraction;
 keep=(z >= threshold);
-location=mean(data(keep,:),1);
+w=z(keep);
+w=w/sum(w);
+w=repmat(w,[1 2]);
+location=sum(w.*data(keep,:),1);
 object.Scaled.Mode=location;
 
 location=location*object.Matrix.Reverse+object.Original.Mean;
@@ -172,9 +177,11 @@ end
 fraction=object.ContourFraction;
 level=object.Scaled.MaxDensity*fraction;
 if isscalar(level)
-    level=repmat(level,[1 2]);
+    temp=repmat(level,[1 2]);
+else
+    temp=level;
 end
-Cmatrix=contourc(normgrid{1},normgrid{2},density,level);
+Cmatrix=contourc(normgrid{1},normgrid{2},density,temp);
 n=1;
 while n<size(Cmatrix,2)
     temp=(Cmatrix(1,n)==level);
@@ -199,14 +206,5 @@ while n<size(Cmatrix,2)
     n=n+Cmatrix(2,n)+1;
 end
 object.Original.ContourMatrix=Cmatrix;
-
-% table=SMASH.Graphics.contours2lines(Cmatrix);
-% table=table{1};
-% 
-% object.Scaled.Boundary=table;
-% 
-% table=table*object.Matrix.Reverse;
-% table=bsxfun(@plus,table,object.Original.Center);
-% object.Original.Boundary=table;
 
 end

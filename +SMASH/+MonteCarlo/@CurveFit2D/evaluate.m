@@ -46,10 +46,10 @@ Npoints=size(points,1);
 assert(Npoints>=2,...
     'ERROR: model function must generate at least two data points');
 object.CurvePoints=points;
-try
-    points2segments(points);
-catch
-    error('ERROR: model function generated invalid data point(s)');
-end
+%try
+%    points2segments(points);
+%catch
+%    error('ERROR: model function generated invalid data point(s)');
+%end
 
 end

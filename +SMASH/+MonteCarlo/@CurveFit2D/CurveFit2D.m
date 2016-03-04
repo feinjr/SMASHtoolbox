@@ -21,9 +21,9 @@ classdef CurveFit2D
         DensitySettings % Density calculation settings (structure)
         XDomain % Horizontal domain ([xmin xmax]) for all measurements
         YDomain % Vertical domain ([ymin ymax]) for all measurements
-        Model % Model function handle   
-        Parameter % Model parameters
-        Bound % Parameter bounds
+        Model % Model function (function handle or string)
+        Parameter % Model parameters (one-column array)
+        Bound % Parameter bounds (two-column array)
         CurvePoints % Model evaluation points (two-column array)      
     end
     properties (SetAccess=protected) % eventually make hidden
@@ -41,7 +41,6 @@ classdef CurveFit2D
     %%
     methods (Access=protected, Hidden=true)
         varargout=create(varargin);   
-        %varargout=evaluate(varargin);
     end
     %% allow saved objects to be restored from a SDA file
     methods (Static=true,Hidden=true)

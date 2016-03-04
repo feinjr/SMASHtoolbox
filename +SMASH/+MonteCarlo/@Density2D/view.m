@@ -26,15 +26,19 @@ end
 assert(ishandle(target) && strcmpi(get(target,'Type'),'axes'),...
     'ERROR: invalid target axes');
 
-% plot contours and peak location
+% plot contours and important points
 h=hggroup('Tag','Density2D plot');
 
 hc=SMASH.Graphics.plotContourMatrix(object.Original.ContourMatrix,target);
-set(hc,'Parent',h,'Color','k');
+set(hc,'Parent',h,'Color','k','LineStyle','--','Tag','DensityContour');
 
-hm=line(object.Original.Mode(1),object.Original.Mode(2),...
-    'Color','k','Marker','+');
-set(hm,'Parent',h);
+hmode=line(object.Original.Mode(1),object.Original.Mode(2),...
+    'Color','k','Marker','+','Tag','Mode');
+set(hmode,'Parent',h);
+
+hmean=line(object.Original.Mean(1),object.Original.Mean(2),...
+    'Color','k','Marker','o','Tag','Mean');
+set(hmean,'Parent',h);
 
 % manage output
 if nargout>0
