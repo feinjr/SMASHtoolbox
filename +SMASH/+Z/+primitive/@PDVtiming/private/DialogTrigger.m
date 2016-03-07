@@ -103,8 +103,11 @@ set(hButton(1),'Callback',@apply);
         delay=get(hDelay(2),'String');
         if isempty(sscanf(delay,'%g'))
             return
-        end        
+        end   
+        temp=get(hDigitizer(2),'String');
         index=get(hDigitizer(2),'Value');    
+        index=sscanf(temp{index},'%d');
+        
         data=get(table,'Data');
         for row=1:size(data,1)
             temp=sscanf(data{row,1},'%d');
