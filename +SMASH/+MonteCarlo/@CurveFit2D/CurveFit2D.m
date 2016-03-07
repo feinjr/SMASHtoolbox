@@ -11,15 +11,16 @@ classdef CurveFit2D
     %%
     properties
         XLabel = 'X' % Horizontal axes label (string)
-        YLabel = 'Y'% Vertical axes label (string)
+        YLabel = 'Y' % Vertical axes label (string)
         AssumeNormal = false % Ignore non-normal density (logical)
-        OptimizationSettings = optimset(); % Optimization parameters
-        GraphicOptions; % Graphic options used by view method (structure)
+        OptimizationSettings = optimset() % Optimization parameters
+        GraphicOptions % Graphic options used by view method (structure)
+        DomainPadding = 0.10 % Domain padding fraction
     end
     properties (SetAccess=protected)
         NumberMeasurements = 0 % Number of measurements (integer)
         MeasurementDensity % Probability densities (cell array of Density2D objects)
-        DensitySettings % Density calculation settings (structure)
+        DensitySettings % Density calculation settings (structure)        
         XDomain % Horizontal domain ([xmin xmax]) for all measurements
         YDomain % Vertical domain ([ymin ymax]) for all measurements
         Model % Model function (function handle or string)

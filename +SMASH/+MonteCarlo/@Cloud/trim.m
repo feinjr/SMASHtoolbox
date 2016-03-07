@@ -5,7 +5,7 @@
 %
 %
 %
-function object=trim(object,range)
+function object=trim(object,range,drop)
 
 % manage input
 if (nargin<2) || isempty(range)
@@ -21,8 +21,16 @@ assert(all(range>=0) && all(range<=1),'ERROR: invalid trim range');
 range=sort(range);
 assert(diff(range)>0,'ERROR: invalid trim range');
 
-% extract data table
+if (nargin<3) || isempty(drop)
+    drop=false(object.NumberPoints,1);
+end
+assert(islogical(drop) && size(drop,1)==object.NumberPoints,...
+    'ERROR: invalid drop array');
+
+% apply drop table
 table=object.Data;
+table=table(~drop,:);
+
 N=size(table,1);
 keep=true(N,1);
 
@@ -41,9 +49,10 @@ for n=1:object.NumberVariables
     bound=temp(index(2));
     keep(table(:,n)>bound)=false;
 end
+table=table(keep,:);
 
 % manage output
-object.Data=table(keep,:);
+object.Data=table;
 object.Source='table';
 object.NumberPoints=size(object.Data,1);
 

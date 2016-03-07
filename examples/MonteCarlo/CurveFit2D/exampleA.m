@@ -4,16 +4,20 @@ object=SMASH.MonteCarlo.CurveFit2D(...
     'ContourFraction',[0.25 0.50 0.75 0.95 0.99],...
     'SmoothFactor',4);
 
-% xmean ymean xvar yvar xycorr xskew yskew
+% xmean ymean xvar yvar
 table=[];
-table(1,:)=[0 0 0.01 0.01];
-table(2,:)=[1 1 0.01 0.01];
+%dx=1e-6;
+dx=0.05;
+dy=0.05;
+table(1,:)=[0 0 dx^2 dy^2];
+table(2,:)=[1 1 dx^2 dy^2];
 object=add(object,table);
 
 view(object);
 
 %% unconstrained optimizations
-object=define(object,@LineModel,[0.5 1],[]);
+result={};
+object=define(object,@LineModel,[1.0 0.0],[]);
 
 object.AssumeNormal=true;
 tic;
@@ -22,7 +26,7 @@ time(1)=toc;
 view(object);
 result{1}=object.Parameter;
 
-% note that this optimization starts where previous one left off
+% this optimization starts where previous one left off
 object.AssumeNormal=false;
 tic;
 object=optimize(object);
@@ -39,17 +43,25 @@ for n=1:2
     fprintf('\tOptimization time: %g seconds\n',time(n));
 end
 
-%% Monte Carlo analysis assuming normal distributions
-iterations=100;
+%% Monte Carlo analysis
+%iterations=50;
+%iterations=500;
+iterations=5000;
 object.AssumeNormal=true;
 tic;
 result=analyze(object,iterations);
-toc
+time=toc;
 view(result);
+fprintf('Monte Carlo analysis with normal assumption\n');
+summarize(result);
+fprintf('\tAnalysis time: %g seconds\n',time);
 
-%% Monte Carlo analysis without assuming normal distributions
 object.AssumeNormal=false;
 tic;
 result=analyze(object,iterations);
-toc
+time=toc;
 view(result);
+fprintf('Monte Carlo analysis without normal assumption\n');
+summarize(result);
+fprintf('\tAnalysis time: %g seconds\n',time);
+

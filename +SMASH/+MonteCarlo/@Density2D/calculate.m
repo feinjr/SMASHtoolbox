@@ -47,7 +47,7 @@ else
     error('ERROR: invalid input');
 end
 
-if Narg<2
+if (Narg<2) || isempty(varargin{2}) || strcmpi(varargin{2},'nothrifty')
     thrifty=false;
 elseif strcmpi(varargin{2},'thrifty')
     thrifty=true;

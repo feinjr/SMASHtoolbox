@@ -27,11 +27,13 @@ if isempty(object.YDomain)
     object.YDomain=[+inf -inf];
 end
 
+%mode='nothrifty';
+mode='thrifty';
 setting=SMASH.General.structure2list(object.DensitySettings);
 sub=SMASH.MonteCarlo.Density2D(setting{:});
 while numel(varargin)>0
     if isa(varargin{1},'SMASH.MonteCarlo.Cloud')
-        sub=calculate(sub,varargin{1},'thrifty');
+        sub=calculate(sub,varargin{1},mode);
         varargin=varargin(2:end);
         object=updateDomain(object,sub);
         object.MeasurementDensity{end+1}=sub;
@@ -46,7 +48,7 @@ while numel(varargin)>0
             varargin=varargin(2:end);
         end
         for n=1:size(table,1)
-            sub=calculate(sub,table(n,:),numpoints,'thrifty');
+            sub=calculate(sub,table(n,:),numpoints,mode);
             object=updateDomain(object,sub);
             object.MeasurementDensity{end+1}=sub;   
             object.NumberMeasurements=object.NumberMeasurements+1;

@@ -41,15 +41,20 @@ end
 object.Parameter=parameter;
 
 % evaluate model function
-points=object.Model(parameter,object.XDomain,object.YDomain); % model function MUST accept three inputs
+xdomain=object.XDomain;
+Lx=xdomain(2)-xdomain(1);
+xdomain=xdomain+[-1 +1]*Lx*object.DomainPadding;
+
+ydomain=object.YDomain;
+Ly=ydomain(2)-ydomain(1);
+ydomain=ydomain+[-1 +1]*Ly*object.DomainPadding;
+
+points=object.Model(parameter,xdomain,ydomain); % model function MUST accept three inputs
+
 Npoints=size(points,1);
 assert(Npoints>=2,...
     'ERROR: model function must generate at least two data points');
 object.CurvePoints=points;
-%try
-%    points2segments(points);
-%catch
-%    error('ERROR: model function generated invalid data point(s)');
-%end
+
 
 end

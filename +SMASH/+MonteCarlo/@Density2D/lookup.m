@@ -51,13 +51,15 @@ B=2*object.Scaled.Var;
 u0=object.Scaled.Mean(1);
 v0=object.Scaled.Mean(2);
 value=A*exp(-(u-u0).^2/B(1)-(v-v0).^2/B(2));
+value(value<object.Scaled.MinDensity)=object.Scaled.MinDensity;
 
 % perform lookup 
 if ~isnormal
-    ub=object.Scaled.ubound;
-    vb=object.Scaled.vbound;
-    index=(u>=ub(1)) & (u<=ub(2)) & (v>=vb(1)) & (v<=vb(2));
-    value(index)=object.Scaled.Lookup(u(index),v(index));
+    %ub=object.Scaled.ubound;
+    %vb=object.Scaled.vbound;
+    %index=(u>=ub(1)) & (u<=ub(2)) & (v>=vb(1)) & (v<=vb(2));
+    value=object.Scaled.Lookup(u,v);
+    value(isnan(value))=object.Scaled.MinDensity;
 end
 
 % scale results as needed
