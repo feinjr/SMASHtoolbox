@@ -15,6 +15,22 @@ object=add(object,table);
 
 view(object);
 
+%% analytic solution
+x=table(:,1);
+y=table(:,2);
+yvar=mean(table(:,4));
+
+N=numel(x);
+Delta=N*sum(x.^2)-(sum(x))^2;
+A=(sum(x.^2)*sum(y)-sum(x)*sum(x.*y))/Delta;
+B=(N*sum(x.*y)-sum(x)*sum(y))/Delta;
+Avar=yvar*sum(x.^2)/Delta;
+Bvar=yvar*N/Delta;
+
+fprintf('Analytic soluction\n');
+fprintf('\tslope    : %#-.4g (%#-.2g variance)\n',B,Bvar);
+fprintf('\tintercept: %#-.4g (%#-.2g variance)\n',A,Avar);
+
 %% unconstrained optimizations
 result={};
 object=define(object,@LineModel,[1.0 0.0],[]);
@@ -44,19 +60,19 @@ for n=1:2
 end
 
 %% Monte Carlo analysis
-%iterations=50;
+iterations=50;
 %iterations=500;
-iterations=5000;
+%iterations=5000;
 object.AssumeNormal=true;
 tic;
 result=analyze(object,iterations);
 time=toc;
 view(result);
 fprintf('Monte Carlo analysis with normal assumption\n');
-fprintf('** All results **\n');
+%fprintf('** All results **\n');
 summarize(result);
-fprintf('** Trimmed results **\n');
-summarize(trim(result,0.95));
+% fprintf('** Trimmed results **\n');
+% summarize(trim(result,0.99));
 fprintf('\tAnalysis time: %g seconds\n\n',time);
 
 object.AssumeNormal=false;
@@ -65,9 +81,9 @@ result=analyze(object,iterations);
 time=toc;
 view(result);
 fprintf('Monte Carlo analysis without normal assumption\n');
-fprintf('** All results **\n');
+%fprintf('** All results **\n');
 summarize(result);
-fprintf('** Trimmed results **\n');
-summarize(trim(result,0.95));
+% fprintf('** Trimmed results **\n');
+% summarize(trim(result,0.99));
 fprintf('\tAnalysis time: %g seconds\n\n',time);
 

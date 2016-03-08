@@ -14,10 +14,11 @@ u0=object.Scaled.ubound(1);
 Lu=object.Scaled.urange;
 v0=object.Scaled.vbound(1);
 Lv=object.Scaled.vrange;
+
 Pmax=object.Scaled.MaxDensity;
 
-uc=object.Scaled.Mean(1);
-vc=object.Scaled.Mean(2);
+uc=0; % normal assumption centered at the origin
+vc=0;
 ustd=object.Scaled.Std(1);
 vstd=object.Scaled.Std(2);
 uvar=object.Scaled.Var(1);

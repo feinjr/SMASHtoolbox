@@ -1,55 +1,71 @@
-% trim Remove outliers from cloud
+% trim Remove points from data cloud
 %
-% UNDER CONSTRUCTION
+% This method removes points from a data cloud.  Simple calls:
+%    object=remove(object);
+% remove points where any variable is infinite or NaN.
+%
+% Clouds can be trimmed to a fraction of their range.
+%    object=trim(object,center); % center fraction, e.g. 0.90
+%    object=trim(object,[low high]); % low/high fractions, e.g. [0.05 0.95]
+% Logical indices may also be passed to indicate points that should be
+% dropped from the cloud.
+%    object=trim(object,index);
+% In either case, nan/inf values should be trimmed *before* fraction or
+% drop trimming.
+%
+% See also Cloud
+%
 
 %
+% created March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
+
 %
-%
-function object=trim(object,range,drop)
+function object=trim(object,arg)
 
 % manage input
-if (nargin<2) || isempty(range)
-    range=1;
+if nargin==1
+    drop=any(isnan(object.Data),2) | any(isinf(object.Data),2);
+    object=trim(object,drop);
+    return
 end
-assert(isnumeric(range),'ERROR: invalid trim range');
-if isscalar(range)
-    width=range;
-    range=0.50+[-0.5 +0.5]*width;
-end
-assert(numel(range)==2,'ERROR: invalid trim range');
-assert(all(range>=0) && all(range<=1),'ERROR: invalid trim range');
-range=sort(range);
-assert(diff(range)>0,'ERROR: invalid trim range');
 
-if (nargin<3) || isempty(drop)
-    drop=false(object.NumberPoints,1);
+if islogical(arg)
+    assert(numel(arg)==object.NumberPoints,...
+        'ERROR: drop array must match the number of cloud points');
+    drop=arg;
+    mode='drop';
+elseif isnumeric(arg)
+    if isscalar(arg)
+        arg=0.50+[-0.5 +0.5]*arg;
+    end
+    assert(numel(arg)==2,'ERROR: invalid trim range');
+    assert(all(arg>=0) && all(arg<=1),'ERROR: invalid trim range');
+    range=sort(arg);
+    assert(diff(range)>0,'ERROR: invalid trim range');
+    mode='fraction';
+else
+    error('ERROR: invalid trim argument');
 end
-assert(islogical(drop) && size(drop,1)==object.NumberPoints,...
-    'ERROR: invalid drop array');
 
-% apply drop table
+% perform trimming
 table=object.Data;
-table=table(~drop,:);
-
-N=size(table,1);
-keep=true(N,1);
-
-% remove obvious problems
-keep(any(isnan(table),2))=false;
-keep(any(isinf(table),2))=false;
-
-% remove extreme values
-index=round(N*range);
-index(1)=max(index(1),1);
-index(2)=min(index(2),N);
-for n=1:object.NumberVariables
-    temp=sort(table(:,n));
-    bound=temp(index(1));
-    keep(table(:,n)<bound)=false;
-    bound=temp(index(2));
-    keep(table(:,n)>bound)=false;
+switch mode
+    case 'drop'
+        table=table(~drop,:);
+    case 'fraction'
+        keep=true(object.NumberPoints,1);
+        index=round(object.NumberPoints*range);
+        index(1)=max(index(1),1);
+        index(2)=min(index(2),object.NumberPoints);
+        for n=1:object.NumberVariables
+            temp=sort(table(:,n));
+            bound=temp(index(1));
+            keep(table(:,n)<bound)=false;
+            bound=temp(index(2));
+            keep(table(:,n)>bound)=false;
+        end
+        table=table(keep,:);
 end
-table=table(keep,:);
 
 % manage output
 object.Data=table;

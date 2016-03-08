@@ -42,13 +42,6 @@ else
     error('ERROR: invalid silent input');
 end
 
-% check normal status
-if object.AssumeNormal
-    type='normal';
-else
-    type='general';
-end
-
 % perform optimization
 M=object.NumberMeasurements;
 miss=false(1,M);
@@ -59,8 +52,13 @@ miss=false(1,M);
         miss(:)=false;
         for m=1:M % iterate over measurements
             measurement=object.MeasurementDensity{m};            
-            [temp,location]=findmax(measurement,'original',...
-                object.CurvePoints,type);
+            if object.AssumeNormal
+                [temp,location]=findmax(measurement,'original',...
+                    object.CurvePoints,'normal');
+            else
+                 [temp,location]=findmax(measurement,'original',...
+                    object.CurvePoints,'general');
+            end
             maxdensity(m)=temp;
             maxlocation(m,:)=location;
             if any(isnan(location))

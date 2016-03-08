@@ -39,23 +39,17 @@ else
 end
 
 % Monte Carlo simulations  
-if object.AssumeNormal
-    mode='normal';
-else
-    mode='general';
-end
-
 miss=nan(object.NumberMeasurements,iterations);
 result=nan(numel(object.Parameter),iterations);
 if SMASH.System.isParallel
     parfor k=1:iterations
-        [temp1,temp2]=process(object,mode);
+        [temp1,temp2]=process(object);
         result(:,k)=temp1(:);
         miss(:,k)=temp2(:);
     end
 else
     for k=1:iterations
-        [temp1,temp2]=process(object,mode);
+        [temp1,temp2]=process(object);
         result(:,k)=temp1(:);
         miss(:,k)=temp2(:);
     end
@@ -80,9 +74,14 @@ result=configure(result,'VariableName',name);
 
 end
 
-function [parameter,miss]=process(object,mode)
+function [parameter,miss]=process(object)
 
-object=recenter(object,mode);
+if object.AssumeNormal
+    object=recenter(object,'normal');
+else
+    object=recenter(object,'general');
+end
+
 [object,miss]=optimize(object,[],'silent');
 parameter=object.Parameter;
 
