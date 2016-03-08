@@ -1,7 +1,27 @@
-% optimize Optimize model parameters to match measurements
+% optimize Optimize model parameters
 %
+% This method optimizes model parameters against the measurements defined
+% in a CurveFit2D object.
+%    object=optimize(object); % use options defined in the object
+%    object=optimize(object,options); % manual options (see optimset function)
+% NOTE: the behavior of this method is senstivie to the AssumeNormal
+% property!
+%
+% By default, this method generates a warning if the optimized curve does
+% not pass near every measurment.  This warning can be suppressed as
+% follows.
+%    object=optimize(object,[],'silent'); % use default options
+%    object=optimize(object,options,'silent');
+% A logical array indicating measurements missed by the optimized curve is
+% returned as a second output.
+%    [object,miss]=optimize(...);
+%
+% See also CurveFit2D, analyze
 %
 
+%
+% creaed March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function [object,miss]=optimize(object,options,silent)
 
 % manage input

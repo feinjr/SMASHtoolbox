@@ -32,7 +32,6 @@ classdef Density2D
         SmoothFactor = 2 % Density smooth factor
         PadFactor = 5 % Density pad factor
         MinDensityFraction = 1e-9 % Minimum allowed density fraction
-        %ModeFraction = 0.90 % Density fraction for estimating mode location
         ContourFraction = 0.10:0.10:0.90 % Counter density fraction(s)  
     end
     properties (SetAccess=protected)

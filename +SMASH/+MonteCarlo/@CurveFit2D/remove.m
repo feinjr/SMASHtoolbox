@@ -1,8 +1,17 @@
-% UNDER CONSTRUCTION
+% remove Remove measurements
+%
+% This method removes measurements from a CurveFit2D object.  Measurements
+% are refennced by numeric index based on the order they were added.
+%    object=remove(object,index);
+% Single and multiple index values may be specified.  To remove all
+% measurements:
+%    object=remove(object,'all');
+%
+% See also CurveFit2D, add, summarize
 %
 
 %
-% created ??? by Daniel Dolan (Sandia National Laboratories)
+% created March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 function object=remove(object,index)
 

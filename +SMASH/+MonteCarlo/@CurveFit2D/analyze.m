@@ -1,3 +1,28 @@
+% analyze Perform Monte Carlo analysis
+%
+% This method uses Monte Carlo analysis to estimate the plausible variation
+% of model parameters due to measurement uncertainty.
+%    result=analyze(object); % 100 iterations (default)
+%    result=analyze(obect,iterations);
+% During each iteration, model parameters are optimized using a set of
+% randomly shifted measurements (based on their probability density).  The
+% output "result" is a Cloud object derived from the parameters generated
+% from this process.
+%
+% By default, this method generates a warning if the optimized curve does
+% not pass near every measurment.  This warning can be suppressed as
+% follows.
+%    object=optimize(object,iterations,'silent');
+% A logical array indicating measurements missed by the optimized curve is
+% returned as a second output.
+%    [object,miss]=analyze(...);
+%
+% See also CurveFit2D, optimize
+% 
+
+%
+% creaed March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function [result,miss]=analyze(object,iterations,silent)
 
 % manage input

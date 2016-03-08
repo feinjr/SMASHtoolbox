@@ -175,6 +175,6 @@ end
 u0=table(1,1);
 v0=table(1,2);
 Lu=table(2,1)-table(1,1);
-Lv=table(2,2)-table(2,1); 
+Lv=table(2,2)-table(1,2); 
 
 end

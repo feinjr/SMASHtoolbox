@@ -6,8 +6,8 @@ object=SMASH.MonteCarlo.CurveFit2D(...
 
 % xmean ymean xvar yvar
 table=[];
-%dx=1e-6;
-dx=0.05;
+dx=1e-6;
+%dx=0.05;
 dy=0.05;
 table(1,:)=[0 0 dx^2 dy^2];
 table(2,:)=[1 1 dx^2 dy^2];
@@ -53,8 +53,11 @@ result=analyze(object,iterations);
 time=toc;
 view(result);
 fprintf('Monte Carlo analysis with normal assumption\n');
+fprintf('** All results **\n');
 summarize(result);
-fprintf('\tAnalysis time: %g seconds\n',time);
+fprintf('** Trimmed results **\n');
+summarize(trim(result,0.95));
+fprintf('\tAnalysis time: %g seconds\n\n',time);
 
 object.AssumeNormal=false;
 tic;
@@ -62,6 +65,9 @@ result=analyze(object,iterations);
 time=toc;
 view(result);
 fprintf('Monte Carlo analysis without normal assumption\n');
+fprintf('** All results **\n');
 summarize(result);
-fprintf('\tAnalysis time: %g seconds\n',time);
+fprintf('** Trimmed results **\n');
+summarize(trim(result,0.95));
+fprintf('\tAnalysis time: %g seconds\n\n',time);
 
