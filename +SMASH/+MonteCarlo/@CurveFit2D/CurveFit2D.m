@@ -1,11 +1,22 @@
-% UNDER CONSTRUCTION
+% This class supports two-dimensional curve fitting with unceratinty in both
+% directions.  Fitting is applied to a set of (x,y) measurements
+% represented by probability density distributions.  These measurements are
+% used to optimize parameters is a user-defined model using the method of
+% maximum likelihood.
 %
-% object=CurveFit2D();
-% Density options set at creation
+% Parameters associated with probability density calculations are defined
+% when a CurveFit2D object is created.
+%    object=CurveFit2D(name,value,...)
+% See the Density2D class for more information about density parameters.
+% Density parameters cannot be changed after an object is created, but
+% measurements can be added/removed and models may be defined/redefined at
+% any time.
+%
+% See also SMASH.MonteCarlo, Density2D
 %
 
 %
-% created ??? by Daniel Dolan (Sandia National Laboratories)
+% created March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef CurveFit2D
     %%

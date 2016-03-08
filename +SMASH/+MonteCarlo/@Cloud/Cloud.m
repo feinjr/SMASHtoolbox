@@ -29,7 +29,7 @@
 % table.  Depending on the underlying distributions, clouds generated from
 % these moments/correlations may differ from the source data.
 %
-% See also MonteCarlo
+% See also SMASH.MonteCarlo
 %
 
 % created April 29, 2014 by Daniel Dolan (Sandia National Laboratories)
