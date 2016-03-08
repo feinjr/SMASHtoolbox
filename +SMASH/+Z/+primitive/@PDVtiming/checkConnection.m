@@ -31,7 +31,8 @@ for n=1:N
         'ERROR: invalid diagnostic index');
     assert(any(map(n,3)==object.Digitizer),...
         'ERROR: invalid digitizer index');
-    assert(any(map(n,4)==object.DigitizerChannel{map(n,3)}),...
+    match=(map(n,3)==object.Digitizer);
+    assert(any(map(n,4)==object.DigitizerChannel{match}),...
         'ERROR: invalid digitizer channel');
 end
 
