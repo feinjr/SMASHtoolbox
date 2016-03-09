@@ -22,11 +22,15 @@
 %
 % created March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=view(object)
+function varargout=view(object,target)
 
-% create figure
-figure;
-target=axes('Box','on');
+% manage input
+if (nargin<2) || isempty(target)
+    figure;
+    target=axes('Box','on');
+end
+assert(ishandle(target) && strcmpi(get(target,'type'),'axes'),...
+    'ERROR: invalid target axes');
 xlabel(object.XLabel);
 ylabel(object.YLabel)
 

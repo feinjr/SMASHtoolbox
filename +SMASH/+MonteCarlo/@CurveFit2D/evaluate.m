@@ -14,6 +14,8 @@
 %
 function object=evaluate(object,mode,parameter)
 
+assert(~isempty(object.Model),'ERROR: no model has been defined');
+
 % manage input
 switch mode
     case 'slack'
@@ -43,11 +45,11 @@ object.Parameter=parameter;
 % evaluate model function
 xdomain=object.XDomain;
 Lx=xdomain(2)-xdomain(1);
-xdomain=xdomain+[-1 +1]*Lx*object.DomainPadding;
+xdomain=xdomain+[-0.5 +0.5]*Lx*object.DomainPadding;
 
 ydomain=object.YDomain;
 Ly=ydomain(2)-ydomain(1);
-ydomain=ydomain+[-1 +1]*Ly*object.DomainPadding;
+ydomain=ydomain+[-0.5 +0.5]*Ly*object.DomainPadding;
 
 points=object.Model(parameter,xdomain,ydomain); % model function MUST accept three inputs
 

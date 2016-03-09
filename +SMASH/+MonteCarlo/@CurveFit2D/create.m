@@ -7,7 +7,9 @@ assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 % default settings
 data=list2structure();
 data.GridPoints=500;
-data.ContourFraction=exp(-2^2/2);
+data.SmoothFactor=4;
+%data.ContourFraction=exp(-2^2/2);
+data.ContourFraction=[0.25 0.50 0.75];
 
 list=fieldnames(data);
 for n=1:2:Narg
