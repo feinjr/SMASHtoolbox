@@ -22,20 +22,26 @@ if Narg==0
     name={'VariableName','Moments','Correlations','NumberPoints','Seed',...
         'GridPoints','SmoothFactor','NumberContours'};    
     for k=1:numel(name)
-        fprintf('%s:\n',name{k});
-        if isempty(object.(name{k}))
+        try
+            value=object.(name{k});
+            fprintf('%s:\n',name{k});
+        catch
+            value=object.DensitySettings.(name{k});
+            fprintf('%s (DensitySettings) :\n',name{k});
+        end
+        if isempty(value)
             fprintf('\t(empty)\n\n');
-        elseif ischar(object.(name{k}))
-            fprintf('\t%s\n\n',object.(name{k}));
-        elseif islogical(object.(name{k}))
-            fprintf('\t%d',object.(name{k}));
-            if object.(name{k})
+        elseif ischar(value)
+            fprintf('\t%s\n\n',value);
+        elseif islogical(value)
+            fprintf('\t%d',value);
+            if value
                 fprintf(' (true)\n\n');
             else
                 fprintf(' (false)\n\n');
             end
         else           
-            disp(object.(name{k}));
+            disp(value);
         end
     end
     return
@@ -109,16 +115,20 @@ for k=1:2:Narg
             assert(...
                 isscalar(value) || (numel(value)==object.NumberVariables),...
                 'ERROR: invalid number of grid points');
-            object.GridPoints=value;        
+            object.DensitySettings.GridPoints=value;        
         case 'smoothfactor'
              assert(isnumeric(value) && isscalar(value) && (value>0),...
-                'ERROR: invalid smooth factor');                                
-            object.SmoothFactor=value;    
+                 'ERROR: invalid smooth factor');
+             object.DensitySettings.SmoothFactor=value;
+        case 'padfactor'
+            assert(isnumeric(value) && isscalar(value) && (value>0),...
+                'ERROR: invalid pad factor');
+            object.DensitySettings.PadFactor=value;
         case 'numbercontours'
             assert(isnumeric(value) && isscalar(value)...
                 && (value>0) && (value==round(value)),...
                 'ERROR: invalid number of contours');
-            object.NumberContours=value;        
+            object.DensitySettings.NumberContours=value;        
         otherwise
             error('ERROR: invalid name');
     end        

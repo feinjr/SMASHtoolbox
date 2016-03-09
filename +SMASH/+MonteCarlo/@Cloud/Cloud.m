@@ -32,6 +32,7 @@
 % See also SMASH.MonteCarlo
 %
 
+%
 % created April 29, 2014 by Daniel Dolan (Sandia National Laboratories)
 % revised August 5, 2014 by Daniel Dolan
 %    -modifed input handling
@@ -51,14 +52,8 @@ classdef Cloud %< SMASH.General.DataClass
         NumberPoints = 1000 % Number of cloud points
         Data % Cloud data table (columns represent variables)
         Source % Data soure: 'moments', 'table', 'transform', or 'bootstrap'
-        Seed = [] % Random number generator seed (uint32 value or text string)                  
-        GridPoints = 100 % Number of density grid points (integer)
-        SmoothFactor = 2 % Kernel smoothing factor (>0)
-        PadFactor = 5 % Density estimation padding factor (>1)
-        NumberContours = 5 % Contour levels used by the view method
-    end
-    properties
-        GraphicOptions % Graphic options
+        Seed = [] % Random number generator seed (uint32 value or text string)                         
+        DensitySettings % Density estimation options
     end
     %% constructor
     methods (Hidden=true)
@@ -67,10 +62,6 @@ classdef Cloud %< SMASH.General.DataClass
                 return
             end
             object=create(object,varargin{:});
-            if isempty(object.GraphicOptions)
-                object.GraphicOptions=SMASH.General.GraphicOptions;
-                object.GraphicOptions.Marker='none';
-            end
         end
         varargout=ellipse(varargin);
     end
@@ -81,5 +72,5 @@ classdef Cloud %< SMASH.General.DataClass
     %%
     methods (Static=true,Hidden=true)
         varargout=restore(varargin);
-    end
+    end    
 end

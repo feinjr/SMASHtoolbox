@@ -55,7 +55,7 @@ end
 data=object.Data(:,variable);
 [Npoints,Ndim]=size(data);
 
-GridPoints=object.GridPoints;
+GridPoints=object.DensitySettings.GridPoints;
 if isscalar(GridPoints)
     GridPoints=repmat(GridPoints,[1 object.NumberVariables]);
 end
@@ -76,8 +76,8 @@ width=nan(1,Ndim); % kernel width
 
 for n=1:Ndim
     temp=std(data(:,n))/Npoints^(1/5); % Silverman's rule
-    width(n)=temp*object.SmoothFactor;
-    span=max(abs(data(:,n)))+object.PadFactor*width(n);
+    width(n)=temp*object.DensitySettings.SmoothFactor;
+    span=max(abs(data(:,n)))+object.DensitySettings.PadFactor*width(n);
     temp=linspace(-span,span,GridPoints(n));
     normgrid{n}=temp(:);
     spacing(n)=(normgrid{n}(end)-normgrid{n}(1))/(GridPoints(n)-1);    

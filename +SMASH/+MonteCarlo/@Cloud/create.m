@@ -40,4 +40,10 @@ for n=1:object.NumberVariables
     object.VariableName{n}=sprintf('Variable #%d',n);
 end
 
+% density options
+object.DensitySettings.GridPoints=100;
+object.DensitySettings.SmoothFactor=2;
+object.DensitySettings.PadFactor=5;
+object.DensitySettings.NumberContours=5;
+
 end

@@ -3,7 +3,26 @@
 % This method verifies the statistical moments and correlations in a data
 % cloud.  Confidence estimates are generated from bootstrap replications of
 % the original cloud.
+%    verify(object,iterations,span);
+% The second and third inputs are optional.  By default, 1000 bootstrap
+% iterations are used to estimate the 1-sigma span for every moment and
+% correlation of the data cloud.  Spans may be specified as a centered
+% width or as a low/high pair.
+%    verify(object,iterations,0.90); % central 90% (5% to 95%)
+%    verify(object,iterations,[0.025 0.975]); % 2.5% to 97.5% span
+%
+% Called this method with no outputs (as above) prints confidence region
+% report to the command window.  Specifying an output:
+%    report=verify(...);
+% returns this report as a structure and suppresses printing.
+%
+% See also Cloud, summarize, confidence
+%
 
+
+%
+% created March 9, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function varargout=verify(object,iterations,span)
 
 % manage input
