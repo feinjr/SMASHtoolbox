@@ -31,11 +31,84 @@ else
 end
 assert((low>0) && (high<1),'ERROR: span values')
 
-% bootstrap analysis
+% generate low/high index values
+low=round(low*iterations);
+low=max(low,1);
 
+high=round(high*iterations);
+high=min(high,iterations);
+
+% bootstrap analysis
+moment=nan(object.NumberVariables,4,iterations);
+correlation=nan(object.NumberVariables,object.NumberVariables,iterations);
+for k=1:iterations
+    temp=bootstrap(object);
+    moment(:,:,k)=temp.Moments;
+    correlation(:,:,k)=temp.Correlations;
+end
+
+report=struct();
+temp=nan(object.NumberVariables,4);
+report.LowerMoment=temp;
+report.UpperMoment=temp;
+temp=diag(ones(1,object.NumberVariables));
+temp(temp==0)=nan;
+report.LowerCorrelation=temp;
+report.UpperCorrelation=temp;
+for m=1:object.NumberVariables
+    for n=1:4
+        temp=moment(m,n,:);
+        temp=sort(temp(:));
+        report.LowerMoment(m,n)=temp(low);
+        report.UpperMoment(m,n)=temp(high);
+    end
+    for n=(m+1):object.NumberVariables
+        temp=correlation(m,n,:);
+        temp=sort(temp(:));
+        report.LowerCorrelation(m,n)=temp(low);
+        report.LowerCorrelation(n,m)=temp(low);
+        report.UpperCorrelation(m,n)=temp(high);
+        report.UpperCorrelation(n,m)=temp(high);
+    end
+end
 
 % manage output
-
-
+if nargout==0
+    if numel(span)==1
+        fprintf('Confidence region for %.3f span\n',span);
+    else
+        fprintf('Confidence region for %.2f-%.2f span\n',span(1),span(2));
+    end
+    % moments
+    fprintf('Minimum statistical moments:\n');
+    width=cellfun(@length,object.VariableName);
+    width=max(width);    
+    format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
+    fprintf(format,'','mean','variance','skewness','kurtosis');
+    format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g%#+10.3g%#+10.3g\n'];
+    for n=1:object.NumberVariables
+        fprintf(format,object.VariableName{n},report.LowerMoment(n,:));
+    end   
+    fprintf('Maximum statistical moments:\n');
+    width=cellfun(@length,object.VariableName);
+    width=max(width);    
+    format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
+    fprintf(format,'','mean','variance','skewness','kurtosis');
+    format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g%#+10.3g%#+10.3g\n'];
+    for n=1:object.NumberVariables
+        fprintf(format,object.VariableName{n},report.UpperMoment(n,:));
+    end    
+    % correlations
+    fprintf('Minimum correlations:\n');
+    format=repmat('%+10.3f ',[1 object.NumberVariables]);
+    format=['\t' format '\n'];
+    fprintf(format,report.LowerCorrelation);
+    fprintf('Maximum correlations:\n');
+    format=repmat('%+10.3f ',[1 object.NumberVariables]);
+    format=['\t' format '\n'];
+    fprintf(format,report.UpperCorrelation);    
+else
+    varargout=report;
+end
 
 end

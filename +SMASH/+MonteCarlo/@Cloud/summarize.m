@@ -19,16 +19,32 @@ function varargout=summarize(object)
 moments=nan(object.NumberVariables,4);
 for n=1:object.NumberVariables
     column=object.Data(:,n);
-    moments(n,1)=mean(column); % mean
+    moments(n,1)=sum(column)/object.NumberPoints; % mean
     column=column-moments(n,1);
-    L=var(column);
-    moments(n,2)=L; % variance
-    moments(n,3)=mean(column.^3)/(L^(3/2)); % skewness
-    moments(n,4)=mean(column.^4)/(L^2)-3; % excess kurtosis
+    temp=column.*column;
+    L=sum(temp)/object.NumberPoints;
+    moments(n,2)=L; % variance 
+    temp=temp.*column;
+    moments(n,3)=sum(temp)/object.NumberPoints/(L^(3/2)); % skewness
+    temp=temp.*column;
+    moments(n,4)=sum(temp)/object.NumberPoints/(L^2)-3; % excess kurtosis
 end
 
 % variable correlations
 correlations=corrcoef(object.Data);
+
+% correlations=eye(object.NumberVariables);
+% for m=1:object.NumberVariables    
+%     columnM=object.Data(:,m)-moments(m,1);
+%     columnM=columnM/sqrt(moments(m,2));
+%     for n=(m+1):object.NumberVariables
+%         columnN=object.Data(:,n)-moments(n,1);
+%         columnN=columnN/sqrt(moments(n,2));
+%         temp=sum(columnM.*columnN)/object.NumberPoints;
+%         correlations(m,n)=temp;
+%         correlations(n,m)=temp;
+%     end
+% end
 
 % handle output
 if nargout==0
