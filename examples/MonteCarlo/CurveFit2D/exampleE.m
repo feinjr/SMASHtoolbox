@@ -1,4 +1,8 @@
 %%
+% This example shows a two-piece line fit to a set of measurements that
+% initially increase to a maximum and then decrease.  A Monte Carlo
+% analysis is used to assess unceratinty of the fit parameters, including
+% the break point bewtween the two linear sections.
 
 %% create object and add measurement
 object=SMASH.MonteCarlo.CurveFit2D('ContourFraction',0.1);
@@ -11,8 +15,8 @@ table(end+1,:)=[0.45 0.40];
 table(end+1,:)=[0.60 0.45];
 table(end+1,:)=[0.75 0.25];
 table(end+1,:)=[1.00 -0.01];
-table(:,3)=0.01^2;
-table(:,4)=0.01^2;
+table(:,3)=0.05^2;
+table(:,4)=0.05^2;
 object=add(object,table);
 
 view(object);
@@ -20,7 +24,7 @@ view(object);
 %%
 figure;
 result={};
-object=define(object,@UpDownLine,[1.0 0.0 0.5 -1.0],[]);
+object=define(object,@UpDownLine,[1.0 0.0 0.4 -1.0],[]);
 
 ha(1)=subplot(2,1,1); box on; 
 text('Units','normalized','Position',[1 1],...
@@ -57,10 +61,9 @@ end
 linkaxes(ha,'xy');
 
 %% parameter uncertainty
-fprintf('Analyzing parameters...');
 tic;
 object.AssumeNormal=true;
-result=analyze(object,1000);
+result=analyze(object,50);
 summarize(result);
 verify(result,1000,0.90);
 toc;

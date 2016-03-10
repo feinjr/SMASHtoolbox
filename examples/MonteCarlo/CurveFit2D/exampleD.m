@@ -1,4 +1,8 @@
 %%
+% This example shows a line fit between three measurements.  One of these
+% measurements has significantly higher uncertainty than the other two, so
+% the fit largely misses the low quality point.
+%
 
 %% create object and add measurements
 
