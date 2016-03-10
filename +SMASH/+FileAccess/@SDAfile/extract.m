@@ -59,6 +59,12 @@ switch h5readatt(archive.ArchiveFile,setname,'RecordType');
         data=extract_function(archive,repmat(setname,[1 2]));
     case {'structure','split'}
         data=extract_structure(archive,setname);
+    case 'structures'
+        temp=extract_cell(archive,setname);
+        data=repmat(temp{1},size(temp));
+        for n=1:numel(temp)
+            data(n)=temp{n};
+        end
     case 'cell'
         data=extract_cell(archive,setname);
     case 'object'

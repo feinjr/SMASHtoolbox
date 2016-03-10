@@ -3,11 +3,12 @@
 % This method inserts a data contained in a MATLAB variable into an archive
 % file.  The variable is stored with a unique text label for identification
 % and access.  The following variable types are supported.
-%    -numeric (double, single, uint8, ...)
-%    -logical
-%    -character
-%    -structure
-%    -cell
+%    -numeric arrays (double, single, uint8, ...)
+%    -logical arrays
+%    -character arrays
+%    -structure arrays
+%    -cell arrays
+%    -objects (*not* object arrays)
 % Arbitrary array sizes and dimensionality are permitted for each variable
 % type; sparse arrays are automatically conveted to double precision.
 % Nested variables--structures within structures, cell arrays within cell
@@ -25,7 +26,8 @@
 %
 % created October 9, 2014 by Daniel Dolan (Sandia National Labs)
 %    -revised to match new SDA specification
-%
+% revised March 10, 2016 by Daniel Dolan
+%    -added supported for structure arrays.
 function insert(archive,label,data,description,deflate)
 
 % handle input
@@ -84,12 +86,17 @@ elseif isa(data,'function_handle')
     h5writeatt(archive.ArchiveFile,datasetname,'RecordType','function');
         h5writeatt(archive.ArchiveFile,datasetname,'Empty','false');
 elseif isstruct(data)
-    errmsg{1}    ='ERROR: structure arrays are not supported:';
-    errmsg{end+1}='Suggestions:';
-    errmsg{end+1}='   -Convert to a cell array of individual structures';
-    errmsg{end+1}='   -Store individual structures as separate records';
-    assert(numel(data)==1,'%s\n',errmsg{:});
-    insert_structure(archive,datasetname,data,deflate);
+    if isscalar(data)
+        insert_structure(archive,datasetname,data,deflate);
+    else
+        temp=cell(size(data));
+        for n=1:numel(data)
+            temp{n}=data(n);
+        end
+        insert_cell(archive,datasetname,temp,deflate);
+        h5writeatt(archive.ArchiveFile,['/' label],...
+            'RecordType','structures');       
+    end   
 elseif iscell(data)
     insert_cell(archive,datasetname,data,deflate);
 elseif isobject(data) % convert objects to structures
@@ -105,7 +112,6 @@ elseif isobject(data) % convert objects to structures
     h5writeatt(archive.ArchiveFile,['/' label],'ClassName',ObjectClass);
 end
 h5writeatt(archive.ArchiveFile,datasetname,'Description',description);
-%h5writeatt(archive.ArchiveFile,datasetname,'Inserted',datestr(now));
 h5writeatt(archive.ArchiveFile,datasetname,'Deflate',deflate);
 
 h5writeatt(archive.ArchiveFile,'/','Updated',datestr(now));
