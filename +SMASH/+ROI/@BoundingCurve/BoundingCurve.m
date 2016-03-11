@@ -48,7 +48,7 @@ classdef BoundingCurve
                 object.Data=varargin{2};
             end                         
             if isempty(object.GraphicOptions)
-                object.GraphicOptions=SMASH.General.GraphicOptions;
+                object.GraphicOptions=SMASH.Graphics.GraphicOptions;
                 object.GraphicOptions.LineWidth=2;
             end
         end
@@ -88,8 +88,8 @@ classdef BoundingCurve
         end
         function object=set.GraphicOptions(object,value)
             if isempty(value)
-                object.GraphicOptions=SMASH.General.GraphicOptions;
-            elseif isa(value,'SMASH.General.GraphicOptions')
+                object.GraphicOptions=SMASH.Graphics.GraphicOptions;
+            elseif isa(value,'SMASH.Graphics.GraphicOptions')
                 object.GraphicOptions=value;
             else
                 error('ERROR: invalid GraphicOptions value');

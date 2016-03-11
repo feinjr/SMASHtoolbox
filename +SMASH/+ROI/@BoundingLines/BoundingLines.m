@@ -29,7 +29,7 @@ classdef BoundingLines
         Data = [-inf inf] % Boundary data (1x2 array)
     end
     properties
-        PlotOptions = SMASH.General.PlotOptions % Default graphic options (see SMASH.General.PlotOptions)
+        PlotOptions = SMASH.Graphics.GraphicOptions % Graphic options
     end
     %%
     methods (Hidden=true)

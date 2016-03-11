@@ -41,7 +41,7 @@
 % These options are provided for graphical interface development in
 % conjunction with the apply function.
 %
-% See also BoundingCurve, define, insert, remove, view, MUI.Dialog
+% See also BoundingCurve, define, insert, remove, view, SMASH.MUI.Dialog
 %
 
 %
@@ -134,13 +134,66 @@ setappdata(dlg.Handle,'Label',h(2));
 makeBold(h(1));
 set(h(end),'String',object.Label,'Callback',{@changeLabel,dlg.Handle});
 
-h=addblock(dlg,'medit','Data table: [x y width]',45,10);
-setappdata(dlg.Handle,'Table',h(end));
-makeBold(h(1));
-set(h(end),'FontName',get(0,'FixedWidthFontName'));
+%h=addblock(dlg,'medit','Data table: [x y width]',45,10);
+%setappdata(dlg.Handle,'Table',h(end));
+%makeBold(h(1));
+%set(h(end),'FontName',get(0,'FixedWidthFontName'));
+%zoom(fig,'on');zoom(fig,'off'); % reset figure toggle state
+%set(fig,'WindowButtonUpFcn',{@useMouse,dlg.Handle});
+%object2table(object,h(end));
+
+hTable=addblock(dlg,'table',{'x' 'y' 'width'},15,10);
+setappdata(dlg.Handle,'Table',hTable(end));
+makeBold(hTable(2:end-1));
 zoom(fig,'on');zoom(fig,'off'); % reset figure toggle state
 set(fig,'WindowButtonUpFcn',{@useMouse,dlg.Handle});
-object2table(object,h(end));
+object2table(object,hTable(end));
+
+h=addblock(dlg,'button',{'Add row' 'Remove row(s)'});
+set(h(1),'Callback',@addRow)
+    function addRow(varargin)
+        current=getappdata(hTable(end),'CurrentCell');        
+        if isempty(current)
+            last=getappdata(hTable(end),'LastRow');
+            if isempty(last)
+                row=1;
+            else
+                row=last;
+            end
+        else
+            row=current(1);           
+            setappdata(hTable(end),'LastRow',row);
+        end
+        data=get(hTable(end),'Data');
+        N=size(data,1);
+        for m=(N+1):-1:(row+1)
+            for col=1:3
+                data{m,col}=data{m-1,col};
+            end
+        end
+        for col=1:3
+            data{row,col}='';
+        end                
+        set(hTable(end),'Data',data);        
+    end
+set(h(2),'Callback',@removeRow)
+    function removeRow(varargin)
+        current=getappdata(hTable(end),'CurrentCell');
+        if isempty(current)
+            return
+        end
+        row=unique(current(:,1));        
+        data=get(hTable(end),'Data');
+        N=size(data,1);
+        keep=true(N,1);
+        for nn=1:N
+            if any(nn==row)
+                keep(nn)=false;
+            end
+        end
+        data=data(keep,:); 
+        set(hTable(end),'Data',data);
+    end
 
 h=addblock(dlg,'button',{'Use table','Show plot'});
 set(h(1),'Callback',{@useTable,dlg.Handle});
@@ -215,7 +268,6 @@ end
 
 function useMouse(~,~,db)
 
-%disp('Button up');
 target=getappdata(db,'TargetAxes');
 fig=getappdata(db,'TargetFigure');
 object=getappdata(db,'CurrentObject');
@@ -256,21 +308,40 @@ table=getappdata(db,'Table');
 points=getappdata(db,'Points');
 envelope=getappdata(db,'Envelope');
 
-entry=get(table,'String');
-N=size(entry,1);
-data=nan(N,3);
-for n=1:N
-    try
-        [value,count]=sscanf(entry(n,:),'%g',3);
-        if count==3
-            data(n,:)=transpose(value);
+entry=get(table,'Data');
+data=nan(size(entry));
+for m=1:size(data,1)
+    for n=1:3
+        temp=sscanf(entry{m,n},'%g');
+        if isempty(temp)
+            if n==3
+                data(m,n)=object.DefaultWidth;
+            else
+                continue
+            end
+        else
+            data(m,n)=temp;
         end
-    catch
-        % do nothing
     end
 end
-keep=~isnan(data(:,1));
+keep=~any(isnan(data),2);
 data=data(keep,:);
+
+% entry=get(table,'String');
+% N=size(entry,1);
+% data=nan(N,3);
+% for n=1:N
+%     try
+%         [value,count]=sscanf(entry(n,:),'%g',3);
+%         if count==3
+%             data(n,:)=transpose(value);
+%         end
+%     catch
+%         % do nothing
+%     end
+% end
+%keep=~isnan(data(:,1));
+%data=data(keep,:);
 object=define(object,data);
 object2table(object,table(end));
 object2plots(object,points,envelope);
@@ -362,6 +433,12 @@ end
 
 %% helper functions
 function makeBold(target)
+
+if numel(target)>1
+    makeBold(target(1));
+    target=target(2:end);
+end
+
 set(target,'FontWeight','bold');
 extent=get(target,'Extent');
 position=get(target,'Position');
@@ -381,9 +458,17 @@ elseif strcmp(object.Direction,'horizontal');
 elseif strcmp(object.Direction,'vertical');
     data=sortrows(data,2);
 end
-data=sprintf('%+15.6g %+15.6g %15.6g\n',transpose(data));
+%data=sprintf('%+15.6g %+15.6g %15.6g\n',transpose(data));
 
-set(table(end),'String',data);
+temp=cell(size(data));
+for m=1:size(temp,1)
+    temp{m,1}=sprintf('%+.6g',data(m,1));
+    temp{m,2}=sprintf('%+.6g',data(m,2));
+    temp{m,3}=sprintf('%.6g',data(m,3));
+end
+
+%set(table(end),'String',data);
+set(table(end),'Data',temp,'ColumnFormat',{'char' 'char' 'char'});
 
 end
 
