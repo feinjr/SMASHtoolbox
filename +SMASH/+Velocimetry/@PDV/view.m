@@ -17,7 +17,7 @@
 % 
 % created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function varargout=view(object,mode,target)
+function varargout=view(object,mode)
 
 % manage input
 if (nargin<2) || isempty(mode)
@@ -25,32 +25,31 @@ if (nargin<2) || isempty(mode)
 end
 assert(ischar(mode),'ERROR: invalid mode');
 
-if (nargin<3) || isempty(target)
-    target=[];
-end
-
 % generate plot
 % NEEDS WORK!
 switch lower(mode)
     case 'measurement'
-        h=view(object.Measurement,target);
+        h=view(object.Measurement);
     case 'preview'
-        h=view(object.Preview,'show',target);
+        h=view(object.Preview,'show');
         h=h.image;
     case 'frequency'
         N=numel(object.Frequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
         color=lines(N);        
-        h=nan(1,N);
-        label=cell(1,N);
+        h=nan(N,2);
+        %label=cell(1,N);
+        figure;
         for n=1:N
-            h(n)=view(object.Frequency{n},1,target);
-            set(h(n),'Color',color(n,:));
-            target=gca;
-            label{n}=object.Frequency{n}.Name;
+            %label{n}=object.Frequency{n}.Name;
+            subplot(2,1,1);
+            h(n,1)=view(object.Frequency{n},1,gca);
+           
+            subplot(2,1,2);
+            set(h(n,:),'Color',color(n,:));
         end
         ylabel('Beat frequency');
-        legend(label,'Location','best');
+        %legend(label,'Location','best');
     case 'velocity'
         N=numel(object.Velocity);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
@@ -58,9 +57,8 @@ switch lower(mode)
         h=nan(1,N);
         label=cell(1,N);
         for n=1:N
-            h(n)=view(object.Velocity{n},1,target);
+            h(n)=view(object.Velocity{n},1);
             set(h(n),'Color',color(n,:));
-            target=gca;
             label{n}=object.Velocity{n}.Name;
         end
         ylabel('Beat frequency');

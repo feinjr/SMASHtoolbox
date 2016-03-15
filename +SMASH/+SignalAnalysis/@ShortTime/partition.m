@@ -61,13 +61,25 @@ function varargout=partition(object,varargin)
 % handle input
 if nargout==0   
     param=object.Partition;
-    assert(~isempty(param),'ERROR: no partitions defined');    
-    fprintf('\tPoints   = %#13.0d\tSkip    = %#13.0d\n',...
-        param.Points,param.Skip);
-    fprintf('\tDuration = %#13.6g\tAdvance = %#13.6g\n',...
-        param.Duration,param.Advance);
-    fprintf('\tBlocks   = %#13.0d\tOverlap = %#13.6g\n',...
-        param.Blocks,param.Overlap);
+    temp=cell(1,6);
+    if isempty(param)
+        for n=1:6
+            temp{n}='(undefined)';
+        end
+    else
+        temp{1}=sprintf('%.0d',param.Points);
+        temp{2}=sprintf('%.0d',param.Skip);
+        temp{3}=sprintf('%#.6g',param.Duration);
+        temp{4}=sprintf('%#.6g',param.Advance);
+        temp{5}=sprintf('%.0d',param.Blocks);
+        temp{6}=sprintf('%#.6g',param.Overlap);
+    end 
+    fprintf('\tPoints   = %#13s\tSkip    = %#13s\n',...
+        temp{1:2});
+    fprintf('\tDuration = %#13s\tAdvance = %#13s\n',...
+        temp{3:4});
+    fprintf('\tBlocks   = %#13s\tOverlap = %#13s\n',...
+        temp{5:6});
     return
 elseif nargin==1
     fprintf('No partitions specified--using default settings\n');

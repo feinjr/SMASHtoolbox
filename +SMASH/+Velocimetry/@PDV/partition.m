@@ -50,28 +50,6 @@ end
 % apply partition settings
 object.Measurement=partition(object.Measurement,varargin{:});
 
-% domain calibration
-dt=object.SampleRate;
-
-t=0:dt:object.Measurement.Partition.Duration;
-fmin=1/t(end); % single fringe
-fmax=1/(8*dt); % 1/4 of Nyquist
-f0=(fmin+fmax)/2;
-s=cos(2*pi*f0*t);
-temp=SMASH.SignalAnalysis.Signal(t,s);
-[f,P]=fft(temp,...
-    'FrequencyDomain','positive',...
-    'SpectrumType','power',...
-    'NumberFrequencies',1e5);
-Pmax=interp1(f,P,f0,'linear');
-object.DomainScaling=Pmax;
-
-% calculate minimum width
-P=P/trapz(f,P);
-width=sqrt(trapz(f,P.*(f-f0).^2));
-object.MinimumWidth=width;
-%object.MinimumWidth=1/(4*pi*t(end));
-
 % manage output
 if nargout>0
     varargout{1}=object;

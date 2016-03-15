@@ -59,7 +59,7 @@ classdef DataClass
             end
             object.Precision=object.Precision; % enforce variable precision
             if isempty(object.GraphicOptions)
-                object.GraphicOptions=SMASH.General.GraphicOptions;
+                object.GraphicOptions=SMASH.Graphics.GraphicOptions;
             end
         end
         varargout=concealMethod(varargin);

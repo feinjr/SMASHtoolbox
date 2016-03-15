@@ -1,17 +1,20 @@
 function history=analyzeSpectrum(measurement,boundary,setting,mode)
 
-%% manage input
+% manage input
 if (nargin<4) || isempty(mode)
     mode='centroid';
 end
 assert(ischar(mode),'ERROR: invalid spectrum analysis mode');
 
-%% set up local analysis
+% set up local analysis
 Nboundary=numel(boundary);
-    function parameter=findPeak(f,y,t,s,boundary)
+fs=setting.SampleRate;
+tau=setting.BoxcarDuration;
+sigma=setting.RMSnoise;
+UncertaintyFactor=sqrt(6/fs*tau^3)*sigma/pi;
+    function parameter=findPeak(f,y,t,~)
         tmid=(t(end)+t(1))/2;
-        parameter=nan(Nboundary,4); % [center chirp amplitude uncertainty]
-        %% analyze active bounds
+        parameter=nan(4,Nboundary); % [center uncertainty chirp unique]
         for index=1:Nboundary
             [fA,fB]=probe(boundary{index},tmid);
             if isnan(fA) || isnan(fB)
@@ -19,28 +22,27 @@ Nboundary=numel(boundary);
             end
             keep=(f>=fA)&(f<=fB);
             fb=f(keep);
-            y=y(keep);
+            yb=y(keep);
             switch lower(mode)
                 case 'centroid'
-                    area=trapz(fb,y);
-                    weight=y/area;
+                    area=trapz(fb,yb);
+                    weight=yb/area;
                     center=trapz(fb,weight.*fb);
-                    parameter(index,1)=center;
-                    parameter(index,3)=interp1(fb,y,center,'linear');
-                    % parameter 4 is uncertainty!
+                    parameter(1,index)=center;                    
+                    amplitude=interp1(fb,yb,center,'linear');                                               
                 otherwise
                     error('ERROR: invalid spectrum analysis mode');
-            end            
-        end
-        
-        %% manage output
-        parameter=transpose(parameter);
+            end     
+            amplitude=amplitude/setting.DomainScaling;    
+            uncertainty=UncertaintyFactor/amplitude;
+            parameter(2,index)=uncertainty;
+            parameter(4,index)=true;
+        end        
         parameter=parameter(:);
     end
 
-%% perform analysis
+% perform analysis
 measurement.FFToptions.SpectrumType='power';
-
 history=analyze(measurement,@findPeak,'none');
 
 end

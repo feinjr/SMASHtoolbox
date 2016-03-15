@@ -22,14 +22,14 @@ end
 % determine sample rate
 t=object.Measurement.Grid;
 dt=(max(t)-min(t))/(numel(t)-1);
-object.SampleRate=dt;
+object.SampleInterval=dt;
+object.SampleRate=1/dt;
 
 % default settings
 object.GraphicOptions=SMASH.Graphics.GraphicOptions;
 object.GraphicOptions.Title='PDV measurement';
 object.GraphicOptions.Marker='none';
 
-% default settings
 p=struct();
 p.Wavelength=1550e-9;
 p.ReferenceFrequency=0;

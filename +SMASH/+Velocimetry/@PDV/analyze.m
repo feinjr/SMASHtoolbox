@@ -45,7 +45,7 @@ assert(ischar(AnalysisMode),'ERROR: invalid analysis mode');
 %% verify partition settings
 if isempty(object.Measurement.Partition)
     message{1}='ERROR: analysis partitions are undefined';
-    message{2}='       Use the "configure" method before "analyze"';
+    message{2}='       Use the "configure" method to define partitions';
     error('%s\n',message{:});
 end
 
@@ -55,7 +55,6 @@ M=numel(xlimit);
 xlimit=sort([xlimit(1) xlimit(end)]);
 SampleTime=diff(xlimit)/(M-1);
 NyquistFrequency=1/(2*SampleTime);
-previous.Bound=xlimit;
 
 boundary=object.Boundary;
 if isempty(boundary)
@@ -85,7 +84,10 @@ measurement=limit(object.Measurement,xbound);
 
 %% perform analysis
 setting=object.Settings;
+setting.SampleRate=object.SampleRate;
 setting.DomainScaling=object.DomainScaling;
+setting.BoxcarDuration=object.BoxcarDuration;
+setting.RMSnoise=object.Settings.RMSnoise;
 switch lower(AnalysisMode)
     case 'power'        
         history=analyzeSpectrum(measurement,boundary,...
@@ -101,7 +103,7 @@ end
 N=numel(boundary);
 object.Frequency=cell(1,N);
 object.Velocity=cell(1,N);
-index=1:4; % location, strength, unique, chirp
+index=1:4; % center, uncertainty, chirp, unique
 for m=1:N
     % remove NaN entries
     t=history.Grid;
@@ -113,7 +115,7 @@ for m=1:N
     object.Frequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
     object.Frequency{m}.GridLabel='Time';
     object.Frequency{m}.DataLabel='';
-    object.Frequency{m}.Legend={'Center','Width','Strength','Unique'}; 
+    object.Frequency{m}.Legend={'Center' 'Uncertainty' 'Chirp','Unique'}; 
     % transfer label
     try
         object.Frequency{m}.Name=object.Boundary{m}.Label;

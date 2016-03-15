@@ -6,10 +6,10 @@
 %
 % created December 12, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef FFToptions %< hgsetget
+classdef FFToptions
     %%
     properties
-        Window = 'gaussian' % Digital window function (name, name/parameter, or array)
+        Window = 'hann' % Digital window function (name, name/parameter, or array)
         NumberFrequencies = 1000 % Mininum number of frequency values (integer)
         RemoveDC = true; % Remove DC component (true or false)        
         FrequencyDomain = 'positive' % Frequency domain ('positive', 'negative', 'all'?)
@@ -26,18 +26,6 @@ classdef FFToptions %< hgsetget
                 object.(name)=varargin{n+1};
             end
         end
-%         varargout=addlistener(varargin);
-%         varargout=eq(varargin);
-%         varargout=findobj(varargin);
-%         %varargout=findprop(varargin);
-%         varargout=ge(varargin);
-%         varargout=getdisp(varargin);
-%         varargout=gt(varargin);
-%         varargout=le(varargin);
-%         varargout=lt(varargin);
-%         varargout=ne(varargin);
-%         varargout=notify(varargin);
-%         varargout=setdisp(varargin);
     end
 %% static methods
     methods (Static=true,Hidden=true)

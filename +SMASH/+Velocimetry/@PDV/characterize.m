@@ -34,6 +34,7 @@ assert(ischar(mode),'ERROR: invalid mode request');
 
 tbound=[-inf +inf];
 fbound=[-inf +inf];
+
 switch lower(mode)    
     case 'noise'
         label='Select noise region';
@@ -47,6 +48,8 @@ end
     function manageRegion()
         Narg=numel(varargin);
         if Narg==0
+            assert(~isempty(object.Preview),...
+                'ERROR: interactive region selection cannot be performed without a preview image');
             preview(object);
             fig=gcf;
             ha=gca;
