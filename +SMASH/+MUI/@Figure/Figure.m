@@ -89,10 +89,6 @@ classdef Figure < handle
             end
             fig=figure(temp{:});            
             % create figure and toolbar
-            %fig=figure('Toolbar','none','MenuBar','none',...
-            %    'NumberTitle','off',...
-            %    'DockControls','off',...
-            %    'Name',object.Name,'Units','pixels','Resize','on');
             object.Handle=fig;
             object.ToolBar=uitoolbar('Parent',fig);
             object.Pointer=get(fig,'Pointer');            
@@ -111,10 +107,10 @@ classdef Figure < handle
             datacursor(object,'create');
             ROIstatistics(object,'create');
             overlay(object,'create');
-            clone(object,'create');
             slice(object,'create');
-            help(object,'create');
-            
+            clone(object,'create');
+            standard(object,'create');
+            help(object,'create');       
             % link figure to dialog boxes generated from it
             uicontrol('Parent',object.Handle,'Visible','off',...
                 'Tag','FigureObjectLink',...
