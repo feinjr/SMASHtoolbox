@@ -7,11 +7,7 @@ object=configure(object,'Window','hann');
 object=preview(object,'Duration',[5e-9 1e-9]);
 preview(object);
 
-%duration=5e-9;
 duration=2e-9;
-%skip=1e-9;
-%skip=0.5e-9;
-%skip=0.2e-9;
 skip=0.1e-9;
 
 %% define bounds

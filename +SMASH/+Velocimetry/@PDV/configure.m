@@ -77,9 +77,6 @@ if nargout==0
 end
 
 % process configuration changes
-if Narg==0
-    fprintf('Interactive configuration is not ready yet...\n');
-end
 assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
 for n=1:2:Narg
     name=varargin{n};
@@ -94,65 +91,18 @@ for n=1:2:Narg
         case 'referencefrequency'
             assert(isnumeric(value) && isscalar(value),...
                 'ERROR: invalid ReferenceFrequency value');
-            object.Settings.ReferenceFrequency=value;
-        case 'noiseamplitude'
+            object.Settings.ReferenceFrequency=value;                  
+        case 'rmsnoise'
             assert(isnumeric(value) && isscalar(value) && value>0,...
-                'ERROR: invalid NoiseAmplitude value');
-            object.Settings.NoiseAmplitude=value;           
-        %case 'uniquetolerance'
-        %    assert(isnumeric(value) && isscalar(value) && (value>0),...
-        %        'ERROR: invalid UniqueTolerance value');
-        %    object.Settings.UniqueTolerance=value;
-%         case 'convertfunction'
-%             if ischar(value)
-%                 value=str2func(value);
-%             end
-%             assert(isa(value,'function_handle') | isempty(value),...
-%                 'ERROR: invalid ConvertFunction value');
-%             object.Settings.ConvertFunction=value;
-        %case 'analysismode'
-        %    assert(ischar(value),'ERROR: invalid AnalysisMode value');
-        %    switch lower(value)
-        %        case 'centroid'
-        %            object.Settings.AnalysisMode='centroid';
-        %            object.Measurement.FFToptions.SpectrumType='power';
-        %        case 'fit'
-        %            object.Settings.AnalysisMode='fit';
-        %            object.Measurement.FFToptions.SpectrumType='complex';
-        %        otherwise
-        %            error('ERROR: %s is an invalid AnalysisMode');
-        %    end
-        case 'harmonicfunction'
-            if ischar(value)
-                value=str2func(value);
-            end
-            assert(isa(value,'function_handle') | isempty(value),...
-                'ERROR: invalid HarmonicFunction value');
-            object.Settings.HarmonicFunction=value;
-        %case 'shocktable' % [index start stop]
-        %    if isempty(value)
-        %        object.Settings.ShockTable=[];
-        %        return
-        %    end
-        %    assert(size(value,2)==3,'ERROR: invalid ShockTable value');
-        %    object.Settings.ShockTable=value;
+                'ERROR: invalid RMSnoise value');
+            object.Settings.NoiseAmplitude=value;                               
         %% FFT options
         case 'window'
             object.Measurement.FFToptions.Window=value;
         case 'numberfrequencies'
             object.Measurement.FFToptions.NumberFrequencies=value;
         case 'removedc'
-            object.Measurement.FFToptions.RemoveDC=value;
-        %case 'frequencydomain'
-        %    object.Measurement.FFToptions.FrequencyDomain=value;
-        %case 'spectrumtype'
-        %    object.Measurement.FFToptions.SpectrumType=value;
-        %    switch lower(object.Measurement.FFToptions.SpectrumType)
-        %        case 'power'
-        %            object.Settings.AnalysisMode='centroid';
-        %        case 'complex'
-        %            object.Settings.AnalysisMode='fit';
-        %    end
+            object.Measurement.FFToptions.RemoveDC=value;       
         %% partition configuration
         case 'partition'
             object=partition(object,value{1},value{2});

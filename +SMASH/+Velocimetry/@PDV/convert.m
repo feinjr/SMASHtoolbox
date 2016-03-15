@@ -27,9 +27,8 @@ function object=convert(object,ConvertFunction)
 % define standard conversion
 lambda=object.Settings.Wavelength;
 f0=object.Settings.ReferenceFrequency;
-correction=object.Settings.WindowCorrection;
     function velocity=standardConvert(index,time,frequency) %#ok<INUSL>
-        velocity=correction*(lambda/2)*(frequency-f0);
+        velocity=(lambda/2)*(frequency-f0);
     end
 
 % manage input
@@ -45,7 +44,7 @@ object.Velocity=cell(1,N);
 for n=1:N
     t=object.BeatFrequency{n}.Grid;
     f=object.BeatFrequency{n}.Data(:,1);
-    v=feval(ConvertFunction,n,t,f);
+    v=ConvertFunction(n,t,f);
     df=object.BeatFrequency{n}.Data(:,4);
     dv=df*correction*(lambda/2);
     object.Velocity{n}=SMASH.SignalAnalysis.SignalGroup(t,[v(:) dv(:)]);

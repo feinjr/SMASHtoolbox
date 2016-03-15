@@ -142,9 +142,9 @@ set(h(end),'String',object.Label,'Callback',{@changeLabel,dlg.Handle});
 %set(fig,'WindowButtonUpFcn',{@useMouse,dlg.Handle});
 %object2table(object,h(end));
 
-hTable=addblock(dlg,'table',{'x' 'y' 'width'},15,10);
+hTable=addblock(dlg,'table',object.ColumnLabel,15,10);
 setappdata(dlg.Handle,'Table',hTable(end));
-makeBold(hTable(2:end-1));
+makeBold(hTable(1:end-1));
 zoom(fig,'on');zoom(fig,'off'); % reset figure toggle state
 set(fig,'WindowButtonUpFcn',{@useMouse,dlg.Handle});
 object2table(object,hTable(end));
@@ -434,7 +434,11 @@ end
 %% helper functions
 function makeBold(target)
 
-if numel(target)>1
+if isempty(target)
+    return
+end
+
+while numel(target)>1
     makeBold(target(1));
     target=target(2:end);
 end

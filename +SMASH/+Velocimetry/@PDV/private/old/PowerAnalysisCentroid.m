@@ -1,14 +1,10 @@
 
-function parameter=PowerAnalysisCentroid(f,y,t,~,boundary,options)
+function parameter=PowerAnalysisCentroid(f,y,t,~,boundary)%,options)
 
 %% general setup
 tmid=(t(end)+t(1))/2;
 Nboundary=numel(boundary);
 parameter=nan(Nboundary,4);
-
-%if (tmid>2955)
-%    keyboard
-%end
 
 %% analyze active bounds
 for index=1:Nboundary
@@ -26,7 +22,7 @@ for index=1:Nboundary
     parameter(index,2)=sqrt(parameter(index,2)); % width (standard deviation)
     %parameter(index,3)=area/(sqrt(2*pi)*parameter(index,2));
     parameter(index,3)=max(weight)*area;
-    parameter(index,3)=sqrt(parameter(index,3))*options.ScaleFactor; % estimated signal amplitude
+    %parameter(index,3)=sqrt(parameter(index,3))*options.ScaleFactor; % estimated signal amplitude
     % uniqueness not used here
 end
 

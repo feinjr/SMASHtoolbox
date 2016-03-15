@@ -13,7 +13,7 @@
 % at 1).  Input "x" can also be a scaler, which is interpreted
 % as the step size for the object's Grid property (starting from 0).  
 %
-% Local smoothing is invoked by a third input argumen:
+% Local smoothing is invoked by a third input argument:
 %    object=Signal(x,y,order);
 %    object=Signal(x,y,[order nhood])
 %    object=Signal(x,y,[order nhood],Ngrid); % default grid is 100 points

@@ -4,13 +4,12 @@
 % The standard process for doing this is:
 %     >> object=preview(object); % generate spectrogram
 %     >> preview(object); % display spectrogram in a new figure
-%     >> preview(object,target); % display spectrogram in target axes
 % The spectrogram is stored as an Image sub-object in the Preview property.
 %  Except for partitioning (described below), all settings for the preview
 % image are derived from the object's configuration.
 %
 % The standard preview is a spectrograms with 1000 non-overlapping blocks.
-% Alternate partitioning can also be specified.
+% Alternate partitioning can be specified as shown below.
 %     >> object=preview(object,'duration',[duration advance]);
 %     >> object=preview(object,'points',[points skip]);
 %     >> object=preview(object,'blocks',[number overlap]);
@@ -36,15 +35,9 @@ Narg=numel(varargin);
 if nargout==0
     if isempty(object.Preview)
         fprintf('Generating preview\n');
-        object=preview(object);
-    end
-    if Narg==0
-        view(object.Preview);
-    elseif Narg==1
-        view(object.Preview,[],varargin{1});
-    else
-        error('ERROR: invalid preview request');
-    end 
+        object=preview(object,varargin{:});
+    end   
+    view(object,'Preview');
     return
 end
 

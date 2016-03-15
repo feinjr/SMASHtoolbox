@@ -10,7 +10,7 @@
 % property as an Image sub-object.  Settings and results are stored in
 % separate structure arrays.
 %
-% History analysis is the ultimate purpose of the PDV class.  Once signal
+% History extraction is the ultimate purpose of the PDV class.  Once signal
 % processing, frequency bounding, and setting configuration is complete,
 % the "analyze" method tracks spectral features as a function of time.
 %
@@ -23,64 +23,36 @@
 %
 classdef PDV
     %%
-    properties
-        Measurement % PDV measurement (STFT object)        
-        Preview % Preview spectrogram (Image object)
-    end
     properties (SetAccess=protected)
-        Settings % Analysis settings (structure)
+        Measurement % PDV measurement (STFT object)
+        Preview % Preview spectrogram (Image object)
+        Settings % Analysis settings (structure)         
+        Boundary = {} % ROI boundaries (BoundaryCurve object)
         Frequency % Analysis results (cell array of SignalGroup objects)
         Velocity % Converted results (cell array of SignalGroup objects)
-        Boundary = {} % ROI boundaries (BoundaryCurve object)
+    end
+    properties
+        GraphicOptions % Graphic optoins (GraphicOptions object)        
+    end    
+    properties (SetAccess=protected)        
+        SampleRate
+        MinimumWidth
+        DomainScaling
     end
     %%
     methods (Hidden=true)
         function object=PDV(varargin)
-            % default settings
-            p=struct();
-            p.Wavelength=1550e-9;
-            p.ReferenceFrequency=0;
-            p.WindowCorrection=1;
-            p.NoiseAmplitude=nan;
-            p.Signal2SpectrumScale=nan;
-            p.HarmonicFunction=[];
-            p.ShockTable=[];            
-            object.Settings=p;
-            % manage input
-            if (nargin==1) && isobject(varargin{1})
-                varargin{1}=SMASH.SignalAnalysis.STFT(varargin{1});
-                object.Measurement=varargin{1};
-            elseif (nargin>0) && ischar(varargin{1})
-                temp=SMASH.FileAccess.readFile(varargin{:});
-                switch class(temp)
-                    case 'SMASH.Velocimetry.PDV'
-                        object=temp;
-                    otherwise
-                        object.Measurement=SMASH.SignalAnalysis.STFT(varargin{:});
-                end
-            else
-                object.Measurement=SMASH.SignalAnalysis.STFT(varargin{:});
-            end
-            object.Measurement.Name='PDV measurement';
-            object.Measurement.GraphicOptions.Title='PDV measurement';
+            object=create(object,varargin{:});            
         end
         varargout=partition(varargin);
+        %varargout=convert(varargin);
+    end
+    %%
+    methods (Access=protected, Hidden=true)
+        varargout=create(object,varargin);
     end
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);        
     end   
-    %% setters
-    methods
-        function object=set.Measurement(object,value)
-            assert(isa(value,'SMASH.SignalAnalysis.STFT'),...
-                'ERROR: Measurement property must be a STFT object');
-            object.Measurement=value;
-        end
-        function object=set.Preview(object,value)   
-            assert(isa(value,'SMASH.ImageAnalysis.Image'),...
-                'ERROR: Preview property must be an Image object');
-            object.Preview=value;
-        end        
-    end
 end

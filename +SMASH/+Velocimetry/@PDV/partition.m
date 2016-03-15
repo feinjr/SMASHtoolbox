@@ -32,10 +32,12 @@
 
 %
 % created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
+% updated March 14, 2016 by Daniel Dolan
+%   -domain scaling calculated whenever partitioning changes
 %
 function varargout=partition(object,varargin)
 
-% manage input/output
+% manage input
 if (nargout==0)
     if nargin>1
         warning('SMASH:PDV',...
@@ -45,9 +47,34 @@ if (nargout==0)
     return;
 end
 
+% apply partition settings
 object.Measurement=partition(object.Measurement,varargin{:});
-varargout{1}=object;
 
+% domain calibration
+dt=object.SampleRate;
+
+t=0:dt:object.Measurement.Partition.Duration;
+fmin=1/t(end); % single fringe
+fmax=1/(8*dt); % 1/4 of Nyquist
+f0=(fmin+fmax)/2;
+s=cos(2*pi*f0*t);
+temp=SMASH.SignalAnalysis.Signal(t,s);
+[f,P]=fft(temp,...
+    'FrequencyDomain','positive',...
+    'SpectrumType','power',...
+    'NumberFrequencies',1e5);
+Pmax=interp1(f,P,f0,'linear');
+object.DomainScaling=Pmax;
+
+% calculate minimum width
+P=P/trapz(f,P);
+width=sqrt(trapz(f,P.*(f-f0).^2));
+object.MinimumWidth=width;
+%object.MinimumWidth=1/(4*pi*t(end));
+
+% manage output
+if nargout>0
+    varargout{1}=object;
 end
 
-% SHOULD THIS BECOME A HIDDEN OR PROTECTED METHOD ????
+end

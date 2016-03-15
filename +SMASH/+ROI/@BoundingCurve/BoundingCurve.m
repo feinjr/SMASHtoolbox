@@ -1,6 +1,6 @@
 % This class defines a finite-width bounding curve in two-dimensional
 % space.  Two curve directions are supported.  Horizontal curves have
-% monotoically increasing x-cordinates and vertical widths.  Vertical
+% monotonically increasing x-cordinates and vertical widths.  Vertical
 % curves have monotically increasing y-coordinates and horizontal widths.
 %
 % BoudingCurve objects are typically created with a specified direction.
@@ -35,6 +35,7 @@ classdef BoundingCurve
         Direction = 'horizontal'; % Independent axis ('horizontal' or 'vertical')
         DefaultWidth % Default boundary width
         Label = 'Boundary curve' % Text label
+        ColumnLabel = {'x' 'y' 'width'} % Table column labels
         GraphicOptions % Graphic options
     end
     %%
@@ -94,6 +95,11 @@ classdef BoundingCurve
             else
                 error('ERROR: invalid GraphicOptions value');
             end        
+        end
+        function object=Set.ColumnLabel(object,value)
+            assert(iscellstr(value) && numel(value)==3,...
+                'error: invalid ColumnLabel value');
+            object.ColumnLabel=value;
         end
     end
 end

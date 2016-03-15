@@ -6,9 +6,9 @@ object.GraphicOptions.Marker='none';
 object.GraphicOptions.LineStyle='-';
 
 Narg=numel(varargin);
-for n=1:Narg
-    assert(isnumeric(varargin{n}),'ERROR: invalid input');
-end
+%for n=1:Narg
+%    assert(isnumeric(varargin{n}),'ERROR: invalid input');
+%end
 
 switch Narg
     case 2 % standard mode: Signal(x,y)        

@@ -17,9 +17,6 @@
 %     -'Noise' determines the RMS noise of the signal.  The
 %     selected region should contain noise with *no* harmonic content.  the
 %     frequency range should be as wide as possible.
-%     -'Scaling' determines the scaling between signal amplitudes and power
-%     spectrum.  This determination based purely on the partition
-%     settings--time/frequency bound inputs are ignored.
 %
 % See also PDV, configure
 %
@@ -37,10 +34,7 @@ assert(ischar(mode),'ERROR: invalid mode request');
 
 tbound=[-inf +inf];
 fbound=[-inf +inf];
-switch lower(mode)
-    case 'scaling'
-        varargin{1}=tbound;
-        varargin{2}=fbound;
+switch lower(mode)    
     case 'noise'
         label='Select noise region';
         manageRegion;
@@ -104,30 +98,10 @@ switch lower(mode)
         %f=f(keep);
         P=P(keep);
         correction=noisefloor/mean(P);
-        object.Settings.NoiseAmplitude=sqrt(correction);
+        object.Settings.RMSnoise=sqrt(correction);
     case 'referencefrequency'
         [~,index]=max(P);
-        object.Settings.ReferenceFrequency=f(index);
-    case 'scaling'
-        try
-            tmax=object.Measurement.Partition.Duration;
-        catch
-            error('ERROR: partitions not defined');
-        end
-        t=object.Measurement.Grid;
-        dt=(max(t)-min(t))/(numel(t)-1);        
-        t=0:dt:tmax;        
-        fmin=1/tmax; % single fringe
-        fmax=1/(8*dt); % 1/4 of Nyquist
-        f0=(fmin+fmax)/2;        
-        s=cos(2*pi*f0*t);
-        temp=SMASH.SignalAnalysis.Signal(t,s);
-        [f,P]=fft(temp,...
-            'FrequencyDomain','positive',...
-            'SpectrumType','power',...
-            'NumberFrequencies',1000);       
-        Pmax=interp1(f,P,f0,'linear');        
-        object.Settings.Signal2SpectrumScale=Pmax;
+        object.Settings.ReferenceFrequency=f(index);   
 end
 
 end

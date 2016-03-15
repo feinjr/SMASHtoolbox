@@ -6,7 +6,7 @@
 %     >> view(object,'Measurement'); % same as above
 % Results can be viewed *after* the analysis method has been used.
 %     >> view(object,'Velocity');
-%     >> view(object,'BeatFrequency');
+%     >> view(object,'Frequency');
 %
 % Specifying an output returns graphic handles for lines from this method.
 %     >> h=view(...);
@@ -36,17 +36,18 @@ switch lower(mode)
         h=view(object.Measurement,target);
     case 'preview'
         h=view(object.Preview,'show',target);
-    case 'beatfrequency'
-        N=numel(object.BeatFrequency);
+        h=h.image;
+    case 'frequency'
+        N=numel(object.Frequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
         color=lines(N);        
         h=nan(1,N);
         label=cell(1,N);
         for n=1:N
-            h(n)=view(object.BeatFrequency{n},1,target);
+            h(n)=view(object.Frequency{n},1,target);
             set(h(n),'Color',color(n,:));
             target=gca;
-            label{n}=object.BeatFrequency{n}.Name;
+            label{n}=object.Frequency{n}.Name;
         end
         ylabel('Beat frequency');
         legend(label,'Location','best');
@@ -67,6 +68,7 @@ switch lower(mode)
     otherwise
         error('ERROR: invalid view mode');
 end
+apply(object.GraphicOptions,h);
 
 % manage output
 if nargout>0

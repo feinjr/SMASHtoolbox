@@ -211,6 +211,7 @@ set(choose(2),'Callback',@chooseBoundary);
 set(choose(3),'Callback',@newBoundary,'ToolTipString','Add new boundary curve');
     function newBoundary(varargin)        
         local{end+1}=SMASH.ROI.BoundingCurve('horizontal');
+        local{end}.ColumnLabel={'Time' 'Frequency' 'Width'};
         current=numel(local);
         updateList;        
     end
@@ -297,6 +298,7 @@ dlg.Hidden=false;
 %dlg.Modal=true;
 
 % wait for user
+
 uiwait(dlg.Handle);
 delete(fig);
 

@@ -1,8 +1,15 @@
 % analyze Perform history analysis
 %
-
+% object=analyze(object,'power');
+% object=analyze(object,'power',mode); % 'centroid'
 %
 % object=analyze(object,'sinusoid');
+% object=analyze(object,'sinusoid',name,value,...)
+% Valid names:
+%   'UniqueTolerance'
+%   'ElectricalHarmonics' 
+%   'OpticalHarmonics'
+%
 % 
 
 % This method performs PDV history analysis...
@@ -41,7 +48,6 @@ if isempty(object.Measurement.Partition)
     message{2}='       Use the "configure" method before "analyze"';
     error('%s\n',message{:});
 end
-object=characterize(object,'Scaling');
 
 %% manage boundaries and limits
 [xlimit,~]=limit(object.Measurement);
@@ -54,8 +60,6 @@ previous.Bound=xlimit;
 boundary=object.Boundary;
 if isempty(boundary)
     table=nan(2,3);    
-    %table(1,:)=[xlimit(1) 0 NyquistFrequency];
-    %table(2,:)=[xlimit(2) 0 NyquistFrequency];
     table(1,:)=[xlimit(1) NyquistFrequency/2 NyquistFrequency/2];
     table(2,:)=[xlimit(2) NyquistFrequency/2 NyquistFrequency/2];
     boundary=SMASH.ROI.BoundingCurve('horizontal',table);
@@ -77,41 +81,21 @@ for n=1:Nboundary
 end
 xbound(1)=max(xbound(1),xlimit(1));
 xbound(2)=min(xbound(2),xlimit(2));
-object.Measurement=limit(object.Measurement,xbound);
+measurement=limit(object.Measurement,xbound);
 
 %% perform analysis
-options=struct();
-options.ScaleFactor=object.Settings.Signal2SpectrumScale;
+setting=object.Settings;
+setting.DomainScaling=object.DomainScaling;
 switch lower(AnalysisMode)
-    case 'power'
-        object.Measurement.FFToptions.SpectrumType='power';        
-        if isempty(varargin) || strcmpi(varargin{1},'centroid')
-            TargetFunction=@(f,y,t,s) PowerAnalysisCentroid(...
-                f,y,t,s,boundary,options);
-        else
-            error('ERROR: alternate power modes not supported yet');
-        end
-        history=analyze(object.Measurement,TargetFunction,'none');
-%    case 'fit'           
-%        object.Measurement.FFToptions.SpectrumType='complex';
-%        Window={'gaussian' 3};
-%        object.Measurement.FFToptions.Window=Window;
-%        options.UniqueTolerance=object.Settings.UniqueTolerance;
-%        options.Tau=object.Measurement.Partition.Duration;
-%        options.Tau=options.Tau/(2*Window{2});
-%        TargetFunction= @(f,y,t,s) ComplexAnalysis(f,y,t,s,boundary,options);
-%        history=analyze(object.Measurement,TargetFunction,'none');
+    case 'power'        
+        history=analyzeSpectrum(measurement,boundary,...
+            setting,varargin{:});                
     case 'sinusoid'
-        measurement=...
-            SMASH.SignalAnalysis.ShortTime.convert(object.Measurement);
-        %analyzeSinusoid('-setup',boundary,varargin{:});
-        %history=analyze(measurement,@analyzeSinusoid);
-        %TargetFunction=@(t,s) analyzeSinusoid(t,s,varargin{:});
-        history=analyzeSinusoid(measurement,boundary,varargin{:});
+        history=analyzeSinusoid(measurement,boundary,...
+            settings,varargin{:});
     otherwise
         error('ERROR: %s is not a valid analysis mode',AnalysisMode);
 end
-
 
 %% separate and process results
 N=numel(boundary);
@@ -138,8 +122,5 @@ for m=1:N
     end
     index=index+numel(index);
 end
-
-%% restore previous settings
-object=limit(object,previous.Bound);
 
 end
