@@ -1,5 +1,4 @@
-% convert Convert frequency to velocity
-%
+% convert Convert raw output to frequency/velocity
 
 
 % This method converts frequency results from the "analyze" method to
@@ -38,20 +37,51 @@ end
 assert(isa(ConvertFunction,'function_handle'),...
     'ERROR: invalid ConvertFunction');
 
-% apply conversion function
-N=numel(object.BeatFrequency);
+% cconversion factors
+fs=object.SampleRate;
+tau=object.BoxcarDuration;
+sigma=object.Settings.RMSnoise;
+UncertaintyFactor=sqrt(6/fs/tau^3)*sigma/pi;
+
+VelocityFactor=object.Settings.Wavelength/2;
+
+% convert raw data
+N=object.RawOutput.NumberSignals/4;
+object.Frequency=cell(1,N);
 object.Velocity=cell(1,N);
 for n=1:N
-    t=object.BeatFrequency{n}.Grid;
-    f=object.BeatFrequency{n}.Data(:,1);
-    v=ConvertFunction(n,t,f);
-    df=object.BeatFrequency{n}.Data(:,4);
-    dv=df*correction*(lambda/2);
-    object.Velocity{n}=SMASH.SignalAnalysis.SignalGroup(t,[v(:) dv(:)]);
+    % select results for current boundary
+    if n==1
+        index=1:4; % center, amplitude, chirp, unique
+    else
+        index=index+4;
+    end    
+    % generate name
+    try
+        name=object.Boundary{m}.Label;
+    catch
+        name='(no name)';
+    end
+    % remove NaN entries
+    data=object.RawOutput.Data(:,index);
+    keep=~isnan(data(:,1));
+    data=data(keep,:);
+    time=object.RawOutput.Grid(keep);
+    % generate frequency results
+    data(:,2)=UncertaintyFactor./data(:,2); % convert amplitude to uncertainty
+    object.Frequency{n}=SMASH.SignalAnalysis.SignalGroup(time,data);    
+    object.Frequency{n}.GridLabel='Time';
+    object.Frequency{n}.DataLabel='';
+    object.Frequency{n}.Legend={'Value' 'Uncertainty' 'Chirp' 'Unique'}; 
+    object.Frequency{n}.Name=name;    
+    % generate velocity results
+    data(:,1)=VelocityFactor*(data(:,1)-object.Settings.ReferenceFrequency);
+    data(:,2)=VelocityFactor*data(:,2);
+    object.Velocity{n}=SMASH.SignalAnalysis.SignalGroup(time,data);    
     object.Velocity{n}.GridLabel='Time';
     object.Velocity{n}.DataLabel='';
-    object.Velocity{n}.Legend={'Velocity','Uncertainty'};    
-    object.Velocity{n}.Name=object.BeatFrequency{n}.Name;
+    object.Velocity{n}.Legend={'Value' 'Uncertainty' 'Chirp' 'Unique'}; 
+    object.Velocity{n}.Name=name;  
 end
 
 end

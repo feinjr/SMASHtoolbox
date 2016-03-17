@@ -26,47 +26,60 @@ end
 assert(ischar(mode),'ERROR: invalid mode');
 
 % generate plot
-% NEEDS WORK!
+SMASH.MUI.Figure;
 switch lower(mode)
     case 'measurement'
-        h=view(object.Measurement);
+        h=view(object.Measurement,gca);
+        apply(object.GraphicOptions,h);
     case 'preview'
-        h=view(object.Preview,'show');
+        h=view(object.Preview,'show',gca);
         h=h.image;
+        apply(object.GraphicOptions,h);
     case 'frequency'
         N=numel(object.Frequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
         color=lines(N);        
         h=nan(N,2);
-        %label=cell(1,N);
-        figure;
+        label=cell(1,N);
         for n=1:N
-            %label{n}=object.Frequency{n}.Name;
-            subplot(2,1,1);
-            h(n,1)=view(object.Frequency{n},1,gca);
-           
-            subplot(2,1,2);
+            label{n}=object.Frequency{n}.Name;
+            ha(1)=subplot(2,1,1);
+            h(n,1)=view(object.Frequency{n},1,gca);           
+            ha(2)=subplot(2,1,2);
+            h(n,2)=view(object.Frequency{n},2,gca);
             set(h(n,:),'Color',color(n,:));
         end
-        ylabel('Beat frequency');
-        %legend(label,'Location','best');
+        apply(object.GraphicOptions,h);
+        ylabel(ha(1),'Beat frequency');
+        xlabel(ha(2),'Time');
+        ylabel(ha(2),'Uncertainty');
+        legend(h(:,1),label,'Location','best');
+        title(ha(2),'');
+        linkaxes(ha,'x');
     case 'velocity'
         N=numel(object.Velocity);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
-        color=lines(N);
-        h=nan(1,N);
+        color=lines(N);        
+        h=nan(N,2);
         label=cell(1,N);
         for n=1:N
-            h(n)=view(object.Velocity{n},1);
-            set(h(n),'Color',color(n,:));
             label{n}=object.Velocity{n}.Name;
+            ha(1)=subplot(2,1,1);
+            h(n,1)=view(object.Velocity{n},1,gca);           
+            ha(2)=subplot(2,1,2);
+            h(n,2)=view(object.Velocity{n},2,gca);
+            set(h(n,:),'Color',color(n,:));
         end
-        ylabel('Beat frequency');
-        legend(label,'Location','best');
+        apply(object.GraphicOptions,h);
+        ylabel(ha(1),'Velocity');
+        xlabel(ha(2),'Time');
+        ylabel(ha(2),'Uncertainty');
+        legend(h(:,1),label,'Location','best');
+        title(ha(2),'');
+         linkaxes(ha,'x');
     otherwise
         error('ERROR: invalid view mode');
 end
-apply(object.GraphicOptions,h);
 
 % manage output
 if nargout>0

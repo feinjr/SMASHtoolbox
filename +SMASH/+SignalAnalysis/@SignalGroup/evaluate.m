@@ -1,6 +1,6 @@
 % EVALUATE Evaluate SignalGroup signals using user defined function(s)
 %
-% This method applys user defined function(s) on the SignalGroup data, 
+% This method applies user defined function(s) on the SignalGroup data, 
 % resulting in a new object.
 %    >> new=evaluate(object,@myfunc);
 %

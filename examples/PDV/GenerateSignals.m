@@ -2,7 +2,7 @@ function GenerateSignals()
 
 %% base velocity history
 T=1/80; % ns
-time=-20:T:150; % ns
+time=-50:T:150; % ns
 velocity=zeros(size(time)); % m/s
 
 t1=30;

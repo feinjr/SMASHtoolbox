@@ -28,8 +28,10 @@ classdef PDV
         Preview % Preview spectrogram (Image object)
         Settings % Analysis settings (structure)         
         Boundary = {} % ROI boundaries (BoundaryCurve object)
-        Frequency = {} % Analysis results (cell array of SignalGroup objects)
-        Velocity = {} % Converted results (cell array of SignalGroup objects)
+        RawOutput % Raw analysis output
+        Frequency = {} % Analysis results (cell array of SignalGroup objects)       
+        %FrequencyChirp = {} % Analysis results (SignalGroup object)
+        Velocity = {} % Converted results (cell array of SignalGroup objects)       
     end
     properties
         GraphicOptions % Graphic optoins (GraphicOptions object)        
@@ -41,6 +43,7 @@ classdef PDV
         DomainScaling
         Duration
         BoxcarDuration
+
     end
     %%
     methods (Hidden=true)
@@ -53,7 +56,6 @@ classdef PDV
     methods (Access=protected, Hidden=true)
         varargout=create(varargin);
         varargout=partition(varargin);
-        varargout=updateFFT(varargin);
     end
     %%
     methods (Static=true, Hidden=true)

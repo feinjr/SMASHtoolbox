@@ -89,40 +89,17 @@ setting.DomainScaling=object.DomainScaling;
 setting.BoxcarDuration=object.BoxcarDuration;
 setting.RMSnoise=object.Settings.RMSnoise;
 switch lower(AnalysisMode)
-    case 'power'        
-        history=analyzeSpectrum(measurement,boundary,...
-            setting,varargin{:});                
+    case 'power'
+        object.RawOutput=analyzeSpectrum(measurement,boundary,...
+            setting,varargin{:});
     case 'sinusoid'
-        history=analyzeSinusoid(measurement,boundary,...
+        object.RawOutput=analyzeSinusoid(measurement,boundary,...
             settings,varargin{:});
     otherwise
         error('ERROR: %s is not a valid analysis mode',AnalysisMode);
 end
 
-%% separate and process results
-N=numel(boundary);
-object.Frequency=cell(1,N);
-object.Velocity=cell(1,N);
-index=1:4; % center, uncertainty, chirp, unique
-for m=1:N
-    % remove NaN entries
-    t=history.Grid;
-    data=history.Data(:,index);
-    keep=~isnan(data(:,1));
-    t=t(keep);
-    data=data(keep,:);
-    % store new object
-    object.Frequency{m}=SMASH.SignalAnalysis.SignalGroup(t,data);    
-    object.Frequency{m}.GridLabel='Time';
-    object.Frequency{m}.DataLabel='';
-    object.Frequency{m}.Legend={'Center' 'Uncertainty' 'Chirp','Unique'}; 
-    % transfer label
-    try
-        object.Frequency{m}.Name=object.Boundary{m}.Label;
-    catch
-        object.Frequency{m}.Name='(no name)';
-    end
-    index=index+numel(index);
-end
+%% convert raw output
+object=convert(object);
 
 end
