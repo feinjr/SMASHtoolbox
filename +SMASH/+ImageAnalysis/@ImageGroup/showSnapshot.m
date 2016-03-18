@@ -32,11 +32,11 @@ end
 
 % create scrollable panel for mini-view
 h.panel = uipanel(h.figure,'Title','Frame Selection',...
-             'Position',[0 .1 NImages*.2+.4 .2]);
-h.slider=uicontrol(h.figure,'Style','slider','Min',0,'Max',max(NImages*.2-.6,0),...
+             'Position',[0 .1 NImages*.15+.4 .2]);
+h.slider=uicontrol(h.figure,'Style','slider','Min',0,'Max',max(NImages*.15-.6,0),...
     'Units','normalized','Position',[.1 .05 .8 .03]);
 set(h.slider,'Callback', @(hObject,eventdata) set(h.panel,...
-    'Position',[-get(hObject,'Value') .1 NImages*.2+.4 .2]));
+    'Position',[-get(hObject,'Value') .1 NImages*.15+.4 .2]));
 
 
 % handle image data

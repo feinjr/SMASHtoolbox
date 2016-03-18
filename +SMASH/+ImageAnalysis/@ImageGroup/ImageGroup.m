@@ -43,7 +43,7 @@ classdef ImageGroup < SMASH.ImageAnalysis.Image
         varargout=showMosaic(varargin);
         varargout=showSnapshot(varargin);
     end
-    methods (Access=protected)
+    methods (Access=protected,Hidden=true)
         varargout=create(varargin);
         varargout=import(varargin);
     end
