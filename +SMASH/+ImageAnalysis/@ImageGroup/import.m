@@ -1,8 +1,8 @@
 function object=import(object,data)
 
-object.Name='Image object';
+object.Name='ImageGroup object';
 object.GraphicOptions=SMASH.General.GraphicOptions;
-object.GraphicOptions.Title='Image object';
+object.GraphicOptions.Title='ImageGroup object';
 object.GraphicOptions.YDir='reverse';
 
 % multiple files
@@ -21,6 +21,7 @@ end
 
 % single file
 object.NumberImages=1;
+object.Legend={'Image Object'};
 switch data.Format
     case 'column'
         object.Data=data.Data;
