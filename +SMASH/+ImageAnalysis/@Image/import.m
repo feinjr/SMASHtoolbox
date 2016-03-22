@@ -84,7 +84,7 @@ if ndims(object.Data)==3
     end
     grayscale=0.2989*r+0.5870*g+0.1140*b; % convert to grayscale
     object.Data=grayscale;
-    object.ColorMap=gray(64);
+    object.GraphicOptions.ColorMap=gray(64);
 end
 assert(ismatrix(object.Data),'ERROR: this class supports scalar data only');
 object.Precision=object.Precision; % invoke superclass set.Precision method

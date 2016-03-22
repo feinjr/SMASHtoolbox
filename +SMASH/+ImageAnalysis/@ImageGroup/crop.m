@@ -3,7 +3,9 @@
 % Usage:
 %   >> object=crop(object,bound1,bound2); % directly input boundaries of 
 %                                           crop region
-%   >> object=crop(object,'manual'); % interactively select crop region
+%   >> object=crop(object,[imageNumber],'manual'); % interactively select crop region
+% You may select which image you want to interact with, though the cropping
+% is still performed on all images.
 %
 % See also IMAGEGROUP, limit
 %
@@ -19,6 +21,10 @@ function object=crop(object,frame,bound1,bound2)
 if strcmpi(frame,'manual')
     frame=1;
     bound1='manual';
+elseif length(frame)==2 || isempty(frame)
+    bound2=bound1;
+    bound1=frame;
+    frame=1;
 end
 assert(rem(frame,1)==0,'Frame slection must be an integer')
 

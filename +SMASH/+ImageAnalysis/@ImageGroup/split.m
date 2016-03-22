@@ -48,6 +48,7 @@ for n=1:object.NumberImages
     varargout{n}.Grid2Label=object.Grid2Label;
     varargout{n}.DataLabel=object.DataLabel;
     varargout{n}.GraphicOptions=object.GraphicOptions;
+    varargout{n}.GraphicOptions.Title=object.Legend{n};
 end
 
 end
