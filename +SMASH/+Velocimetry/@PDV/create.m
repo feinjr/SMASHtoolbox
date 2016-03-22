@@ -11,11 +11,7 @@ if (nargin==2) && isobject(varargin{1})
             error('ERROR: unable to create PDV object from this input');
     end        
 else
-    try
-       source=SMASH.SignalAnalysis.STFT(varargin{:});       
-    catch
-        error('ERROR: unable to create PDV object from this input');
-    end
+    source=SMASH.SignalAnalysis.STFT(varargin{:});
     object.Measurement=source;
 end
 

@@ -1,14 +1,10 @@
-function history=analyzeSpectrum(measurement,boundary,setting,mode)
+function history=analyzeSpectrum(measurement,boundary,setting,varargin)
 
 % manage input
-if (nargin<4) || isempty(mode)
-    mode='centroid';
-end
-assert(ischar(mode),'ERROR: invalid spectrum analysis mode');
+Nboundary=numel(boundary);
 
 % set up local analysis
-Nboundary=numel(boundary);
-    function parameter=findPeak(f,y,t,~)
+    function parameter=processBlock(f,P,t,~)
         tmid=(t(end)+t(1))/2;
         parameter=nan(4,Nboundary); % [center amplitude chirp unique]
         % chirp and unique are not used in spectrum analysis
@@ -18,24 +14,7 @@ Nboundary=numel(boundary);
                 continue
             end
             keep=(f>=fA) & (f<=fB);
-            fb=f(keep);
-            yb=y(keep);
-            threshold=max(yb)*0.10;
-            switch lower(mode)
-                case 'centroid'
-                    weight=yb;
-                    weight(weight<threshold)=0;                            
-                    area=trapz(fb,weight);
-                    weight=weight/area;
-                    center=trapz(fb,weight.*fb);
-                    %width=sqrt(trapz(fb,weight.*(fbb-center).^2));
-                    %fprintf('%3d %#g %#g\n',iteration,center,width);
-                    %left=center-width;
-                    %right=center+width;                                                                                                                                                               
-                    amplitude=interp1(fb,yb,center,'linear');                    
-                otherwise
-                    error('ERROR: invalid spectrum analysis mode');
-            end   
+            [center,amplitude]=findPeak(f(keep),P(keep),varargin{:});                        
             parameter(1,index)=center;
             parameter(2,index)=amplitude/setting.DomainScaling;
         end        
@@ -44,6 +23,6 @@ Nboundary=numel(boundary);
 
 % perform analysis
 measurement.FFToptions.SpectrumType='power';
-history=analyze(measurement,@findPeak,'none');
+history=analyze(measurement,@processBlock,'none');
 
 end

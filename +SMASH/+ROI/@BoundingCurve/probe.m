@@ -2,7 +2,7 @@
 %
 % This function returns the lower/upper limits of a BoundingCurve at
 % specified locations.
-%     >> [lower,upper]=probe(object,location);
+%     >> [low,high]=probe(object,location);
 % For horizontal curves, "location" is an array of x values where the
 % lower/upper y-values are determiend.  For vertical curves, "location"
 % is an array of y values where lower/upper x-values are determined.

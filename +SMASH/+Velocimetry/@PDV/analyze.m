@@ -86,7 +86,8 @@ measurement=limit(object.Measurement,xbound);
 setting=object.Settings;
 setting.SampleRate=object.SampleRate;
 setting.DomainScaling=object.DomainScaling;
-setting.BoxcarDuration=object.BoxcarDuration;
+setting.EffectiveDuration=object.EffectiveDuration;
+setting.EffectiveWidth=object.EffectiveWidth;
 setting.RMSnoise=object.Settings.RMSnoise;
 switch lower(AnalysisMode)
     case 'power'
@@ -94,7 +95,7 @@ switch lower(AnalysisMode)
             setting,varargin{:});
     case 'sinusoid'
         object.RawOutput=analyzeSinusoid(measurement,boundary,...
-            settings,varargin{:});
+            setting,varargin{:});
     otherwise
         error('ERROR: %s is not a valid analysis mode',AnalysisMode);
 end

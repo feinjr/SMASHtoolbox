@@ -30,20 +30,18 @@ classdef PDV
         Boundary = {} % ROI boundaries (BoundaryCurve object)
         RawOutput % Raw analysis output
         Frequency = {} % Analysis results (cell array of SignalGroup objects)       
-        %FrequencyChirp = {} % Analysis results (SignalGroup object)
         Velocity = {} % Converted results (cell array of SignalGroup objects)       
     end
     properties
-        GraphicOptions % Graphic optoins (GraphicOptions object)        
+        GraphicOptions % Graphic options (GraphicOptions object)        
     end    
-    properties (SetAccess=protected)        
+    properties (SetAccess=protected,Hidden=true)        
         SampleInterval
         SampleRate
-        MinimumWidth
         DomainScaling
         Duration
-        BoxcarDuration
-
+        EffectiveDuration
+        EffectiveWidth
     end
     %%
     methods (Hidden=true)

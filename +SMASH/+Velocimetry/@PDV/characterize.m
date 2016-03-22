@@ -6,16 +6,16 @@
 % region can be specified manually:
 %     >> object=characterize(object,mode,[t1 t2]); % use all frequencies
 %     >> object=characterize(object,mode,[t1 t2],[f1 f2]);
-% or by interactive selection from the object's preview image.
+% or by interactive selection using the preview image.
 %     >> object=characterize(object,mode);
 %
 % Several characterization modes are supported.
-%     -'ReferenceFrequency' determines the reference frequency, i.e. the
+%     -'reference' determines the reference frequency, i.e. the
 %     beat frequency associated with zero velocity.  The characterization
 %     region should contain a single spectral peak at fixed frequency.  The
 %     frequency range should be as narrow as possible.
-%     -'Noise' determines the RMS noise of the signal.  The
-%     selected region should contain noise with *no* harmonic content.  the
+%     -'noise' determines the RMS noise of the signal.  The
+%     selected region should contain noise with *no* harmonic content.  The
 %     frequency range should be as wide as possible.
 %
 % See also PDV, configure
@@ -36,12 +36,14 @@ tbound=[-inf +inf];
 fbound=[-inf +inf];
 
 switch lower(mode)    
-    case 'noise'
+    case {'noise' 'rmsniose'}
         label='Select noise region';
         manageRegion;
-    case 'referencefrequency'
+        mode='noise';
+    case {'reference' 'referencefrequency'}
         label='Select reference region';
         manageRegion;
+        mode='reference';
     otherwise
         error('ERROR: %s is an invalid mode',mode);        
 end
@@ -102,7 +104,7 @@ switch lower(mode)
         P=P(keep);
         correction=noisefloor/mean(P);
         object.Settings.RMSnoise=sqrt(correction);
-    case 'referencefrequency'
+    case 'reference'
         [~,index]=max(P);
         object.Settings.ReferenceFrequency=f(index);   
 end
