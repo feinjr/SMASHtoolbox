@@ -52,7 +52,8 @@ switch type
         end
     case 'image'
         parent=get(target,'Parent');
-        apply(object,parent);
+        apply(object,parent,parentmode);
+        return
     case 'axes'
         switch object.AspectRatio
             case 'auto'
@@ -66,7 +67,9 @@ switch type
         set(target,'Box',object.Box);
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
-        title(target,object.Title);
+        %warning off
+        title(target,object.Title); % old graphics system
+        %warning on
     case 'uipanel'
         set(target,'BackgroundColor',object.PanelColor);
     case 'figure'
