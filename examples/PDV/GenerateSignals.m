@@ -34,6 +34,8 @@ end
 SMASH.FileAccess.writeFile(filename,data,'%+#10.6e %+#10.6g\n',...
     {'Time (s) Velocity (m/s)'});
 
+% should this use the NoiseSignal class?
+
 %% exampleA : velocity history only
 params.wavelength=1550e-9;
 params.fshift=1e9;
