@@ -30,9 +30,9 @@ end
 
 % Handle output
 if nargout>=1
-    varargout{1}=view(temp,target);
+    varargout{1}=view(temp,'show',target);
 else
-    view(temp,target);
+    view(temp,'show',target);
 end
 
 end
