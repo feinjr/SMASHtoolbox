@@ -1,11 +1,11 @@
-function Delta=setupDomain(boundary,time,width)
+function [duration,slope]=setupDomain(boundary,time,width)
 
 % locate boundary points
 table=boundary.Data;
 tb=table(:,1);
 keep=(tb > time(1)) & (tb < time(end));
 tb=[time(1); table(keep,1); time(end)];
-fb=interp1(table(:,1),table(:,2),tb,'linear');
+fb=interp1(table(:,1),table(:,2),tb,'linear','extrap');
 
 % identify subdomains
 left=1;
@@ -24,7 +24,7 @@ while true
             left(end+1)=stop; %#ok<AGROW>
             start=stop;
             break
-        end
+        end       
     end
     if stop<N
         continue
@@ -38,7 +38,15 @@ right(end+1)=N;
 left=tb(left);
 right=tb(right);
 
-% normalized subdomain widths
-Delta=sqrt(right-left);
+duration=right-left;
+
+% estimate slope in each domain
+N=numel(left);
+slope=nan(N,1);
+for n=1:N
+    index=(tb >= left(n)) & (tb <= right(n));
+    Q=polyfit(tb(index),fb(index),1);
+    slope(n)=Q(1);
+end
 
 end

@@ -10,15 +10,15 @@ classdef SinusoidFit
         BreakTolerance = inf
         FrequencyBound
         Basis
-        Fit
+        Curve
     end    
     properties (SetAccess=protected) % outputs
         Domains
         StartTime
         StopTime
         Amplitude
-        FrequencyCenter
-        FrequencyChirp
+        Frequency
+        Chirp
     end
     %%
     methods (Hidden=true)

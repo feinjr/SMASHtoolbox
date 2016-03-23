@@ -16,12 +16,18 @@ function varargout=view(object)
 figure;
 
 h(1)=plot(object.Time,object.Signal,'r');
+xlabel('Time');
+ylabel('Signal');
 
-if ~isempty(object.Fit)
-    h(2)=line(object.Time,object.Fit,'k');
+if isempty(object.Curve)
+    legend('Measurement','Location','best');
+else
+    h(2)=line(object.Time,object.Curve,'Color','k');
+    legend('Measurement','Fit curve','Location','best');
 end
 
-if nagout>0
+
+if nargout>0
     varargout=h;
 end
 

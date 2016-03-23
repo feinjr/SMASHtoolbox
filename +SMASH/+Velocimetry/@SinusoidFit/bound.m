@@ -56,13 +56,13 @@ if isnumeric(value)
     value=define(value,data);
 end
 
-if isa(value,'SMASH.ROI.BoundaryCurve')
+if isa(value,'SMASH.ROI.BoundingCurve')
     value={value};
 end
 
 assert(iscell(value),'ERROR: invalid bound input');
 for n=1:numel(value)
-    assert(isa(value{n},'SMASH.ROI.BoundaryCurve'),...
+    assert(isa(value{n},'SMASH.ROI.BoundingCurve'),...
         'ERROR: invalid bound input');
 end
 
