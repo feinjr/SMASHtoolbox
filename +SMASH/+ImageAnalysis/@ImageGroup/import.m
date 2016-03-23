@@ -12,8 +12,8 @@ if numel(data)>1
             object=import(object,data(k));
         else
             temp=import(object,data(k));
-            object=ImageGroup(object,temp);
-        end        
+            object=SMASH.ImageAnalysis.ImageGroup(object,temp);
+        end
     end
     object.NumberImages=numel(data);
     return
