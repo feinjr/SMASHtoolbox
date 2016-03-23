@@ -24,7 +24,7 @@
 % Synethic noise can also be extracted as a 1D array.
 %     >> s=object.Measurement.Data
 %
-% See also SignalAnalysis, Signal
+% See also SMASH.SignalAnalysis, Signal
 %
 
 %

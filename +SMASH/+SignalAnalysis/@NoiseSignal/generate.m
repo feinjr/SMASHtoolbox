@@ -1,4 +1,19 @@
-function object=generate(object,varargin)
+% generate Generate noise 
+%
+% This method generates a noise measurement based on the current amplitude
+% and transfer table.
+%    object=generate(object);
+% NOTE: object changes do NOT automatically generate a new noise
+% measurement.  This method should be called after amplitude/transfer
+% changes are complete.
+% 
+% See also NoiseSignal, defineTransfer
+%
+
+%
+% created March 23, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
+function object=generate(object)
 
 % temporarily reset random seed
 if ~isempty(object.SeedValue)
@@ -23,7 +38,7 @@ Data=noise*(object.Amplitude/std(noise));
 Grid=object.Measurement.Grid;
 object.Measurement=reset(object.Measurement,Grid,Data);
 
-% restore previous ra
+% restore previous random state
 if ~isempty(object.SeedValue)
     rng(previous);
 end

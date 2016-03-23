@@ -1,3 +1,21 @@
+% view Display noise signal or spectrum
+%
+% This method graphically displays a NoiseSignal object.  The default
+% display is the noise signal stored in the Measurement property.
+%    view(object);
+%    view(object,'measurement');
+% Changing the second input displays the frequency spectrum.
+%    view(object,'spectrum');
+%
+% Graphic handles are returned as outputs (if present) in all cases.
+%    hl=view(...);
+%
+% See also NoiseSignal
+%
+
+%
+% created March 23, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function varargout=view(object,mode,varargin)
 
 % manage input

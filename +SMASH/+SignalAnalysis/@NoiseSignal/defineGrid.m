@@ -1,3 +1,16 @@
+% defineGrid Define noise grid
+%
+% This method defines the grid points where noise is evaluated.  It is
+% called automatically when a NoiseSignal is created and can be recalled to
+% change the grid without created a new object.
+%    object=defineGrid(object,t);
+%
+% See also NoiseSignal
+%
+
+%
+% created March 23, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function object=defineGrid(object,Grid)
 
 % manage input

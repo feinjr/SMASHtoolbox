@@ -1,10 +1,13 @@
 % SignalAnalysis package
 %
-% This package contains data classes for signal analysis.
+% This package contains data classes for signal analysis.  Core classes
+% include:
 %    Signal      - base signal class
 %    SignalGroup - class for multiple signals on a common grid
-%    ShortTime   - 
-%    STFT        - Short Time Fourier Transform class
+% Specialized classes include:
+%    NoiseSignal - Realistic noise generation
+%    ShortTime   - Short time analysis of a signal
+%    STFT        - Short Time Fourier Transform analysis of a signal
 %
 % Help and documentation for each class be accessed directly once an object
 % has been created.
@@ -15,5 +18,5 @@
 % See also SMASH
 %
 
-% Last updated November 25, 2013
+% Last updated March 23, 2016
 
