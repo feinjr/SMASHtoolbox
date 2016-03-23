@@ -31,6 +31,7 @@ Once you've configured Git (or your Git client), clone the remote repository to 
 ## Why can't I get SourceTree to work?
 
 Configuring SourceTree can be a little tricky, especially on Windows (which lacks a native bash terminal).  Here are some suggestions:
+- Make sure you install Git before (on your own) or during SourceTree installation!  This is particularly important for Windows, which almost never has Git installed by default.  Macs users *usually* obtain Git through Apple's XCode package, which provides a variety of developer tools.  XCode can be downloaded from the App Store; to download just the command line tools (git, gcc, etc.), type `xcode-select --install` in a bash terminal.  Instructions and downloads for all platforms may be found at https://git-scm.com/book/en/v2/Getting-Started-Installing-Git. 
 - Use the "Terminal" button on toolbar at the top of the SourceTree window.
 - Follow the instructions at https://help.github.com/articles/generating-an-ssh-key to set up a SSH key and associate it with your GitHub account.
 - Make sure SourceTree is looking for your SSH key files in the right place.  This seems to be automatic on Macs, but not for Windows.  Under the "Tools" menu there is an item called "Options".  Clicking on this item shows various tabs for configuring SourceTree.  The "General" tab has a section for SSH client configuration.  The popup menu should be set to OpenSSH (not Putty!).  When OpenSSH is selected, the SSH key location should automatically be set to a *_rsa.pub file.
