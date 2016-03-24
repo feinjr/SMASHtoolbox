@@ -5,12 +5,12 @@
 classdef SinusoidFit
     %%
     properties (SetAccess=protected) % inputs
-        Time
-        Signal
-        BreakTolerance = inf
-        FrequencyBound
+        Time % Measurement time (numeric array)
+        Signal % Measured signal (numeric array)
+        BreakTolerance = inf % Domain break tolerance (scalar)
+        FrequencyBound % Sinusoid frequency bound (cell array of BoundingCurve objects)
         Basis
-        Curve
+        Curve % Optimized sinusoid curve
     end    
     properties (SetAccess=protected) % outputs
         Domains
@@ -23,13 +23,14 @@ classdef SinusoidFit
     %%
     methods (Hidden=true)
         function object=SinusoidFit(varargin)
+            if nargin==0
+                return
+            end
             object=reset(object,varargin{:});
         end
     end
     %%
     methods (Static=true, Hidden=true)
-        function object=restore(data)
-            error('ERROR: restore method has not been enabled yet for this class');
-        end
+       varargou=restore(varargin)
     end  
 end
