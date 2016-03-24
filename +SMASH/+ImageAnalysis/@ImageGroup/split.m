@@ -44,11 +44,16 @@ for n=1:object.NumberImages
     varargout{n}=limit(varargout{n},bound1,bound2);
     varargout{n}.Source='ImageGroup split';    
     varargout{n}.Name=object.Legend{n};
+    varargout{n}.DataLim=object.DataLim;
+    varargout{n}.DataScale=object.DataScale;
+    varargout{n}.LimitIndex1=object.LimitIndex1;
+    varargout{n}.LimitIndex2=object.LimitIndex2;
     varargout{n}.Grid1Label=object.Grid1Label;
     varargout{n}.Grid2Label=object.Grid2Label;
     varargout{n}.DataLabel=object.DataLabel;
     varargout{n}.GraphicOptions=object.GraphicOptions;
     varargout{n}.GraphicOptions.Title=object.Legend{n};
+    varargout{n}.Precision=object.Precision;
 end
 
 end
