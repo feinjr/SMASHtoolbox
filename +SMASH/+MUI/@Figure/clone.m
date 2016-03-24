@@ -61,20 +61,40 @@ h=findall(fig,'-not','DeleteFcn','');
 set(h,'DeleteFcn','');
 
 % deal with legends
-h=findobj(srcfig,'Tag','legend');
-for m=1:numel(h)
-   data=get(h(m),'UserData');
-   if data.PlotHandle~=target
-       continue
-   end
-   index=nan(size(data.handles));
-   children=get(target,'Children');
-   for n=1:numel(index)
-       index(n)=find(data.handles(n)==children);
-   end
-   children=get(new,'Children');
-   location=get(h,'Location');
-   legend(children(index),data.lstrings,'Location',location);
+label={};
+htar=findobj(target,'Type','line');
+hlegend=getappdata(target,'LegendPeerHandle');
+if ~isempty(hlegend)
+    try % new graphics system
+        marked=hlegend.PlotChildren;
+        N=numel(marked);
+        index=nan(1,N);
+        for n=1:N
+            index(n)=find(htar == marked(n));
+        end
+        label=hlegend.String;
+        location=hlegend.Location;
+    catch % legacy graphics system
+        data=get(hlegend,'UserData');
+        %temp=findobj(srcfig,'Type','axes','Tag','legend');
+        %for m=1:numel(temp)
+        %    data=get(temp(m),'UserData');
+        %    if isfield(data,'PlotHandle') && (data.PlotHandle==target)
+        %        hlegend=temp(m);
+        %        break
+        %    end
+        %end
+        N=numel(data.handles);
+        index=nan(1,N);
+        for n=1:N
+            index(n)=find(htar == data.handles(n));
+        end
+        label=data.lstrings;
+        location=get(hlegend,'Location');
+    end
+    hnew=findobj(new,'Type','line');
+    hnew=hnew(index);
+    legend(hnew,label,'Location',location);
 end
 
 % deal with colorbars
