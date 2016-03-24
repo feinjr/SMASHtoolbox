@@ -49,10 +49,10 @@ else
     switch lower(argument)
         case {'left','counter-clockwise','counterclockwise'}          
             object.Data=transpose(object.Data);
-            %object=flip(object,'Grid2');
+            object=flip(object,'Grid2');
             x=x(end:-1:1);
         case {'right','clockwise'}            
-            %object=flip(object,'Grid2');
+            object=flip(object,'Grid2');
             object.Data=transpose(object.Data);
             y=y(end:-1:1);
         otherwise

@@ -56,10 +56,10 @@ else
     switch lower(argument)
         case {'left','counter-clockwise','counterclockwise'}          
             object.Data=permute(object.Data,[2 1 3]);
-            %object=flip(object,'Grid2');
+            object=flip(object,'Grid2');
             x=x(end:-1:1);
         case {'right','clockwise'}            
-            %object=flip(object,'Grid2');
+            object=flip(object,'Grid2');
             object.Data=permute(object.Data,[2 1 3]);
             y=y(end:-1:1);
         otherwise
