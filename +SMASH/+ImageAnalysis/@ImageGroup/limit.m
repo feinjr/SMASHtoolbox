@@ -71,7 +71,13 @@ end
 
 % interactively select (manual) limit region
 if strcmpi(bound1,'manual') || strcmpi(bound2,'manual')
-    h=view(object,'show');
+    imageNumber=1;
+    if isnumeric(bound1) && ~isempty(bound1)
+        imageNumber=bound1;
+    elseif isnumeric(bound2) && ~isempty(bound2)
+        imageNumber=bound2;
+    end
+    h=view(object,imageNumber);
     title(h.axes,'Use zoom/pan to select limit region');    
     hc=uicontrol('Parent',h.panel,...
         'Style','pushbutton','String',' Done ',...
