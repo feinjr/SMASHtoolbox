@@ -86,14 +86,15 @@ for n=1:NImages
         'XData',xThumb,'YData',yThumb,'CData',zThumb(:,:,n));
     apply(object.GraphicOptions,sub{n});
     axis(sub{n},'tight');
+    set(sub{n},'XTickLabel',[],'YTickLabel',[]);
 
     colormap(sub{n},object.GraphicOptions.ColorMap);
-    xlabel(sub{n},object.Grid1Label);
-    ylabel(sub{n},object.Grid2Label);
-    title(sub{n},[object.Legend{n},'(',num2str(n),')']);
+    %xlabel(sub{n},object.Grid1Label);
+    %ylabel(sub{n},object.Grid2Label);
+    title(sub{n},['(',num2str(n),')',object.Legend{n}]);
 
-    cb=SMASH.MUI.Colorbar;
-    ylabel(cb.Handle,object.DataLabel);
+    %cb=SMASH.MUI.Colorbar;
+    %ylabel(cb.Handle,object.DataLabel);
 
     % clicking an images brings it to the main plot
     set(sub{n},'ButtonDownFcn',{@plotMain,n});
@@ -124,7 +125,7 @@ end
         ylabel(h.axes,object.Grid2Label);
         title(h.axes,object.GraphicOptions.Title);
 
-        cb=SMASH.MUI.Colorbar;
+        %cb=SMASH.MUI.Colorbar;
         ylabel(cb.Handle,object.DataLabel);
     end
     
