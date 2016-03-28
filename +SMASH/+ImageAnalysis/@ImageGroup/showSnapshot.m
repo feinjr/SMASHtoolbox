@@ -59,7 +59,7 @@ axis(h.axes,'tight');
 colormap(h.axes,object.GraphicOptions.ColorMap);
 xlabel(h.axes,object.Grid1Label);
 ylabel(h.axes,object.Grid2Label);
-title(h.axes,object.GraphicOptions.Title);
+title(h.axes,object.Legend{1});
 
 cb=SMASH.MUI.Colorbar;
 ylabel(cb.Handle,object.DataLabel);
@@ -123,7 +123,7 @@ end
         colormap(h.axes,object.GraphicOptions.ColorMap);
         xlabel(h.axes,object.Grid1Label);
         ylabel(h.axes,object.Grid2Label);
-        title(h.axes,object.GraphicOptions.Title);
+        title(h.axes,object.Legend{n});
 
         %cb=SMASH.MUI.Colorbar;
         ylabel(cb.Handle,object.DataLabel);
