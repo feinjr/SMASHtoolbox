@@ -51,24 +51,14 @@ else
     param=varargin{2};
 end
 
-if (Narg<3) || isempty(varargin{3})
-    mode='power';
-else
-    mode=varargin{3};
-end
-
 previous.Partition=object.Measurement.Partition;
 object.Measurement=partition(object.Measurement,type,param);
-
-previous.SpectrumType=object.Measurement.FFToptions.SpectrumType;
-object.Measurement.FFToptions.SpectrumType=mode;
 
 object.Preview=analyze(object.Measurement);
 object.Preview.Name='Preview spectrogram';
 object.Preview.GraphicOptions.Title='Preview spectrogram';
 
 object.Measurement=partition(object.Measurement,previous.Partition);
-object.Measurement.FFToptions.SpectrumType=previous.SpectrumType;
 
 % manage output
 varargout{1}=object;

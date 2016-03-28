@@ -29,6 +29,7 @@ object.GraphicOptions.Marker='none';
 p=struct();
 p.Wavelength=1550e-9;
 p.ReferenceFrequency=0;
+p.Bandwidth=nan;
 p.RMSnoise=nan;
 
 object.Settings=p;

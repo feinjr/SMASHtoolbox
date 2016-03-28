@@ -136,7 +136,9 @@ switch choice
         assert(all(value>0),...
             'ERROR: Duration/Advance values must be greater than 0');     
         points=round(value(1)/dt);
-        skip=round(value(2)/dt);        
+        assert(points > 4,'ERROR: specified duration is too small');
+        skip=round(value(2)/dt);     
+        assert(points >= 1,'ERROR: specified advane is too small');
     case {'block','blocks'}
         if isnan(value(2))
             value(2)=0;

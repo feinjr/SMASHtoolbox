@@ -36,6 +36,9 @@ tbound=[-inf +inf];
 fbound=[-inf +inf];
 
 switch lower(mode)    
+    case 'bandwidth'
+        %error('This mode is under construction');
+        
     case {'noise' 'rmsniose'}
         label='Select noise region';
         manageRegion;
@@ -57,7 +60,9 @@ end
             ha=gca;
             hb=uicontrol('Style','pushbutton','String','Done',...
                 'Callback','delete(gcbo)');
+            warning off %#ok<WNOFF>
             title(label);
+            warning on %#ok<WNON>
             set(gcf,'Name','Select region','NumberTitle','off');
             waitfor(hb);
             tbound=xlim(ha);
@@ -79,28 +84,40 @@ assert(isnumeric(fbound) && (numel(fbound)==2),...
     'ERROR: invalid frequency range');
 fbound=sort(fbound);
 
-% perform characterization
-temp=object.Measurement;
-temp=limit(temp,'all');
-temp=crop(temp,tbound);
-temp.FFToptions.FrequencyDomain='positive';
-temp.FFToptions.SpectrumType='power';
-temp.FFToptions.NumberFrequencies=1e6;
-[f,P]=fft(temp,temp.FFToptions);
+% process selected region
+selection=object.Measurement;
+selection=limit(selection,'all');
+selection=crop(selection,tbound);
+
+selection.FFToptions.FrequencyDomain='positive';
+selection.FFToptions.SpectrumType='power';
+[f,P]=fft(selection,selection.FFToptions);
+
 keep=(f>=fbound(1)) & (f<=fbound(2));
 f=f(keep);
 P=P(keep);
+
+t=selection.Grid;
+T=abs(t(end)-t(1))/(numel(t)-1);
+fNyquist=1/(2*T);
+
+% perform characterization
 switch lower(mode)
-    case 'noise'
+    case 'bandwidth'
+        % under construction
+    case 'noise'        
         noisefloor=mean(P);
-        t=object.Measurement.Grid;
-        keep=(t>=tbound(1)) & (t<=tbound(2));
-        t=t(keep);
-        s=randn(size(t));
-        new=SMASH.SignalAnalysis.Signal(t,s);
-        [f,P]=fft(new,temp.FFToptions);
+        % simulate noise
+        noise=SMASH.SignalAnalysis.NoiseSignal(selection.Grid); 
+        bandwidth=object.Settings.Bandwidth;
+        if isempty(bandwidth) || isnan(bandwidth)
+            bandwidth=fNyquist/2;
+            warning('SMASH:PDV','No bandwidth specified--asssuming half of Nyquist frequency');
+        end
+        noise=defineTransfer(noise,'bandwidth',bandwidth);
+        noise=generate(noise);                
+        [f,P]=fft(noise.Measurement,selection.FFToptions);
         keep=(f>=fbound(1)) & (f<fbound(2));
-        %f=f(keep);
         P=P(keep);
         correction=noisefloor/mean(P);
         object.Settings.RMSnoise=sqrt(correction);

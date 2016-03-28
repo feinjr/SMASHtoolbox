@@ -96,6 +96,10 @@ end
                     assert(isnumeric(value) && isscalar(value),...
                         'ERROR: invalid ReferenceFrequency value');
                     object.Settings.ReferenceFrequency=value;
+                case 'bandwidth'
+                    assert(isnumeric(value) && isscalar(value) && (value>0),...
+                        'ERROR: invalid Bandwidth value');
+                    object.Settings.Bandwidth=value;
                 case 'rmsnoise'
                     assert(isnumeric(value) && isscalar(value) && value>0,...
                         'ERROR: invalid RMSnoise value');
