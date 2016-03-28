@@ -18,6 +18,9 @@
 %    object=rotate(object,'left'); % counter-clockwise
 %    object=rotate(object,'right'); % clockwise
 % These rotations can be used cumaltively and are reversible.
+% By default, these operation recenter the origin of the grid. If you do
+% not want this, add the extra tag 'persist'
+%   object=rotate(object,'left','persist');
 %
 % See also ImageGroup, flip
 %
@@ -35,11 +38,15 @@
 %   -interactive rotation is now the default case
 % modified March 23, 2016 by Sean Grant (Sandia National Laboratories/UT)
 %   -changed for ImageGroup
-function object=rotate(object,argument)
+function object=rotate(object,argument,extra)
 
 % handle input
 if (nargin<2) || isempty(argument)  
     argument='gui';
+end
+
+if (nargin<3)
+    extra=[];
 end
 
 % apply rotation
@@ -49,17 +56,24 @@ if isnumeric(argument)
 elseif strcmpi(argument,'gui')
     object=rotateGUI(object);
 else
+    if strcmpi(extra,'persist')
+        %do nothing
+    else
+        %object=twist(object,0);
+        % This needs to be looked at, consecutive uses buffer the edge too
+        % much.
+    end
     x=object.Grid1;
     y=object.Grid2;
     xlabel=object.Grid1Label;
     ylabel=object.Grid2Label;
     switch lower(argument)
-        case {'left','counter-clockwise','counterclockwise'}          
+        case {'left','counter-clockwise','counterclockwise'} 
             object.Data=permute(object.Data,[2 1 3]);
-            object=flip(object,'Grid2');
+            %object=flip(object,'Grid2');
             x=x(end:-1:1);
-        case {'right','clockwise'}            
-            object=flip(object,'Grid2');
+        case {'right','clockwise'}
+            %object=flip(object,'Grid2');
             object.Data=permute(object.Data,[2 1 3]);
             y=y(end:-1:1);
         otherwise
