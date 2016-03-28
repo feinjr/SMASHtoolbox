@@ -52,7 +52,9 @@ Narg=numel(varargin);
 keep=true(1,Narg);
 for n=1:Narg
     if strcmp(varargin{n},'-overwrite')
-        delete(filename);
+        if exist(filename,'file')
+            delete(filename);
+        end
         keep(n)=false;
     end
 end
