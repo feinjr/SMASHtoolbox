@@ -67,9 +67,9 @@ switch type
         set(target,'Box',object.Box);
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
-        %warning off
-        title(target,object.Title); % old graphics system
-        %warning on
+        warning off
+        title(target,object.Title); % old graphics system       
+        warning on
     case 'uipanel'
         set(target,'BackgroundColor',object.PanelColor);
     case 'figure'
