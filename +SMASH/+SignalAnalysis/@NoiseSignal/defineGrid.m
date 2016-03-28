@@ -27,9 +27,14 @@ N2=pow2(nextpow2(N));
 object.Npoints=N;
 object.Npoints2=N2;
 
-object.ReciprocalGrid=(-N2/2):(+N2/2-1);
-object.ReciprocalGrid=object.ReciprocalGrid(:)/(N2*spacing);
-object.NyquistValue=abs(object.ReciprocalGrid(1));
-object.ReciprocalGrid=fftshift(object.ReciprocalGrid);
+object.NyquistValue=1/(2*spacing);
+f=[0:(N2/2) -(N2/2-1):-1];
+f=f(:)/(N2*spacing);
+object.ReciprocalGrid=f;
+
+%object.ReciprocalGrid=(-N2/2):(+N2/2-1);
+%object.ReciprocalGrid=object.ReciprocalGrid(:)/(N2*spacing);
+%object.NyquistValue=abs(object.ReciprocalGrid(1));
+%object.ReciprocalGrid=fftshift(object.ReciprocalGrid);
 
 end

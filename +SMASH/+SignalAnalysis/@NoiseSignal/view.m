@@ -34,7 +34,7 @@ switch lower(mode)
         temp.GridLabel='Frequency';
         temp.DataLabel='Power';
         hl=view(temp,varargin{:});        
-    case 'autocorrelation'
+    case {'correlation' 'autocorrelation'}
         y=object.Measurement.Data;
         N=numel(y);
         %N2=pow2(nextpow2(N)+2);

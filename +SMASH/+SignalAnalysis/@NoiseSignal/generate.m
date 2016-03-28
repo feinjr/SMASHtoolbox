@@ -26,8 +26,9 @@ noise=randn(object.Npoints,1);
 
 % apply transfer function
 transform=fft(noise,object.Npoints2);
-transfer=interp1(...
-    object.TransferTable(:,1),object.TransferTable(:,2),...
+table=object.TransferTable;
+table=sortrows(table,1);
+transfer=interp1(table(:,1),table(:,2),...
     abs(object.ReciprocalGrid));
 transform=transform.*transfer;
 noise=ifft(transform);
@@ -41,6 +42,11 @@ object.Measurement=reset(object.Measurement,Grid,Data);
 % restore previous random state
 if ~isempty(object.SeedValue)
     rng(previous);
+end
+
+% manage output
+if nargout > 1
+    
 end
 
 end
