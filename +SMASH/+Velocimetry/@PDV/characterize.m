@@ -9,12 +9,13 @@
 % or by interactive selection using the preview image.
 %     >> object=characterize(object,mode);
 %
-% Several characterization modes are supported.
-%     -'reference' determines the reference frequency, i.e. the
+% Several characterization modes are supported:
+%    - 'bandwidth' approximates the frequency cutoff of the measurement.  
+%    - 'reference' determines the reference frequency, i.e. the
 %     beat frequency associated with zero velocity.  The characterization
 %     region should contain a single spectral peak at fixed frequency.  The
 %     frequency range should be as narrow as possible.
-%     -'noise' determines the RMS noise of the signal.  The
+%     - 'noise' determines the RMS noise of the signal.  The
 %     selected region should contain noise with *no* harmonic content.  The
 %     frequency range should be as wide as possible.
 %
@@ -37,8 +38,9 @@ fbound=[-inf +inf];
 
 switch lower(mode)    
     case 'bandwidth'
-        %error('This mode is under construction');
-        
+        label='Select bandwidth region';
+        manageRegion; 
+        warning('SMASH:PDV','Bandwidth characterization is very crude at this time');
     case {'noise' 'rmsniose'}
         label='Select noise region';
         manageRegion;
@@ -68,11 +70,13 @@ end
             tbound=xlim(ha);
             fbound=ylim(ha);
             close(fig);
-        elseif Narg==1
-            tbound=varargin{1};
-        elseif Narg==2
-            tbound=varargin{1};
-            fbound=varargin{2};
+        else
+            if (Narg>=1) && ~isempty(varargin{1})
+                tbound=varargin{1};
+            end
+            if (Narg>=2) && ~isempty(varargin{2})     
+                fbound=varargin{2};
+            end
         end
     end
 
@@ -104,7 +108,7 @@ fNyquist=1/(2*T);
 % perform characterization
 switch lower(mode)
     case 'bandwidth'
-        % under construction
+        object.Settings.Bandwidth=findTransition(f,P);       
     case 'noise'        
         noisefloor=mean(P);
         % simulate noise
@@ -125,5 +129,24 @@ switch lower(mode)
         [~,index]=max(P);
         object.Settings.ReferenceFrequency=f(index);   
 end
+
+end
+
+function f0=findTransition(f,P)
+
+fmin=min(f);
+fmax=max(f);
+center=(fmin+fmax)/2;
+amplitude=(fmax-fmin)/2;
+fit=nan(size(f));
+    function chi2=residual(slack)
+        f0=center+amplitude*sin(slack);
+        index=(f<f0);
+        fit(index)=mean(P(index));
+        index=(f>=f0);
+        fit(index)=mean(P(index));
+        chi2=mean((fit-P).^2);
+    end
+result=fminsearch(@residual,0,optimset('Display','iter')); %#ok<NASGU>
 
 end

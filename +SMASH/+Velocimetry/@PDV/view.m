@@ -55,7 +55,9 @@ switch lower(mode)
         ylabel(ha(2),'Uncertainty');
         legend(h(:,1),label,'Location','best');
         title(ha(2),'');
+        warning off; %#ok<WNOFF>
         linkaxes(ha,'x');
+        warning on; %#ok<WNON>
     case 'velocity'
         N=numel(object.Velocity);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
