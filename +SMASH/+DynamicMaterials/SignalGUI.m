@@ -555,7 +555,16 @@ function SaveSignal(src,varargin)
             %labelname = inputdlg('Enter label name for sda file','SDA Label',1,{sig{savenum(i)}.Name}); labelname = labelname{1};
             %labelname = sig{savenum(i)}.Name;
             %export(sig{savenum(i)},fullfile(savepath,savename),labelname);
-            store(sig{savenum(i)},fullfile(savepath,savename),labelnames{i});
+            %store(sig{savenum(i)},fullfile(savepath,savename),labelnames{i});
+            
+            archive=SMASH.FileAccess.SDAfile(savename);
+            description=sprintf('%s object',class(sig{savenum(i)}));
+            deflate=1;
+            insert(archive,labelnames{i},sig{savenum(i)},description,deflate);
+            %h5writeatt(filename,['/' label],'Class',class(sig{savenum(i)}));
+            %h5writeatt(filename,['/' label],'RecordType','object');
+            
+            
            end
            return; %Only ask for sda name once
        else
@@ -635,6 +644,11 @@ h=addblock(dlg,'button',{ 'Apply', 'Delete','Cancel'});
         clear sig; sig = new_sig; clear new_sig;
         sig_tot = numel(sig);
         sig_num = [1:sig_tot];
+        
+        %Reset colors
+        %for i=1:sig_tot;
+        %    sig{i}.GraphicOptions.LineColor=DistinguishedLines(i);
+        %end
         
         %If all signals were deleted, reset
         if new_num == 1
@@ -1022,9 +1036,9 @@ function AverageSignals(src,varargin)
     yaverage = mean(ytot')';
     
     %Custom averaging
-        weights = [2/4 2/4];
+        %weights = [2/4 2/4];
         %weights = [4/3 -1/3];
-        yaverage = weights(1).*ytot(:,1)+weights(2).*ytot(:,2);
+        %yaverage = weights(1).*ytot(:,1)+weights(2).*ytot(:,2);
     
         %ysub = yaverage - ytot(:,2);
         %yaverage = ytot(:,1)-4*ysub;
@@ -1239,7 +1253,7 @@ function newsig = MHDScale(n)
         s = SMASH.SignalAnalysis.Signal(fullfile(pathname,filename),'column');
     end
    
-    %[newsig,s] = register(newsig,s);
+    %[newsig,s] = registeaxr(newsig,s);
     %Regrid to common time base
     tmin = max([min(s.Grid),min(newsig.Grid)]);
     tmax = min([max(s.Grid),max(newsig.Grid)]);
@@ -1356,11 +1370,11 @@ end
 dlg.Hidden = true;
 
 h=addblock(dlg,'text','u=b1u*^b2');
-h=addblock(dlg,'text','532  nm: b1 = 0.7821, b2 = 0.9917 (km/s)');
-h=addblock(dlg,'text','1550 nm: b1 = 0.7900, b2 = 0.9921 (km/s)');
+h=addblock(dlg,'text','532  nm: b1 = 0.7827, b2 = 0.9902 (km/s)');
+h=addblock(dlg,'text','1550 nm: b1 = 0.7895, b2 = 0.9918 (km/s)');
 h=addblock(dlg,'check','Do not remove linear correction (1.2769)');
-h=addblock(dlg,'edit','b1    '); set(h(2),'String', 0.8283);
-h=addblock(dlg,'edit','b2    '); set(h(2),'String', 0.9917);
+h=addblock(dlg,'edit','b1    '); set(h(2),'String', 0.7895);
+h=addblock(dlg,'edit','b2    '); set(h(2),'String', 0.9918);
 
 
 
@@ -1986,12 +2000,12 @@ dlg.Hidden = true;
 %Cv (mgrun.ref to SI units): cv*1e-4/11604.5
 
 %init = [19.24,2.97,1,1.2667e-4,79,1.9697e2,1.66953e2]; % Au
-%init = [16.55,1.6,1,1.3788e-4,73,1.80948e2,1.9953e2]; % Ta
+init = [16.55,1.6,1,1.3788e-4,73,1.80948e2,1.9953e2]; % Ta
 %init = [1.84,1.19,1,2.7662e-3,4,9.0122,1.13367372e2]; % Be
 %init = [21.02,2.44,1,1.3357e-4,75,1.86207e2,3.70e2]; % Re
 %init = [10.915,2.5,1,1.2064e-4,82,207.2,4.178e2]; % Pb
 %init = [2.5,0.5,1,8.0e-4,10,60.08,39.0]; % Soda Lime Glass
-init = [2.21,0.5,1,8.0e-4,10,60.08,39.0]; % Borosilicate Glass
+%init = [2.21,0.5,1,8.0e-4,10,60.08,39.0]; % Borosilicate Glass
 
 ReferenceOptions={'cuisentrope','pdisentrope','usup','pdhugoniot'};
 h=addblock(dlg,'listbox','ReferenceCurveType',ReferenceOptions);
@@ -2253,6 +2267,7 @@ function BigPlot(src,varargin)
 
     set(gca,'FontName','times','FontAngle','normal','LineWidth',2.5,'FontSize',30);
     set(gcf,'Color','w');
+    box on;
     xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',40);
     ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',40);
     
