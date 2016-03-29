@@ -71,7 +71,7 @@ if ndims(object.Data)==3
     end
     
     switch colorStyle
-        case 'grayscale'
+        case 'Grayscale'
             % force scalar data with correct numerical format
             fprintf('Converting full color image to grayscale \n');
             data=object.Data;
