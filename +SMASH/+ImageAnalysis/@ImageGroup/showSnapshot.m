@@ -55,7 +55,6 @@ h.image1=imagesc('Parent',h.axes,...
     'XData',x,'YData',y,'CData',z(:,:,1));
 apply(object.GraphicOptions,h.axes);
 axis(h.axes,'tight');
-set(h.axes,'Layer','top');
 
 colormap(h.axes,object.GraphicOptions.ColorMap);
 xlabel(h.axes,object.Grid1Label);
@@ -87,7 +86,7 @@ for n=1:NImages
         'XData',xThumb,'YData',yThumb,'CData',zThumb(:,:,n));
     apply(object.GraphicOptions,sub{n});
     axis(sub{n},'tight');
-    set(sub{n},'XTickLabel',[],'YTickLabel',[],'Layer','top');
+    set(sub{n},'XTickLabel',[],'YTickLabel',[]);
 
     colormap(sub{n},object.GraphicOptions.ColorMap);
     %xlabel(sub{n},object.Grid1Label);
@@ -120,7 +119,6 @@ end
             'XData',x,'YData',y,'CData',z(:,:,n));
         apply(object.GraphicOptions,h.axes);
         axis(h.axes,'tight');
-        set(h.axes,'Layer','top');
 
         colormap(h.axes,object.GraphicOptions.ColorMap);
         xlabel(h.axes,object.Grid1Label);

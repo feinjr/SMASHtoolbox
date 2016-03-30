@@ -31,7 +31,6 @@ h.image=imagesc('Parent',h.axes,...
     'XData',x,'YData',y,'CData',z);
 apply(object.GraphicOptions,h.axes);
 axis(h.axes,'tight');
-set(h.axes,'Layer','top');
 
 colormap(h.axes,object.GraphicOptions.ColorMap);
 xlabel(h.axes,object.Grid1Label);
