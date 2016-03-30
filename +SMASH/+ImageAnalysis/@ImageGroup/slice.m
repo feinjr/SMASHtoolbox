@@ -121,7 +121,7 @@ switch lower(coordinate)
         Grid2=nan(size(Grid1));         
 end
 hline=line('Parent',h.axes,'XData',Grid1,'YData',Grid2,...
-    'Color',object.GraphicOptions.LineColor,...
+    'Color','m',...
     'Tag','SliceGuide');
 
 fig=ancestor(h.axes,'figure');
@@ -130,8 +130,8 @@ set(h.image,'ButtonDownFcn',@ButtonDown);
 set(hline,'ButtonDownFcn',@ButtonDown);
     function MoveSliceGuide(varargin)
         pos=get(h.axes,'CurrentPoint');
-        Grid1=repmat(pos(1,1),[1 2]);
-        Grid2=repmat(pos(1,2),[1 2]);
+        Grid1=repmat(min(max(pos(1,1),min(xlim(h.axes))),max(xlim(h.axes))),[1 2]);
+        Grid2=repmat(min(max(pos(1,2),min(ylim(h.axes))),max(ylim(h.axes))),[1 2]);
         switch lower(coordinate)
             case 'grid1'
                 Grid2=ylim(h.axes);

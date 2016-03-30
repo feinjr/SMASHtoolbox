@@ -18,8 +18,10 @@ assert(strcmpi(class(objectA),'SMASH.DynamicMaterials.EOS.MieGruneisen'),'ERROR:
 assert(strcmpi(class(objectB),'SMASH.DynamicMaterials.EOS.MieGruneisen'),'ERROR: objectB is not a valid MieGruneisen object');
 assert(isscalar(xA) && isnumeric(xA),'xA must be a numeric scalar');
 
-%Pick pressures between 0 - 9 MBar
-P = linspace(0,900,100)';
+%Pick pressures between 0 - 10 MBar
+%P = linspace(0,1000,100)';
+P = linspace(0,500,20)';
+
 
 %Find density according to Amagrat's rule
 for i = 1:length(P)  
@@ -33,6 +35,9 @@ object = SMASH.DynamicMaterials.EOS.MieGruneisen();
 object.rho0 = rho(1);
 object.c0 = objectA.c0*xA + objectB.c0*(1-xA);
 object.s = objectA.s*xA + objectB.s*(1-xA);
+object.gamma = objectA.gamma*xA + objectB.gamma*(1-xA);
+object.cv = objectA.cv*xA + objectB.cv*(1-xA);
+
 
 object = calibrate(object,rho,P);
 
