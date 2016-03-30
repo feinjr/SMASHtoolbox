@@ -7,7 +7,7 @@
 %
 % created December 10, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef GraphicOptions %< hgsetget
+classdef GraphicOptions
     %%
     properties
         LineStyle = '-' % Line style
@@ -19,6 +19,7 @@ classdef GraphicOptions %< hgsetget
         Box = 'on' % Axes box ('on' or 'off')
         AspectRatio = 'auto' % Axes aspect ratio ('auto' or 'equal')
         AxesColor = 'white' % Axes color
+        AxesLayer = 'top' % Axes layer
         XDir = 'normal' % x-axis direction ('normal' or 'reverse')
         YDir = 'normal' % y-axis direction ('normal' or 'reverse')
         Title = '' % Axes title
@@ -37,18 +38,6 @@ classdef GraphicOptions %< hgsetget
                 object.(name)=varargin{n+1};
             end
         end
-%         varargout=addlistener(varargin);
-%         varargout=eq(varargin);
-%         varargout=findobj(varargin);
-%         %varargout=findprop(varargin);
-%         varargout=ge(varargin);
-%         varargout=getdisp(varargin);
-%         varargout=gt(varargin);
-%         varargout=le(varargin);
-%         varargout=lt(varargin);
-%         varargout=ne(varargin);
-%         varargout=notify(varargin);
-%         varargout=setdisp(varargin);
     end
 %% static methods
     methods (Static=true, Hidden=true)
@@ -130,6 +119,16 @@ classdef GraphicOptions %< hgsetget
         function object=set.AxesColor(object,value)
             assert(SMASH.General.testColor(value),'ERROR: invalid AxesColor value');
             object.AxesColor=value;
+        end
+        function object=set.AxesLayer(object,value)
+            assert(ischar(value),'ERROR: invalid AxesLayer value');
+            value=lower(value);
+            switch value
+                case {'top' 'bottom'}
+                    object.AxesLayer=value;
+                otherwise
+                    error('ERROR: invalid AxesLayer value');
+            end
         end
         function object=set.XDir(object,value)
             assert(ischar(value),'ERROR: invalid XDir value');

@@ -63,8 +63,9 @@ switch type
                 daspect(target,[1 1 1]);
                 pbaspect(target,[1 1 1]);
         end
-        set(target,'Color',object.AxesColor);
+        set(target,'Color',object.AxesColor);        
         set(target,'Box',object.Box);
+        set(target,'Layer',object.AxesLayer);
         set(target,'XDir',object.XDir);
         set(target,'YDir',object.YDir);
         warning off

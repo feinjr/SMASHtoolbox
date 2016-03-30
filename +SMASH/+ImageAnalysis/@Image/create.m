@@ -1,7 +1,8 @@
 function object=create(object,varargin)
 
 object.Name='Image object';
-object.GraphicOptions=SMASH.General.GraphicOptions;
+%object.GraphicOptions=SMASH.General.GraphicOptions;
+object.GraphicOptions=SMASH.Graphics.GraphicOptions;
 object.GraphicOptions.Title='Image object';
 object.GraphicOptions.YDir='reverse';
 
