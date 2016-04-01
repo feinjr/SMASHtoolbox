@@ -169,6 +169,7 @@ y=(D(:,2)-y0)/Ly;
 phase=atan2(y+x*sin(epsilon),x*cos(epsilon));
 phase=unwrap(phase,pi); % deal with phase wraps
 fringeshift=(phase-phaseR)/(2*pi);
+fringeshift=fringeshift-fringeshift(1);
 
 % calculate contrast
 contrast0=sqrt(DO(:,1).^2+2*DO(:,1).*DO(:,2)*sin(epsilon)+DO(:,2).^2)*sec(epsilon);

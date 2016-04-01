@@ -12,10 +12,11 @@
 %
 function object=analyze(object)
 
-assert(isa(object.FringeShift,'SMASH.SignalAnalysis.Signal'),...
-    'ERROR: Must Preprocess Signal to Analyze');
+% assert(isa(object.FringeShift,'SMASH.SignalAnalysis.Signal'),...
+%     'ERROR: Must Preprocess Signal to Analyze');
 
 %calculate velocity 
+object=process(object);
 V=object.InitialVelocity+object.VPF*object.FringeShift;
 object.Velocity=V;
 
