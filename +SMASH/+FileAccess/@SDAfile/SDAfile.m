@@ -33,6 +33,8 @@
 % created October 8, 2013 by Tommy Ao (Sandia National Laboratories)
 % revised October 9, 2014 by Daniel Dolan (Sandia National Laboratories)
 %    -altered method to match revised SDA specification
+% revised April 4, 2016 by Daniel Dolan
+%    -format version updated to 1.0
 classdef SDAfile
     %%
     properties (SetAccess=immutable)
@@ -101,7 +103,7 @@ classdef SDAfile
                 fid=fopen(filename,'w');
                 fclose(fid);
                 h5writeatt(filename,'/','FileFormat','SDA');
-                h5writeatt(filename,'/','FormatVersion','1.0');
+                h5writeatt(filename,'/','FormatVersion','1.1');
                 h5writeatt(filename,'/','Created',datestr(now));
                 h5writeatt(filename,'/','Updated',datestr(now));
                 h5writeatt(filename,'/','Writable','yes');

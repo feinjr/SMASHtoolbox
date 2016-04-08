@@ -6,7 +6,6 @@ for m=1:numel(data)
     name=fieldnames(data(m));
     for k=1:numel(name)
         value=data(m).(name{k});
-        %local=[setname '/' sprintf('element %d',m) '/' name{k}];
         local=[setname '/' name{k}];
         if isnumeric(value)
             insert_numeric(archive,local,value,deflate);
@@ -21,14 +20,14 @@ for m=1:numel(data)
         elseif iscell(value)
             insert_cell(archive,local,value,deflate);
         elseif isobject(value)
-            ObjectClass=class(value);
-            value=object2structure(value);
-            insert_structure(archive,local,value,deflate);
-            h5writeatt(archive.ArchiveFile,local,'Class',ObjectClass);
-            h5writeatt(archive.ArchiveFile,local,'RecordType','object');
+            insert_object(archive,local,value,deflate);           
         end
     end
-    h5writeatt(file,setname,'RecordType','structure');
+    if isscalar(data)
+        h5writeatt(file,setname,'RecordType','structure');
+    else
+        h5writeatt(file,setname,'RecordType','structures');
+    end
     %h5writeatt(file,setname,'RecordSize',size(data));
     h5writeatt(file,setname,'Empty','no');    
     h5writeatt(file,setname,'FieldNames',sprintf('%s ',name{:}));    

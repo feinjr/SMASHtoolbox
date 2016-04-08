@@ -24,11 +24,7 @@ for k=1:numel(data)
     elseif iscell(value)
         insert_cell(archive,local,value,deflate);
     elseif isobject(value)
-        ObjectClass=class(value);
-        value=object2structure(value);
-        insert_structure(archive,local,value,deflate);
-        h5writeatt(archive.ArchiveFile,local,'Class',ObjectClass);
-        h5writeatt(archive.ArchiveFile,local,'RecordType','object');        
+        insert_object(archive,local,value,deflate);        
     end
 end
 h5writeatt(file,datasetname,'RecordType','cell');
