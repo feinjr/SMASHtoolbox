@@ -77,8 +77,10 @@ switch lower(mode)
         xlabel(ha(2),'Time');
         ylabel(ha(2),'Uncertainty');
         legend(h(:,1),label,'Location','best');
-        title(ha(2),'');
-         linkaxes(ha,'x');
+        warning off; %#ok<WNOFF>
+        title(ha(2),'');        
+        linkaxes(ha,'x');
+        warning on; %#ok<WNON>
     otherwise
         error('ERROR: invalid view mode');
 end

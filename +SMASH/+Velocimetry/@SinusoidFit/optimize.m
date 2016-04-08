@@ -103,7 +103,8 @@ amplitude=[];
                 beat{mm}(nn)=slack2variable(beta,[low(2) high(2)]);
                 slope=(high+low)/duration{mm}(nn);
                 slope=slope(3)-slope(1);
-                chirp{mm}(nn)=slope+slack(start+1);
+                %chirp{mm}(nn)=slope+slack(start+1);
+                chirp{mm}(nn)=0; % trial
                 %gamma=slack(start+1);                
                 %chirp{mm}(nn)=slack2variable(gamma,...
                 %    [high(3)-low(1) low(3)-high(1)]/duration{mm}(nn));
@@ -117,6 +118,7 @@ amplitude=[];
                 basis(index,column+1)=sin(phase);
                 basis(~index,column:column+1)=0;
                 column=column+2;
+                left=right;
             end                                               
         end
         %[amplitude,~]=linsolve(basis,object.Signal);
@@ -133,9 +135,6 @@ object.Chirp=chirp;
 object.Amplitude=amplitude;
 
 end
-
-%function [center,width]=analyzeSpectrum()
-%end
 
 function variable=slack2variable(slack,range)
 
