@@ -3,6 +3,7 @@ classdef File
     properties (SetAccess=protected)
         FileName % Access file name
         PathName % Access file location
+        Extension % File extension
     end
     properties (Hidden=true)
         FullName

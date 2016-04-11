@@ -26,6 +26,13 @@ classdef ColumnFile < SMASH.FileAccess.File
                 filename='';
             end
             object=select(object,filename);
+            switch lower(object.Extension)
+                case {'.xls' '.xlsx'}
+                    message={};
+                    message{end+1}='ERROR: this format cannot read binary files';
+                    message{end+1}='       Use "xlsread" to access spreadsheet files';
+                    error('%s\n',message{:});
+            end
         end
     end    
 end
