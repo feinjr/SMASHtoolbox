@@ -2,13 +2,13 @@
 %
 % This method resets the Grid and Data stored in an Image object.  Arrays
 % can be passed directly into the object:
-%    >> object=replace(object,Grid1,Grid2,Data);
+%    >> object=reset(object,Grid1,Grid2,Data);
 % where grid1, grid2, and data are arrays of consistent size; passing an
 % empty array preserves the existing array.
-%    >> object=replace(object,[],[],Data); % preserve original grids
-%    >> object=replace(object,Grid1,[],[]); % change first grid 
+%    >> object=reset(object,[],[],Data); % preserve original grids
+%    >> object=reset(object,Grid1,[],[]); % change first grid 
 % Grid and Data information can also be reset using a source object.
-%    >> object=replace(object,source);
+%    >> object=reset(object,source);
 %
 % See also Image, replace
 %
