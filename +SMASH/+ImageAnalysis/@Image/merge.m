@@ -3,7 +3,7 @@
 % This method merges mutiple Image objects into a single object.
 %    >> new=merge(object1,object2,...);
 % The new object Grid is determined by the outermost points of the source
-% object, spaced by the smallest source grid spacing.  Source objects are
+% objects, spaced by the smallest source grid spacings.  Source objects are
 % added to this new grid sequentially.  Overlapping information is averaged
 % by the number of source contributions at every point. Points that do not
 % correspond to any source object are assigned to NaN.
