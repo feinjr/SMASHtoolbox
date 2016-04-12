@@ -93,7 +93,8 @@ if sinusoid
     [f,P]=fft(temp,options);    
     Pref=interp1(f,P,f0);
     report.Sinusoid.Amplitude=sqrt(Pmax/Pref);
-    % calibrate noise amplitude
+    % calibrate noise amplitude 
+    % THIS CALCULATION SHOULD USE BANDWIDTH
     arg=-20:+20;
     kernel=exp(-arg.^2/(2*0.75^2));
     kernel=kernel/sum(kernel);

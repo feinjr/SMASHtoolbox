@@ -29,8 +29,8 @@ classdef ColumnFile < SMASH.FileAccess.File
             switch lower(object.Extension)
                 case {'.xls' '.xlsx'}
                     message={};
-                    message{end+1}='ERROR: this format cannot read binary files';
-                    message{end+1}='       Use "xlsread" to access spreadsheet files';
+                    message{end+1}='ERROR: this format cannot be used to read binary files';
+                    message{end+1}='       Use MATLAB''s "xlsread" function to access spreadsheet files';
                     error('%s\n',message{:});
             end
         end

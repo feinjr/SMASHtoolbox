@@ -63,7 +63,8 @@ linkaxes(ha,'xy');
 %% parameter uncertainty
 tic;
 object.AssumeNormal=true;
-result=analyze(object,50);
+%result=analyze(object,50);
+result=analyze(object,500);
 summarize(result);
 verify(result,1000,0.90);
 toc;
