@@ -1,0 +1,18 @@
+# create a clean branch
+git checkout master
+git branch -D version1
+git branch --orphan version1
+git rm -rf .
+
+# move approved content
+git checkout master *.m
+git checkout master *.txt
+git checkout master *.md
+git checkout master ../programs
+
+# commit content
+git add *
+git commit -am "Created version1 branch"
+
+# return to the master branch
+git checkout master
