@@ -15,12 +15,21 @@
 %   -changed from package function to toolbox utility
 function varargout=aboutSMASH(varargin)
 
-% current version number (set by developer)
-data.VersionNumber='1.0 beta';
-
-% latest revision date
 location=mfilename('fullpath');
 [location,~]=fileparts(location);
+
+% current version number (set by developer)
+target=fullfile(location,'.SMASHversion');
+if exist(target,'file')
+    fid=fopen(target,'r');
+    data.VersionNumber=fscanf(fid,'%s');
+    fclose(fid);
+else
+    data.VersionNumber='1.1';
+end
+
+
+% latest revision date
 target=fullfile(location,'*.git');
 target=dir(target);
 if numel(target)==1
