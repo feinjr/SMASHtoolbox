@@ -4,7 +4,7 @@
 % polynomial smoothing (Savitzky-Golay method) is used to reduce the
 % effects of noise.  The coordinate and smoothing parameters
 % are specified as input arguments.
-%   >> result=derivative(object,coordinate,[nhood numpoints]);
+%   >> result=differentiate(object,coordinate,[nhood numpoints]);
 % The first input can be 'Grid1' or 'Grid2'; the second input
 % defines the smoothing parameters.  For example:
 %   >> dzdx=differentiate(object,'Grid1',[2 7]); 
