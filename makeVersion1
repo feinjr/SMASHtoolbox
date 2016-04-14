@@ -1,7 +1,7 @@
 # create a clean branch
 git checkout master
 git branch -D version1
-git branch --orphan version1
+git checkout --orphan version1
 git rm -rf .
 
 # move approved content
