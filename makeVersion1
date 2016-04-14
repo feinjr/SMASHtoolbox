@@ -18,9 +18,12 @@ git checkout master +SMASH/+SignalAnalysis
 git checkout master +SMASH/+System
 
 # commit content
-echo "1.0" > .SMASHversion
 git add *
-git commit -am "Created version1 branch"
+git commit -m "Created version1 branch"
+
+echo "1.0" > SMASHversion
+git add *
+git commit -m "Updated version file"
 
 # return to the master branch
 git checkout master

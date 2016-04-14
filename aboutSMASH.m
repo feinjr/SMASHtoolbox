@@ -19,7 +19,7 @@ location=mfilename('fullpath');
 [location,~]=fileparts(location);
 
 % current version number (set by developer)
-target=fullfile(location,'.SMASHversion');
+target=fullfile(location,'SMASHversion');
 if exist(target,'file')
     fid=fopen(target,'r');
     data.VersionNumber=fscanf(fid,'%s');
