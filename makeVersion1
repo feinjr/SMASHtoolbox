@@ -9,7 +9,13 @@ git checkout master *.m
 git checkout master *.txt
 git checkout master *.md
 git checkout master programs
-git checkout master +SMASH/FileAccess
+git checkout master +SMASH/+FileAccess
+git checkout master +SMASH/+General
+git checkout master +SMASH/+Graphics
+git checkout master +SMASH/+ImageAnalysis
+git checkout master +SMASH/+MUI
+git checkout master +SMASH/+SignalAnalysis
+git checkout master +SMASH/+System
 
 # commit content
 git add *
