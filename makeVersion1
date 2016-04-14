@@ -8,7 +8,8 @@ git rm -rf .
 git checkout master *.m
 git checkout master *.txt
 git checkout master *.md
-git checkout master ../programs
+git checkout master programs
+git checkout master +SMASH/FileAccess
 
 # commit content
 git add *
