@@ -69,7 +69,7 @@ end
 % process results
 table=transpose(table);
 new=SMASH.MonteCarlo.Cloud(table,'table');
-bounds=confidence(new,span);
+[bounds,span]=confidence(new,span);
 
 moments=struct();
 moments.Lower=nan(Nvariables,Nmoments);
@@ -97,8 +97,9 @@ end
 
 % manage output
 if nargout==0
+    fprintf('Statistics spanning %.3f to %.3f of the cloud\n',span)
     % moments
-    fprintf('Minimum statistical moments:\n');
+    fprintf('** Minimum statistical moments: **\n');
     width=cellfun(@length,object.VariableName);
     width=max(width);
     format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
@@ -123,6 +124,7 @@ if nargout==0
 else
     varargout{1}=moments;
     varargout{2}=correlations;
+    varargout{3}=span;
 end
 
 end

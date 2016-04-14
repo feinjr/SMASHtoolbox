@@ -1,13 +1,21 @@
 % confidence Calculate confidence regions
 %
 % This method estimates confidence regions for each variable in a data
-% cloud.  By default, a 1-sigma span centered at the median is used, but
-% custom regions can also be specified.
+% cloud.  By default, the calculation spans a 1-sigma range centered at the
+% median.
+%    result=confidence(object); % default span
+% Custom spans can be also be specified.
+%    result=confidence(object,span);
+% Spans are specified in percentiles.  Single values indicate total range
+% centered at the median (50th percentile); lower and upper percentiles may
+% also be specified.
+%    result=confidence(object,0.90); 
+%    result=confidence(object,[0.05 0.95]); % equivalent to the above
 %
-% Examples:
-%   >> result=confidence(object); % 1-sigma span (centered at 50%)
-%   >> result=confidence(object,0.90); % 90% confidence span (centered at 50%)
-%   >> result=confidence(object,[0.10 0.95]); % custom span from 10% to 95%
+% The output "result" is a two-column table of lower/upper values for each
+% value.  Span percentiles used for this calculation are returned as the
+% second output argument.
+%    [result,span]=confidence(...);
 %
 % See also Cloud, investigate, summarize
 %
@@ -32,10 +40,10 @@ end
 
 % error checking
 if low<=0
-    error('ERROR: lower confidence bound must be greater than zero');
+    error('ERROR: lower confidence span must be greater than zero');
 end
 if high>=1
-    error('ERROR: upper confidence bound must be less than one');
+    error('ERROR: upper confidence span must be less than one');
 end
 
 % identify confidence domain
@@ -68,6 +76,7 @@ end
 
 if nargout>=1
     varargout{1}=result;
+    varargout{2}=[low high];
 end
 
 end

@@ -1,26 +1,29 @@
 % trim Remove points from data cloud
 %
 % This method removes points from a data cloud.  Simple calls:
-%    object=remove(object);
-% remove points where any variable is infinite or NaN.
+%    object=trim(object);
+% remove points where any variable is infinite or NaN.  Cloud points may
+% also be removed by passing a logical array; true values indicate points
+% to be removed .
+%    object=trim(object,drop);
+% The input "drop" must have the same number of elements as the number of
+% cloud points. 
 %
-% Clouds can be trimmed to a fraction of their range.
-%    object=trim(object,center); % center fraction, e.g. 0.90
+% Clouds can be trimmed by the span of a particular variable.
+%    object=trim(object,variable,span);
+% The input "variable" must be value variable index for the cloud.  The
+% input "span" indicates the trim range in percentiles.  For example:
+%    object=trim(object,0.90); % trim to central 90%
 %    object=trim(object,[low high]); % low/high fractions, e.g. [0.05 0.95]
-% Logical indices may also be passed to indicate points that should be
-% dropped from the cloud.
-%    object=trim(object,index);
-% In either case, nan/inf values should be trimmed *before* fraction or
-% drop trimming.
+% Nan/inf values should be removed *before* trimming to a variable span.
 %
 % See also Cloud
 %
 
 %
 % created March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
-
 %
-function object=trim(object,arg)
+function object=trim(object,varargin)
 
 % manage input
 if nargin==1
@@ -29,43 +32,40 @@ if nargin==1
     return
 end
 
-if islogical(arg)
-    assert(numel(arg)==object.NumberPoints,...
-        'ERROR: drop array must match the number of cloud points');
-    drop=arg;
-    mode='drop';
-elseif isnumeric(arg)
-    if isscalar(arg)
-        arg=0.50+[-0.5 +0.5]*arg;
-    end
-    assert(numel(arg)==2,'ERROR: invalid trim range');
-    assert(all(arg>=0) && all(arg<=1),'ERROR: invalid trim range');
-    range=sort(arg);
-    assert(diff(range)>0,'ERROR: invalid trim range');
-    mode='fraction';
-else
-    error('ERROR: invalid trim argument');
-end
+Narg=numel(varargin);
 
 % perform trimming
 table=object.Data;
-switch mode
-    case 'drop'
-        table=table(~drop,:);
-    case 'fraction'
-        keep=true(object.NumberPoints,1);
-        index=round(object.NumberPoints*range);
+if (Narg==1) && islogical(varargin{1})
+    assert(numel(varargin{1})==object.NumberPoints,...
+        'ERROR: drop array must match the number of cloud points');
+    drop=varargin{1};
+    table=table(~drop,:);    
+else
+    assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
+    keep=true(object.NumberPoints,1);
+    ValidVariable=1:object.NumberVariables;        
+    for n=1:2:Narg
+        variable=varargin{n};
+        assert(any(variable==ValidVariable),'ERROR: invalid variable index');
+        span=varargin{n+1};
+        assert(isnumeric(span),'ERROR: invalid trim span');
+        if isscalar(span)
+            span=0.50+[-0.5 +0.5]*span;
+        end
+        assert(numel(span)==2,'ERROR: invalid trim span');
+        assert(all(span>=0) && all(span<=1),'ERROR: invalid trim span');
+        index=round(object.NumberPoints*span);
         index(1)=max(index(1),1);
         index(2)=min(index(2),object.NumberPoints);
-        for n=1:object.NumberVariables
-            temp=sort(table(:,n));
-            bound=temp(index(1));
-            keep(table(:,n)<bound)=false;
-            bound=temp(index(2));
-            keep(table(:,n)>bound)=false;
-        end
-        table=table(keep,:);
-end
+        temp=sort(table(:,variable));
+        bound=temp(index(1));
+        keep(table(:,variable)<bound)=false;
+        bound=temp(index(2));
+        keep(table(:,variable)>bound)=false;
+    end
+    table=table(keep,:);
+end     
 
 % manage output
 object.Data=table;

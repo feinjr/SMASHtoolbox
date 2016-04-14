@@ -30,7 +30,8 @@ assert(strcmpi(orientation,'lower') || strcmpi(orientation,'upper'),...
 orientation=lower(orientation);
 
 % create plots
-figure;
+%figure;
+SMASH.MUI.Figure;
 
 hdiagonal=[];
 hcross=[];

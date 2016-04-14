@@ -34,14 +34,16 @@ new.VariableName=object.VariableName(variable);
 % carry over settings
 new.Seed=object.Seed;
 
-if isscalar(object.GridPoints)
-    new.GridPoints=object.GridPoints;    
-else
-    new.GridPoints=object.GridPoints(variable);
-end
+new.DensitySettings=object.DensitySettings;
 
-new.SmoothFactor=object.SmoothFactor;
-new.PadFactor=object.PadFactor;
-new.NumberContours=object.NumberContours;
+%if isscalar(object.GridPoints)
+%    new.GridPoints=object.GridPoints;    
+%else
+%    new.GridPoints=object.GridPoints(variable);
+%end
+
+%new.SmoothFactor=object.SmoothFactor;
+%new.PadFactor=object.PadFactor;
+%new.NumberContours=object.NumberContours;
 
 end
