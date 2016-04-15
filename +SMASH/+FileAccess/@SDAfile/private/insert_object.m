@@ -16,14 +16,7 @@ else
     for n=1:numel(data)
         temp{n}=data(n);
     end
-    insert_cell(archive,datasetname,temp,deflate);
-    %error('ERROR: object arrays are not supported in SDA files');
-    %     temp=cell(size(data));
-    %     for n=1:numel(data)
-    %         temp{n}=object2structure(data(n));
-    %     end
-    %     insert_cell(archive,datasetname,temp,deflate);
-    %     h5writeatt(archive.ArchiveFile,['/' datasetname],'RecordType','objects');
+    insert_cell(archive,datasetname,temp,deflate);   
 end
 
 end

@@ -68,9 +68,9 @@ switch h5readatt(archive.ArchiveFile,setname,'RecordType');
     case 'cell'
         data=extract_cell(archive,setname);
     case 'object'
-        data=extract_structure(archive,setname);
-        data=structure2object(data,metadata.Class);        
+        data=extract_object(archive,setname);              
     otherwise
+        error('ERROR: invalid record type detected');
 end
 
 end

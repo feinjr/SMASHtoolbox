@@ -30,9 +30,7 @@ for k=1:numel(name)
         case 'cell'
             data.(name{k})=extract_cell(archive,local);
         case 'object'
-            temp=extract_structure(archive,local);
-            ObjectClass=h5readatt(archive.ArchiveFile,local,'Class');
-            data.(name{k})=structure2object(temp,ObjectClass);
+            data.(name{k})=extract_object(archive,local);                       
         otherwise
             error('ERROR: invalid record type');
     end
