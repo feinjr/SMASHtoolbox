@@ -64,3 +64,6 @@ for n=1:2
 end
 
 linkaxes(ha,'xy');
+
+%% Monte Carlo analysis
+result=analyze(object,1000);

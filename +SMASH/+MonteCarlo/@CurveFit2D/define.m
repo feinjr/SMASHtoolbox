@@ -1,7 +1,8 @@
 % define Define model function
 %
-%
+% This method defines the model function used in a 2D curve fit.%
 %    object=define(object,model,param);
+% (documentation under construction)
 %    object=define(object,model,param,bound);
 % Empty values can be used as placed holders when changing parameters
 % and/or bounds while leaving earlier parameters unchanged.
