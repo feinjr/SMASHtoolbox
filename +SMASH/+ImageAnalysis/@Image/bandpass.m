@@ -11,7 +11,7 @@
 % See also IMAGE
 
 % created July 24, 2014 by Tommy Ao (Sandia National Laboratories)
-% updated July 16, 2015 by Tommy Ao
+% updated April 21, 2016 by Tommy Ao
 
 %
 function object=bandpass(object,varargin)
@@ -37,18 +37,56 @@ end
 
 % verify uniform grid
 object=makeGridUniform(object);
-view(object);
 
 % find zeropadding size
 m = max(size(object.Data)); % maximum dimension of data
 P = 2^nextpow2(2*m); % find power-of-2 at least twice m
+
+% set up the meshgrid arrays needed for computing the required distances
+[D,D0H,D0L]=setupmeshgrid(P,range);
+
+% calculate bandpass type
+[B,H1,H2]=bandpasstype(D,D0H,D0L,type,order);
+
+% FFT data
+F=fft2(double(object.Data),H1,H2);
+
+% apply bandpass to FFT data
+BF = B.*F;
+
+% inverse bandpassed FFT data
+BFdata=real(ifft2(BF)); 
+BFdata=BFdata-min(min(BFdata));
+
+% create bandpassed Image object
+object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
+object.DataLabel='Intensity (a.u.)';
+object=updateHistory(object);
+view(object);
+title(strcat((object.GraphicOptions.Title),' - bandpassed'));
+
+% plot power spectra
+figure; set(gcf,'OuterPosition',[0 500 1000 1000]);
+subplot(2,2,1); 
+imagesc(fftshift(log(abs(F)))); caxis([0 max(max(log(abs(F))))]);
+title(strcat((object.GraphicOptions.Title),' - power spectrum'));
+subplot(2,2,2);
+imagesc(fftshift(B)); caxis([min(min(abs(B))) max(max(abs(B)))]);
+title('Bandpass power spectrum');
+subplot(2,2,3);
+imagesc(fftshift(log(abs(BF)))); caxis([0 max(max(log(abs(BF))))]);
+title(strcat((object.GraphicOptions.Title),' - bandpassed power spectrum'));
+
+end
+
+function [D,D0H,D0L]=setupmeshgrid(P,range)
+% set up the meshgrid arrays needed for computing the required distances
 PQ = [P, P];
 
 % set bandpass range
 D0H = round(range(1)*sqrt((PQ(1)^2+PQ(2)^2))/2); % highpass cutoff
 D0L = round(range(2)*sqrt((PQ(1)^2+PQ(2)^2))/2); % lowpass cutoff
 
-% set up the meshgrid arrays needed for computing the required distances
 u = 0:(PQ(1)-1);
 v = 0:(PQ(2)-1);
 idx = find(u > PQ(1)/2); % compute the indices for use in meshgrid
@@ -58,7 +96,11 @@ v(idy) = v(idy) - PQ(2);
 [V, U] = meshgrid(v, u); % compute the meshgrid arrays
 D = sqrt(U.^2 + V.^2); % compute the distances D(U, V)
 
-% apply bandpass type
+end
+
+function [B,H1,H2]=bandpasstype(D,D0H,D0L,type,order)
+
+% calculte bandpass type
 switch lower(type)
     case 'ideal'
         L = double(D <=D0L);
@@ -86,26 +128,7 @@ switch lower(type)
         error('Error: invalid bandpass choice');
 end
 
-% FFT data
-F=fft2(double(object.Data),size(H,1),size(H,2));
-FdB=log(abs(F));
-figure; imagesc(fftshift(FdB)); caxis([0 max(max(FdB))]);
-title(strcat((object.GraphicOptions.Title),' - FFT power spectrum'));
-figure; imagesc(fftshift(B));
-title(strcat('Bandpass power spectrum'));
-
-% apply bandpass to FFT data
-BF = B.*F;
-BFdB=log(abs(BF));
-figure; imagesc(fftshift(BFdB)); caxis([0 max(max(BFdB))]);
-title(strcat((object.GraphicOptions.Title),' - bandpassed power spectrum'));
-
-% inverse FFT data
-BFdata=real(ifft2(BF));
-object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
-view(object);
-
-object.DataLabel='Intensity (a.u.)';
-object=updateHistory(object);
+H1=size(H,1);
+H2=size(H,2);
 
 end
