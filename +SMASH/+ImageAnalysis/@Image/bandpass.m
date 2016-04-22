@@ -57,41 +57,44 @@ object.Data=BFdata(1:length(object.Grid2),1:length(object.Grid1));
 object.DataLabel='Intensity (a.u.)';
 object=updateHistory(object);
 
-% show bandpassed Image object
-% view(object);
-% title(strcat((object.GraphicOptions.Title),' - bandpassed'));
-
 end
 
-function BFdata=calculate_bandpass(objectData,P,range,type,order,spectra)
+function F=calculate_bandpass(F,P,range,type,order,spectra)
 
 % FFT bandpass type
 [B,H1,H2]=bandpasstype(P,range,type,order);
-
-% FFT data
-F=fft2(double(objectData),H1,H2);
-
-% apply bandpass to data
-BF = B.*F;
-
-% inverse FFT bandpassed data
-BFdata=real(ifft2(BF)); 
-BFdata=BFdata-min(min(BFdata));
-
 if strcmpi(spectra,'on')
-    % plot power spectra
     figure;
-    subplot(2,2,1); 
-    imagesc(fftshift(log(abs(F)))); caxis([0 max(max(log(abs(F))))]);
-    title('Power spectrum of data');
     subplot(2,2,2);
     imagesc(fftshift(B)); caxis([min(min(abs(B))) max(max(abs(B)))]);
     title('Power spectrum of bandpass');
-    subplot(2,2,3);
-    imagesc(fftshift(log(abs(BF)))); caxis([0 max(max(log(abs(BF))))]);
-    title('Power spectrum of bandpassed data');
-    set(gcf,'OuterPosition',[0 300 800 800]);
 end
+
+% FFT data
+F=fft2(double(F),H1,H2);
+if strcmpi(spectra,'on')
+    subplot(2,2,1);
+    imagesc(fftshift(log(abs(F)))); 
+    caxis([0 max(max(log(abs(F))))]);
+    title('Power spectrum of data');
+end
+
+% apply bandpass to data
+F=B.*F;
+if strcmpi(spectra,'on')
+    subplot(2,2,3);
+    imagesc(fftshift(log(abs(F)))); 
+    caxis([0 max(max(log(abs(F))))]);
+    title('Power spectrum of bandpassed data');
+    %set(gcf,'OuterPosition',[0 300 800 800]);
+    set(gcf,'Units','normalized','Position',[0.05 0.05 0.90 0.90]);
+    set(gcf,'Units','pixels'); 
+    
+end
+
+% inverse FFT bandpassed data
+F=real(ifft2(F));
+F=F-min(F(:));
 
 end
 
@@ -117,32 +120,36 @@ D = sqrt(U.^2 + V.^2); % compute the distances D(U, V)
 % calculate bandpass type
 switch lower(type)
     case 'ideal'
-        L = double(D <=D0L);
-        H = 1 - double(D <=D0H);
-        B = H.*L;
+        U = double(D <= D0L);
+        %V = 1 - double(D <= D0H);
+        V = double(D >= D0H);
+       %B = H.*L;
     case 'gaussian'
-        L = exp(-(D.^2)./(2*(D0L^2)));
-        H = 1 - exp(-(D.^2)./(2*(D0H^2)));
-        B = H.*L;
+        U = exp(-(D.^2)./(2*(D0L^2)));
+        V = 1 - exp(-(D.^2)./(2*(D0H^2)));
+        %B = H.*L;
     case 'butterworth'
         n = order;
-        L = 1./(1 + (D./D0L).^(2*n));
-        H = 1 - 1./(1 + (D./D0H).^(2*n));
-        B = H.*L;
+        U = 1./(1 + (D./D0L).^(2*n));
+        V = 1 - 1./(1 + (D./D0H).^(2*n));
+        %B = H.*L;
  %       B = 1./(1 +((D.^2-D0L.*D0H)./D./(D0H-D0L)).^(2*n));
     case 'chebyshev'
         n = order;
         epsilon = 1;
         TL = polyval(ChebyshevPoly(n),D./D0L);
-        L = 1./(1 + epsilon^2.*TL.^2);
+        U = 1./(1 + epsilon^2.*TL.^2);
         TH = polyval(ChebyshevPoly(n),D./D0H);
-        H = 1 - 1./(1 + epsilon^2.*TH.^2);
-        B = H.*L;
+        V = 1 - 1./(1 + epsilon^2.*TH.^2);
+        %B = H.*L;
     otherwise
         error('Error: invalid bandpass choice');
 end
-
-H1=size(H,1);
-H2=size(H,2);
+%B = H.*L;
+B= U.*V;
+ 
+[H1,H2]=size(B);
+%H1=size(H,1);
+%H2=size(H,2);
 
 end
