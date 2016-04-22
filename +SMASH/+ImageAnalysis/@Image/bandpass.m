@@ -86,10 +86,8 @@ if strcmpi(spectra,'on')
     imagesc(fftshift(log(abs(F)))); 
     caxis([0 max(max(log(abs(F))))]);
     title('Power spectrum of bandpassed data');
-    %set(gcf,'OuterPosition',[0 300 800 800]);
     set(gcf,'Units','normalized','Position',[0.05 0.05 0.90 0.90]);
     set(gcf,'Units','pixels'); 
-    
 end
 
 % inverse FFT bandpassed data
@@ -121,19 +119,14 @@ D = sqrt(U.^2 + V.^2); % compute the distances D(U, V)
 switch lower(type)
     case 'ideal'
         U = double(D <= D0L);
-        %V = 1 - double(D <= D0H);
         V = double(D >= D0H);
-       %B = H.*L;
     case 'gaussian'
         U = exp(-(D.^2)./(2*(D0L^2)));
         V = 1 - exp(-(D.^2)./(2*(D0H^2)));
-        %B = H.*L;
     case 'butterworth'
         n = order;
         U = 1./(1 + (D./D0L).^(2*n));
         V = 1 - 1./(1 + (D./D0H).^(2*n));
-        %B = H.*L;
- %       B = 1./(1 +((D.^2-D0L.*D0H)./D./(D0H-D0L)).^(2*n));
     case 'chebyshev'
         n = order;
         epsilon = 1;
@@ -141,15 +134,11 @@ switch lower(type)
         U = 1./(1 + epsilon^2.*TL.^2);
         TH = polyval(ChebyshevPoly(n),D./D0H);
         V = 1 - 1./(1 + epsilon^2.*TH.^2);
-        %B = H.*L;
     otherwise
         error('Error: invalid bandpass choice');
 end
-%B = H.*L;
+
 B= U.*V;
- 
 [H1,H2]=size(B);
-%H1=size(H,1);
-%H2=size(H,2);
 
 end
