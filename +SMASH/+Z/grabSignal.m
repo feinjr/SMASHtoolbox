@@ -137,7 +137,7 @@ if ispc
 else
     sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
     commandwindow;
-    command=sprintf('scp %s %s',sourcefile,tempfile);
+    command=sprintf('scp "%s" "%s"',sourcefile,tempfile);
     system(command);
 end
 
