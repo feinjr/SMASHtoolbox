@@ -24,7 +24,7 @@ view(object);
 %%
 figure;
 result={};
-object=define(object,@UpDownLine,[1.0 0.0 0.4 -1.0],[]);
+object=define(object,@UpDownLine,[1.0 0.0 0.4 -1.0],[0.5 1.5; -0.1 +0.1;0.2 0.8;-0.5 -1.5]);
 
 ha(1)=subplot(2,1,1); box on; 
 text('Units','normalized','Position',[1 1],...
@@ -68,3 +68,6 @@ result=analyze(object,500);
 summarize(result);
 verify(result,1000,0.90);
 toc;
+
+result=configure(result,'VariableName',{'Slope 1','Intercept 1','Break','Slope 2'});
+view(result)
