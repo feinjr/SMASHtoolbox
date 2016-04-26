@@ -30,7 +30,7 @@ assert(Narg>=1,'ERROR: insufficient nput');
 
 if isa(varargin{1},'SMASH.MonteCarlo.Cloud');
     source=varargin{1};
-    assert(source.NumberVariabes==2,...
+    assert(source.NumberVariables==2,...
         'ERROR: measurement cloud must have two variables');
 elseif isnumeric(varargin{1})
     table=varargin{1};

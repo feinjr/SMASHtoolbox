@@ -96,10 +96,11 @@ for m=1:Nvariables;
 end
 
 % manage output
-if nargout==0
+if nargout==0    
     fprintf('Statistics spanning %.3f to %.3f of the cloud\n',span)
     % moments
-    fprintf('** Minimum statistical moments: **\n');
+    fprintf('%s\n',repmat('*',[1 40]));
+    fprintf('Minimum statistical moments:\n');
     width=cellfun(@length,object.VariableName);
     width=max(width);
     format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
@@ -115,12 +116,14 @@ if nargout==0
     end
     fprintf('\n');   
     % correlations
+    fprintf('%s\n',repmat('*',[1 40]));
     fprintf('Minimum correlations:\n');
     format=repmat('%+10.3f ',[1 Nvariables]);
     format=['\t' format '\n'];
     fprintf(format,correlations.Lower);
-    fprintf('Minimum correlations:\n');
+    fprintf('Maximum correlations:\n');
     fprintf(format,correlations.Upper);
+    fprintf('%s\n',repmat('*',[1 40]));
 else
     varargout{1}=moments;
     varargout{2}=correlations;
