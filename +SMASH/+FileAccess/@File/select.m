@@ -20,15 +20,18 @@ else
     [pathname,filename,ext]=fileparts(name);
     object.FileName=[filename ext];
     if isempty(pathname)
-        pathname=pwd;
+        pathname=fileparts(which(name));
+        if isempty(pathname)
+            pathname=pwd;
+        end
     elseif exist(pathname,'dir')
         current=pwd;
         cd(pathname);
         pathname=pwd;
         cd(current);
     else
-        error('ERROR: invalid path or file name specified');        
-    end
+        error('ERROR: invalid path or file name specified');   
+    end    
     object.PathName=pathname;        
 end
 object.FullName=fullfile(object.PathName,object.FileName);
