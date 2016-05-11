@@ -2,13 +2,18 @@
 %
 % This method rotates step wedge measurement.  The image can be rotated by
 % a specified angle (in degrees):
-%     >> object=rotate(object,theta);
+%    object=rotate(object,theta);
 % or automatically.
-%     >> object=rotate(object);
+%    object=rotate(object,'auto');
 % Automatic rotation forces the image's longest dimension to be horiztonal,
 % with increasing intensity along the horizontal/vertical grid.  NOTE:
 % vertical grids increases from top to bottom by default, so auto-rotated
 % images may appear inverted.
+%
+% Areas in the rotated image that originate outside of the original image
+% are assigned with NaN values.  A different value can be assigned to these
+% regions by passing a third input argument.
+%    object=rotate(object,theta,value);
 %
 % See also StepWedge, view
 %
