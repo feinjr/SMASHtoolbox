@@ -1,6 +1,9 @@
 % This class is a specialized form of the Image class, with specialized
 % capabilities for characterizing and removing geometric distortion.
 % UNDER CONSTRUCTION
+%
+% See also ImageAnalysis
+%
 
 %
 %

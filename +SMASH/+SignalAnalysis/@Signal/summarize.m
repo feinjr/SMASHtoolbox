@@ -72,18 +72,20 @@ if isempty(FrequencyBound)
     FrequencyBound=[0 fmax];
 end    
 if sinusoid
+    left=max(0,FrequencyBound(1));
+    right=min(FrequencyBound(2),fmax);  
     % characterize peak
     options.RemoveDC=true;
     options.NumberFrequencies=1e6;
     [f,P]=fft(object,options);
-    keep=(f>=FrequencyBound(1)) & (f<=FrequencyBound(2));
+    keep=(f>=left) & (f<=right);
     f1=f(keep);
     P1=P(keep);  
     [Pmax,index]=max(P1);
     f0=f1(index);
     report.Sinusoid.Frequency=f0;   
     % characterize noise
-    keep=(f>=0) & (f<=fmax);   
+    keep=(f>=left) & (f<=right);
     P1=P(keep);
     Pnoise=median(P1);    
     % calibrate peak amplitude
@@ -94,7 +96,6 @@ if sinusoid
     Pref=interp1(f,P,f0);
     report.Sinusoid.Amplitude=sqrt(Pmax/Pref);
     % calibrate noise amplitude 
-    % THIS CALCULATION SHOULD USE BANDWIDTH
     arg=-20:+20;
     kernel=exp(-arg.^2/(2*0.75^2));
     kernel=kernel/sum(kernel);
@@ -103,7 +104,7 @@ if sinusoid
     s=s/std(s);
     temp=reset(temp,[],s);
     [f,P]=fft(temp,options);
-    keep=(f>=0) & (f<=fmax);   
+    keep=(f>=left) & (f<=right);
     P1=P(keep);
     Pref=median(P1);
     report.Sinusoid.Noise=sqrt(Pnoise/Pref);

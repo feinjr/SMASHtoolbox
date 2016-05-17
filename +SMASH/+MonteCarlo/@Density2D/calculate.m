@@ -20,7 +20,7 @@
 %
 
 %
-% created March 3, 2016 by Daniel Dolan  (Sandia National Laboratories)
+% created March 3, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 function object=calculate(object,varargin)
 
