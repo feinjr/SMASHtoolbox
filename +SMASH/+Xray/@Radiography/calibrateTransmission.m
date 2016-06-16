@@ -74,7 +74,7 @@ mask = ~isnan(Z);
 if isempty(poly_order)
     figSurface=SMASH.MUI.Figure();
     figSurface.Name='Use Dialog Box to Set Surface Fit Parameters';
-    setappdata(figSurface, 'surface', []);
+    setappdata(figSurface.Handle, 'surface', []);
     plot3(X(mask),Y(mask),Z(mask),'LineStyle','none','Marker','.')
     view(-45,45)
     ax1 = gca;
@@ -104,7 +104,7 @@ if isempty(poly_order)
     
     uiwait;
     
-    ftx = getappdata(figSurface, 'SurfaceFit');
+    ftx = getappdata(figSurface.Handle, 'SurfaceFit');
     close(figSurface.Handle);
     
 else
@@ -152,7 +152,7 @@ end
         delete(diaPoly);
         hData = findobj(ax1);
         SurfaceFit = get(hData(3),'CData');
-        setappdata(figSurface, 'SurfaceFit', SurfaceFit);
+        setappdata(figSurface.Handle, 'SurfaceFit', SurfaceFit);
     end
 %%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for region selection
     function callbackOK(varargin)
