@@ -23,7 +23,7 @@ X = []; Y = []; Z = [];
 getzonepts = 1;
 showplot = false;
 
-temp = object.Measurement;
+temp = object.Linearized;
 title = temp.GraphicOptions.Title;
 temp.GraphicOptions.Title = 'Choose Region for Background Subtraction';
 %% Unpack variable inputs
@@ -123,7 +123,7 @@ elseif ~isempty(poly_order) % use specified poly_order to fit surface
 end
 temp = temp-fbkg;
 temp.GraphicOptions.Title = title;
-object.Measurement = temp;
+object.Linearized = temp;
 
 nout = max(nargout,1)-1;
 if nout == 3
@@ -131,7 +131,7 @@ if nout == 3
     varargout(2) = {Y(mask)};
     varargout(3) = {Z(mask)};
 end
-% delete(diaPoly)
+delete(diaPoly)
 %% Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for dialog box
     function UpdateCallback(varargin)

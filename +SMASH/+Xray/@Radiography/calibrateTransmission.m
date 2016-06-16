@@ -129,7 +129,7 @@ if nout == 3
     varargout(2) = {Y(mask)};
     varargout(3) = {Z(mask)};
 end
-delete(diaPoly)
+% delete(diaPoly)
 
 %% Callback functions for dialog box
     function UpdateCallback(varargin)

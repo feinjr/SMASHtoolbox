@@ -35,7 +35,7 @@ if (nargin<2) || isempty(curvefit) || strcmpi(curvefit,'peak') ...
         || strcmpi(curvefit,'gaussian')
     curve='gauss';
 elseif strcmpi(curvefit,'step')
-    curve='erf';
+    curve='step';
 end
 
 if nargin<3
