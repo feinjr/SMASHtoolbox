@@ -13,16 +13,6 @@
 % at 1).  Input "x" can also be a scaler, which is interpreted
 % as the step size for the object's Grid property (starting from 0).  
 %
-% Local smoothing is invoked by a third input argument:
-%    object=Signal(x,y,order);
-%    object=Signal(x,y,[order nhood])
-%    object=Signal(x,y,[order nhood],Ngrid); % default grid is 100 points
-% that defines the polynomial order (1 or 2) and neighborhood size
-% (optional).  The smoothed signal is evaluated on a uniformly spaced grid.
-% Smoothing is useful for irregularly sampling, overlapping measurements,
-% and non-monotonic grids.  NOTE: signals generarated in this manner may
-% not pass exactly through the input data due to smoothing!
-%
 % Signal objects can also be created by importing file data.
 %    object=Signal(); % interactive file selection
 %    object=Signal(filename,[format],[record]);
@@ -32,6 +22,17 @@
 % multiple records.
 %
 % See also SignalAnalysis, FileAccess.readFile, FileAccess.SupportedFormats
+%
+
+% Local smoothing is invoked by a third input argument:
+%    object=Signal(x,y,order);
+%    object=Signal(x,y,[order nhood])
+%    object=Signal(x,y,[order nhood],Ngrid); % default grid is 100 points
+% that defines the polynomial order (1 or 2) and neighborhood size
+% (optional).  The smoothed signal is evaluated on a uniformly spaced grid.
+% Smoothing is useful for irregularly sampling, overlapping measurements,
+% and non-monotonic grids.  NOTE: signals generarated in this manner may
+% not pass exactly through the input data due to smoothing!
 %
 
 %

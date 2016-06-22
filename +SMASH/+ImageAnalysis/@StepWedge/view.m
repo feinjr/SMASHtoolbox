@@ -2,10 +2,10 @@
 %
 % This method visually displays step wedge information.  The default
 % visualization is the measured image.
-%     >> view(object);
-%     >> view(object,'Measurement');
+%    view(object);
+%    view(object,'measurement');
 % Analysis results can also be displayed.
-%     >> view(object,'Results');
+%    view(object,'results');
 %
 % See also StepWedge, clean, crop, rotate
 %

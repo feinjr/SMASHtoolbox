@@ -1,20 +1,26 @@
 % view Distortion grid visualization
 %
-% This method displays various graphical representations of distortion.
-%
-% UNDER CONSTRUCTION
+% This method displays distortion grid information.  The default
+% visualization is the measured image.
+%    view(object);
+%    view(object,'measurement');
+% Alternate visualizations may also be chosen.
+%    view(object,'isopoints');
+%    view(object,'isomesh');
+%    view(object,'arcmesh');
+%    view(object,'vector');
 %
 % See also DistortionGrid
 %
 
 %
+% created May 18, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
-%
-function varargout=view(object,mode,haxes)
+function varargout=view(object,choice,haxes)
 
 % handle input
-if (nargin<2) || isempty(mode)
-    mode='isomesh';
+if (nargin<2) || isempty(choice)
+    choice='isomesh';
 end
 
 if (nargin<3) || isempty(haxes)
@@ -27,7 +33,7 @@ end
 axes(haxes);
 
 % generate graphics
-switch lower(mode)
+switch lower(choice)
     case {'isopoints','points'}
         h=line(object.IsoPoints(:,1),object.IsoPoints(:,2));
         apply(object.GraphicOptions,h);
@@ -88,7 +94,7 @@ switch lower(mode)
         if newaxes
             delete(ancestor(haxes,'figure'))
         end
-        error('ERROR: invalid visualization mode');        
+        error('ERROR: invalid visualization choice');        
 end
 
 if newaxes

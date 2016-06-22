@@ -1,12 +1,24 @@
 % This class is a specialized form of the Image class, with specialized
 % capabilities for characterizing and removing geometric distortion.
-% UNDER CONSTRUCTION
+% Distortion grid objects are usually created from one or more image files.
+%    object=DistortionGrid(filename,format,label);
+% The inputs "format" and "label" may be optional depending on the type of
+% graphic file.  Multiple images of the same format, specified using
+% a wild card in the filename, are summed into a common image
+%    object=DistortionGrid('*.imd')
+% Image data is stored in the Measurement property and can be accessed
+% directly.
+%    view(object.Measurement); % display distortion image
+%    object.Measurement.DataLim='auto'; % change image data limits
+% The Measurement property can be modified (as in the second example) but
+% must always remain an Image object.
 %
-% See also ImageAnalysis
+%
+% See also SMASH.ImageAnalysis, Image
 %
 
 %
-%
+% created June 22, 2016  by Daniel Dolan (Sandia National Laboratories)
 %
 classdef DistortionGrid 
     properties

@@ -34,7 +34,7 @@ elseif isa(pattern,'SMASH.SignalAnalysis.Signal')
     pattern=pattern.Data;
 end
 
-% perform correlattion
+% perform correlation
 Data=conv2(object.Data,pattern,'same');
 [peak,Location]=max(Data);
 Data=Data/peak;
