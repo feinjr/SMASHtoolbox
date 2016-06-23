@@ -26,15 +26,16 @@ for k=1:N
     n=find(object.DigitizerChannel{m}==channel);
     trigger=object.DigitizerTrigger(m);
     SystemDelay=object.DigitizerDelay(m);
-    ChannelDelay=object.DigitizerChannelDelay{m}(n);
+    ChannelDelay=object.DigitizerChannelDelay{m}(n); %#ok<FNDSB>
     correction(k)=trigger-SystemDelay-ChannelDelay;
     % probe analysis
-    probe=object.MeasurementConnection(n,1);
+    %probe=object.MeasurementConnection(n,1); % THIS IS WRONG!
+    probe=object.MeasurementConnection(k,1);
     m=find(object.Probe==probe);
     delay=object.ProbeDelay(m); %#ok<FNDSB>
     correction(k)=correction(k)-delay;
     % diagnostic analysis
-    diagnostic=object.MeasurementConnection(n,2);
+    diagnostic=object.MeasurementConnection(k,2);
     m=find(object.Diagnostic==diagnostic);
     delay=object.DiagnosticDelay(m); %#ok<FNDSB>
     correction(k)=correction(k)-delay;        
