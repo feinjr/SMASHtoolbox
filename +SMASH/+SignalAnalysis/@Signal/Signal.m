@@ -21,7 +21,7 @@
 % file's extension corresponds to multiple formats or the file contains
 % multiple records.
 %
-% See also SignalAnalysis, FileAccess.readFile, FileAccess.SupportedFormats
+% See also SMASH.SignalAnalysis, SMASH.FileAccess.readFile, SMASH.FileAccess.SupportedFormats
 %
 
 % Local smoothing is invoked by a third input argument:

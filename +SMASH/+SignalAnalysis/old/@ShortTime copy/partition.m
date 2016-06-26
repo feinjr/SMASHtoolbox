@@ -5,21 +5,21 @@
 % Grid points, and regions are also separated by an integer number of Grid
 % points  Partition parameters "points" and "skip" can be defined
 % explicitly.
-%    object=partition(object,'Points',points); % skip=points
-%    object=partition(object,'Points',[points skip]);
+%    >> object=partition(object,'Points',points); % skip=points
+%    >> object=partition(object,'Points',[points skip]);
 %
 % Partitioning can also be defined in terms of "duration" and "advanced"
 % parameters, which use the same dimensions as the object's Grid property.
-%    object=partition(object,'Duration',duration); % advance=duration
-%    object=partition(object,'Duration',[duration advance]);
+%    >> object=partition(object,'Duration',duration); % advance=duration
+%    >> object=partition(object,'Duration',[duration advance]);
 % The parameters "duration"/"advance" are internally converted to
 % "points"/"skip".  Since "points" and "skip" must be integers, the actual
 % values of "duration" and "advance" may be slightly different than
 % specified.  
 %
 % Division into a fixed number of analysis blocks is also supported.
-%    object=partition(object,'Blocks',blocks); % overlap=0
-%    object=partition(object,'Blocks',[blocks overlap]);
+%    >> object=partition(object,'Blocks',blocks); % overlap=0
+%    >> object=partition(object,'Blocks',[blocks overlap]);
 % The spacing between region centers is determined from the "blocks"
 % parameter, i.e. this parameter (in conjuction with the total number of
 % points) determines the "skip" parameter. By default, each region is
@@ -34,16 +34,16 @@
 % the object when this method is invoked (it is automatically called at
 % object creation).  Changes to the limited region should be followed by a
 % partition update.
-%     object=limit(object,[left right]); % limited region change
-%     object=partition(object,'blocks',[blocks overlap]);
+%     >> object=limit(object,[left right]); % limited region change
+%     >> object=partition(object,'blocks',[blocks overlap]);
 % Updates are not needed for 'points' or 'duration' partitioning.
 %
 % To display the parameters of an object, call this method without outputs
 % or parameters.
-%     division(object);
+%     >> division(object);
 % Parameters can also be read from (but not written to) the
 % Partition property.
-%     param=object.Partition;
+%     >> param=object.Partition;
 %
 % See also ShortTime, analyze
 %
@@ -111,7 +111,7 @@ end
 assert(numel(value)==2,'ERROR: invalid number of parameters');
 
 
-[t,~]=limit(object.Measurement);
+[t,~]=limit(object);
 t1=t(1);
 t2=t(end);
 numpoints=numel(t);

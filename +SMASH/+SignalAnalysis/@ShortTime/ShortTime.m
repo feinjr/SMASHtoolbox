@@ -1,44 +1,49 @@
 % This class creates ShortTime objects for local analysis of
-% one-dimensional scalar information.  Objects created  with this class
-% have all properties/methods of the Signal superclass as well as the
-% following capabilities.
-%    -The "partition" method partitions the objects' Grid into local regions.
-%    -The "analyze" method applies a specified function to these regions.
-% For more information, refer the documentation for each method.
+% one-dimensional information.  ShortTime objects are created from Signal
+% objects or the information needed to create a Signal object.
+%    object=ShortTime(source); % build from a source Signal
+%    object=ShortTime(Grid,Data); % build from numeric data
+%    object=ShortTime(filename,format,record); % build from file
+% Signal information is stored in the Measurement property.
 %
-% The most direct way to create a ShortTime object is to pass numerical
-% information directly.
-%    >> object=ShortTime(Grid,Data);
-% Information can also be imported from a data file.
-%    >> object=ShortTime('import',filename,format,[record]);
-%
-% Signals can be restored from previous objects saved by the "store"
-% method.
-%    >> object=ShortTime('restore',filename,[record]);
-% Restoring a previous object requires  a *.sda (Sandia Data Archive) file!
-%
-% See also Signal, FileAccess.SupportedFormats
+% See also SMASH.SignalAnalysis, SMASH.SignalAnalysis.Signal
 %
 
 %
 % created April 8, 2014 by Daniel Dolan (Sandia National Laboratories)
+% signficantly revised June 26, 2016 by Daniel Dolan
+%    -ShortTime is no longer a subclass of Signal, but instead sotres a
+%    Signal object inside the Measurement property.
 %
-classdef ShortTime < SMASH.SignalAnalysis.Signal
+classdef ShortTime
     %%
-    properties (SetAccess=?SMASH.General.DataClass)
-        Partition; % Analysis partition structure  
+    properties
+        Measurement % Measured signal (SMASH.SignalAnalysis.Signal object)
+        Name = 'ShortTime object' % Object name (text)
+    end
+    properties (SetAccess=protected)
+        Comments = '' % Object comments (text).  Modify with the comment method
+        Partition % Analysis partition settings (structure). Modify with the partition method
     end  
-    properties (Hidden=true)
-        ShowWaitbar=false % Enable/disable waitbar display
-        WaitbarIncrement=0.05 % Progress steps on waitbars
+    properties
+        ShowWaitbar=false % Enable/disable waitbar display (logical)
+        WaitbarIncrement=0.05 % Progress steps on waitbars (0-1, exclusive)
     end
     %%
     methods (Hidden=true)
         function object=ShortTime(varargin)
-            object=object@SMASH.SignalAnalysis.Signal(varargin{:});
-            object=makeGridUniform(object); % force uniform Grid spacing            
+            if (nargin==1) && isa(varargin{1},'SMASH.SignalAnalysis.Signal')
+                object.Measurement=varargin{1};
+            else
+                object.Measurement=SMASH.SignalAnalysis.Signal(varargin{:});
+            end
+            object.Measurement=regrid(object.Measurement);                
+            object.Measurement.GraphicOptions.Title='ShortTime object';
+            object.Measurement.GridLabel='Time';
+            object.Measurement.DataLabel='Signal';
+            object=partition(object,'Blocks',[10 0]);
         end
-    end
+    end   
     %% protected methods
     methods (Access=protected, Hidden=true)
         varargout=create(varargin);
@@ -47,5 +52,31 @@ classdef ShortTime < SMASH.SignalAnalysis.Signal
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
         varargout=convert(varargin);
+    end
+    %% setters
+    methods
+        function object=set.Measurement(object,value)
+            assert(isa(value,'SMASH.SignalAnalysis.Signal'),...
+                'ERROR: invalid Measurement value');
+            object.Measurement=value;
+        end
+        function object=set.Name(object,value)
+            assert(ischar(value),'ERROR: invalid name');
+            object.Name=value;
+        end
+        function object=set.ShowWaitbar(object,value)
+            try
+                value=logical(value);
+                assert(isscalar(value));
+            catch
+                error('ERROR: invalid ShowWaitbar value');
+            end
+            object.ShowWaitbar=value;
+        end
+        function object=set.WaitbarIncrement(object,value)
+            assert(SMASH.General.testNumber(value) && (value>0) && (value<1),...
+                'ERROR: invalid WaitbarIncrement value');
+            object.WaitbarIncrement=value;
+        end
     end
 end

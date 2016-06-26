@@ -11,7 +11,7 @@
 %    >> object=locate(object,table); % N points specified in a Nx2 table
 %    >> object=locate(object,filename); % points specified in a two-column file
 %
-% See also Distortion, apply, blur
+% See also DistortionGrid, apply, blur
 %
 
 %
