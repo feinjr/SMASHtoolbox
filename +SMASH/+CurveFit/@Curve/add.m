@@ -75,6 +75,7 @@ for n=1:2:Narg
         case 'scale'
             assert(isnumeric(value) & isscalar(value),...
                 'ERROR: invalid Scale');
+            option.Scale=value;
         case 'fixscale'
             assert(islogical(value) & (numel(value)==1),...
                 'ERROR: FixScale must be true or false');
