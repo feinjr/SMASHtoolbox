@@ -135,10 +135,10 @@ switch choice
         end 
         assert(all(value>0),...
             'ERROR: Duration/Advance values must be greater than 0');     
-        points=round(value(1)/dt);
+        points=round(value(1)/dt)+1;
         assert(points > 4,'ERROR: specified duration is too small');
         skip=round(value(2)/dt);     
-        assert(points >= 1,'ERROR: specified advane is too small');
+        assert(skip >= 1,'ERROR: specified advance is too small');
     case {'block','blocks'}
         if isnan(value(2))
             value(2)=0;
@@ -146,8 +146,7 @@ switch choice
         value(1)=round(value(1));
         assert(value(1)>1,'ERROR: blocks value must be greater than 1');        
         assert(value(2)>=0,'ERROR: Overlap value must be greater than or equal to 0');                       
-        skip=floor(numpoints/value(1));        
-        %assert(skip>0,'ERROR: blocks exceed the number of grid points');
+        skip=floor(numpoints/value(1));         
         skip=max(skip,1);
         points=(value(2)+1)*skip;        
     otherwise        
@@ -155,7 +154,7 @@ switch choice
 end
 
 % calculate duration/advance and blocks/overlap
-duration=points*dt;
+duration=(points-1)*dt;
 advance=skip*dt;
 blocks=floor(numpoints/skip);
 overlap=(points/skip)-1;
