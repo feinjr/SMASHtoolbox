@@ -1,6 +1,6 @@
 % This class manages FFT options in various parts of the SMASH package
 %
-% See also General
+% See also SMASH.General
 % 
 
 %

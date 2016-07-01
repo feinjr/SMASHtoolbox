@@ -14,11 +14,11 @@
 % that matches more than one file, the object is contructed from the sum of
 % the individual files (consistent size required).
 %
-% See also SignalAnalysis, FileAccess.SupportedFormats
+% See also SMASH.SignalAnalysis, SMASH.FileAccess.SupportedFormats
 %
 
 %
-%
+% created July 1, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef SignalGroup < SMASH.SignalAnalysis.Signal
     properties (SetAccess=?SMASH.General.DataClass)
