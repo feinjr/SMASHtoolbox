@@ -6,7 +6,8 @@
 %    object=ShortTime(filename,format,record); % build from file
 % Signal information is stored in the Measurement property.
 %
-% See also SMASH.SignalAnalysis, SMASH.SignalAnalysis.Signal
+% See also SMASH.SignalAnalysis, SMASH.SignalAnalysis.Signal,
+% SMASH.FileAccess.SupportedFormats
 %
 
 %
@@ -32,8 +33,17 @@ classdef ShortTime
     %%
     methods (Hidden=true)
         function object=ShortTime(varargin)
-            if (nargin==1) && isa(varargin{1},'SMASH.SignalAnalysis.Signal')
-                object.Measurement=varargin{1};
+            if (nargin==1)
+                if strcmpi(varargin{1},'-empty')
+                    return % this mode is for subclass constructors
+                end
+                switch class(varargin{1})
+                    case 'SMASH.SignalAnalysis.Signal'
+                        object.Measurement=varargin{1};
+                    case 'SMASH.SignalAnalysis.ShortTime'   
+                        object=varargin{1};
+                        return
+                end
             else
                 object.Measurement=SMASH.SignalAnalysis.Signal(varargin{:});
             end

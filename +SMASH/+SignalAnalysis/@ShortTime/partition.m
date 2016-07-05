@@ -84,7 +84,7 @@ if nargout==0
 elseif nargin==1
     fprintf('No partitions specified--using default settings\n');
     choice='blocks';
-    value=1000;
+    value=10;
 elseif (nargin==2) && isstruct(varargin{1})
     object.Partition=varargin{1};
     varargout{1}=object;
@@ -145,7 +145,7 @@ switch choice
         end
         value(1)=round(value(1));
         assert(value(1)>1,'ERROR: blocks value must be greater than 1');        
-        assert(value(2)>=0,'ERROR: Overlap value must be greater than or equal to 0');                       
+        %assert(value(2)>=0,'ERROR: Overlap value must be greater than or equal to 0');                       
         skip=floor(numpoints/value(1));         
         skip=max(skip,1);
         points=(value(2)+1)*skip;        

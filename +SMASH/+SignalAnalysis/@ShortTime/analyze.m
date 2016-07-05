@@ -3,47 +3,61 @@
 % This method applies a target function to local regions in a ShortTime
 % object.
 %    result=analyze(object,target);
-% The target function should be passed as a function handle.  Inline
-% functions can be used:
-%    target=@(x,y) mean(y); % local mean
-%    target=@(x,y) sqrt(mean(y.^2)); % local RMS
-% Function files, such as target=@myfunction, can also be used so long as
-% the function accepts two inputs and returns at least one output
-% (additional outputs are ignored).  The inputs are column arrays whose
-% length matching object's the "points" parameter; function's output can be
-% a scalar or one-dimenional array.  The method's
-% output "result" is a SignalGroup object, with function evaluations stored
-% in the Data property and regional time centers stored in the Grid
-% property.
+% Target functions must accept one input and return at least one output.
+% The function's output is collected from each local region and returned as
+% a SignalGroup object ("result");
+% 
+% Local regions are passed as Signal objects to the target function.  The
+% "Grid" and "Data" properties of this object hold the information for
+% local analysis.  The following example illustrates a local median
+% calculation.
+%    result=analyze(object,@(local) median(local.Data));
+% Function files can be be used for more involved calculations.
+%    function out=myfunc(local)
+%       out=nan(2,1);
+%       out(1)=median(local.Data);
+%       out(2)=variance(local.Data);
+%    end
+%    result=analyze(object,@myfunc);
+% Any function that accepts a Signal function as its first input and
+% returns a numeric array can be used as a local function.  The target
+% function can use additional inputs only if they are optional: the
+% statement "out=myfunc(local)" must be valid.  Functions with multiple
+% outputs are also acceptible, but only the first is used by this method.
+%
+% Numeric output from the local function ("out") can be an array of any
+% size.  Each element of this array forms one signal in a SignalGroup
+% object.  Local region centers are the time base for this object.
 %
 % This method automatically performs parallel processing when available.
-% If multiple MATLAB workers are present, regional evaluations are managed
-% with a parallelized "parfor" loop; otherwise, a standard "for" loop is
-% used.  Due to differences in how these loops may be evaluated, the target
-% function should *not* rely on evaluation order!
+% When multiple MATLAB workers are present, regional evaluations are
+% managed with a parallelized "parfor" loop; otherwise, a standard "for"
+% loop is used.  NOTE: target function should *not* assume that local
+% regions are evalualated in order!
 %
-% See also SMASH.SignalAnalysis.ShortTime, partition
+% See also SMASH.SignalAnalysis.ShortTime, partition, SMASH.SignalAnalysis.Signal, SMASH.SignalAnalysis.SignalGroup
 %
 
 %
 % created April 8, 2014 by Daniel Dolan (Sandia National Laboratories)
+% revised July 1, 2016 by Daniel Dolan
+%    -converted local information to Signal objects
 %
 function varargout=analyze(object,target_function)
 
 % handle input
 if (nargin<2) || isempty(target_function)
-    target_function=@(x,y) y;
+    warning('SMASH:ShortTime','No target function specified--using local mean');
+    target_function=@(local_obj) mean(local_obj.Data);
 end
-%assert(nargin==2,'ERROR: no target function specified');
 if ischar(target_function)
     target_function=str2func(target_function);
 end
-if ~isa(target_function,'function_handle')
-    error('ERROR: invalid target function');
-end
+assert(isa(target_function,'function_handle'),...
+    'ERROR: invalid target function')
 
-% analyze region of interest
-[time,signal]=limit(object.Measurement);
+% determine region of interest
+[time,~]=limit(object.Measurement);
 numpoints=numel(time);
 
 points=object.Partition.Points;
@@ -51,12 +65,15 @@ skip=object.Partition.Skip;
 
 right=points:skip:numpoints;
 left=right-points+1;
-center=(time(left)+time(right))/2;
-Niter=numel(center);
+tcenter=(time(left)+time(right))/2;
+Niter=numel(tcenter);
+
+% set up block analysis
+LocalFunction=@(index) analyzeBlock(object,index,target_function);
 
 % analyze the first block
 try
-    temp=analyzeBlock(time,signal,left(1):right(1),target_function);
+    temp=LocalFunction(left(1):right(1));
 catch exception
     message{2}='* Target function error *';
     message{3}=repmat('*',size(message{2}));
@@ -70,16 +87,14 @@ data(:,1)=temp(:);
 % analyze remaining blocks  
 if SMASH.System.isParallel
     fprintf('Performing analysis...');
-    parfor k=2:Niter
-        temp=analyzeBlock(time,signal,left(k):right(k),target_function);        
-        data(:,k)=temp(:);
+    parfor k=2:Niter                  
+        data(:,k)=LocalFunction(left(k):right(k));
     end
     fprintf('done!\n');
 else
     fprintf('Performing analysis...');
     for k=2:Niter
-        temp=analyzeBlock(time,signal,left(k):right(k),target_function);        
-        data(:,k)=temp(:);
+        data(:,k)=LocalFunction(left(k):right(k));    
     end
     fprintf('done!\n');
 end
@@ -87,7 +102,7 @@ end
 % handle output
 data=transpose(data);
 
-result=SMASH.SignalAnalysis.SignalGroup(center,data);
+result=SMASH.SignalAnalysis.SignalGroup(tcenter,data);
 result.GridLabel=object.Measurement.GridLabel;
 result.DataLabel='Result';
 label=cell(result.NumberSignals,1);
@@ -104,11 +119,20 @@ end
 
 end
 
-function out=analyzeBlock(time,signal,index,LocalFunction)
+%%
+function out=analyzeBlock(object,index,target_function)
 
-time=time(index);
-signal=signal(index);
+persistent local
+if isempty(local)
+    local=SMASH.SignalAnalysis.Signal([],nan);
+    local.GridLabel=object.Measurement.GridLabel;
+    local.DataLabel=object.Measurement.DataLabel;
+    local.Name='Local signal'; 
+    local.GraphicOptions.Title=object.Measurement.GraphicOptions.Title;
+end
 
-out=LocalFunction(time,signal);
+local=reset(local,object.Measurement.Grid(index),object.Measurement.Data(index));
+out=target_function(local);
+out=out(:);
 
 end
