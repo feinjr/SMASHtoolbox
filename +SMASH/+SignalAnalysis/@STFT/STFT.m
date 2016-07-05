@@ -43,6 +43,11 @@ classdef STFT < SMASH.SignalAnalysis.ShortTime
     end
     %% setters
     methods
+        function object=set.FFToptions(object,value)
+            assert(isa(value,'SMASH.General.FFToptions'),...
+                'ERROR: invalid FFToptions setting');            
+            object.FFToptions=value;
+        end
         function object=set.Normalization(object,value)
             assert(ischar(value),'ERROR: invalid Normalization setting');
             value=lower(value);
