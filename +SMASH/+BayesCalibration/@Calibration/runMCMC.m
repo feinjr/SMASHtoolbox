@@ -221,7 +221,11 @@ for MCMCloop=2:chainlength
         
         rsum=0; 
         for ii = 1:Nexp
-            rsum = rsum - lik_old(ii) - numel(r0)/2*log(2*pi)-sum(log(diag(chol(sig2{ii}))));
+            if isvector(sig2);
+                rsum - lik_old(ii) - numel(r0)/2*log(2*pi) - sum(0.5*log(sig2{ii}));
+            else
+                rsum = rsum - lik_old(ii) - numel(r0)/2*log(2*pi)-sum(log(diag(chol(sig2{ii}))));
+            end
         end
         
         b1 = b0 + rsum;
@@ -334,7 +338,7 @@ lik_new = zeros([1,Nexp]);
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*(phi.^2));
+    lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi);
 end
 
 alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
@@ -375,7 +379,7 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*(phi.^2));
+        lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi);
     end
     
     q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
@@ -443,7 +447,7 @@ for eNum = 1:Nexp
             for ii = 1:Nexp
                 %Update shared variables
                 trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*(phi.^2));
+                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi);
             end
             alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 
@@ -473,7 +477,7 @@ lik_old =zeros([1,Nexp]);
 for ii = 1:Nexp
     %Ensure shared variables are consistent with first experiment
     samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
-    lik_old(ii) = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*(phi.^2));
+    lik_old(ii) = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi);
 end
         
     

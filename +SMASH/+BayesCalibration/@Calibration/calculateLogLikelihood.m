@@ -31,7 +31,7 @@ n = length(r);
 if isvector(sig2);
     %sig2 = diag(sig2);
     %l = -sum(((r./1).^2)./(2.*sig2) + 0.5*log(sig2));
-    l = -sum(((r./1).^2)./(2.*sig2) -n/2*log(2*pi) + 0.5*log(sig2));
+    l = -sum(((r./1).^2)./(2.*sig2) + 0.5*log(sig2)) -n/2*log(2*pi);
 else 
     sig2inv = inv(sig2);
     %l = 0.5*r'*sig2inv*r + n/2*log(2*pi)+0.5*log(det(sig));
