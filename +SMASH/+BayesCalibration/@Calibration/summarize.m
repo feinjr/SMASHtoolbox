@@ -14,7 +14,7 @@
 %   
 %   >> [moments,correlations]=summarize(object,variables)
 %
-% where valid options include 'allinferred','inferred', 'cut', 'hyper', or 'all'
+% where valid options include 'inferred', 'cut', 'hyper', or 'all'
 %
 % See also Calibration, SMASH.MonteCarlo.Cloud
 %
@@ -25,7 +25,7 @@ function varargout=summarize(object,variables)
     
     % manage input
     if nargin < 2 || isempty(variables)
-        variables = 'allInferred';
+        variables = 'Inferred';
     end
     assert(ischar(variables),'ERROR: invalid variables specification. Choose from inferred, cut, hyper, or all');
     

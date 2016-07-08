@@ -20,7 +20,7 @@ function varargout=investigate(object,iterations,span,variables)
     assert(isnumeric(span) && isscalar(span),...
         'ERROR: invalid span setting');
     if nargin < 4 || isempty(variables)
-        variables = 'allinferred';
+        variables = 'inferred';
     end
         assert(ischar(variables),'ERROR: invalid variables specification. Choose from inferred, cut, hyper, or all');
     

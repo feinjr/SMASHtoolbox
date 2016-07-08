@@ -11,8 +11,7 @@
 % The variables to be viewed can be input as the first option:
 %       >> [htop, hbottom] = view(object,'variables')
 %
-% where valid options are 'allinferred' (default), 'inferred', 'cut', 
-%'hyper', and 'all'
+% where valid options are 'inferred' (default), 'cut', 'hyper', and 'all'
 %
 % A second option can be specified as 
 %
@@ -32,7 +31,7 @@
 function varargout=view(object,varargin)
 
 
-variables = 'allinferred';
+variables = 'inferred';
 plottype = 'histogram';
 
 Narg = length(varargin);
@@ -97,8 +96,8 @@ for i = 1:nc
         kdeh = line(dgrid,p); kdeh.LineWidth = 3; %kdeh.Color = [0.8 0.0 0.0];        
         
         %Plot normal distribution
-        mu = mean(c(:,i))
-        stdev = std(c(:,i))
+        mu = mean(c(:,i));
+        stdev = std(c(:,i));
         x=linspace(min(hh(i).BinEdges),max(hh(i).BinEdges),1000)';
         npdf = @(x) 1./(stdev.*sqrt(2*pi))*exp(-((x-mu).^2)./(2*stdev.^2));
         npd = npdf(dgrid);

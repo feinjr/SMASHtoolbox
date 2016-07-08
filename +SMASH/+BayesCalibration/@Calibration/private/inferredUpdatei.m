@@ -1,44 +1,23 @@
-function [I_add,newsamps,acc] = inferredUpdate(obj,addinferred,lik_old,params,samps,sig2,phi,qcov,drscale)
+function [newsamp,acc] = inferredUpdatei(obj,lik_old,samps,eNum,sNum,sig2,phi,qcov,drscale)
 
+newsamp = samps{eNum}(sNum);
 Nexp = length(samps);
 trialsamps = samps;
-I_add = params;
-newsamps = samps;
 acc = 0;
+propstep = 0;
 
-
+priorfunc = str2func(obj{eNum}.VariableSettings.PriorType{sNum});
+priorvals = num2cell(obj{eNum}.VariableSettings.PriorSettings{sNum});
 
 %Use Gaussian step if proposal is specified
 %if ~isempty(obj{eNum}.VariableSettings.ProposalStd) && isnumeric(obj{eNum}.VariableSettings.ProposalStd(sNum))
-[R,p] = chol(qcov);
-if ~isempty(qcov) && ~p
-        trialparams = params + randn(size(params))*R;
-        count = 0; trialsamps = samps;
-        for eNum = 1:length(obj)
-            for sNum=1:length(samps{eNum})
-                if addinferred{eNum}(sNum)
-                count = count+1;
-                priorfunc = str2func(obj{eNum}.VariableSettings.PriorType{sNum});
-                priorvals = num2cell(obj{eNum}.VariableSettings.PriorSettings{sNum});
-                trialsamps{eNum}(sNum) = trialparams(count);
-                end            
-            end
-        end 
-    
-    
+if qcov > 0
+    %propstep = obj{eNum}.VariableSettings.ProposalStd(sNum);
+    %= samps{eNum}(sNum) + Gauss(0,propstep);
+    trialsamps{eNum}(sNum) = samps{eNum}(sNum)+ randn*qcov*2;
 %Otherwise sample from prior
 else
-    count = 0; trialsamps = samps;
-        for eNum = 1:length(obj)
-            for sNum=1:length(samps{eNum})
-                if addinferred{eNum}(sNum)
-                count = count+1;
-                priorfunc = str2func(obj{eNum}.VariableSettings.PriorType{sNum});
-                priorvals = num2cell(obj{eNum}.VariableSettings.PriorSettings{sNum});
-                trialsamps{eNum}(sNum) = priorfunc(priorvals{:});
-                end            
-            end
-        end       
+    trialsamps{eNum}(sNum) = priorfunc(priorvals{:});  
 end
 
 
@@ -51,10 +30,8 @@ for ii = 1:Nexp
 end
 
 % Likelihood of priors
-%lprior_old = priorfunc(priorvals{:},samps{eNum}(sNum));
-%lprior_new = priorfunc(priorvals{:},trialsamps{eNum}(sNum));
-lprior_new = 0;
-lprior_old = 0;
+lprior_old = priorfunc(priorvals{:},samps{eNum}(sNum));
+lprior_new = priorfunc(priorvals{:},trialsamps{eNum}(sNum));
 
 alpha = min(1,exp(sum(lik_new)-sum(lik_old) + lprior_new - lprior_old));
 %alpha = min(0,sum(lik_new)-sum(lik_old) + lprior_new - lprior_old);
@@ -62,8 +39,7 @@ alpha = min(1,exp(sum(lik_new)-sum(lik_old) + lprior_new - lprior_old));
 if rand <= alpha
    acc = 1;  % Accept the candidate
    %prob = min(alpha,1);     % Accept with probability min(alpha,1)
-   I_add = trialparams;
-   newsamps = trialsamps;
+   newsamp = trialsamps{eNum}(sNum);
    return
 end
 

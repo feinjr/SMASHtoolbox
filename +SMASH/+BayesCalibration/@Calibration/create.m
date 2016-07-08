@@ -13,18 +13,20 @@ object.ModelSettings = struct;
 object.ModelSettings.Model = @func; %Function handle defining the model
 
 object.VariableSettings = struct;
-object.VariableSettings.Names = {}; %List of strings
-object.VariableSettings.PriorType = {}; %List of strings
-object.VariableSettings.PriorSettings = {}; %Array correspodning to type for each element
-object.VariableSettings.ProposalStd = []; %Array of proposal jumps for each variable (opt)
-object.VariableSettings.HyperSettings = {}; % {'PriorType',[settings],proposal jump} (opt)
-object.VariableSettings.Infer = []; %Array of logicals (opt)
-object.VariableSettings.Share = []; %Array of logicals (opt)
+object.VariableSettings.Names = {}; % List of strings
+object.VariableSettings.PriorType = {}; % List of strings
+object.VariableSettings.PriorSettings = {}; % Array correspodning to type for each element
 
-object.MCMCSettings.StartPoint = []; %Array of starting point of inferred variables
-object.MCMCSettings.ChainSize = 1e3;
+object.VariableSettings.HyperSettings = {}; % {'PriorType',[settings],proposal jump} (opt)
+object.VariableSettings.Infer = []; % Array of logicals (opt)
+object.VariableSettings.Share = []; % Array of logicals (opt)
+
+object.MCMCSettings.StartPoint = []; % Array of starting point of inferred variables
+object.MCMCSettings.ChainSize = 1e4; % Scalar value for length of chain 
+object.MCMCSettings.JointSampling = 'true'; % Option to switch between joint and individual updates
+object.MCMCSettings.ProposalCov = []; % Proposal covariance matrix for inferred variables (opt)
 object.MCMCSettings.DelayedRejectionScale = 0; % Enables DR algorithm (opt)
-object.MCMCSettings.AdaptiveInterval = 0; % Enables AM algorithm (opt)
+object.MCMCSettings.AdaptiveInterval = 1e2; % Enables AM algorithm (opt)
 
 
 

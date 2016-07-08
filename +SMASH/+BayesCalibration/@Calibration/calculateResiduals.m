@@ -26,7 +26,7 @@ if nargout == 1
     r = object.ModelSettings.Model(object,x);
     varargout{1} = r; 
 elseif nargout == 2
-    [r sig2] = object.ModelSettings.Model(object,x);
+    [r,sig2] = object.ModelSettings.Model(object,x);
     varargout{1} = r; 
     varargout{2} = sig2; 
 else
