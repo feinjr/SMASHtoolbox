@@ -17,6 +17,12 @@
 % not want this, add the extra tag 'persist'
 %   object=rotate(object,'left','persist');
 %
+% Calling this method with no input launches an interactive rotation
+% interface.
+%    object=rotate(object);
+%    object=rotate(object,'gui'); % same result
+%
+%
 % See also Image, flip
 %
 
