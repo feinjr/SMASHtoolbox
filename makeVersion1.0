@@ -1,14 +1,17 @@
 # create a clean branch
 git checkout master
-git branch -D version1
-git checkout --orphan version1
+git branch -D version1.0
+git checkout --orphan version1.0
 git rm -rf .
 
 # move approved content
 git checkout master *.m
 git checkout master *.txt
 git checkout master *.md
+
+git checkout master misc
 git checkout master programs
+
 git checkout master +SMASH/+FileAccess
 git checkout master +SMASH/+General
 git checkout master +SMASH/+Graphics
@@ -23,7 +26,10 @@ git commit -m "Created version1 branch"
 
 echo "1.0" > SMASHversion
 git add *
-git commit -m "Updated version file"
+git commit -m "Released version 1.0"
 
 # return to the master branch
 git checkout master
+
+git remote add origin git@github.com:SMASHtoolbox/version1.0.git
+git push -u origin version1
