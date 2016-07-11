@@ -10,6 +10,7 @@
 %    System            - system tools
 %
 % More specific packages are also provided.
+%    BayesCalibration  - Bayesian calibration (UNDER CONSTRUCTION)
 %    DynamicMaterials  - DMP routines (UNDER CONSTRUCTION)
 %    Graphics          - special plotting routines
 %    MonteCarlo        - Monte Carlo routines (UNDER CONSTRUCTION)
