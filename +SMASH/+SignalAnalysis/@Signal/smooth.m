@@ -2,17 +2,19 @@
 %
 % This method smooths the Data array in Signal objects, removing high
 % frequency content.  The general calling syntax is:
-%    >> object=smooth(object,choice,value);
+%     object=smooth(object,choice,value);
 % Three smoothing choices are supported.
-%    -'mean' performs local averaging (value specifies full width))
+%    -'mean' performs local averaging.  Value specifies full width.
+%    -'polynomial' uses Savitzky-Golay coefficients.  Value specifies
+%    the order and number of points (full width).
 %    -'kernel' uses value as a convolution kernel.
 % The last choice enables a variety of customizable operations to be
 % performed.  For example, an approximate numerical derivative can be
 % calculated as:
-%    >> derivative=smooth(object,'kernel',[-1 0 +1]/(2*h));
+%     derivative=smooth(object,'kernel',[-1 0 +1]/(2*h));
 % where h the grid spacing.  Another example, DC removal, is show below.
-%    >> kernel=[0 0 0 1 0 0 0]-repmat(1/7,[1 7]);
-%    >> new=smooth(object,'kernel',kernel);
+%     kernel=[0 0 0 1 0 0 0]-repmat(1/7,[1 7]);
+%     new=smooth(object,'kernel',kernel);
 %
 % See also Signal, sharpen
 %
