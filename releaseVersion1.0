@@ -32,4 +32,7 @@ git commit -m "Released version 1.0"
 git checkout master
 
 git remote add origin git@github.com:SMASHtoolbox/version1.0.git
-git push -u origin version1
+git push -u origin version1.0
+
+#
+git branch -d version1.0
