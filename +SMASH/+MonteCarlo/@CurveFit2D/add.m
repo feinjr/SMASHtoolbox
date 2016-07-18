@@ -79,6 +79,8 @@ while numel(varargin)>0
     end
 end
 
+object.Optimized=false;
+
 end
 
 function object=updateDomain(object,sub)

@@ -75,4 +75,6 @@ object=evaluate(object,'parameter',param);
 object.Parameter=param;
 object.Bound=bound;
 
+object.Optimized=false;
+
 end

@@ -26,7 +26,7 @@ AnalyticLineFit(table(:,1),table(:,2),sqrt(table(:,4)));
 
 figure;
 result={};
-object=define(object,@LineModel,[1.0 0.0],[]);
+object=define(object,@LineModel,[0.5 0.0],[]);
 
 ha(1)=subplot(2,1,1); box on; 
 text('Units','normalized','Position',[1 1],...

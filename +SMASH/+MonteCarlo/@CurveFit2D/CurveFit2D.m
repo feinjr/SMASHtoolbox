@@ -37,7 +37,8 @@ classdef CurveFit2D
         Model % Model function (function handle or string)
         Parameter % Model parameters (one-column array)
         Bound % Parameter bounds (two-column array)
-        CurvePoints % Model evaluation points (two-column array)      
+        CurvePoints % Model evaluation points (two-column array)
+        Optimized = false % Parameters optimized (true or false)
     end
     properties (SetAccess=protected) % eventually make hidden
         Slack % Model slack parameters       

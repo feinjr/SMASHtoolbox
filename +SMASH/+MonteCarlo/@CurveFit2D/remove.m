@@ -35,4 +35,6 @@ end
 object.MeasurementDensity=object.MeasurementDensity(keep);
 object.NumberMeasurements=sum(keep);
 
+object.Optimized=false;
+
 end

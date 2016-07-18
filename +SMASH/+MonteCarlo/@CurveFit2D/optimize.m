@@ -7,6 +7,8 @@
 % NOTE: the behavior of this method is senstivie to the AssumeNormal
 % property!
 %
+
+
 % By default, this method generates a warning if the optimized curve does
 % not pass near every measurment.  This warning can be suppressed as
 % follows.
@@ -22,62 +24,34 @@
 %
 % creaed March 8, 2016 by Daniel Dolan (Sandia National Laboratories)
 %
-function [object,miss]=optimize(object,options,silent)
+function [object,flag]=optimize(object)%,silent)
 
-% manage input
-if (nargin<2) || isempty(options)
-    options=object.OptimizationSettings;
-end
-try
-    optimset(options);
-catch
-    error('ERROR: invalid optimization settings');
-end
 
-if (nargin<3) || isempty(silent) || strcmpi(silent,'verbose')
-    silent=false;
-elseif strcmpi(silent,'silent')
-    silent=true;
-else
-    error('ERROR: invalid silent input');
-end
+%if (nargin<3) || isempty(silent) || strcmpi(silent,'verbose')
+%    silent=false;
+%elseif strcmpi(silent,'silent')
+%    silent=true;
+%else
+%    error('ERROR: invalid silent input');
+%end
 
 % perform optimization
-M=object.NumberMeasurements;
-miss=false(1,M);
-    function value=likelihood(slack)
-        object=evaluate(object,'slack',slack);        
-        maxdensity=zeros(1,M);
-        maxlocation=nan(M,2);
-        miss(:)=false;
-        for m=1:M % iterate over measurements
-            measurement=object.MeasurementDensity{m};            
-            if object.AssumeNormal
-                [temp,location]=findmax(measurement,'original',...
-                    object.CurvePoints,'normal');
-            else
-                 [temp,location]=findmax(measurement,'original',...
-                    object.CurvePoints,'general');
-            end
-            maxdensity(m)=temp;
-            maxlocation(m,:)=location;
-            if any(isnan(location))
-                miss(m)=true;
-            end            
-        end
-        value=-sum(log(maxdensity))/M; % sign flip converts minimization to maximization                               
-    end
-slack=fminsearch(@likelihood,object.Slack,options);
+options=object.OptimizationSettings;
+options.Display='none';
+[slack,~,flag]=fminsearch(@(p) -examine(object,p,'slack'),object.Slack,...
+    options);
 object=evaluate(object,'slack',slack);
 
-if ~silent && any(miss)
-    message={};
-    message{end+1}='Optimized mode misses one or more measurements:';
-    message{end+1}='   -A better parameter guess may resolve this problem.';
-    message{end+1}='   -A different model may be more appropriate.';
-    message{end+1}='   -Specified measurement variances may be too low.';
-    message{end+1}='   -There may be measurement outliers.';   
-    warning('SMASH:Curvefit2D','%s\n',message{:});
-end
+object.Optimized=true;
+
+% if ~silent && any(miss)
+%     message={};
+%     message{end+1}='Optimized mode misses one or more measurements:';
+%     message{end+1}='   -A better parameter guess may resolve this problem.';
+%     message{end+1}='   -A different model may be more appropriate.';
+%     message{end+1}='   -Specified measurement variances may be too low.';
+%     message{end+1}='   -There may be measurement outliers.';   
+%     warning('SMASH:Curvefit2D','%s\n',message{:});
+% end
 
 end
