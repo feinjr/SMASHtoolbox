@@ -14,4 +14,9 @@ else
     data=h5read(file,setname);
 end
 
+value=h5readatt(file,setname,'Sparse');
+if strcmpi(value,'yes')
+    data=sparse(data(:,1),data(:,2),data(:,3));
+end
+
 end
