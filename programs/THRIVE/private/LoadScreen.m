@@ -514,17 +514,28 @@ delete(hwait);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function data=DataReader(filename)
 
-[pname,fname,ext]=fileparts(filename);
+import SMASH.FileAccess.*
+
+[~,~,ext]=fileparts(filename);
 switch lower(ext)
     case '.dig'
         [y,x]=digread(filename);
         data=[x(:) y(:)];
+    case '.isf'
+        data=readFile(filename,'tektronix');
+        data=[data.Time(:) data.Signal(:)];
     case '.wfm'
         [y,x]=wfmread(filename);
         if isempty(y)
             [y,x]=yokowfmread(filename);
         end
         data=[x(:) y(:)];
+    case '.trc'
+        data=readFile(filename,'lecroy');
+        data=[data.Time(:) data.Signal(:)];
+    case {'.h5' '.bin'}
+        data=readFile(filename,'keysight');
+        data=[data.Time(:) data.Signal(:)];
     otherwise
         data=ColumnReader(filename);
 end
