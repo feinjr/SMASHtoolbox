@@ -24,12 +24,10 @@ if (nargin<3) || isempty(mode)
     mode='parameter';
 end
 
-M=object.NumberMeasurements;
-%fid=fopen('iteration.log','w');
-%cleanup=onCleanup(@() fclose(fid));
-
+% examine model for each measurement
 object=evaluate(object,mode,parameter);
-%fprintf(fid,'%10g ',object.Parameter);
+
+M=object.NumberMeasurements;
 maxdensity=zeros(1,M);
 maxlocation=nan(M,2);
 for m=1:M % iterate over measurements
@@ -43,11 +41,7 @@ for m=1:M % iterate over measurements
     end
     maxdensity(m)=temp;
     maxlocation(m,:)=location;
-    %if any(isnan(location))
-    %    miss(m)=true;
-    %end
 end
 likelihood=sum(log(maxdensity))/M;
-%fprintf(fid,'%10g\n',value);
 
 end

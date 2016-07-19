@@ -1,6 +1,6 @@
 % analyze Analyze parameter variation
 
-function [result,accept]=analyze(object,iterations,drop)
+function [result,accept]=analyze(object,iterations,drop,skip)
 
 % manage input
 assert(object.Optimized,'ERROR: model parameters must be optimized before this analysis can be performed');
@@ -8,10 +8,20 @@ assert(object.Optimized,'ERROR: model parameters must be optimized before this a
 if (nargin<2) || isempty(iterations)
     iterations=10e3;
 end
+assert(SMASH.General.testNumber(iterations,'integer','positive'),...
+    'ERROR: invalid number of iterations');
 
 if (nargin<3) || isempty(drop)
     drop=round(0.10*iterations);    
 end
+assert(SMASH.General.testNumber(drop,'integer','positive'),...
+    'ERROR: invalid number of drop points');
+
+if (nargin<4) || isempty(skip)
+    skip=1;
+end
+assert(SMASH.General.testNumber(skip,'integer','positive'),...
+    'ERROR: invalid number of skip points');
 
 % estimate parameter range
 origin=object.Parameter;
@@ -46,14 +56,26 @@ source=SMASH.MonteCarlo.Cloud(moments,[],iterations);
 
 draw=rand(iterations,1);
 
+% evaluate likelihoods
+likelihood=nan(iterations,1);
+if SMASH.System.isParallel
+    parfor n=1:iterations
+        likelihood(n)=examine(object,source.Data(n,:));
+    end
+else
+    for n=1:iterations
+        likelihood(n)=examine(object,source.Data(n,:));
+    end    
+end
+
 % Metropolis sampling
 accept=0;
 result=nan(iterations,Nparam);
 result(1,:)=source.Data(1,:);
-old=examine(object,result(1,:));
+old=likelihood(1);
 for n=2:iterations
     result(n,:)=source.Data(n,:);
-    new=examine(object,result(n,:));
+    new=likelihood(n);
     temp=exp(new-old);
     if temp >= draw(n);
         old=new;
@@ -63,7 +85,7 @@ for n=2:iterations
     end
 end
 
-result=result(drop:end,:);
+result=result(drop:skip:end,:);
 result=SMASH.MonteCarlo.Cloud(result,'table');
 
 accept=accept/iterations;

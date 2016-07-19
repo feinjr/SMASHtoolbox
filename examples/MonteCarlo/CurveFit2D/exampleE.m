@@ -64,11 +64,10 @@ linkaxes(ha,'xy');
 tic;
 %object.AssumeNormal=true;
 object.AssumeNormal=false;
-result=analyze(object,50);
-%result=analyze(object,500);
-summarize(result);
-verify(result,1000,0.90);
+[result,accept]=analyze(object,5000);
+%verify(result,1000,0.90);
 toc;
 
 result=configure(result,'VariableName',{'Slope 1','Intercept 1','Break','Slope 2'});
+summarize(result);
 view(result)
