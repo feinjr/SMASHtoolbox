@@ -40,6 +40,7 @@ h5create(file,setname,datasize,...
 h5write(file,setname,data,start,count);
 h5writeatt(file,setname,'RecordType','numeric');
 h5writeatt(file,setname,'Sparse','no');
+h5writeatt(file,setname,'Complex','no');
 
 if empty
     h5writeatt(file,setname,'Empty','yes');
