@@ -22,25 +22,25 @@ function ResObj = runMCMC(varargin)
 
 %% Load in all calibration objects
 obj={}; objcount = 0;
-for i = 1:nargin
-    if isobject(varargin{i})
+for ii = 1:nargin
+    if isobject(varargin{ii})
         objcount = objcount+1;
-        obj{objcount} = varargin{i};
+        obj{objcount} = varargin{ii};
     end
 end
 Nexp = numel(obj);
 
 % Object setup
-for i=1:Nexp 
+for ii=1:Nexp 
     %Default to all inferred
     if isempty(obj{1}.VariableSettings.Infer)
-        obj{i}.VariableSettings.Infer = true(size(obj{1}.VariableSettings.Names));
+        obj{ii}.VariableSettings.Infer = true(size(obj{1}.VariableSettings.Names));
     end
     
     %Default to no shared variables
     if isempty(obj{1}.VariableSettings.Share)
-        obj{i}.VariableSettings.Share = false(size(obj{1}.VariableSettings.Names));
-    end
+        obj{ii}.VariableSettings.Share = false(size(obj{1}.VariableSettings.Names));
+    end 
 end
 
 % Results configuration
@@ -69,6 +69,7 @@ for ii = 2:Nexp
 end
 NumberInferredVariables = length(InferredVariables);
 
+
 %Calculate error covariance first so it's not done every time
 r0={size(obj)}; 
 sig2={size(obj)}; 
@@ -95,8 +96,9 @@ end
 
 %Stating point likelihood
 lik_old =zeros([1,Nexp]);
+response = {lik_old};
 for ii = 1:Nexp 
-lik_old(ii) = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii});
+[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii});
 end
 
 
@@ -127,18 +129,25 @@ FC_chain(1,:) = FC_add;
 lik_chain(1,:)=sum(lik_old);
 
 %Hyper-parameter settings
-phi = 1;
 inferhyper = false;
+phi=ones([1,Nexp]); 
+a0 = []; b0 = [];
 if ~isempty(obj{1}.VariableSettings.HyperSettings)
-    inferhyper = true;
-    hyperchain = zeros([chainlength,1]);
+        inferhyper = true;       
+        for ii=1:Nexp
+            if ~isempty(obj{ii}.VariableSettings.HyperSettings)
+                phi(ii) = 1;
+                phi_priorvals = obj{ii}.VariableSettings.HyperSettings;
+                a0(ii) = phi_priorvals(1);
+                b0(ii) = phi_priorvals(2);
+            else
+                phi(ii) = phi(1);
+                a0(ii) = a0(1);
+                b0(ii) = b0(1);
+            end    
+        end
+    hyperchain = zeros([chainlength,Nexp]);
     hyperchain(1,:) = phi;
-
-    phi_priorvals = obj{1}.VariableSettings.HyperSettings;
-    
-    a0 = phi_priorvals(1);
-    b0 = phi_priorvals(2);
-    a1 = a0 + 0.5*numel(r0);
 end
 
 
@@ -176,7 +185,7 @@ if  ~isempty(obj{1}.MCMCSettings.AdaptiveInterval) && isnumeric(obj{1}.MCMCSetti
         if obj{1}.MCMCSettings.JointSampling
             sd = 2.38^2/NumberInferredVariables; %AM ideal covariance scaling
         else
-            sd = 2.38^2; %Single variable sampling : 50% acceptance rate
+            sd = 2.38^2/NumberInferredVariables; %Single variable sampling : 50% acceptance rate
         end
     
 end
@@ -205,7 +214,6 @@ for MCMCloop=2:chainlength
     end
     
     
-    
     if obj{1}.MCMCSettings.JointSampling
         % Apply single metropolis update for all variables
         JointUpdate;
@@ -214,27 +222,21 @@ for MCMCloop=2:chainlength
     end
       
     
-    
     %Update hyperparameter
-    if inferhyper
-        hyperchain(MCMCloop,:) = phi;
-        
-        rsum=0; 
-        for ii = 1:Nexp
-            if isvector(sig2);
-                rsum - lik_old(ii) - numel(r0)/2*log(2*pi) - sum(0.5*log(sig2{ii}));
+    if inferhyper   
+        for ii = 1:Nexp  
+            if isvector(sig2{ii});
+                b1 = b0(ii) + sum(((response_old{ii}./sqrt(sig2{ii})).^2)./2);
             else
-                rsum = rsum - lik_old(ii) - numel(r0)/2*log(2*pi)-sum(log(diag(chol(sig2{ii}))));
+                b1 = b0(ii) + 0.5*response_old{ii}'*sig2inv{ii}*response_old{ii};
             end
+            a1 = a0(ii) + 0.5*numel(response_old{ii});
+            phi(ii) = InvGamma(a1,b1);
         end
-        
-        b1 = b0 + rsum;
-        phi = InvGamma(a1,b1);
-     
+        hyperchain(MCMCloop,:) = phi;
     end
+
    
-       
-    
 % Update chains      
 I_chain(MCMCloop,:) = I_update; 
 accepted(MCMCloop,:) = acc;
@@ -335,10 +337,11 @@ end
 
 %Find likelihood of trial state
 lik_new = zeros([1,Nexp]);
+response_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi);
+    [lik_new(ii),response_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii));
 end
 
 alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
@@ -353,6 +356,7 @@ if rand <= alpha
    samps = trialsamps;
    lik_old = lik_new; 
    lprior_old = lprior_new;
+   response_old = response_new;
    %phi = trialphi;
 else
    acc = 0; 
@@ -376,15 +380,15 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     
     % Proposal likelihood
     lik_new2 =zeros([1,Nexp]);
+    response_new2 = {lik_new2};
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi);
+        [lik_new2(ii),response_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii));
     end
     
-    q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
-    
     % DR algorithm
+    q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
     alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
     L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
     alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
@@ -396,6 +400,7 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
        samps = trialsamps2;
        lik_old = lik_new2; 
        lprior_old = lprior_new2;
+       response_old = response_new2;
     else
        acc = 0; 
     end
@@ -419,7 +424,10 @@ savedsamps = samps;
 savedparams = I_update;
 savedpriors = lprior_old;
 
-propsteps = diag(R);
+if ~isempty(qcov)
+    propsteps = diag(R);
+end
+
 for eNum = 1:Nexp
     for sNum=1:length(samps{eNum})
         if addinferred{eNum}(sNum)
@@ -430,24 +438,27 @@ for eNum = 1:Nexp
             trialparams = I_update;
             lprior_new = lprior_old;
             
-            % Gaussian proposal
+            %Gaussian proposal
             if ~isempty(qcov)
-                trialparams(count) = trialparams(count) + randn*propsteps(count);
+                trialparams(count) = I_update(count) + randn*propsteps(count);
                 trialsamps{eNum}(sNum) = trialparams(count);
-            % Prior proposal
+            %Prior proposal
             else
                 trialparams(count) = priorfunc{count}(priorvals{count}{:});
                 trialsamps{eNum}(sNum) = trialparams(count);
-                lprior_new(count) = priorfunc{count}(priorvals{count}{:},trialsamps{eNum}(sNum));
             end
             
+            %Prior likelihood
+            lprior_new(count) = priorfunc{count}(priorvals{count}{:},trialsamps{eNum}(sNum));
 
             %Find likelihood of trial state
             lik_new = zeros([1,Nexp]);
+            response_new = {lik_new};
             for ii = 1:Nexp
                 %Update shared variables
                 trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi);
+                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii));
+                %lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
             end
             alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 
@@ -462,7 +473,53 @@ for eNum = 1:Nexp
             else
                acc(count) = 0; 
             end
-        
+            
+            
+             
+            %Delayed rejection (single stage)
+            if acc(count) == 0 && drscale > 0 && ~isempty(qcov)
+
+                %Reset to old at each step
+                trialsamps2 = samps;
+                trialparams2 = I_update;
+                lprior_new2 = lprior_old;
+                
+                %trialparams2(count) = trialparams(count) + randn*propsteps(count);
+                trialparams2(count) = I_update(count) + randn*propsteps(count);
+                trialsamps2{eNum}(sNum) = trialparams2(count);           
+
+                % Proposal likelihood
+                lik_new2 =zeros([1,Nexp]);
+                
+                for ii = 1:length(obj)
+                    %Update shared variables
+                    trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
+                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii));
+                    %lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii});
+                end
+                
+                %Prior likelihood
+                lprior_new2(count) = priorfunc{count}(priorvals{count}{:},trialsamps{eNum}(sNum));
+                
+                
+
+                % DR algorithm
+                q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
+                alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
+                L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
+                alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
+
+                if rand <= alpha13
+                    acc(count) = 1;  % Accept the candidate
+                    savedsamps{eNum}(sNum) = trialsamps2{eNum}(sNum);
+                    savedparams(count) = trialparams2(count);
+                    savedpriors(count) = lprior_new2(count);
+                else
+                    acc(count) = 0; 
+                end
+
+
+            end
 
         end            
     end
@@ -472,12 +529,13 @@ samps = savedsamps;
 I_update = savedparams;
 lprior_old = savedpriors;
 
+
 % Reset old likelihood
 lik_old =zeros([1,Nexp]);
+response_old = {lik_old};
 for ii = 1:Nexp
-    %Ensure shared variables are consistent with first experiment
-    samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
-    lik_old(ii) = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi);
+    [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii));
+    %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
         
     

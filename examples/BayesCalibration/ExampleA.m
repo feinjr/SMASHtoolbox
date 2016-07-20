@@ -27,10 +27,14 @@ obj.VariableSettings.PriorSettings = {[-50.0 50.0], [-50 50.0]};
 
 % MCMC settings
 obj.MCMCSettings.StartPoint = [0,0];
-obj.MCMCSettings.ChainSize = 1e4;
+obj.MCMCSettings.ChainSize = 1e3;
 obj.MCMCSettings.BurnIn = 0;
 obj.MCMCSettings.DelayedRejectionScale = 0;
 obj.MCMCSettings.AdaptiveInterval = 0;
+
+
+% Start with MAP point
+obj.MCMCSettings.StartPoint = calculateMAP(obj,obj.MCMCSettings.StartPoint);
 
 
 %Analytic solution
