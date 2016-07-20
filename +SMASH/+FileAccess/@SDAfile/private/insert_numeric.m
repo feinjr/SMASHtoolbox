@@ -1,11 +1,21 @@
 function insert_numeric(archive,setname,data,deflate)
 
-% handle empty arrays
+% manage empty arrays
 file=archive.ArchiveFile;
 empty=false;
 if isempty(data);
     empty=true;
     data=nan;
+end
+
+% manage complex arrays
+if ~isreal(data)
+    ArraySize=size(data);
+    data=[real(data(:)) imag(data(:))];
+    insert_numeric(archive,setname,data,deflate);
+    h5writeatt(file,setname,'Complex','yes');
+    h5writeatt(file,setname,'ArraySize',ArraySize);
+    return
 end
 
 % manage sparse arrays
