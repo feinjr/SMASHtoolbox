@@ -14,12 +14,20 @@ else
     data=h5read(file,setname);
 end
 
-value=h5readatt(file,setname,'Sparse');
+try
+    value=h5readatt(file,setname,'Sparse');
+catch
+    value='no';
+end
 if strcmpi(value,'yes')
     data=sparse(data(:,1),data(:,2),data(:,3));
 end
 
-value=h5readatt(file,setname,'Complex');
+try
+    value=h5readatt(file,setname,'Complex');
+catch
+    value='no';
+end
 if strcmpi(value,'yes')
     data=data(:,1)+1i*data(:,2);
     ArraySize=h5readatt(file,setname,'ArraySize');
