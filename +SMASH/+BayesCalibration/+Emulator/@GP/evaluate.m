@@ -18,7 +18,7 @@
 %
 % created June 20, 2016 by Justin Brown (Sandia National Laboratories)
 %
-function varargout=evaluate(object,x)
+function [y,dy,mse,dmse]=evaluate(object,x)
 
 % % handle input
 % if (nargin)
@@ -62,10 +62,10 @@ else
 
 end
 
-varargout{1} = y;
-varargout{2} = dy;
-varargout{3} = mse;
-varargout{4} = dmse;  
+%varargout{1} = y;
+%varargout{2} = dy;
+%varargout{3} = mse;
+%varargout{4} = dmse;  
     
 end
     

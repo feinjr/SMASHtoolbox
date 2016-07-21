@@ -28,17 +28,21 @@ obj.VariableSettings.PriorSettings = {[5.35 0.1], [1.35 0.1]};
 obj.VariableSettings.HyperSettings = [];
 %obj.VariableSettings.HyperSettings = {'InvGamma',[104,103]};
 %obj.VariableSettings.HyperSettings = {'Gauss',[1,0.1]};
-obj.VariableSettings.HyperSettings = [104,103];
+%obj.VariableSettings.HyperSettings = [104,103];
+%obj.VariableSettings.HyperSettings = [1.75,1.75/5];
 
 
 % MCMC settings
-obj.MCMCSettings.StartPoint = [5.35,1.35];
-obj.MCMCSettings.ProposalCov = [0.02,0.01].^2;
+obj.MCMCSettings.StartPoint = [1,1];
+obj.MCMCSettings.ProposalCov = 2.4^2/2*[0.015,0.01].^2;
 obj.MCMCSettings.ChainSize = 1e4;
 obj.MCMCSettings.BurnIn = 0;
 obj.MCMCSettings.DelayedRejectionScale = 0;
-obj.MCMCSettings.AdaptiveInterval = 1e2;
+obj.MCMCSettings.AdaptiveInterval = 5e2;
 obj.MCMCSettings.JointSampling = true;
+
+% Start with MAP point
+obj.MCMCSettings.StartPoint = calculateMAP(obj,obj.MCMCSettings.StartPoint);
 
 %% Run MCMC
 profile off
@@ -48,7 +52,7 @@ Results = runMCMC(obj);
 toc
 
 %% check results
-summarize(Results,'allinferred')
-view(Results,'allinferred','histogram')
-view(Results,'allinferred','covariance');
-
+summarize(Results,'inferred')
+view(Results,'inferred','histogram')
+view(Results,'inferred','covariance');
+std(Results.MCMCResults.InferredChain)

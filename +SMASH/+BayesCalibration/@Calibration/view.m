@@ -56,19 +56,32 @@ if strcmpi(variables,'cut')
 end
 
 if strcmpi(variables,'hyper')
-    varnames = {'phi'};
     c  = object.MCMCResults.HyperParameterChain;
+    [nr nc] = size(c);
+    for ii = 1:nc
+        varnames{ii} = sprintf('phi%i',ii);
+    end
 end
 
 if strcmpi(variables,'allinferred')
-    varnames = horzcat(object.MCMCResults.InferredVariables,'phi');
-    c  = horzcat(object.MCMCResults.InferredChain,object.MCMCResults.HyperParameterChain);
+    c  = object.MCMCResults.HyperParameterChain;
+    [nr nc] = size(c);
+    for ii = 1:nc
+        varnames{ii} = sprintf('phi%i',ii);
+    end
+    varnames = horzcat(object.MCMCResults.InferredVariables,varnames);
+    c  = horzcat(object.MCMCResults.InferredChain,c);
 end
 
 
 if strcmpi(variables,'all')
-    varnames = horzcat(object.MCMCResults.InferredVariables,'phi',object.MCMCResults.CutVariables);
-    c  = horzcat(object.MCMCResults.InferredChain,object.MCMCResults.HyperParameterChain,object.MCMCResults.CutChain);
+    c  = object.MCMCResults.HyperParameterChain;
+    [nr nc] = size(c);
+    for ii = 1:nc
+        varnames{ii} = sprintf('phi%i',ii);
+    end
+    varnames = horzcat(object.MCMCResults.InferredVariables,varnames,object.MCMCResults.CutVariables);
+    c  = horzcat(object.MCMCResults.InferredChain,c,object.MCMCResults.CutChain);
 end
 
 

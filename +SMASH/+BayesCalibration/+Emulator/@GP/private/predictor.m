@@ -67,7 +67,7 @@ function  [y, or1, or2, dmse] = predictor(x, dmodel)
       end
       if  nargout > 2  % MSE wanted
         
-        rt = dmodel.C \ r;
+        rt = sparse(dmodel.C) \ r;
         u = dmodel.Ft.' * rt - f.';
         v = dmodel.G \ u;
         or2 = repmat(dmodel.sigma2,mx,1) .* repmat((1 + sum(v.^2) - sum(rt.^2))',1,q);

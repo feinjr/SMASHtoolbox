@@ -34,19 +34,33 @@ function varargout=investigate(object,iterations,span,variables)
         cloudtable  = object.MCMCResults.CutChain;
     end
     
-    if strcmpi(variables,'hyper')
-        cloudvars = {'phi'};
+    if strcmpi(variables,'hyper')      
         cloudtable  = object.MCMCResults.HyperParameterChain;
+        [nr nc] = size(cloudtable);
+        for ii = 1:nc
+            cloudvars{ii} = sprintf('phi%i',ii);
+        end
     end
     
     if strcmpi(variables,'allinferred')
-        cloudvars = horzcat(object.MCMCResults.InferredVariables,'phi');
-        cloudtable  = horzcat(object.MCMCResults.InferredChain,object.MCMCResults.HyperParameterChain);
+        cloudtable  = object.MCMCResults.HyperParameterChain;
+        [nr nc] = size(cloudtable);
+        for ii = 1:nc
+            cloudvars{ii} = sprintf('phi%i',ii);
+        end
+        cloudvars = horzcat(object.MCMCResults.InferredVariables,cloudvars);
+        cloudtable  = horzcat(object.MCMCResults.InferredChain,cloudtable);
     end
     
+    
     if strcmpi(variables,'all')
-        cloudvars = horzcat(object.MCMCResults.InferredVariables,'phi',object.MCMCResults.CutVariables);
-        cloudtable  = horzcat(object.MCMCResults.InferredChain,object.MCMCResults.HyperParameterChain,object.MCMCResults.CutChain);
+        cloudtable  = object.MCMCResults.HyperParameterChain;
+        [nr nc] = size(cloudtable);
+        for ii = 1:nc
+            cloudvars{ii} = sprintf('phi%i',ii);
+        end
+        cloudvars = horzcat(object.MCMCResults.InferredVariables,cloudvars,object.MCMCResults.CutVariables);
+        cloudtable  = horzcat(object.MCMCResults.InferredChain,cloudtable,object.MCMCResults.CutChain);
     end
     
     
