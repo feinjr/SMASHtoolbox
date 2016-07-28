@@ -44,6 +44,9 @@ classdef ShortTime
                         object=varargin{1};
                         return
                 end
+                try
+                    object.Measurement=SMASH.SignalAnalysis.Signal(varargin{:});
+                end
             else
                 object.Measurement=SMASH.SignalAnalysis.Signal(varargin{:});
             end
