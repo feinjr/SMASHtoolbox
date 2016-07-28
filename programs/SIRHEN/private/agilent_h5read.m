@@ -1,34 +1,11 @@
-% agilent_h5read : read Agilent HDF5 binary data files
-%
-% This function reads files data created by Agilent digitizers
-% stored in the HDF5 format (*.h5).  These files contain one or more
-% signals in a binary format.
-%
-% Usage:
-%   >> [signal,time,label]=agilent_h5read(filename,index);
-% If filename is omitted or empty (''), the user will be prompted to
-% select a file.  If the index is omitted, the function returns the first
-% signal stored in the file.  Specific signals can be accessed by passing
-% an integer:
-%   >> [signal,time]=agilent_h5read(filename,2);
-% Setting index='all' returns every signal from the file; passing
-% index='gui' prompts the user to select a *single* signal within the file.
-%
-% When a single signal is extracted, the function return numerical
-% (signal/time) and textual (label) arrays.  Cell array outputs are used
-% for multiple signal extraction.
+function [signal,time]=read_agilent(filename,index)
 
-% created December 19, 2011 by Daniel Dolan (Sandia National Labs)
-% updated June 25, 2012 by Daniel Dolan
-%    -signal and time forced to be double precision
-function [signal,time,label]=agilent_h5read(filename,index)
-
-% handle input
+% manage input
 if (nargin<1) || isempty(filename)
     types={};
-    types(end+1,:)={'*.h5;*.H5','Agilent HDF5 files'};
+    types(end+1,:)={'*.h5;*.H5','Agilent/Keysight HDF5 files'};
     types(end+1,:)={'*.*','All files'};
-    [filename,pathname]=uigetfile(types,'Select Agilent data file');
+    [filename,pathname]=uigetfile(types,'Select Agilent/Keysight data file');
     if isnumeric(filename) % user pressed cancel
         return
     end
@@ -39,53 +16,100 @@ if (nargin<2) || isempty(index)
     index=1;
 end
 
-% extract header information
-info=hdf5info(filename);
-info=info.GroupHierarchy.Groups(3);
-num_signal=info.Attributes.Value;
-
-% prompt user to select signal (GUI mode)
-if strcmpi(index,'gui')
-    choice=cell(num_signal,1);
-    for n=1:num_signal
-        [~,choice{n}]=fileparts(info.Groups(n).Name);
-    end
-    [index,ok]=listdlg(...
-        'PromptString','Select signal for import',...
-        'Name','Select signal',...
-        'ListString',choice,...
-        'SelectionMode','single');
-    if ~ok % user pressed cancel or closed the dialog
-        return
-    end    
-elseif strcmp(index,'all')
-    index=1:num_signal;
-end  
-
 % extract data
-[signal,time,label]=deal(cell(numel(index),1));
-for n=1:numel(index)
-    group=info.Groups(index(n));
-    label{n}=group.Name;
-    name=group.Datasets.Name;
-    if exist('h5read','file')
-        signal{n}=h5read(filename,name);
-    elseif exist('hdf5read','file')
-        signal{n}=hdf5read(filename,name);
-    else
-        error('ERROR: unable to read HDF5 files in this version of MATLAB');
-    end
-    signal{n}=double(signal{n}(:));
-    numpoints=numel(signal{n});
-    dx=group.Attributes(8).Value;
-    left=group.Attributes(9).Value;    
-    right=left+(numpoints-1)*dx;
-    time{n}=left:dx:right;
-    time{n}=double(time{n}(:));
+report=probe_agilent(filename);
+[~,~,ext]=fileparts(filename);
+switch lower(ext)
+    case '.h5'
+        [time,signal]=read_agilentH5(filename,index,report);
+    case '.bin'
+        [time,signal]=read_agilentBIN(filename,index,report);
 end
 
 if numel(signal)==1
     signal=signal{1};
     time=time{1};
-    label=label{1};
+end
+
+end
+
+%%
+function [time,signal]=read_agilentH5(filename,index,report)
+
+try
+    report.Name=report.Name(index);
+    report.GroupName=report.GroupName(index);
+    report.DatasetName=report.DatasetName(index);
+    report.NumberSignals=numel(index);
+catch
+    error('ERROR: invalid signal index');
+end
+
+[signal,time]=deal(cell(numel(index),1));
+for n=1:numel(index)
+    % read attributes
+    info=h5info(filename,report.GroupName{n});
+    N=numel(info.Attributes);
+    [name,value]=deal(cell(1,N));
+    for k=1:N
+        temp=info.Attributes(k);
+        name{k}=temp.Name;
+        value{k}=temp.Value;
+    end
+    attribute=cell2struct(value,name,2);
+    % read/convert data
+    signal{n}=h5read(filename,report.DatasetName{n});
+    if isinteger(signal{n})
+        signal{n}=double(signal{n});
+        y0=double(attribute.YOrg);
+        dy=double(attribute.YInc);
+        signal{n}=y0+dy*signal{n};
+    else
+        signal{n}=double(signal{n}(:));
+    end
+    numpoints=double(attribute.NumPoints);
+    dx=double(attribute.XInc);
+    left=double(attribute.XOrg);
+    right=left+(numpoints-1)*dx;
+    time{n}=left:dx:right;
+    time{n}=double(time{n}(:));
+end
+
+end
+
+%%
+function [time,signal]=read_agilentBIN(filename,index,report)
+
+index=report.IndexTable(index,2:3);
+
+try
+    info=report.Waveform(index(1)).Dataset(index(2));
+catch
+    error('ERROR: invalid index');
+end;
+
+Npoints=report.Waveform(index(1)).Points;
+switch info.BufferType
+    case 0
+        % unknown data
+    case {1 2 3}
+        format='single';
+    case {4 5}
+        % not used?
+    case 6
+        format='uint8';
+    otherwise
+        error('ERROR: unrecogized buffer type')
+end
+
+fid=fopen(filename,'r','ieee-le');
+fseek(fid,info.Start,'bof');
+signal=fread(fid,Npoints,format);
+fclose(fid);
+
+tmin=report.Waveform(index(1)).XOrigin;
+dt=report.Waveform(index(1)).XIncrement;
+tmax=tmin+dt*(Npoints-1);
+time=tmin:dt:tmax;
+
 end

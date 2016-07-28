@@ -171,7 +171,10 @@ try
         case '.dig'
             [signal,time]=digread(data.inputfile);
         case '.h5'
-            [signal,time]=agilent_h5read(data.inputfile,'gui');
+            %[signal,time]=agilent_h5read(data.inputfile,'gui');
+            temp=SMASH.FileAccess.readFile(data.inputfile,'agilent');
+            time=temp.Time;
+            signal=temp.Signal;
         case '.trc'
             [signal,time]=trcread(data.inputfile);
         otherwise
