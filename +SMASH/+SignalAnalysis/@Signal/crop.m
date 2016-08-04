@@ -16,13 +16,21 @@
 function object=crop(object,bound)
 
 % handle input
-if nargin<2
-    error('ERROR: crop bounds are required');
+if nargin==1 || strcmpi(bound,'manual') || isempty(bound)
+    h=view(object);
+    haxes=ancestor(h,'axes');
+    title(haxes,'Use zoom/pan to select crop region');    
+    fig=ancestor(haxes,'figure');
+    hc=uicontrol('Parent',fig,...
+        'Style','pushbutton','String',' Done ',...
+        'Callback','delete(gcbo)');
+    waitfor(hc);
+    bound=xlim;    
+    close(fig);
 end
 
-if isempty(bound) || (numel(bound)~=2)
-    error('ERROR: two bound values are needed');
-end
+assert(isnumeric(bound) && (numel(bound)==2),...
+    'ERROR: two bound values are needed');
 bound=sort(bound);
 
 % crop the object

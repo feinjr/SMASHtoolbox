@@ -62,8 +62,10 @@ if ~isreal(object.Data)
     object.DataLim='auto';
     name=object.GraphicOptions.Title;
     data=object.Data;
-    h=basic_figure;
-    set(h.figure,'Name','Complex Image view');
+    %h=basic_figure;
+    fig=SMASH.MUI.Figure;
+    h.fig=fig.Handle;
+    set(h.fig,'Name','Complex Image view');
     ha(1)=subplot(1,2,1);
     object.Data=real(data);   
     object.GraphicOptions.Title=sprintf('Real part of "%s"',name);

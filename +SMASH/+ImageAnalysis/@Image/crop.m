@@ -15,7 +15,7 @@
 function object=crop(object,bound1,bound2)
 
 % handle input
-if strcmpi(bound1,'manual') || strcmpi(bound2,'manual')
+if (nargin==1) || strcmpi(bound1,'manual') || strcmpi(bound2,'manual')
     h=view(object,'show');
     title(h.axes,'Use zoom/pan to select crop region');    
     hc=uicontrol('Parent',h.panel,...
