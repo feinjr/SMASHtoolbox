@@ -45,7 +45,7 @@ T0=object.T0;
 fitobj=SMASH.CurveFit.Curve;
 options=optimset('Display','final');
 fitfun=@(p,x) calculateVinet(object,x,T0,p);
-fitobj = add(fitobj,fitfun,pIC,'lower',p_lower,'upper',p_upper,'FixScale',false);
+fitobj = add(fitobj,fitfun,pIC,'lower',p_lower,'upper',p_upper,'FixScale',true);
 
 %Fit CurveFit object and evaluate least squares error
 fitobj = fit(fitobj,[rhoData(:) pData(:)],options);

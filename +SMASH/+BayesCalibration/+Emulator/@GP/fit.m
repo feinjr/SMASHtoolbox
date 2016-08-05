@@ -51,7 +51,7 @@ ub = object.Settings.Theta0_UpperBound;
 
 % Fit using same theta for every residual
 if sametheta
-    disp('Fitting GP using same correlation coefficients for all residuals')
+    %disp('Fitting GP using same correlation coefficients for all residuals')
     object.DACEFit = dacefit(object.VariableData,object.ResponseData,object.Settings.TrendFunction,object.Settings.CorrFunction,theta,lb,ub);
 else
 % Fit using a different theta for each residual, store as cell array of
