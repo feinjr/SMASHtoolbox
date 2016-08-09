@@ -1,22 +1,20 @@
 % ISENTROPE  Generate a curve of constant entropy from a sesame table object
 %
 % This method returns the new isentrope object for the input array
-% of densities, initial pressure (P0), initial density (rho), and initial
-% particle velocity up1. 
+% of densities, initial density (rho0), initial temperatutre (T0), and 
+% initial particle velocity up0. 
 %
 %    Usage:
 %    >> new =isentrope(object,density)
-%    >> new =isentrope(object,density,P0,rho0,up1)
+%    >> new =isentrope(object,density,rho0,T0,up0)
 %
-% Care should be taken with the density array and initial pressure. The
-% first value of density and this pressure defines the initial state. If
-% this is a shocked state, then density(1), P0 should correspond to that
-% Hugoniot state. The path is then integrated along the density : a
-% compression should be an increasing density array while a release should
-% be decreasing. The step size for the integration is the step between
-% densities so this dictates the accuracy. Rho0 and up1 are only used to
-% convert between Eulerian and Lagrangian soundspeeds, and to define the
-% initial particle velocity, respectively.
+% Care should be taken with the density array and initial values. An
+% attempt is made to ensure consistency with the initial state but it is
+% best if rho(1) = rho0. A compression should be an increasing density array 
+% while a release should be decreasing. The step size for the integration 
+% is the step between densities so this dictates the accuracy. Rho0 and up1 
+% are only used to convert between Eulerian and Lagrangian soundspeeds, and 
+% to define the initial particle velocity, respectively.
 %
 % See also Sesame, hugoniot, isobar, isochor, isotherm
 %
@@ -35,15 +33,21 @@ object = varargin{1};
 density = varargin{2};
 
 %Assume STP for rho0
-rho0 = stp(object,density(1)); rho0 = rho0.Density;
-P0=0;
+st = stp(object,density(1)); 
+rho0 = st.Density;
+T0 = st.Temperature
+P0=st.Pressure;
 up1 = 0;
 
 if nargin > 2
-    P0 = varargin{3};
+    rho0 = varargin{3};
+    if rho0 > density(1)
+        temp = rho > rho0;
+        rho = rho(temp);
+    end
 end
 if nargin > 3
-    rho0 = varargin{4};
+    T0 = varargin{4};
 end    
 if nargin > 4
     up1 = varargin{5};
@@ -54,8 +58,6 @@ if ~isnumeric(density) || min(size(density)) > 1
 end
 
 %Lookup initial state
-T0 = reverselookup(object,'Pressure',P0,density(1));
-T0 = fzero(@(x) lookup(object,'Pressure',density(1),x)-P0,T0);
 S0 = lookup(object,'Entropy',density(1),T0);
 E0 = lookup(object,'Energy',density(1),T0);
 

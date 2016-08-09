@@ -76,6 +76,23 @@ for eNum = 1:length(obj)
 end 
 
 
+
+%Calculate error covariance first so it's not done every time
+r0={size(obj)}; 
+sig2={size(obj)}; 
+for ii = 1:Nexp
+    [rt, sig2t]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
+    r0{ii} = sig2t;
+    sig2{ii} = sig2t;
+    if isvector(sig2{ii})
+         sig2inv{ii} = inv(diag(sig2t));
+    else
+        sig2inv{ii} = inv(sig2t);
+    end
+end
+
+
+
 % Use fminsearch to find maximum likelihood
 params = fminsearch(@fMAP,I_update);
 
@@ -104,7 +121,7 @@ end
         %Likelihoods
         lik = 0;
         for ii = 1:Nexp 
-            lik(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
+            lik(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},sig2inv{ii});
         end
         
         

@@ -148,6 +148,7 @@ elseif strcmpi(plottype,'covariance')
     cobj = SMASH.MonteCarlo.Cloud(c,'table');
     cobj = configure(cobj,'VariableName',varnames);
     view(cobj,'lower');
+    
 % %Plot cov
 % FS = 12;
 % FScov = FS*2;

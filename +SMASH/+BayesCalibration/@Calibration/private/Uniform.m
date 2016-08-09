@@ -22,13 +22,20 @@ if ~(isscalar(ub) && isscalar(lb))
     error('ERROR : Lower and upper bounds need to be scalars')
 end
 if nargin == 2
+
     l = lb+(ub-lb).*rand(1); % return a sample from the distribution
+
 elseif nargin == 3
     
     %Return the log-likelihood and it's derivative
-    N = numel(x);
-    l  = -N.*log(ub-lb);
-    dl = 0;
+    if x<lb || x >ub
+        l = -inf;
+        dl = -inf;
+    else
+        N = numel(x);
+        l  = -N.*log(ub-lb);
+        dl = 0;
+    end
     
     
 else

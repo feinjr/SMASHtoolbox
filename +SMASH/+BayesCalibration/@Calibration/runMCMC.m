@@ -43,7 +43,8 @@ for ii=1:Nexp
     end 
 end
 
-% Results configuration
+% Results configuration - only output 1 object
+% Copy properties if only 1 object, otherwise just keep the first settings
 if objcount == 1;
     ResObj = obj{1};
 else
@@ -55,11 +56,14 @@ end
 
 
 %Variable Bookeeping
+%Seperate first objects inferred and feedback cut variables
 addinferred{1} = obj{1}.VariableSettings.Infer;
 InferredVariables = obj{1}.VariableSettings.Names(addinferred{1});
 addcut{1} = ~obj{1}.VariableSettings.Infer;
 CutVariables = obj{1}.VariableSettings.Names(addcut{1});
 for ii = 2:Nexp    
+    %Loop through each other object and save new inferred and cut variables
+    %if they are not shared with the first object.
     addinferred{ii} = obj{ii}.VariableSettings.Infer & ~obj{ii}.VariableSettings.Share;
     addcut{ii} = ~obj{ii}.VariableSettings.Infer & ~obj{ii}.VariableSettings.Share;
     addn = obj{ii}.VariableSettings.Names(addinferred{ii});
@@ -69,14 +73,16 @@ for ii = 2:Nexp
 end
 NumberInferredVariables = length(InferredVariables);
 
-
 %Calculate error covariance first so it's not done every time
-r0={size(obj)}; 
-sig2={size(obj)}; 
+r0={size(obj)}; %Initial residuals saved as a cell for each object
+sig2={size(obj)}; %Initial covariance saved as a cell for each object
 for ii = 1:Nexp
+    %User model must return residuals and covariance
     [rt, sig2t]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
     r0{ii} = sig2t;
     sig2{ii} = sig2t;
+    %Speedups in code if covariance is a diagonal matrix, this is tracked
+    %but the inverse is carried as a matrix.
     if isvector(sig2{ii})
          sig2inv{ii} = inv(diag(sig2t));
     else
@@ -85,10 +91,14 @@ for ii = 1:Nexp
 end
 
 %Setup initial conditions
+%Inferred variables chain start, object 1
 I_update = obj{1}.MCMCSettings.StartPoint(obj{1}.VariableSettings.Infer);
+%Cut variables chain start, object 1
 FC_add = obj{1}.MCMCSettings.StartPoint(~obj{1}.VariableSettings.Infer);
+%Samps is current value of inferred variables
 samps{1} = obj{1}.MCMCSettings.StartPoint; 
-for ii = 2:Nexp    
+%Add on terms for the rest of objects
+for ii = 2:Nexp
     I_update = horzcat(I_update,obj{ii}.MCMCSettings.StartPoint(addinferred{ii}));
     FC_add = horzcat(FC_add,obj{ii}.MCMCSettings.StartPoint(addcut{ii}));
     samps{ii} = obj{ii}.MCMCSettings.StartPoint; 
@@ -97,14 +107,17 @@ end
 %Stating point likelihood
 lik_old =zeros([1,Nexp]);
 response = {lik_old};
+%For each experiment calculate the log-likelihood and residuals
 for ii = 1:Nexp 
-[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii});
+[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii});
 end
-
 
 % Starting prior likelihood
 lprior_old = zeros([1,NumberInferredVariables]);
 count = 0;
+%Loop through each experiment and then each inferred variable and calculate
+%the prior function and values. These are saved for future use before
+%evaluating the starting point.
 for eNum = 1:length(obj)
     for sNum=1:length(samps{eNum})
         if addinferred{eNum}(sNum)
@@ -116,22 +129,31 @@ for eNum = 1:length(obj)
     end
 end 
 
-
-
+%Pre-allocate the chain sizes
 chainlength = obj{1}.MCMCSettings.ChainSize;
+%Accepted values for calculating acceptance rate
 accepted = zeros([chainlength,length(I_update)]);
+%Inferred variables
 I_chain = zeros([chainlength,length(InferredVariables)]);
+%Cut variables
 FC_chain = zeros([chainlength,length(CutVariables)]);
+%Log-likelihood values
 lik_chain=zeros([chainlength,1]);
+%Residual values are concatenated and saved in a single row
+response_chain=zeros([chainlength,numel(cell2mat(response_old))]);
 
+%Update chain with initial values
 I_chain(1,:) = I_update;
 FC_chain(1,:) = FC_add;
 lik_chain(1,:)=sum(lik_old);
+response_chain(1,:) =cell2mat(response_old')';
 
 %Hyper-parameter settings
 inferhyper = false;
 phi=ones([1,Nexp]); 
 a0 = []; b0 = [];
+%Hyper settings are dictated by object 1. If they exist then all other
+%experiments are given the same values unless they are specified. 
 if ~isempty(obj{1}.VariableSettings.HyperSettings)
         inferhyper = true;       
         for ii=1:Nexp
@@ -153,8 +175,9 @@ end
 
 %Some MCMC options
 qcov = [];
-qmean = obj{1}.MCMCSettings.StartPoint;
-% Initial proposal covariance if specified
+% Initial proposal covariance if specified. If it is left empty, then
+% proposal samples will be drawn from the prior distribution until
+% it is calculated during an adaptation step.
 if ~isempty(obj{1}.MCMCSettings.ProposalCov)
     qcov = obj{1}.MCMCSettings.ProposalCov;
     if isvector(qcov)
@@ -162,30 +185,36 @@ if ~isempty(obj{1}.MCMCSettings.ProposalCov)
     end
     R = chol(qcov);
 end
+
 % Set burnin  
 burnin = 0;
 if  ~isempty(obj{1}.MCMCSettings.BurnIn) && isnumeric(obj{1}.MCMCSettings.BurnIn)
     burnin = obj{1}.MCMCSettings.BurnIn;
 end
-% Set delayed rejection scaling
+
+% Set delayed rejection scaling : from Haario et al. (2006)
 drscale = 0;
 if ~isempty(obj{1}.MCMCSettings.DelayedRejectionScale) && isnumeric(obj{1}.MCMCSettings.DelayedRejectionScale) 
     drscale = obj{1}.MCMCSettings.DelayedRejectionScale;
     if ~isempty(qcov)
-        R2 = R/drscale;
+        R2 = R/drscale; %This is the scaling applied to the proposal covariance during the rejection step
         iR = inv(R);
     end
 end
-% Set adaptive metropolis
+
+% Set adaptive metropolis : from Haario et al. (2006)
 adaptint = 0;
 if  ~isempty(obj{1}.MCMCSettings.AdaptiveInterval) && isnumeric(obj{1}.MCMCSettings.AdaptiveInterval)
     adaptint = obj{1}.MCMCSettings.AdaptiveInterval;
     lastAMupdate = burnin;
     qcoveps = eps.*eye(NumberInferredVariables);
         if obj{1}.MCMCSettings.JointSampling
-            sd = 2.38^2/NumberInferredVariables; %AM ideal covariance scaling
+            %AM ideal covariance scaling
+            sd = 2.38^2/NumberInferredVariables; 
         else
-            sd = 2.38^2/NumberInferredVariables; %Single variable sampling : 50% acceptance rate
+            %Single variable sampling : 40% acceptance rate?
+            sd = 2.38^2/NumberInferredVariables; 
+            %sd = 2.38^2/1;
         end
     
 end
@@ -196,7 +225,6 @@ wb=SMASH.MUI.Waitbar('Running MCMC');
 for MCMCloop=2:chainlength
     
    
-  
     % Sample from cut parameter's prior distributions and set shared
     % variables equal to first experiment samples
     FC_add = [];
@@ -208,25 +236,29 @@ for MCMCloop=2:chainlength
         samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
     end   
     
-    % Feedback cutting always has prior sample
+    % Feedback cutting always just samples from prior distriubtion
     if ~isempty(FC_add)
         FC_chain(MCMCloop,:) = FC_add;
     end
-    
-    
+       
     if obj{1}.MCMCSettings.JointSampling
-        % Apply single metropolis update for all variables
+        % Apply single metropolis update for all variables with
+        % multivariate normal proposal (DRAM, Haario et al. (2006))
         JointUpdate;
     else
+        % Apply a metropolis update seperately for each variable using an
+        % independent normal proposal
         IndividualUpdate;
     end
-      
-    
-    %Update hyperparameter
+        
+    %Update hyperparameter - for normal phi likelihood with known mean, the
+    %conjugate prior is an inverse gamma. This allows direct sampling of
+    %the posterior 
     if inferhyper   
         for ii = 1:Nexp  
             if isvector(sig2{ii});
-                b1 = b0(ii) + sum(((response_old{ii}./sqrt(sig2{ii})).^2)./2);
+                %b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii})).^2);
+                b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii}*phi(ii))).^2);
             else
                 b1 = b0(ii) + 0.5*response_old{ii}'*sig2inv{ii}*response_old{ii};
             end
@@ -241,22 +273,25 @@ for MCMCloop=2:chainlength
 I_chain(MCMCloop,:) = I_update; 
 accepted(MCMCloop,:) = acc;
 lik_chain(MCMCloop,:)=sum(lik_old);
-
+response_chain(MCMCloop,:)=cell2mat(response_old')';
 
 % If using adaptive metropolis, update the proposal jumps
 if adaptint>0 && fix(MCMCloop/adaptint) == MCMCloop/adaptint && MCMCloop > lastAMupdate && MCMCloop > burnin
    
     % Direct calculation : faster than recursion for chains < 1e6? 
     % See Haario et al. Stat Comput 2006 for DRAM algorithm
+    % Covariance of the chain from burnin up to current point
     qcov = sd.*(cov(I_chain(burnin+1:MCMCloop,:))+qcoveps);
     
     R = chol(qcov);
     R2 = R./drscale;
     iR = inv(R);
-
+    
+    % Update step
     lastAMupdate = lastAMupdate+adaptint;
 end
 
+%Update waitbar
 if fix(MCMCloop/(chainlength/10)) == MCMCloop/(chainlength/10)
     update(wb,MCMCloop/obj{1}.MCMCSettings.ChainSize);
 end
@@ -277,21 +312,30 @@ ResObj.MCMCResults.InferredChain = I_chain(keep,:);
 ResObj.MCMCResults.CutChain = FC_chain(keep,:);
 ResObj.MCMCResults.AcceptanceRate = arate(keep,:);
 ResObj.MCMCResults.LogLikelihood = lik_chain(keep,:);
+ResObj.MCMCResults.ResponseChain = response_chain(keep,:);
 if inferhyper
     ResObj.MCMCResults.HyperParameterChain = hyperchain(keep,:);
 end
+%Final proposal covariance
 if adaptint > 0 
     ResObj.MCMCSettings.ProposalCov = qcov;
 end
- 
+
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The following functions perform the Metropolis-Hastings update and are
+% embedded to avoid variable passing between functions to increase speed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%% %%%%%%%%%%%%%    Joint DRAM update (embedded for speed)     %%%%%%%%%%%
+%% %%%%%%%%%%%%%    Joint DRAM update %%%%%%%%%%%
 function JointUpdate
     
-%Use Gaussian step if proposal is specified
+%Initial updated inferred variables log-likelihoods
 lprior_new = lprior_old*0;
-
+%Draw new samples from multivariate normal distrubtion with step sizes
+%given by proposal covariance. Loop through each sample and update sample
+%values and log-likelihood of the priors
 if ~isempty(qcov)
     trialparams = I_update + randn(size(I_update))*R;
     count = 0; trialsamps = samps;
@@ -305,8 +349,8 @@ if ~isempty(qcov)
         end
     end 
     
-    
-%Otherwise sample from prior
+
+%Otherwise loop through each inferred variable and draw an new sample from prior
 else
     count = 0; trialsamps = samps;
     for eNum = 1:length(obj)
@@ -321,6 +365,8 @@ else
     end       
 end
 
+%Might require Metropolis hyperparameter update in future (in presence of
+%feedback cutting)
 % trialphi = phi;
 % lphi_old = 0; lphi_new = 0;
 % if inferhyper
@@ -341,9 +387,10 @@ response_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    [lik_new(ii),response_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii));
+    [lik_new(ii),response_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
 end
 
+%Calculate alpha (update criteria)
 alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 %alpha = min(0,sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old));
 
@@ -365,6 +412,8 @@ end
 %Delayed rejection (single stage)
 if acc == 0 && drscale > 0 && ~isempty(qcov)
 
+    %Is second stage move from previous trial or old value? Old value seems
+    %to produce correct results...
     %trialparams2 = trialparams + randn(size(I_update))*R2;
     trialparams2 = I_update + randn(size(I_update))*R2;
     count = 0; trialsamps2 = samps;
@@ -384,10 +433,10 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        [lik_new2(ii),response_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii));
+        [lik_new2(ii),response_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
     end
     
-    % DR algorithm
+    % DR algorithm - only single stage
     q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
     alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
     L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
@@ -408,8 +457,6 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     
 end
 
-
-
 end % End Joint Update
 
 
@@ -428,8 +475,11 @@ if ~isempty(qcov)
     propsteps = diag(R);
 end
 
+%Start loop by searching each experiment
 for eNum = 1:Nexp
+    %Next step into each inferred variable
     for sNum=1:length(samps{eNum})
+        %If an inferred variable is found, update the count
         if addinferred{eNum}(sNum)
             count = count+1;
             
@@ -438,11 +488,12 @@ for eNum = 1:Nexp
             trialparams = I_update;
             lprior_new = lprior_old;
             
-            %Gaussian proposal
+            %Gaussian proposals step based on diagonal of covariance
             if ~isempty(qcov)
                 trialparams(count) = I_update(count) + randn*propsteps(count);
                 trialsamps{eNum}(sNum) = trialparams(count);
-            %Prior proposal
+            %If proposal covariance does not exist just draw a sample from
+            %the prior
             else
                 trialparams(count) = priorfunc{count}(priorvals{count}{:});
                 trialsamps{eNum}(sNum) = trialparams(count);
@@ -457,7 +508,7 @@ for eNum = 1:Nexp
             for ii = 1:Nexp
                 %Update shared variables
                 trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii));
+                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
                 %lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
             end
             alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
@@ -494,7 +545,7 @@ for eNum = 1:Nexp
                 for ii = 1:length(obj)
                     %Update shared variables
                     trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii));
+                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
                     %lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii});
                 end
                 
@@ -519,37 +570,28 @@ for eNum = 1:Nexp
                 end
 
 
-            end
+            end %End of DR
 
-        end            
-    end
-end
+        end %End of inferred variable check            
+    end %End of variables loop
+end %End of experiments loop
 
+%Update the accepted values
 samps = savedsamps;
 I_update = savedparams;
 lprior_old = savedpriors;
 
 
-% Reset old likelihood
+% Reset the likelihood given the accepted values
 lik_old =zeros([1,Nexp]);
 response_old = {lik_old};
 for ii = 1:Nexp
-    [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii));
+    [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
         
     
 end %End individual update
-
-
-
-
-
-
-
-
-
-
 
 
 
