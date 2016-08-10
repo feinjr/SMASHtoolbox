@@ -2,7 +2,7 @@
 %
 % This method evaluates the Gaussian Process:
 %
-%    >> [y,dy,mse,dmse]=fit(object,x)
+%    >> [y,dy,mse,dmse]=evaluate(object,x)
 %
 % where x is an mxn matrix compatible with the trained GP stored in
 % object.DACEFit.

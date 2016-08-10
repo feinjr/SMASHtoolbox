@@ -14,19 +14,25 @@
 %   
 %   >> [moments,correlations]=summarize(object,variables)
 %
-% where valid options include 'inferred', 'cut', 'hyper', or 'all'
+% where valid options include 'inferred', 'cut', 'hyper', 'all', or
+% 'allinferred'
 %
 % See also Calibration, SMASH.MonteCarlo.Cloud
 %
 %
 % created June 30, 2016 by Justin Brown (Sandia National Laboratories)
 %
-function varargout=summarize(object,variables)
+function varargout=summarize(object,variables,vnums)
     
     % manage input
     if nargin < 2 || isempty(variables)
         variables = 'Inferred';
     end
+    
+    if nargin < 3 
+        vnums = [];
+    end
+    
     assert(ischar(variables),'ERROR: invalid variables specification. Choose from inferred, cut, hyper, or all');
     
     if strcmpi(variables,'inferred')
@@ -70,8 +76,15 @@ function varargout=summarize(object,variables)
     
     
     
-    cloudobj = SMASH.MonteCarlo.Cloud(cloudtable,'table');
-    cloudobj = configure(cloudobj,'VariableName',cloudvars);
+    
+    
+    if isempty(vnums)
+        cloudobj = SMASH.MonteCarlo.Cloud(cloudtable,'table');
+        cloudobj = configure(cloudobj,'VariableName',cloudvars);
+    else
+        cloudobj = SMASH.MonteCarlo.Cloud(cloudtable(:,vnums),'table');
+        cloudobj = configure(cloudobj,'VariableName',{cloudvars{vnums}});
+    end
     
     if nargout==0
         summarize(cloudobj);

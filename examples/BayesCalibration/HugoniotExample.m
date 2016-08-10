@@ -34,7 +34,7 @@ obj.VariableSettings.HyperSettings = [];
 
 % MCMC settings
 obj.MCMCSettings.StartPoint = [1,1];
-obj.MCMCSettings.ProposalCov = 2.4^2/2*[0.015,0.01].^2;
+obj.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2;
 obj.MCMCSettings.ChainSize = 1e4;
 obj.MCMCSettings.BurnIn = 0;
 obj.MCMCSettings.DelayedRejectionScale = 0;
