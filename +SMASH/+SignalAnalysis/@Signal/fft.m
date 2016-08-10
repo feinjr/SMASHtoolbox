@@ -202,6 +202,7 @@ transform=transform*sqrt(area1/area2); % Parsevel scaling
 
 Delta=(numpoints-1)*T/2;
 correction=exp(2i*pi*frequency*Delta);
+%correction=1;
 transform=transform.*correction; % phase correction
 
 switch option.FrequencyDomain

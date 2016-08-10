@@ -52,7 +52,17 @@ axes(target);
 
 % create line with object's properties
 [time,value]=limit(object);
-h=line(time,value);
+if isreal(value)
+    h=line(time,value);
+else
+    value=[real(value) imag(value)];
+    temp=SMASH.SignalAnalysis.SignalGroup(time,value);
+    view(temp,[],target);
+    if new
+        legend('Real part','Imaginary part');
+    end
+    return
+end
 
 % fill out new figure
 if new
