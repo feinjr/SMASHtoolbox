@@ -26,7 +26,7 @@ function varargout=summarize(object,variables,vnums)
     
     % manage input
     if nargin < 2 || isempty(variables)
-        variables = 'Inferred';
+        variables = 'allinferred';
     end
     
     if nargin < 3 
@@ -46,7 +46,7 @@ function varargout=summarize(object,variables,vnums)
     end
     
     if strcmpi(variables,'hyper')      
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);
@@ -54,7 +54,7 @@ function varargout=summarize(object,variables,vnums)
     end
     
     if strcmpi(variables,'allinferred')
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);
@@ -65,7 +65,7 @@ function varargout=summarize(object,variables,vnums)
     
     
     if strcmpi(variables,'all')
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);
@@ -75,21 +75,68 @@ function varargout=summarize(object,variables,vnums)
     end
     
     
-    
-    
-    
-    if isempty(vnums)
-        cloudobj = SMASH.MonteCarlo.Cloud(cloudtable,'table');
-        cloudobj = configure(cloudobj,'VariableName',cloudvars);
-    else
-        cloudobj = SMASH.MonteCarlo.Cloud(cloudtable(:,vnums),'table');
-        cloudobj = configure(cloudobj,'VariableName',{cloudvars{vnums}});
+%     if isempty(vnums)
+%         cloudobj = SMASH.MonteCarlo.Cloud(cloudtable,'table');
+%         cloudobj = configure(cloudobj,'VariableName',cloudvars);
+%     else
+%         cloudobj = SMASH.MonteCarlo.Cloud(cloudtable(:,vnums),'table');
+%         cloudobj = configure(cloudobj,'VariableName',{cloudvars{vnums}});
+%     end
+%     
+%     if nargout==0
+%         summarize(cloudobj);
+%     else
+%         [varargout{1} varargout{2}]=summarize(cloudobj);
+%     end
+
+    % variable names
+    if ~isempty(vnums)
+        cloudvars = {cloudvars{vnums}};
+    end
+
+
+    % variable moments
+    [nr nc] = size(cloudtable);
+    moments=nan(nc,4);
+    for n=1:nc
+        column=cloudtable(:,n);
+        moments(n,1)=sum(column)/nr; % mean
+        column=column-moments(n,1);
+        temp=column.*column;
+        L=sum(temp)/nr;
+        moments(n,2)=L; % variance 
+        temp=temp.*column;
+        moments(n,3)=sum(temp)/nr/(L^(3/2)); % skewness
+        temp=temp.*column;
+        moments(n,4)=sum(temp)/nr/(L^2)-3; % excess kurtosis
     end
     
+    % variable correlations
+    correlations=corrcoef(cloudtable);
+    
+    %Use standard deviation in ouput
+    pmom = moments;
+    pmom(:,2) = sqrt(pmom(:,2));
+    
+    % handle output
     if nargout==0
-        summarize(cloudobj);
+        fprintf('Statistical moments:\n');
+        width=cellfun(@length,cloudvars);
+        width=max(width);    
+        format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
+        fprintf(format,'','mean','error','skewness','kurtosis');
+        format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g%#+10.3g%#+10.3g\n'];
+        for n=1:nc
+            fprintf(format,cloudvars{n},pmom(n,:));
+        end    
+
+        fprintf('Correlations:\n');
+        format=repmat('%+10.3f ',[1 nc]);
+        format=['\t' format '\n'];
+        fprintf(format,correlations);
     else
-        [varargout{1} varargout{2}]=summarize(cloudobj);
+        varargout{1}=moments;
+        varargout{2}=correlations;
     end
     
     

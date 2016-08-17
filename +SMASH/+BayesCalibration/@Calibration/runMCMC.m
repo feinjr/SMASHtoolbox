@@ -106,10 +106,12 @@ end
 
 %Stating point likelihood
 lik_old =zeros([1,Nexp]);
-response = {lik_old};
+response_old = {lik_old};
+error_old = {lik_old};
 %For each experiment calculate the log-likelihood and residuals
 for ii = 1:Nexp 
-[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii});
+    samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii});
 end
 
 % Starting prior likelihood
@@ -145,21 +147,25 @@ FC_chain = zeros([chainlength,length(CutVariables)]);
 lik_chain=zeros([chainlength,1]);
 %Residual values are concatenated and saved in a single row
 response_chain=zeros([chainlength,numel(cell2mat(response_old))]);
+%Residual errors correspond to responses
+error_chain=response_chain;
 
 %Update chain with initial values
 I_chain(1,:) = I_update;
 FC_chain(1,:) = FC_add;
 lik_chain(1,:)=sum(lik_old);
 response_chain(1,:) =cell2mat(response_old')';
+error_chain(1,:) =cell2mat(error_old')';
 
 %Hyper-parameter settings
 inferhyper = false;
-phi=ones([1,Nexp]); 
+phi=ones([1,Nexp]);
+hyperchain = ones([chainlength,length(phi)]);
 a0 = []; b0 = [];
 %Hyper settings are dictated by object 1. If they exist then all other
 %experiments are given the same values unless they are specified. 
 if ~isempty(obj{1}.VariableSettings.HyperSettings)
-    inferhyper = true;       
+    inferhyper = true;
     for ii=1:Nexp
         if ~isempty(obj{ii}.VariableSettings.HyperSettings)
             phi(ii) = 1;
@@ -226,7 +232,15 @@ end
 wb=SMASH.MUI.Waitbar('Running MCMC');
 for MCMCloop=2:chainlength
     
-        
+    %Update error multiplier - for normal phi likelihood with known mean,
+    %the conjugate prior is an inverse gamma. This allows direct sampling
+    %of the posterior 
+    if inferhyper
+        HyperUpdate;
+        hyperchain(MCMCloop,:) = phi;
+    end
+    
+             
     % Sample from cut parameter's prior distributions and set shared
     % variables equal to first experiment samples
     FC_add = [];
@@ -241,15 +255,6 @@ for MCMCloop=2:chainlength
     % Feedback cutting always just samples from prior distriubtion
     if ~isempty(FC_add)
         FC_chain(MCMCloop,:) = FC_add;
-    end
-
-    
-    %Update hyperparameter - for normal phi likelihood with known mean, the
-    %conjugate prior is an inverse gamma. This allows direct sampling of
-    %the posterior 
-    if inferhyper
-        HyperUpdate;
-        hyperchain(MCMCloop,:) = phi;
     end
     
     % Reset the likelihood given parameter updates
@@ -269,13 +274,14 @@ for MCMCloop=2:chainlength
         % independent normal proposal
         IndividualUpdate;
     end
-    
+     
     
     % Update chains      
     I_chain(MCMCloop,:) = I_update; 
     accepted(MCMCloop,:) = acc;
     lik_chain(MCMCloop,:)=sum(lik_old);
     response_chain(MCMCloop,:)=cell2mat(response_old')';
+    error_chain(MCMCloop,:)=cell2mat(error_old')';
 
     % If using adaptive metropolis, update the proposal jumps
     if adaptint>0 && fix(MCMCloop/adaptint) == MCMCloop/adaptint && MCMCloop > lastAMupdate && MCMCloop > burnin
@@ -318,12 +324,23 @@ ResObj.MCMCResults.InferredChain = I_chain(keep,:);
 ResObj.MCMCResults.CutChain = FC_chain(keep,:);
 ResObj.MCMCResults.AcceptanceRate = arate(keep,:);
 ResObj.MCMCResults.LogLikelihood = lik_chain(keep,:);
+ResObj.MCMCResults.HyperChain = hyperchain(keep,:);
+
+%Credible intervals
 cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
 moments = summarize(cloudobj);
-ResObj.MCMCResults.ResponseChain = moments;
-if inferhyper
-    ResObj.MCMCResults.HyperParameterChain = hyperchain(keep,:);
-end
+ResObj.MCMCResults.ResponseMoments = moments;
+sec = sqrt(moments(:,2));
+ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
+
+%Prediction intervals
+pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
+pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
+ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
+%sep = mean(error_chain)'; 
+%ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),moments(:,1)+2*sec+2*sep,moments(:,1)-2*sec-2*sep];
+
+
 %Final proposal covariance
 if adaptint > 0 
     ResObj.MCMCSettings.ProposalCov = qcov;
@@ -391,10 +408,11 @@ end
 %Find likelihood of trial state
 lik_new = zeros([1,Nexp]);
 response_new = {lik_new};
+error_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    [lik_new(ii),response_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
 end
 
 %Calculate alpha (update criteria)
@@ -411,7 +429,7 @@ if rand <= alpha
    lik_old = lik_new; 
    lprior_old = lprior_new;
    response_old = response_new;
-   %phi = trialphi;
+   error_old = error_new;
 else
    acc = 0; 
 end
@@ -437,10 +455,11 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     % Proposal likelihood
     lik_new2 =zeros([1,Nexp]);
     response_new2 = {lik_new2};
+    error_new2 = {lik_new2};
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        [lik_new2(ii),response_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
+        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
     end
     
     % DR algorithm - only single stage
@@ -457,6 +476,7 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
        lik_old = lik_new2; 
        lprior_old = lprior_new2;
        response_old = response_new2;
+       error_old = error_new2;
     else
        acc = 0; 
     end
@@ -588,15 +608,14 @@ samps = savedsamps;
 I_update = savedparams;
 lprior_old = savedpriors;
 
-% This is now updated before metropolis step, but log-likelihood in saved
-% chain will be incorrect (I chose speed over this minor error). 
-% % Reset the likelihood given the accepted values
-% lik_old =zeros([1,Nexp]);
-% response_old = {lik_old};
-% for ii = 1:Nexp
-%     [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
-%     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
-% end
+
+% Update the likelihood given final combination of accepted values
+lik_old =zeros([1,Nexp]);
+response_old = {lik_old};
+for ii = 1:Nexp
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+    %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
+end
         
     
 end %End individual update
@@ -606,9 +625,11 @@ end %End individual update
 function HyperUpdate
     for ii = 1:Nexp  
         if isvector(sig2{ii});
-            b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii}*phi(ii))).^2);
+            %b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii}*phi(ii))).^2);
+            b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii})).^2);
         else
-            b1 = b0(ii) + 0.5*response_old{ii}'*(sig2inv{ii}/phi(ii))*response_old{ii};
+            %b1 = b0(ii) + 0.5*response_old{ii}'*(sig2inv{ii}/phi(ii))*response_old{ii};
+            b1 = b0(ii) + 0.5*response_old{ii}'*sig2inv{ii}*response_old{ii};
         end
         a1 = a0(ii) + 0.5*numel(response_old{ii});
         phi(ii) = InvGamma(a1,b1);

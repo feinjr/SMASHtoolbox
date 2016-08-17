@@ -14,7 +14,7 @@
 %
 % created June 21, 2016 by Justin Brown (Sandia National Laboratories)
 %
-function [l,r] = calculateLogLikelihood(object,x,sig2,sig2inv)
+function [l,r,er] = calculateLogLikelihood(object,x,sig2,sig2inv)
 
 
 
@@ -48,5 +48,15 @@ else
     l = -0.5*r'*sig2inv*r -sum(log(diag(chol(sig2))));
     %l = -0.5*r'*sig2inv*r - n/2*log(2*pi) - sum(log(diag(chol(sig2))));  
 end
+
+if nargout > 2
+    if isvector(sig2);    
+        %er = ((r./1).^2)./sig2;
+        er = sqrt(sig2);
+    else 
+        er = r'*sig2inv*r;
+    end
+end    
+
 
 end

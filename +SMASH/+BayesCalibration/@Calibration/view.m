@@ -37,7 +37,7 @@ function varargout=view(object,variables,vnums,plottype)
 
     % manage input
     if nargin < 2 || isempty(variables)
-        variables = 'Inferred';
+        variables = 'allinferred';
     end
     
     if nargin < 3 
@@ -64,7 +64,7 @@ function varargout=view(object,variables,vnums,plottype)
     end
 
     if strcmpi(variables,'hyper')
-        c  = object.MCMCResults.HyperParameterChain;
+        c  = object.MCMCResults.HyperChain;
         [nr nc] = size(c);
         for ii = 1:nc
             varnames{ii} = sprintf('phi%i',ii);
@@ -72,7 +72,7 @@ function varargout=view(object,variables,vnums,plottype)
     end
 
     if strcmpi(variables,'allinferred')
-        c  = object.MCMCResults.HyperParameterChain;
+        c  = object.MCMCResults.HyperChain;
         [nr nc] = size(c);
         for ii = 1:nc
             varnames{ii} = sprintf('phi%i',ii);
@@ -83,7 +83,7 @@ function varargout=view(object,variables,vnums,plottype)
 
 
     if strcmpi(variables,'all')
-        c  = object.MCMCResults.HyperParameterChain;
+        c  = object.MCMCResults.HyperChain;
         [nr nc] = size(c);
         for ii = 1:nc
             varnames{ii} = sprintf('phi%i',ii);

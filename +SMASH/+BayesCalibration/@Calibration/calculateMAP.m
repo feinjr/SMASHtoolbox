@@ -82,7 +82,6 @@ r0={size(obj)};
 sig2={size(obj)}; 
 for ii = 1:Nexp
     [rt, sig2t]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
-    r0{ii} = sig2t;
     sig2{ii} = sig2t;
     if isvector(sig2{ii})
          sig2inv{ii} = inv(diag(sig2t));
@@ -118,9 +117,12 @@ end
             end
         end 
 
+        
         %Likelihoods
         lik = 0;
         for ii = 1:Nexp 
+            %Update shared variables
+            trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
             lik(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},sig2inv{ii});
         end
         

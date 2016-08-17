@@ -1931,7 +1931,7 @@ function SaveCallback(varargin)
         fprintf(fid,'\n# Initial stress: %f , Initial strain : %f',stress0,strain0);
         fprintf(fid,'\n# time\tup\tcl\tdens\tstress\n'); 
         [time LA_array] = limit(LA_result);
-        dlmwrite(saveas, [time' LA_array],'-append','delimiter','\t','precision','%10.6f');
+        dlmwrite(saveas, [time' LA_array],'-append','delimiter','\t','precision','%10.8e');
         fclose(fid);
     end    
 end

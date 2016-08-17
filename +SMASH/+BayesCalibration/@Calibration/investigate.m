@@ -54,7 +54,7 @@ function varargout=investigate(object,iterations,span,variables,vnums)
     end
     
     if strcmpi(variables,'hyper')      
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);
@@ -62,7 +62,7 @@ function varargout=investigate(object,iterations,span,variables,vnums)
     end
     
     if strcmpi(variables,'allinferred')
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);
@@ -73,7 +73,7 @@ function varargout=investigate(object,iterations,span,variables,vnums)
     
     
     if strcmpi(variables,'all')
-        cloudtable  = object.MCMCResults.HyperParameterChain;
+        cloudtable  = object.MCMCResults.HyperChain;
         [nr nc] = size(cloudtable);
         for ii = 1:nc
             cloudvars{ii} = sprintf('phi%i',ii);

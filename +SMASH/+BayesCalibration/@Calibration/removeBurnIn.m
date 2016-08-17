@@ -20,8 +20,6 @@ function object = removeBurnIn(object,burnin)
     object.MCMCResults.CutChain = object.MCMCResults.CutChain(burnin+1:end,:);
     object.MCMCResults.AcceptanceRate = object.MCMCResults.AcceptanceRate(burnin+1:end,:);
     object.MCMCResults.LogLikelihood = object.MCMCResults.LogLikelihood(burnin+1:end,:);
-    try
-        object.MCMCResults.HyperChain = object.MCMCResults.HyperChain(burnin+1:end,:);
-    end
+    object.MCMCResults.HyperChain = object.MCMCResults.HyperChain(burnin+1:end,:);
 
 end
