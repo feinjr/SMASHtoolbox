@@ -146,7 +146,7 @@ FC_chain = zeros([chainlength,length(CutVariables)]);
 %Log-likelihood values
 lik_chain=zeros([chainlength,1]);
 %Residual values are concatenated and saved in a single row
-response_chain=zeros([chainlength,numel(cell2mat(response_old))]);
+response_chain=zeros([chainlength,numel(cell2mat(response_old'))]);
 %Residual errors correspond to responses
 error_chain=response_chain;
 
@@ -161,6 +161,7 @@ error_chain(1,:) =cell2mat(error_old')';
 inferhyper = false;
 phi=ones([1,Nexp]);
 hyperchain = ones([chainlength,length(phi)]);
+hyperacc = ones([chainlength,1]);
 a0 = []; b0 = [];
 %Hyper settings are dictated by object 1. If they exist then all other
 %experiments are given the same values unless they are specified. 
@@ -178,6 +179,11 @@ if ~isempty(obj{1}.VariableSettings.HyperSettings)
             b0(ii) = b0(1);
         end        
     end
+    
+    %Define proposal covariance for phi
+    qcov_phi = diag(0.1*ones(size(phi))).^2;
+    R_phi = chol(qcov_phi); iR_phi = inv(R_phi);
+        
 end
 
 
@@ -205,7 +211,6 @@ drscale = 0;
 if ~isempty(obj{1}.MCMCSettings.DelayedRejectionScale) && isnumeric(obj{1}.MCMCSettings.DelayedRejectionScale) 
     drscale = obj{1}.MCMCSettings.DelayedRejectionScale;
     if ~isempty(qcov)
-        R2 = R/drscale; %This is the scaling applied to the proposal covariance during the rejection step
         iR = inv(R);
     end
 end
@@ -290,14 +295,18 @@ for MCMCloop=2:chainlength
         % See Haario et al. Stat Comput 2006 for DRAM algorithm
         % Covariance of the chain from burnin up to current point
         qcov = sd.*(cov(I_chain(burnin+1:MCMCloop,:))+qcoveps);
+        R = chol(qcov); iR = inv(R);
 
-        R = chol(qcov);
-        R2 = R./drscale;
-        iR = inv(R);
-
+        
+        %Update phi covariance
+        if inferhyper
+            qcov_phi = 2.38^2/length(phi).*(cov(hyperchain(burnin+1:MCMCloop,:))+eps.*eye(length(phi)));
+            R_phi = chol(qcov_phi);iR_phi = inv(R_phi);
+        end
+        
+       
         % Update step
         lastAMupdate = lastAMupdate+adaptint;
-
 
         %obj{1}.MCMCSettings.JointSampling = true;
     end
@@ -390,20 +399,6 @@ else
     end       
 end
 
-%Might require Metropolis hyperparameter update in future (in presence of
-%feedback cutting)
-% trialphi = phi;
-% lphi_old = 0; lphi_new = 0;
-% if inferhyper
-%     phistep = 0.01;
-%     trialphi = phi + randn*phistep;
-%     if trialphi < 0
-%         trialphi = phi;
-%     end
-%     lphi_old = phi_priorfunc(phi_priorvals{:},phi);
-%     lphi_new = phi_priorfunc(phi_priorvals{:},trialphi);
-% end
-
 
 %Find likelihood of trial state
 lik_new = zeros([1,Nexp]);
@@ -439,8 +434,8 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
 
     %Is second stage move from previous trial or old value? Old value seems
     %to produce correct results...
-    %trialparams2 = trialparams + randn(size(I_update))*R2;
-    trialparams2 = I_update + randn(size(I_update))*R2;
+    %trialparams2 = trialparams + randn(size(I_update))*R/drscale;
+    trialparams2 = I_update + randn(size(I_update))*R/drscale;
     count = 0; trialsamps2 = samps;
     for eNum = 1:length(obj)
         for sNum=1:length(samps{eNum})
@@ -563,7 +558,7 @@ for eNum = 1:Nexp
                 lprior_new2 = lprior_old;
                 
                 %trialparams2(count) = trialparams(count) + randn*propsteps(count);
-                trialparams2(count) = I_update(count) + randn*propsteps(count);
+                trialparams2(count) = I_update(count) + randn*propsteps(count)/drscale;
                 trialsamps2{eNum}(sNum) = trialparams2(count);           
 
                 % Proposal likelihood
@@ -623,17 +618,83 @@ end %End individual update
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%  Hyperparameter, phi, Update %%%%%%%%%%%%%%%%%%
 function HyperUpdate
+
+% Conjugate prior update
+if any(a0 == 0)
+    
     for ii = 1:Nexp  
         if isvector(sig2{ii});
-            %b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii}*phi(ii))).^2);
             b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii})).^2);
         else
-            %b1 = b0(ii) + 0.5*response_old{ii}'*(sig2inv{ii}/phi(ii))*response_old{ii};
             b1 = b0(ii) + 0.5*response_old{ii}'*sig2inv{ii}*response_old{ii};
         end
         a1 = a0(ii) + 0.5*numel(response_old{ii});
         phi(ii) = InvGamma(a1,b1);
     end
+ 
+    
+% Metropolis update    
+else
+
+
+    %Draw new samples from multivariate normal distrubtion with step sizes
+    %given by proposal covariance.    
+    trial_phi = phi + randn(size(phi))*R_phi;
+
+    lphi_new = 0*phi;
+    lik_new = zeros([1,Nexp]);
+    for ii = 1:length(phi)
+        %lphi_new = phi_priorfunc(phi_priorvals{:},trialphi);
+        lphi_old(ii) = InvGamma(a0(ii),b0(ii),phi(ii));
+        lphi_new(ii) = InvGamma(a0(ii),b0(ii),trial_phi(ii));
+        lik_new(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi(ii),sig2inv{ii}/trial_phi(ii));
+    end
+
+    %Calculate alpha (update criteria)
+    alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lphi_new) - sum(lphi_old)));
+
+    % Metropolis update
+    if rand <= alpha
+        phi = trial_phi;
+        hyperacc(MCMCloop,1) = 1;
+    else
+        hyperacc(MCMCloop,1) = 0;
+    end
+    
+    %Delayed rejection (single stage)
+    if hyperacc(MCMCloop,1) == 0 && drscale > 0
+
+        %Next step
+        trial_phi2 = phi + randn(size(phi))*R_phi/drscale;
+          
+
+        % Proposal likelihood
+        lik_new2 =zeros([1,Nexp]);
+        for ii = 1:length(obj)
+            lphi_new2(ii) = InvGamma(a0(ii),b0(ii),trial_phi2(ii));
+            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi2(ii),sig2inv{ii}/trial_phi2(ii));
+        end
+
+        % DR algorithm
+        q1 = exp(-0.5*(norm((trial_phi2-trial_phi)*iR_phi)^2-norm((phi-trial_phi)*iR_phi)^2));
+        alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lphi_new) - sum(lphi_new2)));
+        L2 = exp(sum(lik_new2) + sum(lphi_new2) -sum(lik_old)-sum(lphi_old) );
+        alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
+
+        if rand <= alpha13
+            phi = trial_phi2;
+            hyperacc(MCMCloop,1) = 1;
+        else
+            hyperacc(MCMCloop,1) = 0;
+        end
+    end
+    
+    
+    
+    
+    
+end
+
 end
 
 

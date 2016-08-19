@@ -1,7 +1,5 @@
-% Calibration of a linear Us-up fit to Al Hugoniot data. Each datum is
-% treated as an individual experiment such that the hyperparameters (error
-% multipliers) are inferred individually to give more accurate prediction
-% intervals. 
+% Calibration of a linear Us-up fit to Al Hugoniot data. Data is seperated
+% into lower and upper sets to give better predictive calculations
 
 
 %% Parse the hugoniot data
@@ -14,16 +12,22 @@ dUs = data(:,4);
 
 [~,I] = sort(up); up = up(I); dup = dup(I); Us = Us(I); dUs = dUs(I);
 
+range1 = find(up < 0.8); 
+range2 = find(up >= 0.8); 
+
+dat{1} = [up(range1), Us(range1), dUs(range1).^2];
+dat{2} = [up(range2), Us(range2), dUs(range2).^2]; 
+
 
 %% Setup the BayesCalibration objects
 obj={};
-for ii=1:length(up)
+for ii=1:length(dat)
     obj{ii} = SMASH.BayesCalibration.Calibration;
 
     % Measurement data - custom structure used by model
-    obj{ii}.Measurement.Data = Us(ii);
-    obj{ii}.Measurement.Grid = up(ii);
-    obj{ii}.Measurement.Variance = dUs(ii).^2;
+    obj{ii}.Measurement.Data = dat{ii}(:,2);
+    obj{ii}.Measurement.Grid = dat{ii}(:,1);
+    obj{ii}.Measurement.Variance = dat{ii}(:,3);
 
     % Model handle
     obj{ii}.ModelSettings.Model = @LinearHugoniot;
@@ -35,8 +39,8 @@ for ii=1:length(up)
     %obj.VariableSettings.PriorType = {'Gauss','Gauss'};
     %obj.VariableSettings.PriorSettings = {[5.35 0.1], [1.35 0.1]};
 
-    % Hyper-parameter priors. Purely non-informative is too difuse, while
-    % Dakota defaults are too contraining. 
+    % Hyper-parameter priors. Dakota defaults are too constraining, while
+    % diffuse priors seem to work well
     %obj{ii}.VariableSettings.HyperSettings = []; % Don't infer
     %obj{ii}.VariableSettings.HyperSettings = [103,102]; % Dakota defaults
     obj{ii}.VariableSettings.HyperSettings = [1.75,1.75/5];
@@ -57,8 +61,7 @@ end
 obj{1}.MCMCSettings.StartPoint = calculateMAP(obj{:},obj{1}.MCMCSettings.StartPoint);
 
 
-%obj{1}.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2;
-obj{1}.MCMCSettings.ProposalCov = [0.3e-3, -0.02e-3; -0.02e-3, 0.1e-3];
+obj{1}.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2;
 obj{1}.MCMCSettings.ChainSize = 1e4;
 obj{1}.MCMCSettings.BurnIn = 0;
 obj{1}.MCMCSettings.DelayedRejectionScale = 2;
@@ -77,8 +80,8 @@ toc
 
 %% check results
 summarize(Results,'allinferred')
-view(Results,'inferred',[],'histogram')
-%view(Results,'inferred',[],'covariance');
+view(Results,'allinferred',[],'histogram')
+view(Results,'inferred',[],'covariance');
 
 
 

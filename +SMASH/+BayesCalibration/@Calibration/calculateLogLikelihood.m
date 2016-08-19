@@ -38,7 +38,6 @@ else
     end   
 end
 
-n = length(r);
 % Speed up if diagonal
 if isvector(sig2);
     l = -sum(((r./1).^2)./(2.*sig2) + 0.5*log(sig2));

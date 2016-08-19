@@ -27,7 +27,7 @@ obj.VariableSettings.PriorSettings = {[-50.0 50.0], [-50 50.0]};
 
 % MCMC settings
 obj.MCMCSettings.StartPoint = [0,0];
-obj.MCMCSettings.ChainSize = 1e3;
+obj.MCMCSettings.ChainSize = 1e4;
 obj.MCMCSettings.BurnIn = 0;
 obj.MCMCSettings.DelayedRejectionScale = 0;
 obj.MCMCSettings.AdaptiveInterval = 0;
@@ -50,7 +50,7 @@ tic
 R1 = runMCMC(obj);
 toc
 summarize(R1)
-[h1,h2]=view(R1,'inferred','histogram');
+[h1,h2]=view(R1,'inferred',[],'histogram');
 axes(h1(1)); h=line(x,p1(x)); h.Color = 'k'; h.LineWidth = 3;
 axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 
@@ -60,7 +60,7 @@ tic
 R2 = runMCMC(obj);
 toc
 summarize(R2)
-[h1,h2]=view(R2,'inferred','histogram');
+[h1,h2]=view(R2,'inferred',[],'histogram');
 axes(h1(1)); h=line(x,p1(x)); h.Color = 'k'; h.LineWidth = 3;
 axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 
@@ -71,7 +71,7 @@ tic
 R3 = runMCMC(obj);
 toc
 summarize(R3)
-[h1,h2]=view(R3,'inferred','histogram');
+[h1,h2]=view(R3,'inferred',,[],'histogram');
 axes(h1(1)); h=line(x,p1(x)); h.Color = 'k'; h.LineWidth = 3;
 axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 
@@ -82,7 +82,7 @@ tic
 R4 = runMCMC(obj);
 toc
 summarize(R4)
-[h1,h2]=view(R4,'inferred','histogram');
+[h1,h2]=view(R4,'inferred',[],'histogram');
 axes(h1(1)); h=line(x,p1(x)); h.Color = 'k'; h.LineWidth = 3;
 axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 
@@ -90,12 +90,12 @@ axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 %% Run with error term
 obj.MCMCSettings.AdaptiveInterval = 1e2;
 obj.MCMCSettings.ProposalCov = 2.4^2/sqrt(1)*[4,1];
-obj.VariableSettings.HyperSettings = [104,103];
+obj.VariableSettings.HyperSettings = [102,101];
 tic
 R5 = runMCMC(obj);
 toc
 summarize(R5,'allinferred')
-[h1,h2]=view(R5,'allinferred','histogram');
+[h1,h2]=view(R5,'allinferred',[],'histogram');
 axes(h1(1)); h=line(x,p1(x)); h.Color = 'k'; h.LineWidth = 3;
 axes(h1(2));h=line(x,p2(x)); h.Color = 'k'; h.LineWidth = 3;
 

@@ -241,13 +241,15 @@ fh.Color = 'w';
                 set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
                 set(gca,'XTick',[],'YTick',[]);
                 
-                %Correlation coefficient
+                
                 %subplot(nvars,nvars,(i-1)*nvars+j)
                 pos = [fac*(mod(j-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(i-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
                 hsub{j,i} = axes('Parent',fh,'Units','normalized','Position',pos);
-
-                cc = corrcoef([c(:,i),c(:,j)]);
-                text(tloc,0.5,sprintf('%3.3f',cc(2)),'FontSize',FScov);
+                [cdata,ch]=contour(dgrid2,dgrid1,p,obj.DensitySettings.NumberContours); ch.LineWidth = 1;
+                axis([mu2-stdcutoff*stdev2,mu2+stdcutoff*stdev2,mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
+                %Correlation coefficient
+                %cc = corrcoef([c(:,i),c(:,j)]);
+                %text(tloc,0.5,sprintf('%3.3f',cc(2)),'FontSize',FScov);
                 box on;
                 %xlabel(varnames{j});
                 %ylabel(varnames{i});

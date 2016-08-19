@@ -30,36 +30,34 @@ obj.VariableSettings.PriorSettings = {[0.1 10.0], [0.1 10.0]};
 %obj.VariableSettings.PriorType = {'Gauss','Gauss'};
 %obj.VariableSettings.PriorSettings = {[5.35 0.1], [1.35 0.1]};
 
+% Error multiplier prior
 %obj.VariableSettings.HyperSettings = [];
 %obj.VariableSettings.HyperSettings = [103,102];
-obj.VariableSettings.HyperSettings = [1.75,1.75/5];
-%obj.VariableSettings.HyperSettings = [0,0];
+%obj.VariableSettings.HyperSettings = [1.75,1.75/5];
+obj.VariableSettings.HyperSettings = [0,0];
 
-% MCMC settings
-obj.MCMCSettings.StartPoint = [5.35,1.35];
-%obj.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2;
-obj.MCMCSettings.ProposalCov = [0.3e-3, -0.02e-3; -0.02e-3, 0.1e-3];
-obj.MCMCSettings.ChainSize = 1e3;
-obj.MCMCSettings.BurnIn = 0;
-obj.MCMCSettings.DelayedRejectionScale = 2;
-obj.MCMCSettings.AdaptiveInterval = 1e3;
-obj.MCMCSettings.JointSampling = true;
-
-% Start with MAP point
+% Solve for MAP point
+obj.MCMCSettings.StartPoint = [1,1];
 obj.MCMCSettings.StartPoint = calculateMAP(obj,obj.MCMCSettings.StartPoint);
 
+% MCMC settings
+obj.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2; % Proposal covariance for metropolis steps
+obj.MCMCSettings.ChainSize = 1e4;   % Length of MCMC chain
+obj.MCMCSettings.BurnIn = 0;        % Burn-in (typically 0 for MAP solve)
+obj.MCMCSettings.DelayedRejectionScale = 2; % Implement delayed rejection with this factor
+obj.MCMCSettings.AdaptiveInterval = 1e3;    % Implement adaptive metropolis with this chain step size
+obj.MCMCSettings.JointSampling = true;      % Implement joint sampling. If false 1D metropolis is performed
+
+
 %% Run MCMC
-profile off
-profile on
 tic
 Results = runMCMC(obj);
 toc
 
-%% check results
+%% view results
 summarize(Results,'allinferred')
 view(Results,'allinferred',[],'histogram')
-%view(Results,'inferred',[],'covariance');
-
+view(Results,'inferred',[],'covariance');
 
 
 %% Propogate Results - 2 sigma (95% CI)

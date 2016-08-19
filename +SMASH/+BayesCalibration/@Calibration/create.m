@@ -28,7 +28,6 @@ object.MCMCSettings.ProposalCov = []; % Proposal covariance matrix for inferred 
 object.MCMCSettings.DelayedRejectionScale = 0; % Enables DR algorithm (opt)
 object.MCMCSettings.AdaptiveInterval = 1e2; % Enables AM algorithm (opt)
 
-
 object.MCMCResults.InferredVariables = {};
 object.MCMCResults.CutVariables = {};
 object.MCMCResults.InferredChain = [];
