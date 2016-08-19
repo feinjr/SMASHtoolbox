@@ -171,9 +171,8 @@ tloc = 0.2;
 stdcutoff=5;    
 %fh = SMASH.Graphics.AIPfigure(6,'16in');
 %fh = SMASH.Graphics.AIPfigure(2);
-%fh.Color = 'w';
-fh = SMASH.MUI.Figure;
-fh.Handle.Color = 'w';
+sfh = SMASH.MUI.Figure; fh = sfh.Handle; 
+fh.Color = 'w';
     
     nvars = nc;
     hsub = [];
@@ -181,11 +180,22 @@ fh.Handle.Color = 'w';
         for i = 1:j
             %for i = 1:nvars
             %[j,i]
-            hsub{i,j} = subplot(nvars,nvars,(j-1)*nvars+i);
+            fac = 0.9;
+            subwidth = fac/nvars;
+            pos = [fac*(mod(i-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(j-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
+            %hsub{i,j} = subplot(nvars,nvars,(j-1)*nvars+i,'Position',pos);
+            hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
+            
             if i==j
                 %hh = histogram(c(:,j),'Normalization','pdf');
-                xlabel(varnames{i});
-                ylabel('Density');
+                %xlabel(varnames{i});
+                %ylabel('Density');
+                if j==nvars
+                    xlabel(varnames{i});
+                elseif i==1
+                    ylabel(varnames{j});
+                end
+                             
                 axis tight; box on;
                 set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
                 
@@ -193,7 +203,8 @@ fh.Handle.Color = 'w';
                 obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
                 configure(obj,'GridPoints',1000)
                 [dgrid,p] = density(obj);
-                kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';        
+                kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';
+                set(gca,'XTick',[],'YTick',[]);
                 
                 
 %                 %Plot normal distribution
@@ -211,10 +222,14 @@ fh.Handle.Color = 'w';
                 [dgrid1,dgrid2,p]=density(obj);    
                 [cdata,ch]=contour(dgrid1,dgrid2,p,obj.DensitySettings.NumberContours); ch.LineWidth = 1;
                 %colormap jet;
-                
-                
-                xlabel(varnames{i});
-                ylabel(varnames{j});
+                %xlabel(sprintf('%i %i',i,j));
+                %ylabel(sprintf('%i %i',i,j));
+                if j==nvars 
+                    xlabel(varnames{i});
+                end
+                if i==1
+                    ylabel(varnames{j});
+                end
                 
                 mu1 = mean(c(:,i));
                 stdev1 = std(c(:,i));
@@ -224,15 +239,18 @@ fh.Handle.Color = 'w';
                 axis([mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1,mu2-stdcutoff*stdev2,mu2+stdcutoff*stdev2]);
                 box on;
                 set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
+                set(gca,'XTick',[],'YTick',[]);
                 
                 %Correlation coefficient
-                subplot(nvars,nvars,(i-1)*nvars+j)
-             
+                %subplot(nvars,nvars,(i-1)*nvars+j)
+                pos = [fac*(mod(j-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(i-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
+                hsub{j,i} = axes('Parent',fh,'Units','normalized','Position',pos);
+
                 cc = corrcoef([c(:,i),c(:,j)]);
                 text(tloc,0.5,sprintf('%3.3f',cc(2)),'FontSize',FScov);
                 box on;
-                xlabel(varnames{j});
-                ylabel(varnames{i});
+                %xlabel(varnames{j});
+                %ylabel(varnames{i});
                 set(gca,'XTick',[],'YTick',[]);
                 set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
             end

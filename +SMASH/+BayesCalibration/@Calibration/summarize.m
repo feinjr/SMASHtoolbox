@@ -125,7 +125,7 @@ function varargout=summarize(object,variables,vnums)
         width=max(width);    
         format=['\t' sprintf('%%%ds',width) '%10s%10s%10s%10s\n'];
         fprintf(format,'','mean','error','skewness','kurtosis');
-        format=['\t' sprintf('%%%ds',width) '%#+10.3g%#+10.3g%#+10.3g%#+10.3g\n'];
+        format=['\t' sprintf('%%%ds',width) '%#+10.4g%#+10.3g%#+10.3g%#+10.3g\n'];
         for n=1:nc
             fprintf(format,cloudvars{n},pmom(n,:));
         end    
