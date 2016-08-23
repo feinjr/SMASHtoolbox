@@ -11,6 +11,9 @@ assert(isnumeric(pulse) && any(pulse==valid),...
 % extract requested pulse
 bound=object.PulseBound(pulse,:);
 local=crop(object.Measurement,bound);
+local=shift(local,-object.PulseCenter(pulse));
 
+% convert to STFT object
+%local=SMASH.SignalAnalysis.STFT(local);
 
 end

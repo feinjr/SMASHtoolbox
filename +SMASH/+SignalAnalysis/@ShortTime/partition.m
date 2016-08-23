@@ -125,7 +125,7 @@ switch choice
             value(2)=value(1);
         end      
         value=round(value);
-        assert(all(value>1),...
+        assert(value(1)>1,...
             'ERROR: Points/Skip values must be greater than 1');
         points=value(1);
         skip=value(2);        

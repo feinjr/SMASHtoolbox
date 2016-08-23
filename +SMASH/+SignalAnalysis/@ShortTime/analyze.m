@@ -43,7 +43,7 @@
 % revised July 1, 2016 by Daniel Dolan
 %    -converted local information to Signal objects
 %
-function varargout=analyze(object,target_function)
+function varargout=analyze(object,target_function,silent)
 
 % handle input
 if (nargin<2) || isempty(target_function)
@@ -55,6 +55,15 @@ if ischar(target_function)
 end
 assert(isa(target_function,'function_handle'),...
     'ERROR: invalid target function')
+
+if (nargin<3) || isempty(silent)
+    silent=false;
+elseif strcmpi(silent,'silent')
+    silent=true;
+else
+    silent=false;
+end
+verbose=~silent;
 
 % determine region of interest
 [time,~]=limit(object.Measurement);
@@ -86,17 +95,25 @@ data(:,1)=temp(:);
 
 % analyze remaining blocks  
 if SMASH.System.isParallel
-    fprintf('Performing analysis...');
+    if verbose
+        fprintf('Performing analysis...');
+    end
     parfor k=2:Niter                  
         data(:,k)=LocalFunction(left(k):right(k));
     end
-    fprintf('done!\n');
+    if verbose
+        fprintf('done!\n');
+    end
 else
-    fprintf('Performing analysis...');
+    if verbose
+        fprintf('Performing analysis...');
+    end
     for k=2:Niter
         data(:,k)=LocalFunction(left(k):right(k));    
     end
-    fprintf('done!\n');
+    if verbose
+        fprintf('done!\n');
+    end
 end
 
 % handle output

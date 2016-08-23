@@ -59,7 +59,7 @@ phase0=atan2(imag(phase0),real(phase0));
 
 % set up clock times
 period=1/f0;
-object.Period=period;
+object.ClockPeriod=period;
 Delta=phase-phase0;
 %temp=SMASH.SignalAnalysis.Signal(t,sin(2*pi*f0*t+Delta));
 
@@ -73,7 +73,12 @@ tc=tc(:);
 
 object.PulseCenter=tc;
 object.NumberPulses=numel(tc);
-object.PulseBound(:,2)=tc+object.Period/2;
-object.PulseBound(:,1)=tc-object.Period/2;
+object.PulseBound(:,2)=tc+object.ClockPeriod/2;
+object.PulseBound(:,1)=tc-object.ClockPeriod/2;
+
+% record sampling
+T=(t(end)-t(1))/(numel(t)-1);
+object.SamplePeriod=T;
+object.SampleRate=1/T;
 
 end
