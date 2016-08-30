@@ -70,6 +70,7 @@ tc=tc:-period:t(1);
 tc=tc(end:-1:1);
 tc=[tc tc(end)+period:period:t(end)];
 tc=tc(:);
+tc=tc(2:end-1); % drop first and last pulses, which may be partials
 
 object.PulseCenter=tc;
 object.NumberPulses=numel(tc);
