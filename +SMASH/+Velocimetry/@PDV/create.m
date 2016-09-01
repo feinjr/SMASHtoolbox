@@ -16,7 +16,7 @@ else
 end
 
 % determine sample rate
-t=object.Measurement.Grid;
+t=object.Measurement.Measurement.Grid;
 dt=(max(t)-min(t))/(numel(t)-1);
 object.SampleInterval=dt;
 object.SampleRate=1/dt;

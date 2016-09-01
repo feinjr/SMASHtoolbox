@@ -93,6 +93,6 @@ classdef CurveFit2D
                 end
             end
             object.GraphicOptions=value;
-        end
+        end        
     end
 end

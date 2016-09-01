@@ -90,18 +90,18 @@ fbound=sort(fbound);
 
 % process selected region
 selection=object.Measurement;
-selection=limit(selection,'all');
-selection=crop(selection,tbound);
+selection.Measurement=limit(selection.Measurement,'all');
+selection.Measurement=crop(selection.Measurement,tbound);
 
 selection.FFToptions.FrequencyDomain='positive';
 selection.FFToptions.SpectrumType='power';
-[f,P]=fft(selection,selection.FFToptions);
+[f,P]=fft(selection.Measurement,selection.FFToptions);
 
 keep=(f>=fbound(1)) & (f<=fbound(2));
 f=f(keep);
 P=P(keep);
 
-t=selection.Grid;
+t=selection.Measurement.Grid;
 T=abs(t(end)-t(1))/(numel(t)-1);
 fNyquist=1/(2*T);
 
@@ -112,7 +112,7 @@ switch lower(mode)
     case 'noise'        
         noisefloor=mean(P);
         % simulate noise
-        noise=SMASH.SignalAnalysis.NoiseSignal(selection.Grid); 
+        noise=SMASH.SignalAnalysis.NoiseSignal(selection.Measurement.Grid); 
         bandwidth=object.Settings.Bandwidth;
         if isempty(bandwidth) || isnan(bandwidth)
             bandwidth=fNyquist/2;

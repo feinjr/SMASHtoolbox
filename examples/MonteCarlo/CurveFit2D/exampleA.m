@@ -61,3 +61,7 @@ for n=1:2
 end
 
 linkaxes(ha,'xy');
+
+%%
+result=analyze(object,5000);
+summarize(result);

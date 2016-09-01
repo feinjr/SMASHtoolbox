@@ -1,27 +1,35 @@
 % analyze Analyze parameter variation
 
-function [result,accept]=analyze(object,iterations,drop,skip)
+function [result,accept]=analyze(object,iterations,varargin)
 
+% function object=set.Metropolis(object,value)
+%             assert(isstruct(value),'ERROR: invalid Metropolis settings');
+%             name=fieldnames(value);
+%             for n=1:numel(name)
+%                 switch name{n}
+%                     case 'Burn'
+%                         
+%                     case 'Lag'
+%                         
+%                     case 'Scale'
+%                         
+%                     otherwise
+%                         error('ERROR: invalid Metropolis setting');
+%                 end
+%             end
+%             object.Metropolis=value;
+%         end
+% 
 % manage input
-assert(object.Optimized,'ERROR: model parameters must be optimized before this analysis can be performed');
+assert(object.Optimized,...
+    'ERROR: model parameters must be optimized before this analysis can be performed');
 
 if (nargin<2) || isempty(iterations)
-    iterations=10e3;
+    iterations=2*object.Metropolis.Burn;
 end
 assert(SMASH.General.testNumber(iterations,'integer','positive'),...
     'ERROR: invalid number of iterations');
-
-if (nargin<3) || isempty(drop)
-    drop=round(0.10*iterations);    
-end
-assert(SMASH.General.testNumber(drop,'integer','positive'),...
-    'ERROR: invalid number of drop points');
-
-if (nargin<4) || isempty(skip)
-    skip=1;
-end
-assert(SMASH.General.testNumber(skip,'integer','positive'),...
-    'ERROR: invalid number of skip points');
+assert(iterations >= 2*object.Metropolis.Burn,'ERROR: more iterations needed to overcome the burn-in phase');
 
 % estimate parameter range
 origin=object.Parameter;
@@ -51,7 +59,7 @@ end
 
 % prepare random draws
 moments(:,1)=origin(:);
-moments(:,2)=width(:).^2;
+moments(:,2)=(scale*width(:)).^2;
 source=SMASH.MonteCarlo.Cloud(moments,[],iterations);
 
 draw=rand(iterations,1);
