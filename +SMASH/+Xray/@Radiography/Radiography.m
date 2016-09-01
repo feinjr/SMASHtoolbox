@@ -30,8 +30,8 @@ classdef Radiography
             p.Shot = 9999;
             p.Frame = [];
             p.Time = [];
-            p.PhotonEnergy = 6151; %Standard ZBL Backlighter Energy
-            p.Opacity = 2.2392; % Be Opacity at 6151 eV
+            p.PhotonEnergy = 6151; %Standard ZBL Backlighter Energy in eV
+            p.Opacity = 2.2392; % Be Opacity at 6151 eV in cm^2/g
             
             object.Settings = p;
             if (nargin==1) && isobject(varargin{1})
