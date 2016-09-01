@@ -1,3 +1,4 @@
+% 
 function object=align(object,fbound)
 
 % manage input
@@ -10,75 +11,71 @@ fbound=sort(fbound);
 assert(diff(fbound)>0,'ERROR: invalid frequency bound');
 
 % determine base frequency
-FFToptions=struct('RemoveDC',true,'NumberFrequencies',2e6,...
-    'SpectrumType','complex');
-[f,y]=fft(object.Measurement,FFToptions);
-keep=(f>=fbound(1)) & (f<=fbound(2));
-f=f(keep);
-y=y(keep);
-P=real(y.*conj(y));
-
-[Pmax,index]=max(P);
-threshold=Pmax*0.50;
-left=index;
-right=index;
-while true
-    done=true;
-    if P(left) > threshold
-        if left>=1
-            left=left-1;
-            done=false;
-        end
-    end       
-    if P(right) > threshold
-        if (right<=numel(f))            
-            right=right+1;
-            done=false;
-        end
-    end 
-    if done
-        break
-    end    
-end
-
-fc=f(left:right);
-w=P(left:right);
-w=w/trapz(fc,w);
-f0=trapz(fc,w.*fc);
+temp=object.Measurement;
+FFToptions=struct('RemoveDC',true,'NumberFrequencies',1e6);
+[f,P]=fft(temp,FFToptions);
+[~,index]=max(P);
+guess=f(index);
+t=temp.Grid;
+s=temp.Data;
+s=s-mean(s);
+f0=fminsearch(@DCpower,guess,optimset('TolX',1e-9));
+    function P0neg=DCpower(fb)
+        temp=reset(temp,[],s.*sin(2*pi*fb*t));
+        P0neg=-mean(temp.Data)^2;
+    end
 object.ClockRate=f0;
 
-%% phase analysis
-phase=interp1(f,y,f0);
-phase=atan2(imag(phase),real(phase));
-
-t=object.Measurement.Grid;
-temp=SMASH.SignalAnalysis.Signal(t,sin(2*pi*f0*t));
-[f,y]=fft(temp,FFToptions);
-phase0=interp1(f,y,f0);
-phase0=atan2(imag(phase0),real(phase0));
-
-% set up clock times
 period=1/f0;
 object.ClockPeriod=period;
-Delta=phase-phase0;
-%temp=SMASH.SignalAnalysis.Signal(t,sin(2*pi*f0*t+Delta));
 
-nc=2*mean(t)/period+Delta/pi-0.5;
-nc=round(nc);
-tc=period*((nc+1/2)/2-Delta/(2*pi));
-tc=tc:-period:t(1);
-tc=tc(end:-1:1);
-tc=[tc tc(end)+period:period:t(end)];
-tc=tc(:);
-tc=tc(2:end-1); % drop first and last pulses, which may be partials
+% find center pulse
+t=object.Measurement.Grid;
+first=t(1);
+last=t(end);
+T=(last-first)/(numel(t)-1);
+center=(t(end)+t(1))/2;
+local=crop(object.Measurement,center+[-2 +2]*period);
 
+tau=period/10;
+Dlocal=differentiate(local,[1 round(tau/T)]);
+t=Dlocal.Grid;
+s=Dlocal.Data;
+[~,index]=max(s);
+if t(index) < center
+    left=t(index);
+    right=left+period;
+else
+    right=t(index);
+    left=right-period;
+end
+
+Dlocal=crop(Dlocal,[left right]);
+t=Dlocal.Grid;
+s=Dlocal.Data;
+[~,index]=min(s);
+boundary=t(index);
+
+local=crop(local,[left right]);
+A=std(local.Data(1:index));
+B=std(local.Data(index:end));
+if A > B
+    center=(left+boundary)/2;
+else
+    center=(boundary+right)/2;
+end
+
+tc=[center:-period:first (center+period):period:last];
+tc=sort(tc);
+tc=tc(2:end-1);
+
+% set up timing
 object.PulseCenter=tc;
 object.NumberPulses=numel(tc);
 object.PulseBound(:,2)=tc+object.ClockPeriod/2;
 object.PulseBound(:,1)=tc-object.ClockPeriod/2;
 
 % record sampling
-T=(t(end)-t(1))/(numel(t)-1);
 object.SamplePeriod=T;
 object.SampleRate=1/T;
 

@@ -1,6 +1,6 @@
 classdef HVPDV
     properties
-        Measurement               
+        Measurement % Measured (x,y) data [Signal object]              
         SampleRate
         SamplePeriod
     end
@@ -10,11 +10,11 @@ classdef HVPDV
         NumberPulses
         PulseCenter
         PulseBound
+        PulseShape  
+        HilbertCutoff= 0.1e9 
     end
     properties
         MaxCrossings=2; % maximum number of crossings
-        AreaThreshold=0.10; % fractional area threshold for m>1 crossings
-        RemoveBoundary=0; % fractional duration removed from each side of a crossing
     end
     %%
     methods (Hidden=true)

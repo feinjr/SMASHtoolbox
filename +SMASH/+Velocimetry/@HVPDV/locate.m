@@ -43,11 +43,25 @@ try
 catch
     error('ERROR: invalid pulse request');
 end
+
 time=local.Grid;
+shape=lookup(object.PulseShape,time,'extrap');
+local=local-shape;
+
+local=hilbert(local,object.HilbertCutoff);
 x=real(local.Data);
 y=imag(local.Data);
 amplitude=sqrt(x.^2+y.^2);
-%area=cumtrapz(time,amplitude);
+
+persistent temp
+if isempty(temp)
+    temp=SMASH.SignalAnalysis.Signal(time,amplitude);
+else
+    temp=reset(temp,time,amplitude);
+end
+L=round(duration/(2*object.SamplePeriod));
+temp=smooth(temp,'mean',L);
+amplitude=temp.Data;
 
 assert(duration < (time(end)-time(1)),...
     'ERROR: crossing duration is too large');
@@ -56,54 +70,41 @@ assert(duration < (time(end)-time(1)),...
 location=nan(object.MaxCrossings,1);
 for m=1:object.MaxCrossings
     % identify cross region
-    [value,index]=max(amplitude);
-    % what about area threshold?
-    threshold=value*0.75;
-    center=time(index);
-    keep=abs(time-center) <= duration;
-    tk=time(keep);
-    Ak=amplitude(keep);
-    keep=(Ak >= threshold);
-    tk=tk(keep);
-    center=(tk(1)+tk(end))/2;              
+    [~,index]=max(amplitude);   
+    center=time(index);         
     % restrict data to cross region
     keep=(abs(time-center) <= (duration/2));
     tm=time(keep);
     zm=x(keep)+1i*y(keep);
-    % optimize to the nearest sample point
+    % general optimization
     span=duration/4;
-    T=object.SamplePeriod;
+    T=object.SamplePeriod/10;
     ts=(center-span):T:(center+span);    
     err=symerr(ts,tm,zm);
     [~,index]=min(err);
-    center=ts(index);    
-    % refine optimization between sample points
-    span=T;
-    T=T/10;
-    ts=(center-span):T:(center+span);
-    err=symerr(ts); % uses previously defined data
-    [~,index]=min(err);
-    centerA=ts(index);
-    k=index+(-3:3);
-    ts=ts(k);
+    centerA=ts(index);    
+    % refine optimization        
+    k=index+(-4:4);
+    tsn=ts(k);
     t0=ts(1);
     tau=ts(end)-t0;
-    ts=(ts-t0)/tau; 
-    ts=ts(:);
-    err=err(k);
-    err=(err-min(err))/(max(err)-min(err));
-    err=err(:);
+    tsn=(tsn-t0)/tau; 
+    tsn=tsn(:);
+    errn=err(k);
+    errn=(errn-min(errn))/(max(errn)-min(errn));
+    errn=errn(:);
     %param=polyfit(ts,err,2);
-    matrix=ones(numel(ts),3);
-    matrix(:,1)=ts.^2;
-    matrix(:,2)=ts;
-    param=matrix \ err;
+    matrix=ones(numel(tsn),3);
+    matrix(:,1)=tsn.^2;
+    matrix(:,2)=tsn;
+    param=matrix \ errn;
     solution=-param(2)/(2*param(1));
     center=t0+solution*tau;       
     %center=ts(index);       
     location(m)=center;   
     % remove cross region for next iteration
-    amplitude(keep)=0;
+    drop=(abs(time-center) <= (duration));
+    amplitude(drop)=0;
 end
 
 location=sort(location);
