@@ -76,6 +76,7 @@ NumberInferredVariables = length(InferredVariables);
 %Calculate error covariance first so it's not done every time
 r0={size(obj)}; %Initial residuals saved as a cell for each object
 sig2={size(obj)}; %Initial covariance saved as a cell for each object
+ESS = []; %Effective sample size for each experiment
 for ii = 1:Nexp
     %User model must return residuals and covariance
     [rt, sig2t]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
@@ -88,6 +89,13 @@ for ii = 1:Nexp
     else
         sig2inv{ii} = inv(sig2t);
     end
+    
+    if ~isempty(obj{ii}.VariableSettings.EffectiveSampleSize);
+        ESS(ii) = obj{ii}.VariableSettings.EffectiveSampleSize;
+    else
+        ESS(ii) = length(rt); 
+    end
+     
 end
 
 %Setup initial conditions
@@ -111,7 +119,7 @@ error_old = {lik_old};
 %For each experiment calculate the log-likelihood and residuals
 for ii = 1:Nexp 
     samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
-    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii});
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii},ESS(ii));
 end
 
 % Starting prior likelihood
@@ -232,6 +240,10 @@ if  ~isempty(obj{1}.MCMCSettings.AdaptiveInterval) && isnumeric(obj{1}.MCMCSetti
     
 end
 
+% Some error checking
+assert(length(diag(R)) == length(InferredVariables),'ERROR : Proposal covariance is not compatible with number of inferred variables');
+
+
 
 %% %%%%%%%%%%%%%%%%%%%%  MCMC loop  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 wb=SMASH.MUI.Waitbar('Running MCMC');
@@ -266,7 +278,7 @@ for MCMCloop=2:chainlength
     lik_old =zeros([1,Nexp]);
     response_old = {lik_old};
     for ii = 1:Nexp
-        [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+        [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
     end
     
    
@@ -407,11 +419,11 @@ error_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
 end
 
 %Calculate alpha (update criteria)
-alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
+alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
 %alpha = min(0,sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old));
 
 % Metropolis update
@@ -454,14 +466,14 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii));
+        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii),ESS(ii));
     end
     
     % DR algorithm - only single stage
     q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
-    alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
+    alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)),'includenan');
     L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
-    alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
+    alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
     
     if rand <= alpha13
        acc = 1;  % Accept the candidate
@@ -530,10 +542,10 @@ for eNum = 1:Nexp
             for ii = 1:Nexp
                 %Update shared variables
                 trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
                 %lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
             end
-            alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
+            alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
 
 
             % Metropolis update
@@ -567,7 +579,7 @@ for eNum = 1:Nexp
                 for ii = 1:length(obj)
                     %Update shared variables
                     trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
                     %lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii});
                 end
                 
@@ -578,9 +590,9 @@ for eNum = 1:Nexp
 
                 % DR algorithm
                 q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
-                alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
+                alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)),'includenan');
                 L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
-                alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
+                alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
 
                 if rand <= alpha13
                     acc(count) = 1;  % Accept the candidate
@@ -608,7 +620,7 @@ lprior_old = savedpriors;
 lik_old =zeros([1,Nexp]);
 response_old = {lik_old};
 for ii = 1:Nexp
-    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii));
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
         
@@ -620,18 +632,16 @@ end %End individual update
 function HyperUpdate
 
 % Conjugate prior update
-if any(a0 == 0)
-    
+if 1
     for ii = 1:Nexp  
         if isvector(sig2{ii});
-            b1 = b0(ii) + 0.5*sum((response_old{ii}./sqrt(sig2{ii})).^2);
+            b1 = b0(ii) + 0.5*(ESS(ii)/numel(response_old{ii}))*sum((response_old{ii}./sqrt(sig2{ii})).^2);
         else
-            b1 = b0(ii) + 0.5*response_old{ii}'*sig2inv{ii}*response_old{ii};
+            b1 = b0(ii) + 0.5*(ESS(ii)/numel(response_old{ii}))*response_old{ii}'*sig2inv{ii}*response_old{ii};
         end
-        a1 = a0(ii) + 0.5*numel(response_old{ii});
-        phi(ii) = InvGamma(a1,b1);
+        a1 = a0(ii) + 0.5*ESS(ii);
+        phi(ii) = InvGamma(a1,b1);   
     end
- 
     
 % Metropolis update    
 else
@@ -640,6 +650,12 @@ else
     %Draw new samples from multivariate normal distrubtion with step sizes
     %given by proposal covariance.    
     trial_phi = phi + randn(size(phi))*R_phi;
+    
+    if trial_phi <= 0
+        hyperacc(MCMCloop,1) = 0;
+        return;
+    end
+        
 
     lphi_new = 0*phi;
     lik_new = zeros([1,Nexp]);
@@ -647,11 +663,11 @@ else
         %lphi_new = phi_priorfunc(phi_priorvals{:},trialphi);
         lphi_old(ii) = InvGamma(a0(ii),b0(ii),phi(ii));
         lphi_new(ii) = InvGamma(a0(ii),b0(ii),trial_phi(ii));
-        lik_new(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi(ii),sig2inv{ii}/trial_phi(ii));
+        lik_new(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi(ii),sig2inv{ii}/trial_phi(ii),ESS(ii));
     end
 
     %Calculate alpha (update criteria)
-    alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lphi_new) - sum(lphi_old)));
+    alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lphi_new) - sum(lphi_old)),'includenan');
 
     % Metropolis update
     if rand <= alpha
@@ -666,20 +682,25 @@ else
 
         %Next step
         trial_phi2 = phi + randn(size(phi))*R_phi/drscale;
-          
-
+        
+        if trial_phi2 <= 0
+            hyperacc(MCMCloop,1) = 0;
+            return;
+        end
+        
+       
         % Proposal likelihood
         lik_new2 =zeros([1,Nexp]);
         for ii = 1:length(obj)
             lphi_new2(ii) = InvGamma(a0(ii),b0(ii),trial_phi2(ii));
-            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi2(ii),sig2inv{ii}/trial_phi2(ii));
+            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi2(ii),sig2inv{ii}/trial_phi2(ii),ESS(ii));
         end
 
         % DR algorithm
         q1 = exp(-0.5*(norm((trial_phi2-trial_phi)*iR_phi)^2-norm((phi-trial_phi)*iR_phi)^2));
-        alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lphi_new) - sum(lphi_new2)));
-        L2 = exp(sum(lik_new2) + sum(lphi_new2) -sum(lik_old)-sum(lphi_old) );
-        alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
+        alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lphi_new) - sum(lphi_new2)),'includenan');
+        L2 = exp(sum(lik_new2) + sum(lphi_new2) -sum(lik_old)-sum(lphi_old));
+        alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
 
         if rand <= alpha13
             phi = trial_phi2;

@@ -20,9 +20,12 @@ object.VariableSettings.PriorSettings = {}; % Array correspodning to type for ea
 object.VariableSettings.HyperSettings = {}; % {'PriorType',[settings],proposal jump} (opt)
 object.VariableSettings.Infer = []; % Array of logicals (opt)
 object.VariableSettings.Share = []; % Array of logicals (opt)
+object.VariableSettings.EffectiveSampleSize = []; % Scalar value
+
 
 object.MCMCSettings.StartPoint = []; % Array of starting point of inferred variables
-object.MCMCSettings.ChainSize = 1e4; % Scalar value for length of chain 
+object.MCMCSettings.ChainSize = 1e4; % Scalar value for length of chain
+object.MCMCSettings.BurnIn = 0; %Scalar value specifying amount of burnin
 object.MCMCSettings.JointSampling = 'true'; % Option to switch between joint and individual updates
 object.MCMCSettings.ProposalCov = []; % Proposal covariance matrix for inferred variables (opt)
 object.MCMCSettings.DelayedRejectionScale = 0; % Enables DR algorithm (opt)
