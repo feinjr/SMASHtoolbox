@@ -24,9 +24,16 @@ classdef HVPDV
                     SMASH.SignalAnalysis.Signal(varargin{:});
             catch
                 error('ERROR: invalid input');
-            end
+            end            
             object.Measurement=regrid(object.Measurement); % enforce uniform sampling
-            object=align(object);            
+            %
+            fprintf('Locating pulses...');
+            object=align(object);      
+            fprintf('done\n');
+            %
+            fprintf('Determining average pulse shape...');
+            object=characterize(object);
+            fprintf('done\n');
         end
         %varargout=align(varargin);
     end

@@ -57,8 +57,10 @@ s=Dlocal.Data;
 boundary=t(index);
 
 local=crop(local,[left right]);
-A=std(local.Data(1:index));
-B=std(local.Data(index:end));
+%A=std(local.Data(1:index));
+A=std(diff(local.Data(1:index)));
+%B=std(local.Data(index:end));
+B=std(diff(local.Data(index:end)));
 if A > B
     center=(left+boundary)/2;
 else

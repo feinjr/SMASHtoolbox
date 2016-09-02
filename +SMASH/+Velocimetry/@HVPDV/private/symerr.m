@@ -23,7 +23,9 @@ elseif nargin==3
     %
     data.t0=time(1);
     data.t=time(:)-data.t0;
-    data.z=signal(:);
+    %data.z=signal(:);
+    data.z=1i*imag(signal(:));
+    %data.z=real(signal(:));
     data.T=data.t(end)/(data.M-1);       
     %
     data.M2=pow2(nextpow2(numel(data.t))+2);

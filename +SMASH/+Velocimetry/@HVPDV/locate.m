@@ -49,9 +49,9 @@ shape=lookup(object.PulseShape,time,'extrap');
 local=local-shape;
 
 local=hilbert(local,object.HilbertCutoff);
-x=real(local.Data);
-y=imag(local.Data);
-amplitude=sqrt(x.^2+y.^2);
+z=local.Data;
+amplitude=sqrt(real(z.*conj(z)));
+phase=unwrap(atan2(imag(z),real(z)));
 
 persistent temp
 if isempty(temp)
@@ -71,37 +71,39 @@ location=nan(object.MaxCrossings,1);
 for m=1:object.MaxCrossings
     % identify cross region
     [~,index]=max(amplitude);   
-    center=time(index);         
+    centerA=time(index);            
     % restrict data to cross region
-    keep=(abs(time-center) <= (duration/2));
+    keep=(abs(time-centerA) <= (duration/2));
     tm=time(keep);
-    zm=x(keep)+1i*y(keep);
-    % general optimization
-    span=duration/4;
-    T=object.SamplePeriod/10;
-    ts=(center-span):T:(center+span);    
+    zm=z(keep);
+    Am=amplitude(keep);
+    phim=phase(keep);
+    centerA=analyzePhase(tm,phim,Am);
+    % symmetry optimization
+    %span=2*object.SamplePeriod;
+    span=5*object.SamplePeriod;
+    T=object.SamplePeriod/20;
+    ts=(centerA-span):T:(centerA+span);
     err=symerr(ts,tm,zm);
     [~,index]=min(err);
-    centerA=ts(index);    
-    % refine optimization        
-    k=index+(-4:4);
-    tsn=ts(k);
-    t0=ts(1);
-    tau=ts(end)-t0;
-    tsn=(tsn-t0)/tau; 
-    tsn=tsn(:);
-    errn=err(k);
-    errn=(errn-min(errn))/(max(errn)-min(errn));
-    errn=errn(:);
-    %param=polyfit(ts,err,2);
-    matrix=ones(numel(tsn),3);
-    matrix(:,1)=tsn.^2;
-    matrix(:,2)=tsn;
-    param=matrix \ errn;
-    solution=-param(2)/(2*param(1));
-    center=t0+solution*tau;       
-    %center=ts(index);       
-    location(m)=center;   
+    center=ts(index);
+    % refine optimization
+    %     k=index+(-4:4);
+    %     tsn=ts(k);
+    %     t0=ts(1);
+    %     tau=ts(end)-t0;
+    %     tsn=(tsn-t0)/tau;
+    %     tsn=tsn(:);
+    %     errn=err(k);
+    %     errn=(errn-min(errn))/(max(errn)-min(errn));
+    %     errn=errn(:);
+    %     matrix=ones(numel(tsn),3);
+    %     matrix(:,1)=tsn.^2;
+    %     matrix(:,2)=tsn;
+    %     param=matrix \ errn;
+    %     solution=-param(2)/(2*param(1));
+    %     center=t0+solution*tau;
+    location(m)=center;
     % remove cross region for next iteration
     drop=(abs(time-center) <= (duration));
     amplitude(drop)=0;

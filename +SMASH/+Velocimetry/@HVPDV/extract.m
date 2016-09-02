@@ -1,19 +1,19 @@
-function local=extract(object,pulse)
+%
+
+function [local,tc]=extract(object,pulse)
 
 % manage input
 if (nargin<2) || isempty(pulse)
     pulse=1;
 end
 valid=1:object.NumberPulses;
-assert(isnumeric(pulse) && any(pulse==valid),...
+assert(isnumeric(pulse) && isscalar(pulse) && any(pulse==valid),...
     'ERROR: invalid pulse requested');
 
 % extract requested pulse
 bound=object.PulseBound(pulse,:);
 local=crop(object.Measurement,bound);
-local=shift(local,-object.PulseCenter(pulse));
-
-% convert to STFT object
-%local=SMASH.SignalAnalysis.STFT(local);
+tc=object.PulseCenter(pulse);
+local=shift(local,-tc);
 
 end
