@@ -204,7 +204,7 @@ if any(drop)
         signal(index(k))=value;
     end
 end
-temp=struct('time',time,'signal',signal);
+temp=struct('time',time+data.time_shift,'signal',signal);
 set(data.handle{1}.SignalLine,'UserData',temp);
 
 data.update.signal=true;
@@ -738,6 +738,7 @@ for k=1:numel(header)
     end
     
 end
+
 
 % update the program
 data.update.signal=true;
