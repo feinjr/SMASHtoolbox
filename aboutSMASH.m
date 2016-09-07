@@ -45,10 +45,17 @@ if nargout==0
     format='%10s : %s\n';
     fprintf(format,'version',data.VersionNumber);
     fprintf(format,'committed',data.Committed);
-    fprintf('\n')
-    fprintf('\t Copyright 2016 Sandia Corporation.\n');
-    fprintf('\t Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive license for use of this work by or on behalf of the U.S. Government.\n');
-    fprintf('\t Export of this program may require a license from the United States Government.\n');
+    file=fullfile(location,'LICENSE.txt');
+    fid=fopen(file,'r');
+    while ~feof(fid)        
+        temp=strtrim(fgets(fid));
+        if isempty(temp)
+            continue
+        end
+        fprintf('\n%s\n\n',temp);
+        break
+    end
+    fclose(fid);    
 else
     varargout{1}=data;
 end
