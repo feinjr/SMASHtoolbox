@@ -18,6 +18,8 @@ object.VariableSettings.PriorType = {}; % List of strings
 object.VariableSettings.PriorSettings = {}; % Array correspodning to type for each element
 
 object.VariableSettings.HyperSettings = {}; % {'PriorType',[settings],proposal jump} (opt)
+object.VariableSettings.DiscrepancyPriorCov = []; % Prior covariance for discrepancy function
+object.VariableSettings.DiscrepancyPriorWeights = []; % Residual weights for discrepancy prior
 object.VariableSettings.Infer = []; % Array of logicals (opt)
 object.VariableSettings.Share = []; % Array of logicals (opt)
 object.VariableSettings.EffectiveSampleSize = []; % Scalar value
@@ -37,6 +39,7 @@ object.MCMCResults.InferredChain = [];
 object.MCMCResults.CutChain = [];
 object.MCMCResults.AcceptanceRate = [];
 object.MCMCResults.HyperChain = [];
+object.MCMCResults.DiscrepancyChain = [];
 object.MCMCResults.ResponseMoments = [];
 object.MCMCResults.ResponseCredibleInterval = [];
 object.MCMCResults.ResponsePredictionInterval = [];

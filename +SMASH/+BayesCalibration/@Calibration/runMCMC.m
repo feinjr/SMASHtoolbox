@@ -75,30 +75,25 @@ NumberInferredVariables = length(InferredVariables);
 
 %Calculate error covariance first so it's not done every time
 r0={size(obj)}; %Initial residuals saved as a cell for each object
-sig2={size(obj)}; %Initial covariance saved as a cell for each object
+sig2e={size(obj)}; %Initial covariance saved as a cell for each object
 ESS = []; %Effective sample size for each experiment
 for ii = 1:Nexp
     %User model must return residuals and covariance
-    [rt, sig2t]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
-    r0{ii} = sig2t;
-    sig2{ii} = sig2t;
-    %Speedups in code if covariance is a diagonal matrix, this is tracked
-    %but the inverse is carried as a matrix.
-    if isvector(sig2{ii})
-         sig2inv{ii} = inv(diag(sig2t));
-    else
-        sig2inv{ii} = inv(sig2t);
-    end
+    [rt, sig2et]= calculateResiduals(obj{ii},obj{ii}.MCMCSettings.StartPoint);
+    r0{ii} = rt;
+    sig2e{ii} = sig2et;
     
     if ~isempty(obj{ii}.VariableSettings.EffectiveSampleSize);
-        ESS(ii) = obj{ii}.VariableSettings.EffectiveSampleSize;
+        ESS(ii) = obj{ii}.VariableSettings.EffectiveSampleSize/length(rt);
     else
-        ESS(ii) = length(rt); 
+        ESS(ii) = 1; %Effective scaling, not effective sample size
     end
      
 end
 
+
 %Setup initial conditions
+chainlength = obj{1}.MCMCSettings.ChainSize;
 %Inferred variables chain start, object 1
 I_update = obj{1}.MCMCSettings.StartPoint(obj{1}.VariableSettings.Infer);
 %Cut variables chain start, object 1
@@ -112,61 +107,10 @@ for ii = 2:Nexp
     samps{ii} = obj{ii}.MCMCSettings.StartPoint; 
 end
 
-%Stating point likelihood
-lik_old =zeros([1,Nexp]);
-response_old = {lik_old};
-error_old = {lik_old};
-%For each experiment calculate the log-likelihood and residuals
-for ii = 1:Nexp 
-    samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
-    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},sig2inv{ii},ESS(ii));
-end
-
-% Starting prior likelihood
-lprior_old = zeros([1,NumberInferredVariables]);
-count = 0;
-%Loop through each experiment and then each inferred variable and calculate
-%the prior function and values. These are saved for future use before
-%evaluating the starting point.
-for eNum = 1:length(obj)
-    for sNum=1:length(samps{eNum})
-        if addinferred{eNum}(sNum)
-        count = count+1;
-        priorfunc{count}= str2func(obj{eNum}.VariableSettings.PriorType{sNum});
-        priorvals{count} = num2cell(obj{eNum}.VariableSettings.PriorSettings{sNum});
-        lprior_old(count) = priorfunc{count}(priorvals{count}{:},samps{eNum}(sNum));
-        end            
-    end
-end 
-
-%Pre-allocate the chain sizes
-chainlength = obj{1}.MCMCSettings.ChainSize;
-%Accepted values for calculating acceptance rate
-if obj{1}.MCMCSettings.JointSampling
-    accepted = zeros([chainlength,1]);
-else
-    accepted = zeros([chainlength,length(I_update)]);
-end
-%Inferred variables
-I_chain = zeros([chainlength,length(InferredVariables)]);
-%Cut variables
-FC_chain = zeros([chainlength,length(CutVariables)]);
-%Log-likelihood values
-lik_chain=zeros([chainlength,1]);
-%Residual values are concatenated and saved in a single row
-response_chain=zeros([chainlength,numel(cell2mat(response_old'))]);
-%Residual errors correspond to responses
-error_chain=response_chain;
-
-%Update chain with initial values
-I_chain(1,:) = I_update;
-FC_chain(1,:) = FC_add;
-lik_chain(1,:)=sum(lik_old);
-response_chain(1,:) =cell2mat(response_old')';
-error_chain(1,:) =cell2mat(error_old')';
 
 %Hyper-parameter settings
 inferhyper = false;
+inferdiscrepancy = false;
 phi=ones([1,Nexp]);
 hyperchain = ones([chainlength,length(phi)]);
 hyperacc = ones([chainlength,1]);
@@ -190,10 +134,102 @@ if ~isempty(obj{1}.VariableSettings.HyperSettings)
     
     %Define proposal covariance for phi
     qcov_phi = diag(0.1*ones(size(phi))).^2;
-    R_phi = chol(qcov_phi); iR_phi = inv(R_phi);
-        
+    R_phi = chol(qcov_phi); iR_phi = inv(R_phi);       
 end
 
+%Set up discrepancy error
+if isempty(obj{1}.VariableSettings.DiscrepancyPriorCov)
+    sig2 = sig2e;
+    for ii=1:Nexp
+        if isvector(sig2{ii})
+            R_sig2{ii} = chol(diag(sig2{ii}));
+        else
+            R_sig2{ii} = chol(sig2{ii});
+        end
+    end
+else
+    inferdiscrepancy = true;
+    Rd0 = {}; %Corrleation structure
+    wd0 = {}; %Weights
+   
+    for ii=1:Nexp
+        if isempty(obj{ii}.VariableSettings.DiscrepancyPriorWeights)
+            wd0{ii} = eye(length(r0{ii}));
+        else
+            wd0{ii} = obj{ii}.VariableSettings.DiscrepancyPriorWeights;
+            if isvector(wd0{ii})
+                wd0{ii}=diag(wd0{ii});
+            end
+        end
+        Rd0{ii} = obj{ii}.VariableSettings.DiscrepancyPriorCov;
+        if isvector(sig2e{ii})
+            sig2e{ii} = diag(sig2e{ii});
+        end
+        Rd0{ii}=wd0{ii}*Rd0{ii}*wd0{ii};
+        sig2{ii} = phi(ii)*Rd0{ii} + sig2e{ii};
+        R_Rd0{ii} = chol(Rd0{ii});
+        R_sig2{ii} = chol(sig2{ii});
+    end
+end
+R_sig20=R_sig2;
+
+
+%Stating point likelihood
+lik_old =zeros([1,Nexp]);
+response_old = {lik_old};
+error_old = {lik_old};
+%For each experiment calculate the log-likelihood and residuals
+for ii = 1:Nexp 
+    samps{ii}(obj{ii}.VariableSettings.Share) = samps{1}(obj{ii}.VariableSettings.Share);
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
+    lik_old(ii) = ESS(ii)*lik_old(ii);
+    disc_mu{ii} = 0*response_old{ii};
+end
+
+% Starting prior likelihood
+lprior_old = zeros([1,NumberInferredVariables]);
+count = 0;
+%Loop through each experiment and then each inferred variable and calculate
+%the prior function and values. These are saved for future use before
+%evaluating the starting point.
+for eNum = 1:length(obj)
+    for sNum=1:length(samps{eNum})
+        if addinferred{eNum}(sNum)
+        count = count+1;
+        priorfunc{count}= str2func(obj{eNum}.VariableSettings.PriorType{sNum});
+        priorvals{count} = num2cell(obj{eNum}.VariableSettings.PriorSettings{sNum});
+        lprior_old(count) = priorfunc{count}(priorvals{count}{:},samps{eNum}(sNum));
+        end            
+    end
+end 
+
+%Pre-allocate the chain sizes
+%Accepted values for calculating acceptance rate
+if obj{1}.MCMCSettings.JointSampling
+    accepted = zeros([chainlength,1]);
+else
+    accepted = zeros([chainlength,length(I_update)]);
+end
+%Inferred variables
+I_chain = zeros([chainlength,length(InferredVariables)]);
+%Cut variables
+FC_chain = zeros([chainlength,length(CutVariables)]);
+%Log-likelihood values
+lik_chain=zeros([chainlength,1]);
+%Residual values are concatenated and saved in a single row
+response_chain=zeros([chainlength,numel(cell2mat(response_old'))]);
+%Residual errors correspond to responses
+error_chain=response_chain;
+%Discrepancy
+discrepancy_chain=zeros([chainlength,numel(cell2mat(response_old'))]);
+
+%Update chain with initial values
+I_chain(1,:) = I_update;
+FC_chain(1,:) = FC_add;
+lik_chain(1,:)=sum(lik_old);
+response_chain(1,:) =cell2mat(response_old')';
+error_chain(1,:) =cell2mat(error_old')';
+        
 
 %Some MCMC options
 qcov = [];
@@ -252,9 +288,10 @@ for MCMCloop=2:chainlength
     %Update error multiplier - for normal phi likelihood with known mean,
     %the conjugate prior is an inverse gamma. This allows direct sampling
     %of the posterior 
-    if inferhyper
+    if inferhyper | inferdiscrepancy
         HyperUpdate;
         hyperchain(MCMCloop,:) = phi;
+        discrepancy_chain(MCMCloop,:)=cell2mat(disc_mu')';
     end
     
              
@@ -278,10 +315,10 @@ for MCMCloop=2:chainlength
     lik_old =zeros([1,Nexp]);
     response_old = {lik_old};
     for ii = 1:Nexp
-        [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
+        [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
+        lik_old(ii) = ESS(ii)*lik_old(ii);
     end
-    
-   
+       
     if obj{1}.MCMCSettings.JointSampling
         % Apply single metropolis update for all variables with
         % multivariate normal proposal (DRAM, Haario et al. (2006))
@@ -299,6 +336,7 @@ for MCMCloop=2:chainlength
     lik_chain(MCMCloop,:)=sum(lik_old);
     response_chain(MCMCloop,:)=cell2mat(response_old')';
     error_chain(MCMCloop,:)=cell2mat(error_old')';
+    
 
     % If using adaptive metropolis, update the proposal jumps
     if adaptint>0 && fix(MCMCloop/adaptint) == MCMCloop/adaptint && MCMCloop > lastAMupdate && MCMCloop > burnin
@@ -346,18 +384,19 @@ ResObj.MCMCResults.CutChain = FC_chain(keep,:);
 ResObj.MCMCResults.AcceptanceRate = arate(keep,:);
 ResObj.MCMCResults.LogLikelihood = lik_chain(keep,:);
 ResObj.MCMCResults.HyperChain = hyperchain(keep,:);
+ResObj.MCMCResults.DiscrepancyChain = discrepancy_chain(keep,:);
 
 %Credible intervals
-cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
-moments = summarize(cloudobj);
-ResObj.MCMCResults.ResponseMoments = moments;
-sec = sqrt(moments(:,2));
-ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
+%cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
+%moments = summarize(cloudobj);
+%ResObj.MCMCResults.ResponseMoments = moments;
+%sec = sqrt(moments(:,2));
+%ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
 
 %Prediction intervals
-pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
-pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
-ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
+%pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
+%pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
+%ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
 %sep = mean(error_chain)'; 
 %ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),moments(:,1)+2*sec+2*sep,moments(:,1)-2*sec-2*sep];
 
@@ -419,7 +458,8 @@ error_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
+    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},R_sig2{ii});
+    lik_new(ii) = ESS(ii)*lik_new(ii);
 end
 
 %Calculate alpha (update criteria)
@@ -466,7 +506,8 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}./phi(ii),ESS(ii));
+        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii},R_sig2{ii});
+        lik_new2(ii) = ESS(ii)*lik_new2(ii);
     end
     
     % DR algorithm - only single stage
@@ -542,7 +583,8 @@ for eNum = 1:Nexp
             for ii = 1:Nexp
                 %Update shared variables
                 trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
+                lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},R_sig2{ii});
+                lik_new(ii) = ESS(ii)*lik_new(ii);
                 %lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
             end
             alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
@@ -579,7 +621,8 @@ for eNum = 1:Nexp
                 for ii = 1:length(obj)
                     %Update shared variables
                     trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
+                    lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii},R_sig2{ii});
+                    lik_new2(ii) = ESS(ii)*lik_new2(ii);
                     %lik_new2(ii) = calculateLogLikelihood(obj{ii},trialsamps2{ii});
                 end
                 
@@ -620,7 +663,8 @@ lprior_old = savedpriors;
 lik_old =zeros([1,Nexp]);
 response_old = {lik_old};
 for ii = 1:Nexp
-    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*phi(ii),sig2inv{ii}/phi(ii),ESS(ii));
+    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
+    lik_old(ii) = ESS(ii)*lik_old(ii);
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
         
@@ -631,39 +675,47 @@ end %End individual update
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%  Hyperparameter, phi, Update %%%%%%%%%%%%%%%%%%
 function HyperUpdate
 
-% Conjugate prior update
-if 1
+% Conjugate prior update for phi if there is no discrepancy (scaling of
+% sig2e)
+if ~inferdiscrepancy
     for ii = 1:Nexp  
         if isvector(sig2{ii});
-            b1 = b0(ii) + 0.5*(ESS(ii)/numel(response_old{ii}))*sum((response_old{ii}./sqrt(sig2{ii})).^2);
+            b1 = b0(ii) + 0.5*ESS(ii)*sum((response_old{ii}./sqrt(sig2{ii})).^2);
         else
-            b1 = b0(ii) + 0.5*(ESS(ii)/numel(response_old{ii}))*response_old{ii}'*sig2inv{ii}*response_old{ii};
+            %b1 = b0(ii) + 0.5*ESS(ii)*response_old{ii}'*sig2inv{ii}*response_old{ii};
+            z = R_sig2{ii}\response_old{ii};
+            b1 = b0(ii) + 0.5*ESS(ii)*(z'*z);
         end
-        a1 = a0(ii) + 0.5*ESS(ii);
+        a1 = a0(ii) + 0.5*ESS(ii)*length(response_old{ii});
         phi(ii) = InvGamma(a1,b1);   
+               
+        sig2{ii} = phi(ii) * sig2e{ii};
+        R_sig2{ii} = R_sig20{ii}/sqrt(phi(ii));
     end
     
-% Metropolis update    
+% Metropolis update of phi and sampling of discrepancy posteriors   
 else
-
 
     %Draw new samples from multivariate normal distrubtion with step sizes
     %given by proposal covariance.    
     trial_phi = phi + randn(size(phi))*R_phi;
     
-    if trial_phi <= 0
+    if any(trial_phi <= eps)
         hyperacc(MCMCloop,1) = 0;
         return;
     end
         
-
     lphi_new = 0*phi;
     lik_new = zeros([1,Nexp]);
+    %updateSig2(trial_phi);
     for ii = 1:length(phi)
         %lphi_new = phi_priorfunc(phi_priorvals{:},trialphi);
         lphi_old(ii) = InvGamma(a0(ii),b0(ii),phi(ii));
         lphi_new(ii) = InvGamma(a0(ii),b0(ii),trial_phi(ii));
-        lik_new(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi(ii),sig2inv{ii}/trial_phi(ii),ESS(ii));
+        trial_sig2{ii} = trial_phi(ii).*Rd0{ii} + sig2e{ii};
+        R_trial{ii}=chol(trial_sig2{ii});
+        lik_new(ii)  = calculateLogLikelihood(obj{ii},samps{ii},trial_sig2{ii},R_trial{ii});
+        lik_new(ii) = ESS(ii)*lik_new(ii);
     end
 
     %Calculate alpha (update criteria)
@@ -673,6 +725,8 @@ else
     if rand <= alpha
         phi = trial_phi;
         hyperacc(MCMCloop,1) = 1;
+        sig2 = trial_sig2;
+        R_sig2 = R_trial;
     else
         hyperacc(MCMCloop,1) = 0;
     end
@@ -683,7 +737,7 @@ else
         %Next step
         trial_phi2 = phi + randn(size(phi))*R_phi/drscale;
         
-        if trial_phi2 <= 0
+        if any(trial_phi2 <= eps)
             hyperacc(MCMCloop,1) = 0;
             return;
         end
@@ -692,8 +746,11 @@ else
         % Proposal likelihood
         lik_new2 =zeros([1,Nexp]);
         for ii = 1:length(obj)
+            trial2_sig2{ii} = trial_phi2(ii).*Rd0{ii} + sig2e{ii};
+            R_trial2{ii}=chol(trial2_sig2{ii});
             lphi_new2(ii) = InvGamma(a0(ii),b0(ii),trial_phi2(ii));
-            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii}*trial_phi2(ii),sig2inv{ii}/trial_phi2(ii),ESS(ii));
+            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},trial2_sig2{ii},R_trial2);
+            lik_new2(ii) = ESS(ii)*lik_new2(ii);
         end
 
         % DR algorithm
@@ -705,12 +762,27 @@ else
         if rand <= alpha13
             phi = trial_phi2;
             hyperacc(MCMCloop,1) = 1;
+            sig2 = trial2_sig2;
+            R_sig2 = R_trial2;
         else
             hyperacc(MCMCloop,1) = 0;
         end
     end
     
     
+    %Update discrepancy mu and sig2
+    disc_mu={};
+    disc_sig2={};
+    for ii = 1:length(obj) 
+        %lambda = phi(ii)*Rd0{ii};
+        %disc_mu{ii} = lambda*inv(sig2{ii})*response_old{ii};
+        %disc_mu{ii} = lambda*(sig2{ii}\response_old{ii});
+        %iRs = inv(R_sig2{ii});
+        %disc_mu{ii} = lambda*iRs*iRs'*response_old{ii};
+        %disc_mu{ii} = phi(ii)*R_Rd0{ii}*R_sig2{ii}\response_old{ii};
+        %disc_sig2{ii} = phi(ii)*wd0{ii}.^2+sig2e{ii}-lambda'*sig2inv{ii}*lambda';
+        disc_mu{ii} = response_old{ii};
+    end
     
     
     
@@ -718,8 +790,8 @@ end
 
 end
 
-
-
+    
+    
 
 
 end %%End runMCMC

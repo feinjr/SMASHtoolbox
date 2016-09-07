@@ -1793,11 +1793,13 @@ function PerformCallback(varargin)
             uload = []; 
         end
         
-        if numel(t{i}(maxu_index(i):end)) > 1
+        %if numel(t{i}(maxu_index(i):end)) > 1
+        try
             utemp = us{i}(maxu_index(i):end); ttemp = t{i}(maxu_index(i):end);
             [~, ia] = unique(utemp); utemp = utemp(ia); ttemp = ttemp(ia);
             tunload{i}=interp1(utemp,ttemp,uunload,'linear',t{i}(maxu_index(i)));
-        else
+        %else
+        catch
             uunload = [];  
         end
     end  
