@@ -315,7 +315,7 @@ for MCMCloop=2:chainlength
     lik_old =zeros([1,Nexp]);
     response_old = {lik_old};
     for ii = 1:Nexp
-        [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
+        [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
         lik_old(ii) = ESS(ii)*lik_old(ii);
     end
        
@@ -384,19 +384,23 @@ ResObj.MCMCResults.CutChain = FC_chain(keep,:);
 ResObj.MCMCResults.AcceptanceRate = arate(keep,:);
 ResObj.MCMCResults.LogLikelihood = lik_chain(keep,:);
 ResObj.MCMCResults.HyperChain = hyperchain(keep,:);
-ResObj.MCMCResults.DiscrepancyChain = discrepancy_chain(keep,:);
+
+%Discrepancy function
+cloudobj = SMASH.MonteCarlo.Cloud(discrepancy_chain(keep,:),'table');
+moments = summarize(cloudobj);
+ResObj.MCMCResults.DiscrepancyMoments = moments;
 
 %Credible intervals
-%cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
-%moments = summarize(cloudobj);
-%ResObj.MCMCResults.ResponseMoments = moments;
-%sec = sqrt(moments(:,2));
-%ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
+cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
+moments = summarize(cloudobj);
+ResObj.MCMCResults.ResponseMoments = moments;
+sec = sqrt(moments(:,2));
+ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
 
 %Prediction intervals
-%pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
-%pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
-%ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
+pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
+pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
+ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
 %sep = mean(error_chain)'; 
 %ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),moments(:,1)+2*sec+2*sep,moments(:,1)-2*sec-2*sep];
 
@@ -435,7 +439,7 @@ if ~isempty(qcov)
     end 
     
 
-%Otherwise loop through each inferred variable and draw an new sample from prior
+%Otherwise loop through each inferred variable and draw a new sample from prior
 else
     count = 0; trialsamps = samps;
     for eNum = 1:length(obj)
@@ -458,7 +462,7 @@ error_new = {lik_new};
 for ii = 1:Nexp
     %Update shared variables
     trialsamps{ii}(obj{ii}.VariableSettings.Share) = trialsamps{1}(obj{ii}.VariableSettings.Share);
-    [lik_new(ii),response_new{ii},error_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},R_sig2{ii});
+    [lik_new(ii),response_new{ii}]  = calculateLogLikelihood(obj{ii},trialsamps{ii},sig2{ii},R_sig2{ii});
     lik_new(ii) = ESS(ii)*lik_new(ii);
 end
 
@@ -476,7 +480,6 @@ if rand <= alpha
    lik_old = lik_new; 
    lprior_old = lprior_new;
    response_old = response_new;
-   error_old = error_new;
 else
    acc = 0; 
 end
@@ -506,7 +509,7 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     for ii = 1:length(obj)
         %Update shared variables
         trialsamps2{ii}(obj{ii}.VariableSettings.Share) = trialsamps2{1}(obj{ii}.VariableSettings.Share);
-        [lik_new2(ii),response_new2{ii},error_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii},R_sig2{ii});
+        [lik_new2(ii),response_new2{ii}] = calculateLogLikelihood(obj{ii},trialsamps2{ii},sig2{ii},R_sig2{ii});
         lik_new2(ii) = ESS(ii)*lik_new2(ii);
     end
     
@@ -524,7 +527,6 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
        lik_old = lik_new2; 
        lprior_old = lprior_new2;
        response_old = response_new2;
-       error_old = error_new2;
     else
        acc = 0; 
     end
@@ -663,7 +665,7 @@ lprior_old = savedpriors;
 lik_old =zeros([1,Nexp]);
 response_old = {lik_old};
 for ii = 1:Nexp
-    [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
+    [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
     lik_old(ii) = ESS(ii)*lik_old(ii);
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
@@ -678,20 +680,22 @@ function HyperUpdate
 % Conjugate prior update for phi if there is no discrepancy (scaling of
 % sig2e)
 if ~inferdiscrepancy
+    
     for ii = 1:Nexp  
         if isvector(sig2{ii});
-            b1 = b0(ii) + 0.5*ESS(ii)*sum((response_old{ii}./sqrt(sig2{ii})).^2);
+            b1 = b0(ii) + 0.5*ESS(ii)*sum((response_old{ii}./sqrt(sig2e{ii})).^2);
         else
             %b1 = b0(ii) + 0.5*ESS(ii)*response_old{ii}'*sig2inv{ii}*response_old{ii};
-            z = R_sig2{ii}\response_old{ii};
+            z = R_sig20{ii}\response_old{ii};
             b1 = b0(ii) + 0.5*ESS(ii)*(z'*z);
         end
         a1 = a0(ii) + 0.5*ESS(ii)*length(response_old{ii});
         phi(ii) = InvGamma(a1,b1);   
-               
+
         sig2{ii} = phi(ii) * sig2e{ii};
-        R_sig2{ii} = R_sig20{ii}/sqrt(phi(ii));
+        R_sig2{ii} = R_sig20{ii}*sqrt(phi(ii));
     end
+    
     
 % Metropolis update of phi and sampling of discrepancy posteriors   
 else
@@ -749,7 +753,7 @@ else
             trial2_sig2{ii} = trial_phi2(ii).*Rd0{ii} + sig2e{ii};
             R_trial2{ii}=chol(trial2_sig2{ii});
             lphi_new2(ii) = InvGamma(a0(ii),b0(ii),trial_phi2(ii));
-            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},trial2_sig2{ii},R_trial2);
+            lik_new2(ii)  = calculateLogLikelihood(obj{ii},samps{ii},trial2_sig2{ii},R_trial2{ii});
             lik_new2(ii) = ESS(ii)*lik_new2(ii);
         end
 
@@ -776,12 +780,12 @@ else
     for ii = 1:length(obj) 
         %lambda = phi(ii)*Rd0{ii};
         %disc_mu{ii} = lambda*inv(sig2{ii})*response_old{ii};
-        %disc_mu{ii} = lambda*(sig2{ii}\response_old{ii});
+        disc_mu{ii} = phi(ii)*Rd0{ii}*(sig2{ii}\response_old{ii});
         %iRs = inv(R_sig2{ii});
         %disc_mu{ii} = lambda*iRs*iRs'*response_old{ii};
         %disc_mu{ii} = phi(ii)*R_Rd0{ii}*R_sig2{ii}\response_old{ii};
         %disc_sig2{ii} = phi(ii)*wd0{ii}.^2+sig2e{ii}-lambda'*sig2inv{ii}*lambda';
-        disc_mu{ii} = response_old{ii};
+        %disc_mu{ii} = response_old{ii};
     end
     
     
@@ -791,7 +795,14 @@ end
 end
 
     
-    
+
+
+
+
+
+
+
+
 
 
 end %%End runMCMC

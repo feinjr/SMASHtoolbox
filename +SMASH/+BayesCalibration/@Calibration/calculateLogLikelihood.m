@@ -29,7 +29,7 @@ if nargin < 4
     if isvector(sig2)
         R_sig2 = chol(diag(sig2));
     else
-        R_sig2 = inv(sig2);
+        R_sig2 = chol(sig2);
     end
 end
     

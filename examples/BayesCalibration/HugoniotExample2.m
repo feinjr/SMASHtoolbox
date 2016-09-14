@@ -12,11 +12,15 @@ dUs = data(:,4);
 
 [~,I] = sort(up); up = up(I); dup = dup(I); Us = Us(I); dUs = dUs(I);
 
-range1 = find(up < 0.8); 
-range2 = find(up >= 0.8); 
+break1 = 0.8; break2 = 2.6;
+range1 = find(up < break1); 
+range2 = find(up >= break1 & up <= break2); 
+range3 = find(up > break2); 
 
+dat = [];
 dat{1} = [up(range1), Us(range1), dUs(range1).^2];
-dat{2} = [up(range2), Us(range2), dUs(range2).^2]; 
+dat{2} = [up(range2), Us(range2), dUs(range2).^2];
+dat{3} = [up(range3), Us(range3), dUs(range3).^2]; 
 
 
 %% Setup the BayesCalibration objects
@@ -43,8 +47,8 @@ for ii=1:length(dat)
     % diffuse priors seem to work well
     %obj{ii}.VariableSettings.HyperSettings = []; % Don't infer
     %obj{ii}.VariableSettings.HyperSettings = [103,102]; % Dakota defaults
-    obj{ii}.VariableSettings.HyperSettings = [1.75,1.75/5];
-    %obj{ii}.VariableSettings.HyperSettings = [0,0]; %Non-informative
+    %obj{ii}.VariableSettings.HyperSettings = [1.75,1.75/5];
+    obj{ii}.VariableSettings.HyperSettings = [0.01,0.01]; %Non-informative
 
 
     % Infered variables - Infer both physical parameters
@@ -64,7 +68,7 @@ obj{1}.MCMCSettings.StartPoint = calculateMAP(obj{:},obj{1}.MCMCSettings.StartPo
 obj{1}.MCMCSettings.ProposalCov = 2.4^2/2*[0.03,0.02].^2;
 obj{1}.MCMCSettings.ChainSize = 1e4;
 obj{1}.MCMCSettings.BurnIn = 0;
-obj{1}.MCMCSettings.DelayedRejectionScale = 2;
+obj{1}.MCMCSettings.DelayedRejectionScale = 0;
 obj{1}.MCMCSettings.AdaptiveInterval = 1e3;
 obj{1}.MCMCSettings.JointSampling = true;
 

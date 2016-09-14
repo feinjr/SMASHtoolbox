@@ -23,7 +23,7 @@ if nargin == 2
     l = sig*randn+mu; % return a sample from the distribution
 elseif nargin == 3
     %Return the log-likelihood and it's derivative
-    s2 = sig^2;
+    s2 = sig.^2;
     %l  = -(x-mu).^2/(2*s2) - log(2*pi*s2)/2;
     %dl = -(x-mu)/s2;
     
