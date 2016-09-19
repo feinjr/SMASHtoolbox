@@ -27,17 +27,20 @@
 %
 classdef BoundParameter
     %%    
+    properties
+        ParameterName % Parameter names (cell array)
+    end
     properties (Dependent=true)
-        Slack % slack parameter values
-        Parameter % parameter values
+        Slack % slack parameter values (numeric array)
+        Parameter % parameter values (numeric array)
     end
     properties (SetAccess=protected)
-        Bound % min/max parameter values
+        Bound % min/max parameter values (two-column array)
     end
-    properties                        
-        VerifyInput = true % 
+    properties                                
+        VerifyInput = true % Perform input checks (logical value)
     end
-    properties (Access=protected)
+    properties (Access=protected, Hidden=true)
         NumberParameters %
         SlackValue % 
     end
@@ -47,6 +50,11 @@ classdef BoundParameter
             assert((nargin==1) && isnumeric(arg),...
                 'ERROR: invalid input');
             N=numel(arg);
+            name=cell(N,1);
+            for n=1:N
+                name{n}=sprintf('Parameter %d',n);
+            end        
+            object.ParameterName=name;
             object.NumberParameters=N;
             object.SlackValue=arg(:);            
             object.Bound=repmat([-inf +inf],[N 1]);
@@ -61,6 +69,15 @@ classdef BoundParameter
     end
     %% setters
     methods
+        function object=set.ParameterName(object,value)
+            if isempty(object.ParameterName)
+                object.ParameterName=value;
+                return;
+            end
+            assert(iscell(value) && numel(value) == numel(object.ParameterName),...
+                'ERROR: invalud parameter name input');
+            object.ParameterName=value;
+        end
         function object=set.Slack(object,value)
             if object.VerifyInput
                 assert(numel(value)==numel(object.SlackValue),...
