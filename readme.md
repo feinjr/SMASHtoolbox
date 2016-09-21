@@ -5,7 +5,7 @@ Welcome to the distribution site for the SMASH toolbox.  The repository you see 
 
 ## What is SMASH?
 
-SMASH stands for Sandia Matlab AnalysiS Hierarchy. It's a fancy way of saying "a collection of MATLAB code". The acronym and logo are inspired by dynamic compression research, where experiments involve literal smashing. The goals of the toolbox are: 
+SMASH stands for Sandia Matlab AnalysiS Hierarchy.  That is a fancy way of saying "a collection of MATLAB code". The acronym and logo are inspired by dynamic compression research, where experiments involve literal smashing. The goals of the toolbox are: 
 - To reduce development time in data analysis programs. 
 - To standardize analysis techniques across dynamic compression and high-energy density researchers. 
 - To promote and encourage collaborate analysis of complicated measurements. 
@@ -14,7 +14,9 @@ The toolbox contains a "+SMASH" directory where most of the functions and class 
 
 ## Who can use SMASH?
 
-SMASH is currently licensed for government-use only.  If you have access to this webpage, you must have been granted access through an existing license.  You can download SMASH onto any computer owned by the organization (national laboratory, university, etc.) that holds this license.  Copies of SMASH may be shared between users within an organization but should *not* be shared between organizations.  This site is the best way of accessing the SMASH toolbox---copies shared between users may be out of date.
+The master branch of SMASH is currently limited to Sandia and other national laboratories (Los Alamos, etc.).  If you have access to this webpage, you must have been granted access through an existing license.  You can download SMASH onto any computer owned by the organization (national laboratory, university, etc.) that holds this license.  Copies of SMASH may be shared between users within an organization but should *not* be shared between organizations.  This site is the best way of accessing the SMASH toolbox---copies shared between users may be out of date.
+
+An open source release branch of SMASH is available at (https://github.com/SMASHtoolbox/release).  The release branch is only a subset of the master branch, focusing on completed and documented features.
 
 ## How do I get SMASH?
 
@@ -48,7 +50,7 @@ Add the "SMASHtoolbox" directory to your MATLAB path. The "Set Path" button on t
 
 ## Do I really need a MATLAB startup file
 
-Startup files aren't strictly required, but they turn out to be incredibly useful. You should really use them to tailor MATLAB to your needs.  Here's a very basic startup file (which must be named "startup.m") that places the toolbox and its programs on the MATLAB path.
+Startup files aren't strictly required, but they turn out to be incredibly useful for tailoring MATLAB to your needs.  Here's a very basic startup file (which must be named "startup.m") that places the toolbox and its programs on the MATLAB path.
 
 ```matlab
 function startup()
