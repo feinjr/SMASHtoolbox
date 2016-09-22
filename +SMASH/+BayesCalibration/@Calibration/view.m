@@ -168,10 +168,10 @@ elseif strcmpi(plottype,'covariance')
 FS = 12;
 FScov = FS;
 tloc = 0.2;
-stdcutoff=5;    
+stdcutoff=3;    
 %fh = SMASH.Graphics.AIPfigure(6,'16in');
-%fh = SMASH.Graphics.AIPfigure(2);
-sfh = SMASH.MUI.Figure; fh = sfh.Handle; 
+fh = SMASH.Graphics.AIPfigure(2);
+%sfh = SMASH.MUI.Figure; fh = sfh.Handle; 
 fh.Color = 'w';
     
     nvars = nc;
@@ -187,24 +187,42 @@ fh.Color = 'w';
             hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
             
             if i==j
-                %hh = histogram(c(:,j),'Normalization','pdf');
-                %xlabel(varnames{i});
-                %ylabel('Density');
+                hh = histogram(c(:,j),'Normalization','pdf');
+                hh.EdgeColor='none';
+                                
+                obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
+                obj = configure(obj,'GridPoints',1e3)
+                [dgrid,p] = density(obj);
+                kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';
+                
+    
+                mu1 = mean(c(:,i));
+                stdev1 = std(c(:,i));
+              
+                i1=find(dgrid>(mu1-stdev1),1,'first');
+                i2=find(dgrid>(mu1+stdev1),1,'first');
+                
+                th=text(dgrid(i1),p(i1),sprintf('%0.4g  ',dgrid(i1)));
+                set(th,'HorizontalAlignment','right');
+                th=text(dgrid(i2),p(i2),sprintf('  %0.4g ',dgrid(i2)));
+                
+                h=line([dgrid(i1),dgrid(i1)],[0,max(p)]); 
+                set(h,'LineStyle','--','Color','k');
+                h=line([dgrid(i2),dgrid(i2)],[0,max(p)]); 
+                set(h,'LineStyle','--','Color','k');
+                
+                axis tight;
+                set(gca,'XLim',[mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
+                box on;
+                set(gca,'XTick',[],'YTick',[]);
+                %set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
+                set(gca,'LineWidth',1.0,'FontSize',FS);
+                
                 if j==nvars
                     xlabel(varnames{i});
                 elseif i==1
                     ylabel(varnames{j});
                 end
-                             
-                axis tight; box on;
-                set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
-                
-                
-                obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
-                configure(obj,'GridPoints',1000)
-                [dgrid,p] = density(obj);
-                kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';
-                set(gca,'XTick',[],'YTick',[]);
                 
                 
 %                 %Plot normal distribution
@@ -218,16 +236,19 @@ fh.Color = 'w';
             else
 
                 obj = SMASH.MonteCarlo.Cloud([c(:,i),c(:,j)],'table');
-                %obj=configure(obj,'GridPoints',1e3);
+                obj=configure(obj,'GridPoints',1e2);
                 [dgrid1,dgrid2,p]=density(obj);    
-                [cdata,ch]=contour(dgrid1,dgrid2,p,obj.DensitySettings.NumberContours); ch.LineWidth = 1;
+                [cdata,ch]=contour(dgrid1,dgrid2,p,obj.DensitySettings.NumberContours); 
+                set(ch,'LineWidth',1,'ShowText','off');
                 %colormap jet;
                 %xlabel(sprintf('%i %i',i,j));
                 %ylabel(sprintf('%i %i',i,j));
                 if j==nvars 
+                    varnames{i}
                     xlabel(varnames{i});
                 end
                 if i==1
+                    varnames{j}
                     ylabel(varnames{j});
                 end
                 
@@ -238,14 +259,15 @@ fh.Color = 'w';
                 
                 axis([mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1,mu2-stdcutoff*stdev2,mu2+stdcutoff*stdev2]);
                 box on;
-                set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
+                set(gca,'LineWidth',1.0,'FontSize',FS);
                 set(gca,'XTick',[],'YTick',[]);
                 
                 
                 %subplot(nvars,nvars,(i-1)*nvars+j)
                 pos = [fac*(mod(j-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(i-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
                 hsub{j,i} = axes('Parent',fh,'Units','normalized','Position',pos);
-                [cdata,ch]=contour(dgrid2,dgrid1,p,obj.DensitySettings.NumberContours); ch.LineWidth = 1;
+                [cdata,ch]=contour(dgrid2,dgrid1,p,obj.DensitySettings.NumberContours);
+                set(ch,'LineWidth',1,'ShowText','off');
                 axis([mu2-stdcutoff*stdev2,mu2+stdcutoff*stdev2,mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
                 %Correlation coefficient
                 %cc = corrcoef([c(:,i),c(:,j)]);
@@ -254,7 +276,7 @@ fh.Color = 'w';
                 %xlabel(varnames{j});
                 %ylabel(varnames{i});
                 set(gca,'XTick',[],'YTick',[]);
-                set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
+                set(gca,'LineWidth',1.0,'FontSize',FS);
             end
         end
     end   
