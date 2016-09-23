@@ -63,19 +63,20 @@ classdef Dialog < handle
     end
     properties (SetAccess=private)
         Handle % Graphic handle
-        Controls = [] % Graphic handles
+        Controls = [] % Control handles (uicontrol, uitab, axes objects)
+        Boxes = [] % Box handles (axes objects)
     end
     properties (SetAccess=immutable,Hidden=true)
-        FontName = get(0,'DefaultUIControlFontName');
-        FontUnits = get(0,'DefaultUIControlFontUnits');
-        FontSize = get(0,'DefaultUIControlFontSize');
-        HorizontalMargin=0;
-        HorizontalGap=0;
-        VerticalMargin=0;
-        VerticalGap=0;
+        FontName = get(0,'DefaultUIControlFontName')
+        FontUnits = get(0,'DefaultUIControlFontUnits')
+        FontSize = get(0,'DefaultUIControlFontSize')
+        HorizontalMargin=0
+        HorizontalGap=0
+        VerticalMargin=0
+        VerticalGap=0
     end
     properties (Access=private)
-        MinimumFigureWidth=0;
+        MinimumFigureWidth=0
     end
     %%
     methods (Hidden=true)

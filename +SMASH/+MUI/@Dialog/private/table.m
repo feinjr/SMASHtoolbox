@@ -59,6 +59,7 @@ extent=get(h(end),'Extent');
 position(4)=extent(4);
 set(h(end),'Position',position);
 object.pushup;
+object.Controls(end+1)=h(end);
 
 % leave room for vertical slider
 ht=uicontrol('Parent',object.Handle,'Style','slider');

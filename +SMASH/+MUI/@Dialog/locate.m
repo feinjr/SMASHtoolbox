@@ -18,16 +18,21 @@
 %    -added outside locations
 function locate(object,location,reference)
 
+% manage input
 verify(object);
 if (nargin<2) || isempty(location)
     location='center';
 end
+assert(ischar(location),'ERROR: invalid location');
+location=lower(location);
+
 if (nargin<3) || isempty(reference)
     reference=0;
 end
+
 if ~ishandle(reference)
     error('ERROR: invalid reference figure handle');
-elseif reference==0 % root objectect
+elseif reference==0 % root object    
     movegui(object.Handle,location);
 else % another figure
     units=get(reference,'Units');
