@@ -367,7 +367,6 @@ for MCMCloop=2:chainlength
         update(wb,MCMCloop/obj{1}.MCMCSettings.ChainSize);
     end
 
-
 end %End MCMC loop
 delete(wb);
    
