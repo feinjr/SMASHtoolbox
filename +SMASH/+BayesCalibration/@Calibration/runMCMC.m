@@ -384,24 +384,26 @@ ResObj.MCMCResults.AcceptanceRate = arate(keep,:);
 ResObj.MCMCResults.LogLikelihood = lik_chain(keep,:);
 ResObj.MCMCResults.HyperChain = hyperchain(keep,:);
 
-%Discrepancy function
-cloudobj = SMASH.MonteCarlo.Cloud(discrepancy_chain(keep,:),'table');
-moments = summarize(cloudobj);
-ResObj.MCMCResults.DiscrepancyMoments = moments;
+try
+    %Discrepancy function
+    cloudobj = SMASH.MonteCarlo.Cloud(discrepancy_chain(keep,:),'table');
+    moments = summarize(cloudobj);
+    ResObj.MCMCResults.DiscrepancyMoments = moments;
 
-%Credible intervals
-cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
-moments = summarize(cloudobj);
-ResObj.MCMCResults.ResponseMoments = moments;
-sec = sqrt(moments(:,2));
-ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
+    %Credible intervals
+    cloudobj = SMASH.MonteCarlo.Cloud(response_chain(keep,:),'table');
+    moments = summarize(cloudobj);
+    ResObj.MCMCResults.ResponseMoments = moments;
+    sec = sqrt(moments(:,2));
+    ResObj.MCMCResults.ResponseCredibleInterval = [moments(:,1),moments(:,1)+2*sec,moments(:,1)-2*sec];
 
-%Prediction intervals
-pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
-pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
-ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
-%sep = mean(error_chain)'; 
-%ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),moments(:,1)+2*sec+2*sep,moments(:,1)-2*sec-2*sep];
+    %Prediction intervals
+    pchain_up = response_chain(keep,:)+2*error_chain(keep,:);
+    pchain_down = response_chain(keep,:)-2*error_chain(keep,:);
+    ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),mean(pchain_up)',mean(pchain_down)'];
+    %sep = mean(error_chain)'; 
+    %ResObj.MCMCResults.ResponsePredictionInterval = [moments(:,1),moments(:,1)+2*sec+2*sep,moments(:,1)-2*sec-2*sep];
+end
 
 
 %Final proposal covariance
@@ -466,7 +468,7 @@ for ii = 1:Nexp
 end
 
 %Calculate alpha (update criteria)
-alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
+alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 %alpha = min(0,sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old));
 
 % Metropolis update
@@ -514,9 +516,9 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     
     % DR algorithm - only single stage
     q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
-    alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)),'includenan');
+    alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
     L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
-    alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
+    alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
     
     if rand <= alpha13
        acc = 1;  % Accept the candidate
@@ -588,7 +590,8 @@ for eNum = 1:Nexp
                 lik_new(ii) = ESS(ii)*lik_new(ii);
                 %lik_new(ii) = calculateLogLikelihood(obj{ii},trialsamps{ii});
             end
-            alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
+            %alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
+            alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 
 
             % Metropolis update
@@ -634,9 +637,9 @@ for eNum = 1:Nexp
 
                 % DR algorithm
                 q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
-                alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)),'includenan');
+                alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
                 L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
-                alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
+                alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
 
                 if rand <= alpha13
                     acc(count) = 1;  % Accept the candidate
@@ -722,7 +725,7 @@ else
     end
 
     %Calculate alpha (update criteria)
-    alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lphi_new) - sum(lphi_old)),'includenan');
+    alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lphi_new) - sum(lphi_old)));
 
     % Metropolis update
     if rand <= alpha
@@ -758,9 +761,9 @@ else
 
         % DR algorithm
         q1 = exp(-0.5*(norm((trial_phi2-trial_phi)*iR_phi)^2-norm((phi-trial_phi)*iR_phi)^2));
-        alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lphi_new) - sum(lphi_new2)),'includenan');
+        alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lphi_new) - sum(lphi_new2)));
         L2 = exp(sum(lik_new2) + sum(lphi_new2) -sum(lik_old)-sum(lphi_old));
-        alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha),'includenan');
+        alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
 
         if rand <= alpha13
             phi = trial_phi2;

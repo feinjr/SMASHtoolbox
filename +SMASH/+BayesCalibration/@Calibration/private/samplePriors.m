@@ -18,7 +18,7 @@
 function [l,dl] = samplePriors(object,varargin)
 % Error checking on object
 nel = [numel(object.VariableSettings.Names),numel(object.VariableSettings.PriorType),numel(object.VariableSettings.PriorSettings)];
-if range(nel) ~= 0 
+if (max(nel)-min(nel)) ~= 0 
     error('ERROR : object.VariableSettings must contain same number of elements for each field')
 end
 

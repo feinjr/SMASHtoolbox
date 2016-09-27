@@ -75,22 +75,10 @@ function varargout=summarize(object,variables,vnums)
     end
     
     
-%     if isempty(vnums)
-%         cloudobj = SMASH.MonteCarlo.Cloud(cloudtable,'table');
-%         cloudobj = configure(cloudobj,'VariableName',cloudvars);
-%     else
-%         cloudobj = SMASH.MonteCarlo.Cloud(cloudtable(:,vnums),'table');
-%         cloudobj = configure(cloudobj,'VariableName',{cloudvars{vnums}});
-%     end
-%     
-%     if nargout==0
-%         summarize(cloudobj);
-%     else
-%         [varargout{1} varargout{2}]=summarize(cloudobj);
-%     end
 
     % variable names
     if ~isempty(vnums)
+        cloudtable=cloudtable(:,vnums);
         cloudvars = {cloudvars{vnums}};
     end
 

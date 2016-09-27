@@ -91,7 +91,7 @@ function SelectTimes(src,varargin)
     temp=analyze(temp);
     [x y]=limit(temp.Results);
     h=line(x,y);
-    set(h,'Color',[0 0 1]);
+    %set(h,'Color',[0 1 1]);
 
 end
 

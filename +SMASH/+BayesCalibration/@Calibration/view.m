@@ -176,65 +176,16 @@ fh.Color = 'w';
     
     nvars = nc;
     hsub = [];
+    fac = 0.9;
+    subwidth = fac/nvars; 
     for j = 1:nvars
         for i = 1:j
-            %for i = 1:nvars
-            %[j,i]
-            fac = 0.9;
-            subwidth = fac/nvars;
-            pos = [fac*(mod(i-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(j-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
-            %hsub{i,j} = subplot(nvars,nvars,(j-1)*nvars+i,'Position',pos);
-            hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
-            
-            if i==j
-                hh = histogram(c(:,j),'Normalization','pdf');
-                hh.EdgeColor='none';
-                                
-                obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
-                obj = configure(obj,'GridPoints',1e3)
-                [dgrid,p] = density(obj);
-                kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';
+            %Subplots first so diagonals go on top
+            if i~=j
+                pos = [fac*(mod(i-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(j-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
+                %hsub{i,j} = subplot(nvars,nvars,(j-1)*nvars+i,'Position',pos);
+                hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
                 
-    
-                mu1 = mean(c(:,i));
-                stdev1 = std(c(:,i));
-              
-                i1=find(dgrid>(mu1-stdev1),1,'first');
-                i2=find(dgrid>(mu1+stdev1),1,'first');
-                
-                th=text(dgrid(i1),p(i1),sprintf('%0.4g  ',dgrid(i1)));
-                set(th,'HorizontalAlignment','right');
-                th=text(dgrid(i2),p(i2),sprintf('  %0.4g ',dgrid(i2)));
-                
-                h=line([dgrid(i1),dgrid(i1)],[0,max(p)]); 
-                set(h,'LineStyle','--','Color','k');
-                h=line([dgrid(i2),dgrid(i2)],[0,max(p)]); 
-                set(h,'LineStyle','--','Color','k');
-                
-                axis tight;
-                set(gca,'XLim',[mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
-                box on;
-                set(gca,'XTick',[],'YTick',[]);
-                %set(gca,'FontName','times','FontAngle','normal','LineWidth',1.0,'FontSize',FS);
-                set(gca,'LineWidth',1.0,'FontSize',FS);
-                
-                if j==nvars
-                    xlabel(varnames{i});
-                elseif i==1
-                    ylabel(varnames{j});
-                end
-                
-                
-%                 %Plot normal distribution
-%                 mu = mean(c(:,i));
-%                 stdev = std(c(:,i));
-%                 npdf = @(x) 1./(stdev.*sqrt(2*pi))*exp(-((x-mu).^2)./(2*stdev.^2));
-%                 npd = npdf(dgrid);
-%                 ndh = line(dgrid,npd); ndh.LineWidth = 1; ndh.Color = [0.8 0.0 0.0];
-%                 axis([mu-stdcutoff*stdev,mu+stdcutoff*stdev,0,max([max(npd),max(p)])]);
-                
-            else
-
                 obj = SMASH.MonteCarlo.Cloud([c(:,i),c(:,j)],'table');
                 obj=configure(obj,'GridPoints',1e2);
                 [dgrid1,dgrid2,p]=density(obj);    
@@ -244,11 +195,9 @@ fh.Color = 'w';
                 %xlabel(sprintf('%i %i',i,j));
                 %ylabel(sprintf('%i %i',i,j));
                 if j==nvars 
-                    varnames{i}
                     xlabel(varnames{i});
                 end
                 if i==1
-                    varnames{j}
                     ylabel(varnames{j});
                 end
                 
@@ -266,7 +215,7 @@ fh.Color = 'w';
                 %subplot(nvars,nvars,(i-1)*nvars+j)
                 pos = [fac*(mod(j-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(i-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
                 hsub{j,i} = axes('Parent',fh,'Units','normalized','Position',pos);
-                [cdata,ch]=contour(dgrid2,dgrid1,p,obj.DensitySettings.NumberContours);
+                [cdata,ch]=contour(dgrid2,dgrid1,p',obj.DensitySettings.NumberContours);
                 set(ch,'LineWidth',1,'ShowText','off');
                 axis([mu2-stdcutoff*stdev2,mu2+stdcutoff*stdev2,mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
                 %Correlation coefficient
@@ -279,7 +228,67 @@ fh.Color = 'w';
                 set(gca,'LineWidth',1.0,'FontSize',FS);
             end
         end
-    end   
+    end
+    
+    for j = 1:nvars
+        for i = 1:j    
+
+            if i==j    
+            pos = [fac*(mod(i-1,nvars))/nvars+(1-fac*1.025) fac*(1-1/nvars-(mod(j-1,nvars))/nvars)+(1-fac*1.025) subwidth subwidth];
+            hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
+            hh = histogram(c(:,j),'Normalization','pdf');
+            hh.EdgeColor='none';
+
+            obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
+            obj = configure(obj,'GridPoints',1e3);
+            [dgrid,p] = density(obj);
+            kdeh = line(dgrid,p); kdeh.LineWidth = 1; kdeh.Color = 'k';
+
+
+            mu1 = mean(c(:,i));
+            stdev1 = std(c(:,i));
+
+            i1=find(dgrid>(mu1-stdev1),1,'first');
+            i2=find(dgrid>(mu1+stdev1),1,'first');
+
+            th=text(dgrid(i1),p(i1)*0,sprintf('%0.4g  ',dgrid(i1)));
+            set(th,'HorizontalAlignment','center','VerticalAlignment','bottom');
+            th=text(dgrid(i2),p(i2)*0,sprintf('  %0.4g ',dgrid(i2)));
+            set(th,'HorizontalAlignment','center','VerticalAlignment','bottom');
+            %h=line([dgrid(i1),dgrid(i1)],[0,max(p)]); 
+            %set(h,'LineStyle','--','Color','k');
+            %h=line([dgrid(i2),dgrid(i2)],[0,max(p)]); 
+            %set(h,'LineStyle','--','Color','k');
+
+            axis tight;
+            set(gca,'XLim',[mu1-stdcutoff*stdev1,mu1+stdcutoff*stdev1]);
+            box on;
+            set(gca,'XTick',[dgrid(i1),dgrid(i2)],'YTick',[],'XTickLabel',[]);
+            set(gca,'LineWidth',1.0,'FontSize',FS-2);
+
+            if j==nvars
+                xlabel(varnames{i});
+            elseif i==1
+                ylabel(varnames{j});
+            end
+
+
+%                 %Plot normal distribution
+%                 mu = mean(c(:,i));
+%                 stdev = std(c(:,i));
+%                 npdf = @(x) 1./(stdev.*sqrt(2*pi))*exp(-((x-mu).^2)./(2*stdev.^2));
+%                 npd = npdf(dgrid);
+%                 ndh = line(dgrid,npd); ndh.LineWidth = 1; ndh.Color = [0.8 0.0 0.0];
+%                 axis([mu-stdcutoff*stdev,mu+stdcutoff*stdev,0,max([max(npd),max(p)])]);
+            end
+        end
+    end
+    
+    
+    
+    
+    
+    
     varargout{1} = hsub;
 end
 
