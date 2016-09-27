@@ -13,13 +13,14 @@
 % command window.  This information can be captured as an output structure.
 %    >> report=probeFile(...);
 %
+% See also SMASH.FileAccess, SupportedFormats
+%
+
 % Some formats support a GUI option:
 %    >>dlg=probeFile(filename,format,'gui');
 % for displaying the contents of a multi-record file.  The output in such
 % cases is a handle to the dialog box where the records are displayed.
-%
-% See also SMASH.FileAccess, SupportedFormats
-%
+
 
 %
 % created December 4, 2013 by Daniel Dolan (Sandia National Laboratories)
