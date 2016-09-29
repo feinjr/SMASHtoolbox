@@ -119,6 +119,37 @@ if strcmpi(plottype,'TP')
     ylabel([object.YLabel]);
 end
 
+% View in 3D
+if strcmpi(plottype,'3D')
+    if table
+        rho = unique(object.Density);
+        temp = unique(object.Temperature);
+
+        for i = 1:length(temp)
+            tempobj = isotherm(object,rho,temp(i));
+                x = tempobj.Temperature;
+                y = tempobj.Density;
+                z = tempobj.Pressure;
+                
+                minpressure = max(min(object.Pressure),1e-3);
+                bad = x <= minpressure;
+                x(bad) = minpressure;
+
+            set(target,'xscale','log','yscale','log');
+            h=line(x,y,z);
+            apply(object.GraphicOptions,h);
+            axis tight;
+        end
+    else
+        h=line(object.Pressure,object.Temperature);
+        apply(object.GraphicOptions,h);
+    end
+    xlabel([object.ZLabel]);
+    ylabel([object.YLabel]);
+end
+
+
+
 title(target,object.Title);
 box(target,'on');
 figure(fig);
