@@ -16,7 +16,6 @@ function object=analyze(object)
 %     'ERROR: Must Preprocess Signal to Analyze');
 
 %calculate velocity 
-object=process(object);
 V=object.InitialVelocity+object.VPF*object.FringeShift;
 object.Velocity=V;
 
