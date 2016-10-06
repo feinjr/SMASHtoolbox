@@ -998,7 +998,7 @@ function StrengthIntegration(src,varargin)
 
                 Y=3/4.*rho0.*trapz(u,(cl.^2-cb.^2)./cl)
 
-                strain = 1-data(1,3)./data(:,3);
+                strain = 1-rho0./data(:,3);
                 u1 = find(data(:,1)>=umax); u1 = u1(end);
                 u2 = find(data(:,1)>=umin); u2 = u2(end);
 
@@ -1257,6 +1257,7 @@ function varargout = plotdata(varargin)
                 sig{sig_num(i)}.DataLabel = 'Lagrangian Wavespeed (km/s)';
             case('Stress-Strain')
                 x = 1-data(1,3)./data(:,3);
+                %x = 1-16.55./data(:,3);
                 y = data(:,4);
                 sig{sig_num(i)}.GridLabel = 'Strain';
                sig{sig_num(i)}.DataLabel = 'Stress (GPa)';               

@@ -91,9 +91,8 @@ for k=1:size(J,1)
         Fshift=Fshift+factor*(1+tanh((object.Velocity.Grid-J(k,2))/s))/2;
     end
 end
-object.FringeShift=object.FringeShift+Fshift;
+object.FringeShift=SMASH.SignalAnalysis.Signal(object.FringeShift.Grid,object.FringeShift.Data+Fshift);
 
-%recalculate velocity
-object=analyze(object);
+
 
  
