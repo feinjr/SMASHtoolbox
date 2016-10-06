@@ -25,15 +25,7 @@ classdef HVPDV
             catch
                 error('ERROR: invalid input');
             end            
-            object.Measurement=regrid(object.Measurement); % enforce uniform sampling
-            %
-            fprintf('Locating pulses...');
-            object=align(object);      
-            fprintf('done\n');
-            %
-            fprintf('Determining average pulse shape...');
-            object=characterize(object);
-            fprintf('done\n');
+            object.Measurement=regrid(object.Measurement); % enforce uniform sampling           
         end
         %varargout=align(varargin);
     end

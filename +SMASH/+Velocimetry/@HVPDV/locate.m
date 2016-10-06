@@ -1,9 +1,11 @@
 % locate Locate optical crossings within a pulse
 %
+% cross=locate(object,duration,pulse);
+%
 % UNDER CONSTRUCTION
 %
 
-function location=locate(object,duration,pulse)
+function result=locate(object,duration,pulse)
 
 % manage input
 assert(nargin >= 2,'ERROR: crossing duration is required');
@@ -20,6 +22,21 @@ end
 assert(isnumeric(pulse),'ERROR: invalid pulse request');
 Npulse=numel(pulse);
 
+% 
+if isempty(object.NumberPulses)
+    fprintf('Aligning time base to pulses...');
+    object=align(object);
+    fprintf('done\n');
+    fprintf('Use the "align" method for faster results\n');
+end
+
+if isempty(object.PulseShape)
+    fprintf('Characterizing average pulse shape...');
+    object=characterize(object);
+    fprintf('done\n');
+    fprintf('Use the "characterize" method for faster results\n');
+end
+
 % analyze requested pulse(s)
 location=nan(object.MaxCrossings,Npulse);
 
@@ -32,6 +49,10 @@ else
         location(:,m)=findCross(object,duration,pulse(m));
     end
 end
+
+%location=transpose(location);
+result=SMASH.SignalAnalysis.SignalGroup(...
+    object.PulseCenter,transpose(location));
 
 end
 

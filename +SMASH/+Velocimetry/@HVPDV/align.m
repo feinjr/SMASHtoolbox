@@ -72,7 +72,7 @@ tc=sort(tc);
 tc=tc(2:end-1);
 
 % set up timing
-object.PulseCenter=tc;
+object.PulseCenter=tc(:);
 object.NumberPulses=numel(tc);
 object.PulseBound(:,2)=tc+object.ClockPeriod/2;
 object.PulseBound(:,1)=tc-object.ClockPeriod/2;
