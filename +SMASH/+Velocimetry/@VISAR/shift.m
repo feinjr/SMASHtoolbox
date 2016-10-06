@@ -1,11 +1,11 @@
-% SHIFT -Shift the times scales of VISAR Signals
+% SHIFT - Alignst the times scale of the signals in a VISAR object
 %
-% This object determines the relative time shifts between VISAR signals
-% using a fiducial in the signal.  The possible sytnaxes are below.
+% This method determines the relative time shifts between VISAR signals.
+% The possible sytnaxes are below.
 %      >> object=shift(object,method);
 %      >> object=shift(object);
 %
-% There are two methods for determining the location of hte timing
+% There are two methods for determining the location of the timing
 % fiducials in each VISAR signal
 %     'manual'  - The fiducial times are slected by the user on a graph of 
 %                 the raw signal. This is done sequentially for each 
@@ -24,10 +24,10 @@
 %     >> object.TimeShifts=object.Timeshifts+t
 %
 % The first time shift is applied to the first signal.  If only one
-% timeshift is entered onlyt he first signal is shifted.  If there are more
-% timeshifts the signals, the extra timeshifts are ignored.  
+% timeshift is entered only the first signal is shifted.  If there are more
+% timeshifts than signals, the extra timeshifts are ignored.  
 %
-% Timeshifts do not alter any defined experimental of reference ROIs
+% Any defined experimental of reference ROIs are
 %
 % created March 15 2016 by Paul Specht (Sandia National Laboratories) 
 %

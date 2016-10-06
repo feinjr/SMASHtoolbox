@@ -1,10 +1,10 @@
 % LOADSETTINGS - Load the Settings for a VISAR object
 %
-% This method loads the settings of the current VISAR object
+% This method loads the settings for the current VISAR object from a file
 %     >> object=loadSettings(object,filename)
 %     >> object=loadSettings(object)
 %
-% If a filename is specified, it must be in the current direcotry.  If no 
+% If a filename is specified, it must be in the current directory.  If no 
 % filename is specified the user is prompted to locate the file.  
 %
 % created March 21, 2016 by Paul Specht (Sandia National Laboratories)

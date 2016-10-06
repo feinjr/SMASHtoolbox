@@ -4,7 +4,7 @@
 % using the ellipse fitting functions written by Dan Dolan for PointVISAR.  
 % This is just a front end to those scripts.  Details of the algorithms can
 % be found in the DirectEllipseFit.m and IterativeEllipseFit.m files in the
-% private directory of Point VISAR. Teh possible syntaxes are listed below.
+% private directory of PointVISAR. The possible syntaxes are listed below.
 %      >> object=fitEllipse(object,method,fixed);
 %      >> object=fitEllispe(object,method);
 %      >> object=fitEllipse(object,fixed);

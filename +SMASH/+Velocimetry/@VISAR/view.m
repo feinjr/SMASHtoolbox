@@ -1,24 +1,26 @@
 % VIEW - Display a VISAR object
 % 
-% This method line plots of various Signal objects and Signal Group objects
-% of a VISAR method.  All possible syntaxes are below.
+% This method plots the various Signal objects and Signal Group objects
+% of a VISAR object.  All possible syntaxes are below.
 %     >> view(object);
 %     >> view(object,Signal); 
 %
 % There are a variety of Signal options
 %     'Measurement'  - View the Raw measurement signals.  This is the
 %                      default.
-%     'Experiment'   - View the Experimental region of the raw signals
-%                      only.
-%     'Reference'    - View the reference region of the raw signals only.
+%     'Experiment'   - View the Experimental region of the raw signals.
+%     'Reference'    - View the reference region of the raw signals.
+%     'Processed'    - View the VISAR signals after scaling, shifting, and
+%                      filtering.  The signal must be analyzed for this
+%                      option.
 %     'Quadrature'   - View the quadrature signals.  The VISAR object must
-%                      be processed for this option.
+%                      be analyzed for this option.
 %     'Lissajou  '   - View the VISAR Lissajou with the ellipse fit.  The
-%                       VISAR object must be processed for this option.
-%     'Fringeshift'  - View the Fringe shift signal.  The VISAR object must
-%                      be processed for this option.
+%                      VISAR object must be analyzed for this option.
+%     'Fringeshift'  - View the Fringe Shift signal.  The VISAR object must
+%                      be analyzed for this option.
 %     'Contrast'     - View the Contrast signal.  The VISAR object must
-%                      be processed for this option.
+%                      be analyzed for this option.
 %     'Velocity'     - View the Velocity signal.  The VISAR object must
 %                      be analyzed for this option.
 % 
@@ -53,7 +55,7 @@ switch lower(mode)
         legend(label,'Location','best');
     case 'processed'
         assert(isa(object.Processed,'SMASH.SignalAnalysis.SignalGroup'),...
-            'ERROR: Must Preprocess Signal to View');
+            'ERROR: Must Analyze Signal to View');
         h=view(object.Processed,target);
         ylabel('Amplitude');
         xlabel('Time');
@@ -82,19 +84,19 @@ switch lower(mode)
         legend(label,'Location','best');
     case 'fringeshift'
         assert(isa(object.FringeShift,'SMASH.SignalAnalysis.Signal'),...
-            'ERROR: Must Preprocess Signal to View');
+            'ERROR: Must Analyze Signal to View');
         h=view(object.FringeShift,target);
         ylabel('Phase');
         xlabel('Time');
     case 'contrast'
         assert(isa(object.Contrast,'SMASH.SignalAnalysis.Signal'),...
-            'ERROR: Must Preprocess Signal to View');
+            'ERROR: Must Analyze Signal to View');
         h=view(object.Contrast,target);
         ylabel('Amplitude');
         xlabel('Time');
     case 'lissajou'
         assert(isa(object.Quadrature,'SMASH.SignalAnalysis.SignalGroup'),...
-            'ERROR: Must Preprocess Signal to View');
+            'ERROR: Must Analyze Signal to View');
         target=SMASH.MUI.Figure;
         target=target.Handle;
         target=axes('Parent',target);
@@ -110,12 +112,14 @@ switch lower(mode)
         legend('Lissajou','Elliptical Fit','Location','best');
     case 'quadrature'
         assert(isa(object.Quadrature,'SMASH.SignalAnalysis.SignalGroup'),...
-            'ERROR: Must Preprocess Signal to View');
+            'ERROR: Must Analyze Signal to View');
         h=view(object.Quadrature,target);
         ylabel('Amplitude');
         xlabel('Time');
         legend('DX','DY','Location','best');
     case 'velocity'
+        assert(isa(object.Velocity,'SMASH.SignalAnalysis.Signal'),...
+            'ERROR: Must Analyze Signal to View');
         h=view(object.Velocity,target);
         xlabel('Time');
         ylabel('Velocity');

@@ -1,7 +1,7 @@
 % ADJUSTELLIPSE - Calculates the vertical offsets and scaling to generate a 
 % centered Lissajou with a magnitude of 1. 
 %
-% This method calculates the offsets and scalings for the quadrature signal
+% This method calculates the offsets and scalings for the Quadrature signal
 % of a VISAR object to obtain a centered Lissajou with unit magnitude.  The
 % possible syntaxes are below.
 %      >> object=adjust(object,percentage);
@@ -70,7 +70,11 @@ end
 object.VerticalOffsets=voffset;
 
 %Process the Results to generate a centered Lissajou
-objtemp=process(object);
+if isa(object.Processed,'SMASH.SignalAnalysis.Signal') ~= 1
+    objtemp=analyze(object);
+else
+    objtemp=object;
+end
 
 %calculate scalings
 X=objtemp.Quadrature.Data(:,1);

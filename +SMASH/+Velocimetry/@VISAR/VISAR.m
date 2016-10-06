@@ -1,12 +1,12 @@
 % This class creates objects for analyzing Velocity Interferomtry for Any
-% Reflector (VISAR) measurements.  
+% Reflector (VISAR) signals.  
 %
 % The class accepts three types of VISAR measurements distinguished by the
 % number of signals loaded.
 %      >> Fast Push-Pull - There are 4 signals with an assumed order of D1A,
 %                         D2A, D1B, and D2B
 %      >> Conventional - There are 3 signals with an assumed order of
-%                        DX,DY, and BIM
+%                        DX, DY, and BIM
 %      >> Standard Push-Pull - There are 2 signals with an assumed order
 %                              of DX and DY
 %
@@ -70,7 +70,6 @@ classdef VISAR
                 object.Measurement=object.Measurement.Data(:,1:4);
             end
         end
-        varargout=process(varargin);
         varargout=adjustEllipse(varargin);
         varargout=fitEllipse(varargin);
         varargout=adjustFringes(varargin);
@@ -78,10 +77,6 @@ classdef VISAR
         varargout=saveSettings(varargin);
         varargout=loadSettings(varargin);
     end
-    %%
-%     methods (Static=true, Hidden=true)
-%         varargout=restore(varargin);
-%     end
     %% setters
     methods
         function object=set.Measurement(object,value)

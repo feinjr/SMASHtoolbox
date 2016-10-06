@@ -1,6 +1,6 @@
 % SCALE - Scale a VISAR object Grid 
 %
-% This method multiplies a VISAR object's Grid array by a scalar value.
+% This method multiplies a VISAR object's Grid by a scalar value.
 % This scaling is applied to all grids in the VISAR object and all
 % time-based quantities.  The possible syntaxes are below.
 %      >> object=scale(object,value);
@@ -17,6 +17,7 @@ end
 if isempty(value) || (numel(value)~=1)
     error('ERROR: Shift Value Must be a Scalar');
 end
+
 value=abs(value);
 
 % apply scaling to measurement

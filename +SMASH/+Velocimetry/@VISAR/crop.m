@@ -1,7 +1,7 @@
-% CROP - Crop Grid range of a VISAR object
+% CROP - Crop the Grid of a VISAR object
 %
-% This method crops VISAR objects, disposing all information outside
-% of the specified Grid bound.  Th possible syntaxes are below.
+% This method crops VISAR objects, disposing of all the information outside
+% of the specified Grid bound.  The possible syntaxes are below.
 %    >> object=crop(object,bound);
 %    >> object=crop(object);
 %
@@ -15,7 +15,7 @@
 %
 % If an experimental and/or reference ROI are already specified, this
 % method will automatically adjust them to remain within the new grid
-% bounds. If the ROI is completed exluded from the cropped signal, it is 
+% bounds. If the ROI is completed excluded from the cropped signal, it is 
 % defaulted to the whole signal for the experimental ROI and to the first 
 % two grid points for the reference ROI.  
 %

@@ -1,32 +1,27 @@
-% ADJUSTFRINGES - Add or Subtract fringes to the fringe shift record of a
-% VISAR object
+% ADJUSTFRINGES - Add or Subtract fringes to a VISAR object
 %
-% This method add or subtracts fringes to a VISAR record.  This is done by 
-% displaying the velocity record of the VISAR object and the user slecting 
-% the times to add or subtract frionges with the mouse.  A Left mouse click
+% This method adds or subtracts fringes to a VISAR record.  This is done by 
+% displaying the velocity record of the VISAR object and the user selecting 
+% the times to add or subtract fringes with the mouse.  A Left mouse click
 % signifies an added fringe, while a right mouse click signifies a
 % subtracted fringe.  When finished adding or subtracting fringes the
-% return key should be hit.  The syntax for this method is below.
+% return key is hit.  The syntax for this method is below.
 %     >> object=analyze(object,width);
 %
 % Width defines the width of the fringe that are added and subtracted.  It
-% should be specified in units of time. 
+% should be specified in units of time. This method automatically analyzes 
+% the signal with using the new Fringe Shift.
 %
 % The fringe jumps are not a protected property.  They can be modified in 
 % the command window.  The format for a fringe jump is a 3 element array.
 %     >>object.Jumps=[+/-1 tf w];
 % Here the first entry is a +1 or -1 depending on if the fringe is added or
-% subtracted.  the term tf is the time of the added fringe, and w is the
-% width.  To add multipel fringe jumps enter a Nx3 matrix,  where each row
-% is a fringe jump.
+% subtracted.  The term "tf" is the time of the added fringe, and "w" is 
+% the width.  To add multiple fringe jumps enter a Nx3 matrix,  where each 
+% row is a fringe jump.
 %
-% If Finge jumps are added in the command window they will not be applied
-% to the Fringe shift signal of the object.  they can be applied after
-% manual entry witht eh following command
-%     >> object=analyze(object,'update');
-%
-% This method automatically analyzes the signal with using the new fringe
-% shift
+% If Fringe jumps are added in the command window they are not applied to 
+% the object.  The VISAR object must be analyzed again.
 %
 % Created March 17 by Paul Specht (Sandia National Laboratories)
 %

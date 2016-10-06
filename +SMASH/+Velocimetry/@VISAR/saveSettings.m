@@ -1,6 +1,6 @@
 % SAVESETTINGS - Save the Settings for a VISAR object
 %
-% This method saves the settings of the current VISAR object
+% This method saves the settings of the current VISAR object to a file
 %     >> object=saveSettings(object,filename)
 %
 % The default filename is 'VISAR_Settings.txt'
@@ -13,6 +13,8 @@ function object=saveSettings(object,filename)
 if nargin < 2
      error('ERROR:  Invalid saveSettings Input.  Must Define File Name.');
 end
+assert(ischar(filename),...
+    'ERROR: File Name Invalid');
 
 % Open the specified file and begin generating the file text
 fid=fopen(filename,'wt');

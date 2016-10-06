@@ -1,23 +1,23 @@
 % EXPORT - Export the data and settings from a VISAR object
 %
-% This method exports data from a VSIAR object ot a column text file
+% This method exports data from a VSIAR object to a column text file
 %     >> view(object,filename,option);
 %
 % Filename defines the file the data is saved to.  These can be *.txt,
 % *.out, or *.dat extensions.
 %
-% Otpion defines which signal is to be exported
+% Option defines which signal is to be exported
 %     'Measurement'  - Export the Raw measurement signals.  This is the
 %                      default.
-%     'Experiment'   - Export the Experimental region of the raw signals
-%                      only.
-%     'Reference'    - Export the reference region of the raw signals only.
+%     'Experiment'   - Export the Experimental region of the raw signals.
+%     'Reference'    - Export the reference region of the raw signals.
+%     'Processed'    - Export the shifted, scaled, and filter signals.
 %     'Quadrature'   - Export the quadrature signals.  The VISAR object 
-%                      must be processed for this option.
-%     'Fringeshift'  - Export the Fringe shift signal.  The VISAR object 
-%                      must be processed for this option.
+%                      must be analyzed for this option.
+%     'Fringeshift'  - Export the Fringe Shift signal.  The VISAR object 
+%                      must be analyzed for this option.
 %     'Contrast'     - Export the Contrast signal.  The VISAR object must
-%                      be processed for this option.
+%                      be analyzed for this option.
 %     'Velocity'     - Export the Velocity signal.  The VISAR object must
 %                      be analyzed for this option.
 % 
@@ -29,6 +29,8 @@ function object=export(object,filename,option)
 if nargin < 3 || nargin > 3
     error('ERROR:  Invalid Export Input.  Must Define File Name.');
 end
+assert(ischar(filename),...
+    'ERROR: File Name Invalid');
 
 %export the signals
 switch lower(option)
