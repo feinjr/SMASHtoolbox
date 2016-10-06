@@ -54,6 +54,8 @@ switch format
         object=SMASH.FileAccess.SDAfile(filename);   
     case 'column'
         object=SMASH.FileAccess.ColumnFile(filename);
+    case 'block'
+        object=SMASH.FileAccess.BlockFile(filename);
     otherwise
         error('ERROR: unable to probe ''%s'' format',format);
 end

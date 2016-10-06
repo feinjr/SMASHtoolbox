@@ -78,6 +78,9 @@ switch format
         catch
             error('ERROR: invalid column request');
         end
+    case 'block'
+        object=SMASH.FileAccess.BlockFile(filename);
+        data=read(object);                
     case {'oceanoptics','optronicslab','optronicslabdump'}
         object=SMASH.FileAccess.CustomFile(filename,format);
         data=read(object);
