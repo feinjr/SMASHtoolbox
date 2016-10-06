@@ -75,7 +75,7 @@ switch object.Format
         [signal,time]=read_lecroy(object.FullName);
     case 'tektronix'
         [~,~,ext]=fileparts(object.FullName);
-        switch ext
+        switch lower(ext)
             case '.wfm'
                 [signal,time]=read_tektronixWFM(object.FullName);
             case '.isf'
