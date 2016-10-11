@@ -4,7 +4,8 @@
 % noted below.
 %
 % Text formats:
-% 'column'           : Data stored in columns with an optional header
+% 'block'            : Numeric data blocks stored in columns, separated by text headers 
+% 'column'           : Numeric data stored in columns with an optional header
 % 'oceanoptics'      : Ocean Optics spectrometer measurements
 % 'optronicslab'     : OL-750 spectrometer measurments
 % 'optronicslabdump' : OL-750 spectrometer screen dump

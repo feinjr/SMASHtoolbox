@@ -33,6 +33,7 @@ function [format,FileName]=...
 % supported formats
 format={};
 
+format{end+1}='block';
 format{end+1}='column';
 format{end+1}='oceanoptics';
 format{end+1}='optronicslab';
@@ -202,7 +203,7 @@ switch lower(extension)
     case '.wfm'
         choice={'tektronix' 'yokogawa'};
     otherwise
-        choice={'column' 'oceanoptics' 'optronicslab' 'optronicslabdump'};
+        choice={'block' 'column' 'oceanoptics' 'optronicslab' 'optronicslabdump'};
 end
 
 Nchoice=numel(choice);
