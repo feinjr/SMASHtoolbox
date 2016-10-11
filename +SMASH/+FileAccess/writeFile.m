@@ -2,9 +2,10 @@
 %
 % This method writes data from MATLAB to a file in 'column', 'dig', or
 % 'sda' format based on the specified file extension.  Any extension other
-% than *.dig or *.sda uses the 'column' format, which requires a numerical
-% "table" input.
-%    >> writeFile('myfile.txt',table,[format],[header]); % 'column' format
+% than *.dig or *.sda uses the 'column' or 'block format based on the
+% input "table" (numeric matrix or cell array of numeric matrices,
+% respectively).
+%    >> writeFile('myfile.txt',table,[format],[header]); %
 % An optional format string can be passed to control how the data table is
 % written ; MATLAB's "fprintf" documentation describes how format strings
 % are constructed.  An optional cell array "header" can also be specified;
@@ -70,7 +71,13 @@ switch lower(ext)
         object=SMASH.FileAccess.SDAfile(filename);
         insert(object,varargin{:});        
     otherwise
-        object=SMASH.FileAccess.ColumnFile(filename);
+        if isnumeric(varargin{1})
+            object=SMASH.FileAccess.ColumnFile(filename);
+        elseif iscell(varargin{1})
+             object=SMASH.FileAccess.BlockFile(filename);
+        else
+            error('ERROR: invalid table input');
+        end
         write(object,varargin{:});
 end
 

@@ -7,7 +7,7 @@
 %    -NumberColumns
 %    -Format
 %
-% See also ColumnFile, read, write
+% See also BlockFile, read, write
 %
 
 function varargout=probe(object,delim,mincol)
