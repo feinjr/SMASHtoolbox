@@ -37,20 +37,24 @@ h(end+1)=local_uicontrol(object,...
     'Style','popup','HorizontalAlignment','left',...
     'String',dummy);
 set(h(end),'String',choices);
+pushup(object,1);
 
-pos=get(h(end),'Position');
-x0=pos(1)+pos(3)+object.HorizontalGap;
-ym=pos(2)+pos(4)/2;
-dummy=repmat('M',[1 numel(label{2})]);
-h(end+1)=local_uicontrol(object,'Style','pushbutton','String',dummy,...
-    'HorizontalAlignment','center');
-object.Controls(end+1)=h(end);
-set(h(end),'String',label{2});
-pos=get(h(end),'Position');
-pos(1)=x0;
-pos(2)=ym-pos(4)/2;
-set(h(end),'Position',pos);
-pushup(object,2);
+L=max(cellfun(@numel,label(2:end)));
+for m=2:numel(label)
+    pos=get(h(end),'Position');
+    x0=pos(1)+pos(3)+object.HorizontalGap;
+    ym=pos(2)+pos(4)/2;
+    dummy=repmat('M',[1 L]);
+    h(end+1)=local_uicontrol(object,'Style','pushbutton','String',dummy,...
+        'HorizontalAlignment','center');
+    object.Controls(end+1)=h(end);
+    set(h(end),'String',label{m});
+    pos=get(h(end),'Position');
+    pos(1)=x0;
+    pos(2)=ym-pos(4)/2;
+    set(h(end),'Position',pos);
+end
+%pushup(object,2);
 make_room(object);
 
 % handle output
