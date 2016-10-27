@@ -9,11 +9,14 @@ end
 info=hdfinfo(filename);
 
 config=struct('File',[]);
-N=numel(info.Attributes);
-for n=1:N
-    name=info.Attributes(n).Name;
-    value=info.Attributes(n).Value;
-    config.File.(name)=value;
+try
+    N=numel(info.Attributes);
+    for n=1:N
+        name=info.Attributes(n).Name;
+        value=info.Attributes(n).Value;
+        config.File.(name)=value;
+    end
+catch
 end
 
 M=numel(info.SDS);
@@ -29,7 +32,12 @@ end
 
 % read data
 fore=double(hdfread(filename,'fore'));
-back=double(hdfread(filename,'back'));
-data=fore-back;
+try
+    back=double(hdfread(filename,'back'));
+    data=fore-back;
+catch
+   data=fore;
+   back=[];
+end
 
 end
