@@ -7,7 +7,7 @@
 %    -Header
 %    -Data
 %
-% see also ColumnFile, probe
+% see also BlockFile, probe
 %
 
 function output=read(object,delim,mincol)
