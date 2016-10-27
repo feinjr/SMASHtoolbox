@@ -38,7 +38,7 @@
 classdef SDAfile
     %%
     properties (SetAccess=immutable)
-        ArchiveFile % File (*.sda) linked to archive
+        ArchiveFile % File (*.sda) linked to archive        
     end
     properties       
         Writable % Write access ('yes' or 'no')
@@ -78,7 +78,11 @@ classdef SDAfile
                     case 'create'
                         %error('ERROR: file cannot be created because it already exists');
                     case 'overwrite'
-                        delete(filename)
+                        if SMASH.FileAccess.SDAfile.isWritable(filename);
+                            delete(filename)
+                        else
+                            error('ERROR: archive is not writable');
+                        end
                         if verbose
                             fprintf('Overwriting archive \n');
                         end
@@ -127,6 +131,21 @@ classdef SDAfile
                     error('ERROR: invalid Writable setting');
             end
         end        
+    end
+    %%
+    methods (Static=true)
+        function state=isWritable(filename)
+            try
+                state=h5readatt(filename,'/','Writable');
+            catch                
+                state=[];
+            end
+            if strcmpi(state,'yes')
+                state=true;
+            else
+                state=false;
+            end
+        end
     end
     
 end
