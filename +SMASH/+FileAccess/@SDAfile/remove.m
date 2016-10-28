@@ -16,6 +16,19 @@ function remove(archive,varargin)
 % handle input
 assert(nargin>=2,'ERROR: insufficient input');
 
+persistent ShowWaitbar
+if isempty(ShowWaitbar)
+    ShowWaitbar=true;
+end
+switch varargin{1}
+    case '-show'
+        ShowWaitbar=true;
+        return
+    case '-hide'
+        ShowWaitbar=false;
+        return
+end
+
 % determine if archive is writable
 setting=h5readatt(archive.ArchiveFile,'/','Writable');
 if strcmpi(setting,'no')
@@ -30,6 +43,10 @@ filename=fullfile(pathname,[filename '__temporary__' ext]);
 new=SMASH.FileAccess.SDAfile(filename,'overwrite');
 
 label=probe(archive);
+if ShowWaitbar
+    h=waitbar(0,'Progress');
+    set(h,'WindowStyle','modal');
+end
 for k=1:numel(label)
     if any(cellfun(@(s) strcmp(label{k},s),varargin))
         continue
@@ -41,6 +58,12 @@ for k=1:numel(label)
     insert(new,label{k},data,description,deflate);
     h5writeatt(filename,setname,'RecordType',...
         h5readatt(archive.ArchiveFile,setname,'RecordType'));
+    if ShowWaitbar
+        waitbar(k/numel(label),h);
+    end
+end
+if ShowWaitbar
+    delete(h);
 end
 
 % replace original file

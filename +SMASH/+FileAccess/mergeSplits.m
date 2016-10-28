@@ -9,9 +9,10 @@
 % Either call restores the the original file "mydata" as long as both split
 % files are present.
 % 
-% This function does *not* overwrite existing files!  If there is a name
-% conflict, the restored file name can be manually specified as a second
-% function input.
+% By default, this function does not overwrite existing files.  If there is
+% a name conflict, the user is prompted to select a new file name.  The
+% restored file name can also be manually specified as a second function
+% input.
 %    >> mergeSplits(filename,target);
 %
 % See also FileAccess, splitFile
@@ -47,7 +48,8 @@ end
 files=data.SplitFiles;
 N=numel(files);
 for k=1:N
-    files{k}=fullfile(pathname,files{k});
+    [~,short,ext]=fileparts(files{k});
+    files{k}=fullfile(pathname,[short ext]);
     assert(exist(files{k},'file')==2,...
         'ERROR: one or more split files are missing');
 end
@@ -56,7 +58,16 @@ end
 if isempty(target)
     target=fullfile(pathname,data.OriginalName);
 end
-assert(~exist(target,'file'),'ERROR: target file already exists');
+if exist(target,'file')
+    [~,~,ext]=fileparts(target);
+    ext=sprintf('*%s',ext);
+    [filename,pathname]=uiputfile(ext,'Select merged file name');
+    if isnumeric(pathname)
+        return
+    end
+    target=fullfile(pathname,filename);
+end
+%assert(~exist(target,'file'),'ERROR: target file already exists');
 
 fid=fopen(target,'w');
 finishup = onCleanup(@() fclose(fid));

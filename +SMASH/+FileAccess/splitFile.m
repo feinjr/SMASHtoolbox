@@ -67,11 +67,13 @@ if isempty(pathname)
     pathname=pwd;
 end
 target=cell(1,N);
+ShortName=target;
 for k=1:N
     temp=sprintf(format,k);
     temp=[shortname ext temp]; %#ok<AGROW>
-    target{k}=fullfile(pathname,temp);
+    target{k}=fullfile(pathname,temp);    
     assert(~exist(target{k},'file'),'ERROR: split file already exists');
+    ShortName{k}=temp;
 end
 
 % split file into SDA files
@@ -79,7 +81,7 @@ fid=fopen(filename,'r');
 finishup = onCleanup(@() fclose(fid));
 data=struct('Bytes',[],'OriginalName','','SplitFiles','');
 data.OriginalName=[shortname ext];
-data.SplitFiles=target;
+data.SplitFiles=ShortName;
 for k=1:N
     archive=SMASH.FileAccess.SDAfile(target{k});
     data.Bytes=uint8(fread(fid,bytes,'uint8'));    

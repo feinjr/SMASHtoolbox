@@ -1,9 +1,9 @@
 % import Import file into archive
 %
 % This method imports an external file into an archive file.  The imported
-% file is automatically labelled by name; an optional description can be
-% specified.
-%   >> import(object,filename,[description]);
+% file is automatically labelled by name.  An optional description and
+% deflate level can be specified.
+%   >> import(object,filename,[description],[deflate]);
 %
 % See also SDAfile, export, insert, probe, select
 %
