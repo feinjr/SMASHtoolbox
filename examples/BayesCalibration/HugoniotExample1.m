@@ -51,6 +51,8 @@ obj.MCMCSettings.DelayedRejectionScale = 2; % Implement delayed rejection with t
 obj.MCMCSettings.AdaptiveInterval = 1e3;    % Implement adaptive metropolis with this chain step size
 obj.MCMCSettings.JointSampling = true;      % Implement joint sampling. If false 1D metropolis is performed
 
+%View settings in GUI
+settingsGUI(obj);
 
 %% Run MCMC
 tic
@@ -65,7 +67,8 @@ view(Results,'inferred',[],'covariance');
 
 %% Propogate Results - 2 sigma (95% CI)
 figure;
-h1 = line(Results.Measurement.Grid,Results.Measurement.Data); h1.Color = 'k'; h1.LineStyle = 'none'; h1.Marker = 'o';
+h1 = line(up,Us); h1.Color = 'k'; h1.LineStyle = 'none'; h1.Marker = 'o';
+h1e = SMASH.Graphics.errorbar2(up,Us,dup,dUs);
 h2 = line(Results.Measurement.Grid,Results.Measurement.Data+Results.MCMCResults.ResponseCredibleInterval(:,1)); h2.Color = 'r';
 h2 = line(Results.Measurement.Grid,Results.Measurement.Data+Results.MCMCResults.ResponseCredibleInterval(:,2)); h2.Color = 'r'; h2.LineStyle = '--'; 
 h2 = line(Results.Measurement.Grid,Results.Measurement.Data+Results.MCMCResults.ResponseCredibleInterval(:,3)); h2.Color = 'r'; h2.LineStyle = '--'; 

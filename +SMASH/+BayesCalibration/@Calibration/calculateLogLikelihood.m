@@ -16,7 +16,20 @@
 %
 function [l,r,er] = calculateLogLikelihood(object,x,sig2,R_sig2)
 
-
+%Check constraints
+if ~isempty(object.VariableSettings.ConstraintSettings)
+    cfunc = object.VariableSettings.ConstraintSettings{2};
+    cvarnums = object.VariableSettings.ConstraintSettings{1};
+    constraint = cfunc(x(cvarnums));
+    
+    if ~constraint
+        r = object.ModelSettings.Model(object,x);
+        l = -inf;
+        r = -inf*abs(r);
+        er = -inf*abs(sig2);
+        return;
+    end
+end
 
 if nargin < 3
     [r,sig2] = object.ModelSettings.Model(object,x);

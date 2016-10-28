@@ -242,6 +242,7 @@ if ~isempty(obj{1}.MCMCSettings.ProposalCov)
         qcov = diag(qcov);
     end
     R = chol(qcov);
+    assert(length(diag(R)) == length(InferredVariables),'ERROR : Proposal covariance is not compatible with number of inferred variables');
 end
 
 % Set burnin  
@@ -276,8 +277,7 @@ if  ~isempty(obj{1}.MCMCSettings.AdaptiveInterval) && isnumeric(obj{1}.MCMCSetti
     
 end
 
-% Some error checking
-assert(length(diag(R)) == length(InferredVariables),'ERROR : Proposal covariance is not compatible with number of inferred variables');
+
 
 
 
@@ -319,6 +319,7 @@ for MCMCloop=2:chainlength
         lik_old(ii) = ESS(ii)*lik_old(ii);
     end
        
+    
     if obj{1}.MCMCSettings.JointSampling
         % Apply single metropolis update for all variables with
         % multivariate normal proposal (DRAM, Haario et al. (2006))
@@ -328,7 +329,7 @@ for MCMCloop=2:chainlength
         % independent normal proposal
         IndividualUpdate;
     end
-     
+    
     
     % Update chains      
     I_chain(MCMCloop,:) = I_update; 
@@ -593,7 +594,6 @@ for eNum = 1:Nexp
             %alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)),'includenan');
             alpha = min(1,exp(sum(lik_new)-sum(lik_old) + sum(lprior_new) - sum(lprior_old)));
 
-
             % Metropolis update
             if rand <= alpha
                acc(count) = 1;  % Accept the candidate
@@ -604,9 +604,8 @@ for eNum = 1:Nexp
             else
                acc(count) = 0; 
             end
-            
-            
-             
+                       
+              
             %Delayed rejection (single stage)
             if acc(count) == 0 && drscale > 0 && ~isempty(qcov)
 
@@ -652,25 +651,32 @@ for eNum = 1:Nexp
 
 
             end %End of DR
-
         end %End of inferred variable check            
     end %End of variables loop
 end %End of experiments loop
 
-%Update the accepted values
-samps = savedsamps;
-I_update = savedparams;
-lprior_old = savedpriors;
-
-
 % Update the likelihood given final combination of accepted values
-lik_old =zeros([1,Nexp]);
-response_old = {lik_old};
+
+lik_old_check =zeros([1,Nexp]);
+response_old_check = {lik_old};
 for ii = 1:Nexp
-    [lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
-    lik_old(ii) = ESS(ii)*lik_old(ii);
+    [lik_old_check(ii),response_old_check{ii}] = calculateLogLikelihood(obj{ii},savedsamps{ii},sig2{ii},R_sig2{ii});
+    lik_old_check(ii) = ESS(ii)*lik_old_check(ii);
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
+
+%There is a possibility the combination violates prior constraints
+if ~any(isinf(lik_old_check))
+    lik_old = lik_old_check;
+    response_old = response_old_check;
+    %Update the accepted values
+    samps = savedsamps;
+    I_update = savedparams;
+    lprior_old = savedpriors;
+end
+
+
+
         
     
 end %End individual update

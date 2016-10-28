@@ -20,26 +20,41 @@
 %       PriorSettings : cell array of arrays specifying the settings for
 %           each prior. Uniform should be [lowerbound, upperbound], while
 %           gauss is [mean, std].
+%       ConstraintSettings : cell array specifying constraints on the
+%           variables : {[variable numbers], @equation}. Equation should be 
+%           a logical anonymous function relating to variables. 
+%           eg. @(x) x(1)>0 & x(2) > 0.           
 %       Infer (opt): Logical array specifying which variables should be 
 %           inferred in the calibration. If they are fixed, then Feedback 
-%           cutting is applied. If left blank, the default is to infer all 
-%           parameters.
+%           cutting / modularization  is applied (sampling occurs from 
+%           prior / no MCMC updates). If left blank, the default is to 
+%           infer all parameters.
 %       Share (opt): Logical array specifying if any variables are shared 
 %           when calibrating multiple objects (experiments). The default 
 %           is to share no parameters.
+%       EffectiveSampleSize : likelihood scaling algorithm based on ESS.
+%           Note: this size is used in the conjugate sampling of phi.
+%       DiscrepancyPriorCov : Switch into "standard" calibration mode where
+%           this defines the correlation matrix, R. Note: this also
+%           requires a switch from conjugate to Metropolis sampling of phi.
+%       DiscrepancyPriorWeights : "Standard" calibration mode where this
+%           defines the weights, sigma.
+%       
 %       
 %   MCMCSettings : Settings for the Markov Chain Monte Carlo algorithm
 %       StartPoint : Array specifying the starting set of parameters
 %       ChainSize : Amount of points in the chain to generate
-%       ProposalStd (opt) : Array specifying standard deviation of proposal
+%       ProposalCov (opt) : Array specifying covariance for proposal
 %           jumps. If empty, proposals are drawn from the priors instead.
 %       DelayedRejectionScale : Scalar specifying the factor of decrease in
 %           the proposal jump in the delayed rejection algorithm. If 0, no
 %           delayed rejection is used.
-%       AdaptiveInterval : Scalar specifying the amount of points used to
-%           adapt the ProposalStd. If 0, no adaptation is used.
+%       AdaptiveInterval : Scalar specifying the length of chain points
+%       between adaptation of the proposal covariance. If 0, no adaptation 
+%            is used.
 %       HyperSettings : Specification for inferrence of the error scaling
-%           hyperparameter : {'PriorType',[PriorSettings],ProposalStd(opt)}
+%           hyperparameter. This prior is an assumed inverse gamma with
+%           parameters [shape,scale]. 
 %
 %   The Measurement options is provided as a placeholder for experimental
 %       data for use in the ModelSettings.Model function.

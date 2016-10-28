@@ -2,9 +2,9 @@
 %
 % Calculates the set of parameters which maximizes the likelihood function
 %
-%    >> [params] = calculateMAP(object,params0);
+%    >> [params] = calculateMAP(object);
 % 
-% where params0 are the inputs to the calibration object. Note that for
+% where it starting point is object.MCMCSettings.StartPoint. Note: for
 % uniform priors this results in an MLE estimate.
 %
 % See also BayesCalibration, Calibration, runMCMC
@@ -39,8 +39,6 @@ for ii = 1:nargin
     end
 end
 Nexp = numel(obj);
-params0 = varargin{end};
-
 
 
 %Prior settings bookkeeping
