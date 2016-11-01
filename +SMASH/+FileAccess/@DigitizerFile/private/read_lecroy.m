@@ -313,8 +313,8 @@ switch value
         result='CHANNEL_3';
     case 3
         result='CHANNEL_4';
-    case 9
-        result='UNKNOWN';
+    otherwise
+        result='UNKNOWN';    
 end
 
 end
