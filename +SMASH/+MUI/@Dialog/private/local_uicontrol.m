@@ -34,6 +34,9 @@ switch style
             N=1;
         end
         position(4)=N*extent(4);
+        set(h,'String','');
+        extent=get(h,'Extent');
+        position(4)=position(4)-N*extent(4);
         set(h,'Position',position);
 end
 
