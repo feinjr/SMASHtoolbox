@@ -39,6 +39,7 @@ format{end+1}='oceanoptics';
 format{end+1}='optronicslab';
 format{end+1}='optronicslabdump';
 
+format{end+1}='acqiris';
 format{end+1}='agilent';
 format{end+1}='keysight';
 format{end+1}='lecroy';
@@ -128,7 +129,7 @@ switch lower(extension)
     case '.gif'
         choice={'graphics'};
     case '.h5'
-        choice={'agilent'};
+        choice={'acqiris' 'agilent' 'keysight'};
     case '.hdf'
         choice={'film' 'saturn' 'sydor' 'zdas'};
     case '.hdr'

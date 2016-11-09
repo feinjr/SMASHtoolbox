@@ -126,7 +126,7 @@ end
 
 function format=chooseH5()
 
-choice={'Agilent digitizer','Keysight digitizer'};
+choice={'Acqiris digitizers' 'Agilent digitizer' 'Keysight digitizer'};
 dlg=SMASH.MUI.Dialog;
 dlg.Hidden=true;
 dlg.Name='Select format';
@@ -143,8 +143,10 @@ catch
 end
 switch data{1}
     case choice{1}
-        format='agilent';
+        format='acqiris';
     case choice{2}
+        format='agilent';
+    case choice{3}
         format='keysight';
 end
 

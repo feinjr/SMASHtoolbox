@@ -54,6 +54,8 @@ description{end+1}='Optronics Laboratory spectrometer measurement';
 list{end+1}='optronicslabdump';
 description{end+1}='Optronics Laboratory spectrometer screen dump';
 
+list{end+1}='acqiris';
+description{end+1}='Acqiris digitizer signal';
 list{end+1}='agilent';
 description{end+1}='Agilent digitizer signal';
 list{end+1}='dig';

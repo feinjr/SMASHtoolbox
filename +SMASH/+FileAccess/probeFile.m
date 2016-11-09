@@ -44,7 +44,7 @@ assert(ischar(format),'ERROR: invalid format');
 
 % probe object
 switch format
-    case {'agilent','keysight'}
+    case {'acqiris','agilent','keysight'}
         object=SMASH.FileAccess.DigitizerFile(filename,format);   
     case {'zdas','saturn'}
         object=SMASH.FileAccess.DigitizerFile(filename,format);    

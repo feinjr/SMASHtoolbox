@@ -3,6 +3,7 @@
 % Syntax:
 %    >> object=DigitizerFile([filename],[format]);
 % Supported formats include:
+%    'acqiris'   - Acqiris binary files (*.h5)
 %    'agilent'   - Agilent binary files (*.h5)
 %    'lecroy     - LeCroy binary files (*.trc)
 %    'keysight'  - Keysight binary files (*.h5)

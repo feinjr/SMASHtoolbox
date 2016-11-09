@@ -18,7 +18,7 @@ assert(exist(object.FullName,'file')==2,...
 
 % look inside source file
 switch object.Format
-    case {'agilent','keysight'}
+    case {'acqiris' 'agilent','keysight'}
         report=probe_agilent(object.FullName);               
     case {'zdas','saturn'}
         file_id = hdfh('open',object.FullName,'read',0);
@@ -42,7 +42,7 @@ switch object.Format
             vdata_id = hdfvs('attach',file_id,vdata_ref+8*i,'r');
             n = hdfvs('elts',vdata_id);
             status = hdfvs('setfields',vdata_id,'NAME'); %#ok<NASGU>
-            [name,count] = hdfvs('read',vdata_id,n); %#ok<NASGU>
+            [name,count] = hdfvs('read',vdata_id,n);  %#ok<ASGLU>
             names(i+1,1:length(name{1})) = name{1};  %#ok<*AGROW>
         end
         hdfv('end',file_id);

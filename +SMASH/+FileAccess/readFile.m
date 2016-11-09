@@ -84,7 +84,7 @@ switch format
     case {'oceanoptics','optronicslab','optronicslabdump'}
         object=SMASH.FileAccess.CustomFile(filename,format);
         data=read(object);
-    case {'agilent','keysight','lecroy','tektronix','yokogawa'}
+    case {'acqiris','agilent','keysight','lecroy','tektronix','yokogawa'}
         object=SMASH.FileAccess.DigitizerFile(filename,format);
         data=read(object,record);
     case {'zdas','saturn'}

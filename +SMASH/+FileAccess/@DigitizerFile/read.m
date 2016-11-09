@@ -51,7 +51,7 @@ output.FileName=object.FullName;
 output.Format=object.Format;
 output.FileOption=record;
 switch object.Format
-    case {'agilent','keysight'}
+    case {'acqiris' 'agilent','keysight'}
         report=probe(object);
         if isempty(record)
             if report.NumberSignals==1
