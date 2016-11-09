@@ -72,6 +72,8 @@ uimenu(hm,'Label','Ellipse fit','Tag','ellipse',...
 %uimenu(hm,'Label','Beam block','Tag','beamblock',...
 %    'Callback',@CharacterizationCallback,...
 %    'Enable','off');
+uimenu(hm,'Label','Unroll phase','Tag','unroll','Separator','on',...
+    'Callback',{@unrollPhase,fig},'Enable','off');
 
 hm=uimenu(fig,'Label','Help');
 uimenu(hm,'Label','About THRIVE','Callback',{@aboutTHRIVE,fig});
@@ -407,6 +409,7 @@ function LoadData(src,varargin)
 % get handles
 fig=ancestor(src,'figure');
 h=guihandles(fig);%get(fig,'UserData');
+set(h.unroll,'Enable','off');
 
 % read file name
 if logical(get(h.SingleFile,'Value')) % single file mode
@@ -499,6 +502,7 @@ set(h.CharacterizationBound1,'YData',[Dmin Dmax]);
 set(h.CharacterizationBound2,'YData',[Dmin Dmax]);
 set(h.ExperimentBound1,'YData',[Dmin Dmax]);
 set(h.ExperimentBound2,'YData',[Dmin Dmax]);
+set(h.unroll,'Enable','on');
 
 %ha=get(h.D1,'Parent');
 %legend(ha,'off');

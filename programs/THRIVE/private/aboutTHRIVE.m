@@ -10,8 +10,10 @@ switch nargin
 end               
 
 name='THRIVE (THRee-Interferometer VElocimetry)';
-codever='1.2';
-releasedate='July 2016';
+%codever='1.2';
+%releasedate='July 2016';
+codever='1.3';
+releasedate='November 2016';
 switch mode
     case 'name'
         varargout{1}=name;
