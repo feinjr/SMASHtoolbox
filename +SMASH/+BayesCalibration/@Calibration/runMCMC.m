@@ -521,7 +521,7 @@ if acc == 0 && drscale > 0 && ~isempty(qcov)
     L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
     alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
     
-    if rand <= alpha13
+    if rand <= alpha13 && all(isfinite(lprior_new)) && all(isfinite(lprior_new2))
        acc = 1;  % Accept the candidate
        %prob = min(alpha,1);     % Accept with probability min(alpha,1)
        I_update = trialparams2;
@@ -630,17 +630,16 @@ for eNum = 1:Nexp
                 end
                 
                 %Prior likelihood
-                lprior_new2(count) = priorfunc{count}(priorvals{count}{:},trialsamps{eNum}(sNum));
+                lprior_new2(count) = priorfunc{count}(priorvals{count}{:},trialsamps2{eNum}(sNum));
                 
-                
-
+               
                 % DR algorithm
                 q1 = exp(-0.5*(norm((trialparams2-trialparams)*iR)^2-norm((I_update-trialparams)*iR)^2));
                 alpha32 = min(1,exp(sum(lik_new)-sum(lik_new2) + sum(lprior_new) - sum(lprior_new2)));
                 L2 = exp(sum(lik_new2) + sum(lprior_new2) -sum(lik_old)-sum(lprior_old) );
                 alpha13 = min(1, (L2*q1*(1-alpha32))/(1-alpha));
 
-                if rand <= alpha13
+                if rand <= alpha13 && all(isfinite(lprior_new))
                     acc(count) = 1;  % Accept the candidate
                     savedsamps{eNum}(sNum) = trialsamps2{eNum}(sNum);
                     savedparams(count) = trialparams2(count);
@@ -656,7 +655,6 @@ for eNum = 1:Nexp
 end %End of experiments loop
 
 % Update the likelihood given final combination of accepted values
-
 lik_old_check =zeros([1,Nexp]);
 response_old_check = {lik_old};
 for ii = 1:Nexp
@@ -664,6 +662,7 @@ for ii = 1:Nexp
     lik_old_check(ii) = ESS(ii)*lik_old_check(ii);
     %[lik_old(ii),response_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii});
 end
+
 
 %There is a possibility the combination violates prior constraints
 if ~any(isinf(lik_old_check))
