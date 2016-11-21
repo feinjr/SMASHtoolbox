@@ -33,8 +33,11 @@ set(Directory(4),'Callback',@(varargin) refreshDirectory);
 group={};
 if strcmpi(object.FilterControl,'on')
     Filter=addblock(dlg,'edit_check',{'Filter:' 'Enable'},30);
-    set(Filter(2),'Callback',@changeFilter);
+    set(Filter(2),'Callback',@changeFilter,'String',object.Filter);
     set(Filter(3),'Callback',@enableFilter);
+    if strcmpi(object.EnableFilter,'on')
+        set(Filter(3),'Value',1);
+    end
     group=[group Filter];
 end
 
@@ -97,7 +100,7 @@ if isempty(Recent)
     Recent{1}=object.StartDir;
 end
 enableFilter();
-
+refreshDirectory()
 
 if isempty(object.Reference)
     try

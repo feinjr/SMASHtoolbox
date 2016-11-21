@@ -20,7 +20,7 @@
 % than the specified size.  This overhead is on the order of tens of
 % kilobytes.
 %
-% See also FileAccess, mergeSplits
+% See also SMASH.FileAccess, mergeSplits
 %
 
 %

@@ -62,7 +62,7 @@ switch h5readatt(archive.ArchiveFile,setname,'RecordType');
     case 'structures'
         temp=extract_cell(archive,setname);
         data=repmat(temp{1},size(temp));
-        for n=1:numel(temp)
+        for n=2:numel(temp)
             data(n)=temp{n};
         end
     case 'cell'
