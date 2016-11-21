@@ -35,6 +35,10 @@
 
 function varargout=view(object,variables,vnums,plottype)
 
+    %KDE settings
+    smoothfac = 2;
+    npoints = 500;
+    
     % manage input
     if nargin < 2 || isempty(variables)
         variables = 'allinferred';
@@ -118,6 +122,7 @@ for i = 1:nc
 
         %Plot KDE
         obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
+        obj=configure(obj,'GridPoints',npoints,'SmoothFactor',smoothfac);
         [dgrid,p] = density(obj);
         kdeh = line(dgrid,p); kdeh.LineWidth = 3; %kdeh.Color = [0.8 0.0 0.0];        
         
@@ -125,9 +130,19 @@ for i = 1:nc
         mu = mean(c(:,i));
         stdev = std(c(:,i));
         x=linspace(min(hh(i).BinEdges),max(hh(i).BinEdges),1000)';
+        
+        %t=stdev.^2./mu; k = stdev.^2./(t.^2);
+        %t
+        %k
+        %gammapdf = @(x) exp(-x./t)./gamma(k).*x.^(k-1)./(t.^k);
+        
+        %a=mu.^2./(stdev.^2);b = stdev.*(a-1)
+        %igammapdf = @(x) exp(-b./x)./gamma(a).*(x.^(-a-1)).*(b.^a);
+        
         npdf = @(x) 1./(stdev.*sqrt(2*pi))*exp(-((x-mu).^2)./(2*stdev.^2));
         npd = npdf(dgrid);
-        ndh = line(dgrid,npd); ndh.LineWidth = 3; ndh.Color = [0.8 0.0 0.0]; 
+        %ndh = line(dgrid,gammapdf(dgrid)); ndh.LineWidth = 3; ndh.Color = [0.8 0.0 0.0];
+        ndh = line(dgrid,npd); ndh.LineWidth = 3; ndh.Color = [0.8 0.0 0.0];
         
 
 %         %Autocorrelation plot
@@ -187,7 +202,7 @@ fh.Color = 'w';
                 hsub{i,j} = axes('Parent',fh,'Units','normalized','Position',pos);
                 
                 obj = SMASH.MonteCarlo.Cloud([c(:,i),c(:,j)],'table');
-                obj=configure(obj,'GridPoints',1e2);
+                obj=configure(obj,'GridPoints',npoints,'SmoothFactor',smoothfac);
                 [dgrid1,dgrid2,p]=density(obj);    
                 [cdata,ch]=contour(dgrid1,dgrid2,p,obj.DensitySettings.NumberContours); 
                 set(ch,'LineWidth',1.0,'ShowText','off');
@@ -241,7 +256,7 @@ fh.Color = 'w';
             hh.EdgeColor='none';
 
             obj = SMASH.MonteCarlo.Cloud(c(:,i),'table');
-            obj = configure(obj,'GridPoints',1e3);
+            obj = configure(obj,'GridPoints',npoints,'SmoothFactor',smoothfac);
             [dgrid,p] = density(obj);
             kdeh = line(dgrid,p); kdeh.LineWidth = 1.0; kdeh.Color = 'k';
 
