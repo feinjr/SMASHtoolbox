@@ -51,7 +51,14 @@ output.FileName=object.FullName;
 output.Format=object.Format;
 output.FileOption=record;
 switch object.Format
-    case {'acqiris' 'agilent','keysight'}
+    case 'acqiris'
+        if isempty(record)
+            record=1;
+        end
+        acquisition=1;
+        segment=1;
+        [signal,time]=read_acqiris(object.FullName,record,acquisition,segment);        
+    case {'agilent','keysight'}
         report=probe(object);
         if isempty(record)
             if report.NumberSignals==1
@@ -90,8 +97,7 @@ switch object.Format
     otherwise
         error('ERROR: requested format is not supported');
 end
-output.Time=time;
-output.Signal=signal;
-
+output.Time=time(:);
+output.Signal=signal(:);
 
 end

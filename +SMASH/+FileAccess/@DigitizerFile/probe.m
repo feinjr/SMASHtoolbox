@@ -18,7 +18,9 @@ assert(exist(object.FullName,'file')==2,...
 
 % look inside source file
 switch object.Format
-    case {'acqiris' 'agilent','keysight'}
+    case 'acqiris'
+        report=probe_acqiris(object.FullName);  
+    case {'agilent','keysight'}
         report=probe_agilent(object.FullName);               
     case {'zdas','saturn'}
         file_id = hdfh('open',object.FullName,'read',0);

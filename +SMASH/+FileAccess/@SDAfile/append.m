@@ -1,5 +1,9 @@
 % UNDER CONSTRUCTION
-function append(object,dataset,data)
+
+%
+% created November 23, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
+function append(object,label,dimension,data)
 
 try
     info=h5info(object.ArchiveFile,dataset);
