@@ -19,6 +19,7 @@ y=cumtrapz(x,y);
 
 object.Grid=x;
 object.Data=y;
+object=limit(object,'all');
 
 object=updateHistory(object);
 

@@ -75,7 +75,10 @@ switch lower(edge)
         error('ERROR: invalid edge option');
 end
 
+object.Grid=x;
 object.Data=dydx;
+object=limit(object,'all');
+
 object=updateHistory(object);
 
 end
