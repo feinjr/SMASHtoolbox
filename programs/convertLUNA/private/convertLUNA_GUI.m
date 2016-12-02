@@ -172,7 +172,7 @@ set(h(3),'Callback',@viewCurrent);
         end
         current=get(hFile(2),'Value');
         target=fullfile(setting.Source,setting.FileList{current});
-        object=SMASH.Velocimetry.LUNA(target);
+        object=SMASH.FileAccess.LUNA(target);
         step=setting.TimeStep{current};
         range=setting.TimeRange{current};
         if isempty(step) && isempty(range)
