@@ -26,7 +26,7 @@
 % (all files) or a cell array of values (two-element or empty) specific to
 % each file.
 %
-% See also SMASH.Velocimetry.LUNA
+% See also SMASH.FileAccess.LUNA
 %
 
 %
@@ -91,7 +91,7 @@ for n=1:N
     [~,shortname,extension]=fileparts(source{n});
     filename=[shortname extension];
     try
-        object=SMASH.Velocimetry.LUNA(source{n});
+        object=SMASH.FileAccess.LUNA(source{n});
     catch    
         warning('"%s" is not a valid LUNA file',filename);
         continue
