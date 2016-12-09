@@ -64,6 +64,7 @@ set(Action(2),'Callback',@cancel);
         value=get(Variable(2),'Value');
         variable=get(Variable(2),'String');        
         variable=variable{value};
+        variable=evalin('base',variable);
         new=get(Label(2),'String');
         description=get(Description(2),'String');
         deflate=get(Deflate(2),'Value')-1;
