@@ -132,10 +132,12 @@ tempfile=sprintf('.tempfileZ%d%s',shot,extension);
 tempfile=fullfile(pwd,tempfile);
 sourcefile=sprintf('pbfa2z_%d%s',shot,extension);
 if ispc
-    sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
+    %sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
+    sourcefile=fullfile('\\york',subdir,'pbfa2z',sourcefile);
     copyfile(sourcefile,tempfile,'f');
 else
-    sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
+    %sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
+    sourcefile=fullfile('york:',subdir,'pbfa2z',sourcefile);
     commandwindow;
     command=sprintf('scp "%s" "%s"',sourcefile,tempfile);
     system(command);
