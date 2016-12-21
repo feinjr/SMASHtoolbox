@@ -10,17 +10,19 @@
 %     'Experiment'   - View the Experimental region of the raw signals.
 %     'Reference'    - View the reference region of the raw signals.
 %     'Processed'    - View the VISAR signals after scaling, shifting, and
-%                      filtering.  The signal must be analyzed for this
+%                      filtering.  The signal must be processed for this
 %                      option.
 %     'Quadrature'   - View the quadrature signals.  The VISAR object must
-%                      be analyzed for this option.
+%                      be processed for this option.
 %     'Lissajou  '   - View the VISAR Lissajou with the ellipse fit.  The
-%                      VISAR object must be analyzed for this option.
+%                      VISAR object must be processed for this option.
 %     'Fringeshift'  - View the Fringe Shift signal.  The VISAR object must
-%                      be analyzed for this option.
+%                      be processed for this option.
 %     'Contrast'     - View the Contrast signal.  The VISAR object must
-%                      be analyzed for this option.
+%                      be processed for this option.
 %     'Velocity'     - View the Velocity signal.  The VISAR object must
+%                      be analyzed for this option.
+%     'Displacement' - View the Displacement signal.  The VISAR object must
 %                      be analyzed for this option.
 %
 % There are two PlotMethods:
@@ -35,7 +37,8 @@
 % target is specified a new figure is generated.
 %
 % created March 10, 2016 by Paul Specht (Sandia National Laboratories)
-%
+% Updated December 21 2016 by Paul Specht (Sandia National Laboratories)
+
 function varargout=view(varargin)
 
 % manage the input
@@ -189,6 +192,13 @@ for k=1:length(objs)
             type=6;
             label=getLabel(object,label,type);
             setColor(h,color,type,k);
+        case 'displacement'
+            assert(isa(object.Displacement,'SMASH.SignalAnalysis.Signal'),...
+                'ERROR: Must Analyze Signal to View');
+            h=view(object.Displacement,target(k));
+            type=7;
+            label=getLabel(object,label,type);
+            setColor(h,color,type,k);
         otherwise
             error('ERROR: Invalid View Mode');
     end
@@ -235,6 +245,12 @@ for k=1:length(objs)
         if length(unique(target)) > 1
             legend(label{k},'Location','best');
         end
+    elseif type == 7
+        xlabel('Time');
+        ylabel('Displacement');
+        if length(unique(target)) > 1
+            legend(label{k},'Location','best');
+        end
     end
 end
 if length(unique(target)) == 1
@@ -253,40 +269,4 @@ fig.Hidden=false;
 % manage output
 if nargout>0
     varargout{1}=h;
-end
-
-    function Label=getLabel(object,label,type)
-        if type < 2
-            %determine the number of signals
-            N=object.Measurement.NumberSignals;
-            if N > 3
-                l={['D1A-',object.Label],['D1B-',object.Label],['D2A-',object.Label],['D2B-',object.Label]};
-            elseif N > 2
-                l={['D1-',object.Label],['D2-',object.Label],['BIM-',object.Label]};
-            else
-                l={['D1-',object.Label],['D2-',object.Label]};
-            end
-        elseif type == 2
-            l={['Lissajou-',object.Label]};
-        elseif type == 3
-            l={['DX-',object.Label],['DY-',object.Label]};
-        elseif type > 3
-            l={object.Label};
-        end
-        Label=[label,l];
-    end
-
-    function setColor(handle,Colors,type,k)
-        if type < 2
-            int=4;
-        elseif type == 3
-            int=2;
-        else
-            int=1;
-        end
-        for n=1:length(handle)
-            set(handle(n),'Color',Colors(n+int*(k-1),:));
-        end
-    end
-
 end

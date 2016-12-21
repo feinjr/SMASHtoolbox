@@ -9,12 +9,8 @@
 %
 % Percentage defines the range around each axis intercept to use for
 % determining the scalings.  This percentage is defined by the range of the
-% signal along the opposite axis.  The default is 5%.
-%
-% For a Fast Push-Pull signal, each axis crossing is given is own
-% independent scaling.  For Conventional and Standard Push-Pull signals,
-% the scales for both crossings of each axis are averaged to determine the
-% signal scaling.
+% signal along the opposite axis.  The default is 5%.  The scales for both
+% crossings of each axis are averaged to determine the signal scaling.
 %
 % The vertical scales and offsets are not protected properties.  The user
 % can specifiy them in the command window.
@@ -26,7 +22,11 @@
 % shifted.  If the number of offsets or scalings exceed the number of 
 % signals, the addtional offsets or scalings are ignored.  
 %
+% this method works with relatively cirular Lissajous.  Odd features int he
+% results can lead to misalignments.  Work is ongoing to improve this.
+%
 % created March 15 2016 by Paul Specht (Sandia National Laboratories)
+% Updated December 21 2016 by Paul Specht (Sandia National Laboratories)
 
 function object=adjustEllipse(object,percent)
 
@@ -56,45 +56,39 @@ N=object.Measurement.NumberSignals;
 object.VerticalOffsets=zeros(1,N);
 object.VerticalScales=ones(1,N);
 
-%calculate the offsets
-bound=object.ExperimentalRegion;
-roi=(object.Measurement.Grid >= bound(1)) & (object.Measurement.Grid <= bound(2));
-if N == 4
-    voffset=zeros(1,N);
-else
-    voffset=zeros(1,2);
-end
-for k=1:length(voffset);
-    voffset(k)=-1*mean(object.Measurement.Data(roi,k));
-end
-object.VerticalOffsets=voffset;
 
-%Process the Results to generate a centered Lissajou
-if isa(object.Processed,'SMASH.SignalAnalysis.Signal') ~= 1
-    objtemp=analyze(object);
-else
-    objtemp=object;
-end
+%process the object
+object=process(object);
+
+%calculate the offsets
+xoff=mean(object.Quadrature.Data(:,1));
+yoff=mean(object.Quadrature.Data(:,2));
+object.VerticalOffsets=[-0.5*xoff 0.5*xoff -0.5*yoff 0.5*yoff];
+
+%reprocess the object
+object=process(object);
 
 %calculate scalings
-X=objtemp.Quadrature.Data(:,1);
-Y=objtemp.Quadrature.Data(:,2);
+X=object.Quadrature.Data(:,1);
+Y=object.Quadrature.Data(:,2);
 keep=cell(1,4);
 scales=zeros(1,4);
+Xrange=max(X)-min(X);
+Yrange=max(Y)-min(Y);
 %values for D1A
-keep{1}=(abs(Y) <= 0.5*percent*max(Y)) & (X >= 0);
+keep{1}=(abs(Y) <= 0.5*percent*Yrange) & (X >= 0);
 %values for D1B
-keep{2}=(abs(Y) <= 0.5*percent*max(Y)) & (X <= 0);
+keep{2}=(abs(Y) <= 0.5*percent*Yrange) & (X <= 0);
 %values for D2A
-keep{3}=(abs(X) <= 0.5*percent*max(X)) & (Y >= 0);
+keep{3}=(abs(X) <= 0.5*percent*Xrange) & (Y >= 0);
 %values for D2B
-keep{4}=(abs(X) <= 0.5*percent*max(X)) & (Y <= 0);
+keep{4}=(abs(X) <= 0.5*percent*Xrange) & (Y <= 0);
 for k=1:4
     if sum(keep{k}) ~= 0
         if k < 3
-            scales(k)=1/mean(X(keep{k}));
+              scales(k)=1/abs(mean(X(keep{k})));
         else
-            scales(k)=1/mean(Y(keep{k}));
+            scales(k)=1/abs(mean(Y(keep{k})));
         end
     end
 end
@@ -109,17 +103,13 @@ for m=1:4
         end
     end
 end
-%Use average scaling factores if not Fast Push-Pull since only 2 signals
+%Use average scaling factores 
+scales=[mean(scales(1:2)),mean(scales(1:2)),mean(scales(3:4)),mean(scales(3:4))];
+%adjust if not fast push-pull
 if N < 4
-    scales(1)=mean(scales(1:2));
-    scales(2)=mean(scales(3:4));
-    scales=scales(1:2);
+    scales=[scales(1),scales(3)];
 end
 object.VerticalScales=scales;
 
-
-    
-
-
-    
-
+%reprocess the object
+object=process(object);

@@ -15,7 +15,8 @@
 % channel.
 %
 % created March 7th, 2016 by Paul Specht (Sandia National Laboratories)
-%
+% Updated December 21 2016 by Paul Specht (Sandia National Laboratories)
+
 classdef VISAR
     %%
     properties
@@ -26,6 +27,7 @@ classdef VISAR
         VerticalOffsets=[];
         VerticalScales=[];
         VPF=1;
+        Wavelength=532e-9;
         InitialVelocity=0;
         EllipseParameters=[0 0 1 1 0];
         ReferenceRegion = [] % Reference ROI boundaries
@@ -37,7 +39,8 @@ classdef VISAR
         Quadrature %Quadrature Signals (SingalGroup Object)
         FringeShift %Fringe Shift (Signal object)
         Contrast  %Contrast (Signal object)
-        Velocity % Converted results (Signal object)
+        Velocity % Converted Velocity results (Signal object)
+        Displacement % Converted Displacement results (Signal object)
     end
     properties (Dependent)
         Type
@@ -70,8 +73,11 @@ classdef VISAR
                 object.Measurement=object.Measurement.Data(:,1:4);
             end
         end
+        varargout=process(varargin);
+        varargout=analyze(varargin);
+        varargout=analyzeFourier(varargin);
         varargout=adjustEllipse(varargin);
-        varargout=fitEllipse(varargin);
+        varargout=offset(varargin);
         varargout=adjustFringes(varargin);
         varargout=export(varargin);
         varargout=saveSettings(varargin);
@@ -133,6 +139,15 @@ classdef VISAR
                 object.VPF=abs(value(1,1));
             else
                 object.VPF=abs(value);
+            end
+        end
+        function object=set.Wavelength(object,value)
+            assert(isnumeric(value),...
+                'ERROR: Wavelength Must be Numeric');
+            if numel(value) > 1
+                object.Wavelength=abs(value(1,1));
+            else
+                object.Wavelength=abs(value);
             end
         end
         function object=set.InitialVelocity(object,value)
