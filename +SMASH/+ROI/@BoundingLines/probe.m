@@ -1,6 +1,6 @@
-% probe Probe limits of a BoundingCurve
+% probe Probe bound limits
 %
-% This method probes the limits specified in a BoundingCurve object.
+% This method probes the limits specified in a BoundingLines object.
 %     >> limit=probe(object);
 %     >> limit=probe(object,locations);
 % The first example returns the lower and upper limits as a 1x2 array.  The

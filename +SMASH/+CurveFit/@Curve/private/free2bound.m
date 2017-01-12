@@ -2,6 +2,8 @@ function x=free2bound(u,left,right)
 
 if left==right
     x=left;
+elseif isinf(left) && isinf(right)
+    x=u;
 elseif isinf(left) 
     x=right-u.^2;
 elseif isinf(right)

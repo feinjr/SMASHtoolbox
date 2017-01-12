@@ -13,7 +13,7 @@
 % remove methods.  The summarize and evaluate methods describe the current
 % object state.  Parameter optimization is provided with the fit method.
 %
-% See also CurveFit, makeBackground, makePeak, makeStep
+% See also SMASH.CurveFit, makeBackground, makePeak, makeStep
 %
 
 %

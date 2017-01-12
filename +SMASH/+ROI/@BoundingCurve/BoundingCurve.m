@@ -18,7 +18,7 @@
 % Class methods "define", "insert, and "remove" alter the bounding curve
 % after object creation.
 %
-% See also ROI
+% See also SMASH.ROI
 % 
 
 %

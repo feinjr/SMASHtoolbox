@@ -18,7 +18,7 @@
 %
 % created December 1, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=fit(object,data,options)
+function [object,chi2]=fit(object,data,options)
 
 % handle input
 assert(nargin>=2,'ERROR: insufficient input');
@@ -118,7 +118,6 @@ end
 param=fminsearch(@residual,guess,options);
 
 [chi2,scale]=residual(param);
-%fprintf('chi2=%g\n',chi2);
 for m=1:Ntotal
     param(m)=free2bound(param(m),lower(m),upper(m));
 end

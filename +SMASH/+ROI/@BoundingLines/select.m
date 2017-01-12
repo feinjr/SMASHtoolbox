@@ -1,4 +1,4 @@
-% select Interactive bounding lines selection
+% select Interactive bound selection
 %
 % This method allows bounding lines to be selected interactively.  The
 % standard call is:

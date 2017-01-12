@@ -1,4 +1,4 @@
-% define Manually define points in a BoundingCurve
+% define Manually define bounding values
 %
 % This method manually defines bounding line positions.
 %    >> object=define(object,[lower upper]);

@@ -1,4 +1,4 @@
-% define Manually define BoundingCurve points
+% define Manually define bound points
 %
 % This method defines BoundingCurve points with a data table.
 %     >> object=define(object,table);

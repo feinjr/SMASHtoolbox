@@ -2,6 +2,8 @@ function u=bound2free(x,left,right)
 
 if left==right
     u=left;
+elseif isinf(left) && isinf(right)
+    u=x;
 elseif isinf(left)     
     u=sqrt(right-x);
 elseif isinf(right)   

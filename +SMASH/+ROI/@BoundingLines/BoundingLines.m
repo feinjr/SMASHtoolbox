@@ -16,7 +16,7 @@
 %     >> object=BoundingLine(direction,[lower upper]);
 % or with the "define" and "select" methods.
 %
-% See also ROI
+% See also SMASH.ROI
 %
 
 %
