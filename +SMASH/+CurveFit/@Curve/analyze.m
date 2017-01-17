@@ -1,7 +1,24 @@
-% analyze Analyze fit uncertainty
+% analyze Analyze parameter uncertainty
 %
-% report=analyze(object,data,iterations,cutoff);
+% This method analyzes parameter uncertainty for a Curve object.
+%    report=analyze(object,data,iterations);
+% The input "data" must be a 2-3 column ([x y] or [x y dy]) column of
+% data points.  The input "interations" is optional (default value is 1000)
+% and can be any positive integer.  Larger iteration numbers take more time
+% but produce more reliable results.
+%
+% The output "report" is a Cloud object describing the variation in all
+% basis parameters and scale factors.  NOTE: this method cannot be used
+% until the fit method has been called.  Adding, removing, and editing the
+% basis functions in a Curve object require the fit method to be called
+% before uncertainty analysis.
+%
+% See also SMASH.CurveFit, fit, SMASH.MonteCarlo.Cloud
+%
 
+%
+% created January 17, 2016 by Daniel Dolan (Sandia National Laboratories)
+%
 function [report,accept]=analyze(object,data,iterations,cutoff)
 
 assert(object.FitComplete,...
