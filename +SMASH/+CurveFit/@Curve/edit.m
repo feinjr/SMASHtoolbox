@@ -70,5 +70,6 @@ for n=1:2:Narg
     end
 end
 
+object.FitComplete=false;
 
 end

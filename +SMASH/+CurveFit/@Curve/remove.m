@@ -41,4 +41,6 @@ while numel(index)>0
     index=index(2:end);
 end
 
+object.FitComplete=false;
+
 end

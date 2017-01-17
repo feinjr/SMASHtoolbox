@@ -94,4 +94,6 @@ object.Bound{end+1}=[option.Lower; option.Upper];
 object.Scale{end+1}=option.Scale;
 object.FixScale{end+1}=option.FixScale;
 
+object.FitComplete=false;
+
 end

@@ -23,11 +23,14 @@ classdef Curve
     %% properties
     properties (SetAccess=protected)
         Basis = {} % Basis function handles
-        Parameter = {} % Basis function variables
+        Parameter = {} % Basis function parameters
         Bound = {} % Variable bounds (lower/upper)
-        Scale = {} % Basis scaling factors
-        FixScale = {} % Fixed scaling factor settings
+        Scale = {} % Basis scale factors
+        FixScale = {} % Fixed scaling factor settings        
     end
+    properties (Access=protected)
+        FitComplete = false
+    end    
     %% methods
     methods (Hidden=true)
         function object=Curve(varargin)
@@ -36,5 +39,5 @@ classdef Curve
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);
-    end
+    end      
 end

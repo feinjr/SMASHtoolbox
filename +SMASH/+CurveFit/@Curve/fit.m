@@ -6,30 +6,34 @@
 % The input "data" must be a two- or three-column array.  The first two
 % columns are always x and y, respectively.  The third column is used for
 % weighting data points; if omitted, all points are treated equally.
-% 
+%
 % Optimization options can be passed as a third input.
 %     >> object=fit(object,data,options);
 % The MATLAB function "optimset" should be used to generate the options
 % structure.
-% 
+%
 % See also Curve, evaluate, optimset, summarize
 %
 
 %
 % created December 1, 2014 by Daniel Dolan (Sandia National Laboratories)
 %
-function [object,chi2]=fit(object,data,options)
+function object=fit(object,data,options)
 
-% handle input
+% manage input
 assert(nargin>=2,'ERROR: insufficient input');
 
 assert(isnumeric(data),'ERROR: data table must be numeric');
 Ncolumn=size(data,2);
 if Ncolumn==2
-    data(:,3)=1;
+    data(:,3)=0;
     Ncolumn=3;
 end
 assert(Ncolumn==3,'ERROR: data table must have 2-3 columns');
+assert(all(data(:,3) >= 0),'ERROR: invalid uncertainty value(s)');
+if any(data(:,3) == 0)
+    assert(all(data(:,3) == 0),'ERROR: invalid uncertainty value(s)')
+end
 
 if (nargin<3) || isempty(options)
     options=optimset();
@@ -66,16 +70,20 @@ for m=1:Nbasis
             warning('SMASH:CurveFit',...
                 'Invalid parameter detected, using upper bound instead');
         end
-        guess(end+1)=bound2free(param(n),lower(end),upper(end)); %#ok<AGROW>                
-    end    
+        guess(end+1)=bound2free(param(n),lower(end),upper(end)); %#ok<AGROW>
+    end
 end
 Ntotal=numel(guess);
 
 % perform optimization
 x=data(:,1);
 y=data(:,2);
-weight=data(:,3);
-weight=weight./sum(weight);
+Dy=data(:,3);
+if Dy(1) == 0
+    weight=ones(size(Dy));
+else
+    weight=1./Dy.^2;
+end
 
 fixed=false(1,Nbasis);
 for m=1:Nbasis
@@ -84,20 +92,21 @@ for m=1:Nbasis
     end
 end
 
-    function [chi2,scale]=residual(current)       
-        % parameter conversion and penalty assessment
-        penalty=ones(1,Ntotal);
+if numel(guess) > 0
+    slack=fminsearch(@residual,guess,options);
+else
+    slack=[];
+end
+[~,scale,param]=residual(slack);
+    function [chi2,scale,param]=residual(slack)
+        % parameter conversion
+        param=slack;
         for j=1:Ntotal
-            if isinf(lower(j)) || isinf(upper(j)) || lower(j)==upper(j)
-                % do nothing
-            elseif abs(current(j))>1
-                penalty(j)=abs(current(j));
-            end
-            current(j)=free2bound(current(j),lower(j),upper(j));            
-        end      
+            param(j)=free2bound(slack(j),lower(j),upper(j));
+        end
         scale=nan(Nbasis,1);
         for j=1:Nbasis
-            object.Parameter{j}=current(start(j):stop(j));
+            object.Parameter{j}=param(start(j):stop(j));
             scale(j)=object.Scale{j};
         end
         [~,basis]=evaluate(object,x);
@@ -107,24 +116,18 @@ end
         basis_reduced=basis(:,~fixed);
         scale_reduced=distinctLLS(basis_reduced,y_reduced);
         fit_reduced=basis_reduced*scale_reduced;
-        fit=fit_reduced+y_fixed;   
+        fit=fit_reduced+y_fixed;
         scale(~fixed)=scale_reduced;
-        % residual calculation with complex function/weight support
+        % residual calculation with complex values and weight support
         chi2=weight.*(y-fit);
-        chi2=real(chi2.*conj(chi2));
-        chi2=mean(chi2);
-        chi2=chi2*prod(penalty);
+        chi2=sum(real(chi2.*conj(chi2))); 
     end
-param=fminsearch(@residual,guess,options);
-
-[chi2,scale]=residual(param);
-for m=1:Ntotal
-    param(m)=free2bound(param(m),lower(m),upper(m));
-end
 
 for m=1:Nbasis
     object.Parameter{m}=param(start(m):stop(m));
-    object.Scale{m}=scale(m);
+    object.Scale{m}=scale(m);   
 end
+
+object.FitComplete=true;
 
 end
