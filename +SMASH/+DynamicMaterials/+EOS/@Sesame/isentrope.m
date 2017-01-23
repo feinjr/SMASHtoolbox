@@ -35,7 +35,7 @@ density = varargin{2};
 %Assume STP for rho0
 st = stp(object,density(1)); 
 rho0 = st.Density;
-T0 = st.Temperature
+T0 = st.Temperature;
 P0=st.Pressure;
 up1 = 0;
 
@@ -58,6 +58,7 @@ if ~isnumeric(density) || min(size(density)) > 1
 end
 
 %Lookup initial state
+
 S0 = lookup(object,'Entropy',density(1),T0);
 E0 = lookup(object,'Energy',density(1),T0);
 
