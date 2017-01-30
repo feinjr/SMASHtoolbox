@@ -36,7 +36,7 @@
 function varargout=view(object,variables,vnums,plottype)
 
     %KDE settings
-    smoothfac = 2;
+    smoothfac = 1.5;
     npoints = 500;
     
     % manage input
@@ -300,10 +300,7 @@ fh.Color = 'w';
         end
     end
     
-    
-    
-    
-    
+   
     
     varargout{1} = hsub;
 end

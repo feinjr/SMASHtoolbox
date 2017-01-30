@@ -28,6 +28,7 @@ classdef VISAR
         VerticalScales=[];
         VPF=1;
         Wavelength=532e-9;
+        Dispersion=0;
         InitialVelocity=0;
         EllipseParameters=[0 0 1 1 0];
         ReferenceRegion = [] % Reference ROI boundaries
@@ -82,6 +83,7 @@ classdef VISAR
         varargout=export(varargin);
         varargout=saveSettings(varargin);
         varargout=loadSettings(varargin);
+        varargout=deGhost(varargin);
     end
     %% setters
     methods
@@ -148,6 +150,15 @@ classdef VISAR
                 object.Wavelength=abs(value(1,1));
             else
                 object.Wavelength=abs(value);
+            end
+        end
+        function object=set.Dispersion(object,value)
+            assert(isnumeric(value),...
+                'ERROR: Dispersion Must be Numeric');
+            if numel(value) > 1
+                object.Dispersion=abs(value(1,1));
+            else
+                object.Dispersion=abs(value);
             end
         end
         function object=set.InitialVelocity(object,value)

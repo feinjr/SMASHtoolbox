@@ -88,6 +88,7 @@
 % Edit axis labels : Change the grid and data labels
 % Calculate % difference : New plot showing the percent difference between
 %   the first signal and all other signals
+% Velocity residuals : Quantify difference between experiment and sim
 % Large AIP figure : Creates a large figure - typically found to be useful
 %   for presentation figures. 
 % Single column AIP figure : Single column report figure
@@ -237,6 +238,7 @@ uimenu(hm,'Label','Update Line Properties','Callback',@UpdateLineProp);
 uimenu(hm,'Label','Edit Signal Order','Callback',@EditOrder);
 uimenu(hm,'Label','Edit axis labels','Callback',@EditAxisLabel);
 uimenu(hm,'Label','Calculate % Difference','Callback',@PercentDifference);
+uimenu(hm,'Label','Velocity Residuals','Callback',@VelocityResiduals);
 uimenu(hm,'Label','Large AIP Figure','Callback',@BigPlot);
 uimenu(hm,'Label','Single column AIP Figure','Callback',@AIPFigure1);
 uimenu(hm,'Label','Double column AIP Figure','Callback',@AIPFigure2);
@@ -1721,7 +1723,7 @@ set(h(1),'Callback',@PerformCallback);
 function PerformCallback(varargin)
     time = []; u = []; cl = [];  stress = []; rho =[]; strain =[];
     %Hardwired parameters
-    num_upoints = 2.5e3; 
+    num_upoints = 10.0e3; 
     
     %Get parameters
     value = probe(dlg);
@@ -2261,6 +2263,102 @@ function PercentDifference(src,varargin)
     axis([x(1) x(end) -10*max(mean(cell2mat(PercentDiff))) 10*max(mean(cell2mat(PercentDiff)))]); 
 end %Percent difference
 
+
+%% Velocity Residuals
+function VelocityResiduals(src,varargin)
+    
+    %Find absolute min and max
+    xmin=[]; xmax=[];
+    for i=1:numel(sig_num)
+        xt = limit(sig{sig_num(i)});
+        xmin = [xmin;min(xt)];
+        xmax = [xmax;max(xt)];
+    end
+    xmin = max(xmin); xmax = min(xmax);
+    
+    %Limit range of first curve
+    %vobj=limit(sig{sig_num(1)},[xmin xmax]);
+    texp = linspace(xmin,xmax,5e3)';
+    vobj = regrid(sig{sig_num(1)},texp);
+    [texp,vexp]=limit(vobj);
+    
+    
+    %Calculate error in velocity curve
+    evis = sqrt((0.002.*vexp).^2 + 8.4^2);
+    tvis = [];
+    
+    %Total variance w/ time:
+    dt = 0.5e-9; ndt = 100; % Time variance settings
+    tvis = evis*0;
+    for i = 1:length(texp)
+        if texp(i)+dt >= max(texp)
+            tlookup = linspace(texp(i)-dt,texp(i),ndt);
+        elseif texp(i)-dt <= max(texp)
+            tlookup = linspace(texp(i),texp(i)+dt,ndt);
+        else
+            tlookup = linspace(texp(i)-dt,texp(i)+dt,ndt);
+        end
+        vel = interp1(texp,vexp,tlookup,'linear',0);
+        tvis(i) = var(vel);
+    end
+    
+    fh = SMASH.Graphics.AIPfigure(4,'14in'); fh.Color='w'; delete(gca);
+    ax1 = axes('Parent',fh,'Units','normalized','Position',[0.125 0.55 0.85 0.4]); box on; hold on;
+    set(gca,'LineWidth',2.0,'FontSize',24);
+    ax2 = axes('Parent',fh,'Units','normalized','Position',[0.125 0.15 0.85 0.4]); box on; hold on;
+    set(gca,'LineWidth',2.0,'FontSize',24);
+    linkaxes([ax1,ax2],'x');
+    
+    
+    %Plot velocity trace
+    axes(ax1);
+    if ~isempty(tvis)
+        hfill=fill([texp' fliplr(texp')],[(vexp+2*(evis+tvis))',fliplr((vexp-2*(evis+tvis))')],[0.75,0.75,0.75]);
+        hfill.EdgeColor=[0.75 0.75 0.75];
+    end
+    hfill=fill([texp' fliplr(texp')],[(vexp+2*evis)',fliplr((vexp-2*evis)')],[0.6,0.6,0.6]);
+    hfill.EdgeColor=[0.6 0.6 0.6];
+    %uistack(hfill,'bottom');
+    he = line(texp,vexp); he.Color = 'k';
+    ylabel(sig{sig_num(1)}.DataLabel,'FontSize',32);
+    ax1.XTickLabel = [];
+    ax1.YLim = [0,max(vexp+2*evis)];
+    
+    
+    
+    %Plot residuals
+    axes(ax2);
+    if ~isempty(tvis)
+        hfill=fill([texp' fliplr(texp')],[(2*(evis+tvis))',fliplr((-2*(evis+tvis))')],[0.75,0.75,0.75]);
+        hfill.EdgeColor=[0.75,0.75,0.75];
+    end
+    hfill=fill([texp' fliplr(texp')],[(2*evis)',fliplr((-2*evis)')],[0.6,0.6,0.6]);
+    hfill.EdgeColor=[0.6,0.6,0.6];
+    he = line(texp,texp.*0); he.Color = 'k';
+    xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',32);
+    ylabel('Residual','FontSize',32);
+    ax2.XLim = [xmin,xmax];
+    
+
+    %Loop through and plot each
+    maxr = 0;
+    for i=2:length(sig_num)
+        col =  sig{sig_num(i)}.GraphicOptions.LineColor;
+        y = lookup(sig{sig_num(i)},texp);
+        axes(ax1);
+        hs = line(texp,y); hs.Color = col;
+        axes(ax2);
+        hs = line(texp,vexp-y); hs.Color = col;
+        maxr = max(maxr,max(abs(vexp-y)));
+    end
+    maxr = max(max(2*(evis+tvis)),maxr);
+    ax2.YLim = [-maxr,maxr];
+   
+end %Velocity Residuals
+
+
+
+
 %% Large plot 
 function BigPlot(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(4,'11in');
@@ -2346,9 +2444,12 @@ function DualAxes(src,varargin)
     ylabel(ax1,sig{sig_num(1)}.DataLabel,'FontSize',40); ylabel(ax2,sig{sig_num(end)}.DataLabel,'FontSize',40);
     set(ax1,'FontName','times','FontAngle','normal','FontSize',30);
     set(ax2,'FontName','times','FontAngle','normal','FontSize',30);
-
     set(gcf,'Color','w');
+    pause(0.1);
+    ax1.Position = ax2.Position;
 
+    
+    
     end
 
 end %Dual axes
@@ -2700,7 +2801,7 @@ switch material
         g0 = 1; 
         material = {'Aluminum','Beryllium','Copper','Gold', ...
             'LiF','Lead','Molybdenum','Stainless Steel','Tantalum',...
-            'Rhenium','Zirconium','Zirconium1','Zirconium2'};
+            'Rhenium','Zirconium','Zirconium1','Zirconium2','Epoxy'};
         
       case 'DefinedWindows'
         rho = 1;
@@ -2716,7 +2817,7 @@ switch material
         g0 = 1; 
         material = {'Aluminum','Beryllium','Copper','Gold', 'Diamond', ...
             'LiF','Molybdenum','PMMA','Quartz','Sapphire', ...
-            'Stainless Steel','Tantalum','Rhenium'};
+            'Stainless Steel','Tantalum','Rhenium','Epoxy'};
         
     
     %% Metals
@@ -2791,7 +2892,16 @@ switch material
         rho = 6.506;
         c0 = 3.296;
         s = 1.271;
-        g0 = 1.09;       
+        g0 = 1.09;   
+        
+    case 'Epoxy'
+        rho = 1.107;
+        c0 = 2.8;
+        s = 1.7;
+        g0 = 1.13;       
+        
+        
+        
         
     %% Windows    
     case 'Diamond'

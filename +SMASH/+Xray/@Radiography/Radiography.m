@@ -35,7 +35,7 @@ classdef Radiography
             
             object.Settings = p;
             if (nargin==1) && isobject(varargin{1})
-                varargin{1}=SMASH.ImageAnalysis.Image(varargin{1});
+                varargin{1}=SMASH.ImageAnalysis.Image(varargin{1}.Grid1,varargin{1}.Grid2,varargin{1}.Data);
                 object.Measurement=varargin{1};
             elseif (nargin == 2) && ischar(varargin{1}) && ischar(varargin{2})
                 object.Measurement=SMASH.ImageAnalysis.Image(varargin{1},varargin{2});

@@ -7,6 +7,7 @@
 %   Usage:
 %    >> new=stp(object);
 %    >> new=stp(object, rho guess);
+%    >> new=stp(object, rho guess, T0);
 %
 % See also Sesame, hugoniot, isentrope, isobar, isochor
 %
