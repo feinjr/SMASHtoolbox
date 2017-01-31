@@ -1,30 +1,31 @@
-% grabSignal Grab DAS signal(s)
+% grabSignal Grab signal(s) from ZDAS
 %
-% This function grabs signals by name from a DAS file and returns data as a
-% SignalGroup object.  Signals can be grabbed from a local file:
+% This function grabs Data Acquisition System (DAS) signals from Z
+% experiments.  Signals can be grabbed from a local file:
 %    object=grabSignal(filename,label1,label2,...);
 % or from the local network.
-%    object=grabSignal(shotnumber,label1,label2,...);
-% The shot number in the second example must be the integer ID for a
-% particular experiment.  Wild cards are allowed in the signal label(s).
+%    object=grabSignal(shotnumber,label1,label2,...); % integer ID
+% The output is a SignalGroup object generated from the specified label(s).
+%  Wild cards, such as '*PSB*', are permitted in the labels.
 % 
-% When accessing network files, this function defaults to the *.pff
-% archive.  If for some reason these files are unavailable, the *.hdf
-% archive can be used.
-%    object=grabSignal(shotnumber,'hdf',...); % use *.hdf archive
-%    object=grabSignal(shotnumber,'pff',...); % use *.pff archive (default)
-% Archive files are temporarily copied from the network to the local
+% The default access point for network files is the raw PFF data stored on
+% the york server.  The same information can also be accessed in HDF
+% format.
+%    object=grabSignal(shotnumber,'-hdf',label); % use *.hdf archive
+%    object=grabSignal(shotnumber,'-pff',label); % use *.pff archive (default)
+% Network files are temporarily copied from the network to the local
 % machine, so it is faster to grab several signals at once rather than
-% calling this function for individual signals.
+% calling this function for individual signals.  
 %
-% Calling this function with no record labels and no output copies the
-% archive file (without reading it) to the local machine.
-%    grabSignal(shotnumber); % copy *.pff archive
-%    grabSignal(shotnumber,'pff'); % copy *.pff archive
-%    grabSignal(shotnumber,'hdf'); % copy *.hdf archive
-% Local archives are named "ZDAS" followed by the shot number and the
-% extension *.pff/*.hdf.
-% 
+% An additional flag can be specified to access the processed machine
+% current files instead of the raw signals.
+%    object=grabSignal(shotnumber,'-hdf','-jkmoore',label);
+%    object=grabSignal(shotnumber,'-tcwagon',label);
+%
+% Calling this function with no output copies a network file to the local machine.
+%    grabSignal(shotnumber); % copy raw *.pff
+%    grabSignal(shotnumber,'-jkmoore'); % copy processed *.pff file  
+%    grabSignal(shotnumber,'-hdf'); % copy raw *.hdf file 
 %
 % See also Z, SMASH.Signal.SignalGroup
 % 
@@ -33,54 +34,29 @@
 % created January 29, 2016 by Daniel Dolan (Sandia National Laboratories)
 % updated February 25, 2016 by Daniel Dolan
 %    -added copy-only mode
+% updated January 30, 2017 by Daniel Dolan
+%    -transitioned from sasn898 to york server
+%    -refined option handling to support processed machine current files
 %
 function varargout=grabSignal(varargin)
 
 % manage input
 assert(nargin >= 1,'ERROR: insufficient input');
 
-if (nargout==0) % copy-only mode
-    if nargin<2
-        varargin{2}='pff';
-    end
-    assert(strcmpi(varargin{2},'pff') || strcmpi(varargin{2},'hdf'),...
-        'ERROR: invalid archive format');
-else
-    assert(nargin >= 2,'ERROR: insufficient input');
-end
-
-if isnumeric(varargin{1}) || isscalar(varargin{1})
-    shot=varargin{1};       
-    object=grabRemote(shot,varargin{2:end});
+if isnumeric(varargin{1})
+    assert(SMASH.General.testNumber(varargin{1},'positive','integer'),...
+        'ERROR: invalid shot number');    
+    object=grabRemote(nargout,varargin{:});
 elseif ischar(varargin{1})
-    file=varargin{1};
-    if logical(exist(file,'file'))
-        object=grabLocal(file,varargin{2:end});
-    else
-        shot=findNumber(file);
-        assert(~isempty(shot),...
-            'ERROR: unable to find requested file or extract shot number');
-        commandwindow
-        warning('SMASH:grabSignal','Unable to find requested file');
-        fprintf('Look for shot %d on the remote server?\n',shot);
-        answer=input('   (y)es or (n)o? : ','s');
-        assert(strcmpi(answer,'y') || strcmpi(answer,'yes'),...
-            'ERROR: no signals were grabbed');       
-        try
-            object=grabRemote(shot,varargin{2:end});
-        catch
-            error('ERROR: unable to find shot %d',shot);
-        end
-    end    
+    assert(exist(varargin{1},'file')==2,'ERROR: file not found');
+    object=grabLocal(varargin{:});
 else
     error('ERROR: invalid input');
 end
 
 % manage output
 if nargout==0
-    if isempty(object)
-        % do nothing
-    else
+    if ~isempty(object)
         view(object);
     end
 else
@@ -89,68 +65,80 @@ end
 
 end
 
-function object=grabRemote(shot,varargin)
+function object=grabRemote(Nout,shot,varargin)
 
-object=[];
-
-CopyOnly=false;
-if numel(varargin)==1
-    if strcmpi(varargin{1},'pff') || strcmpi(varargin{1},'hdf')
-        CopyOnly=true;
-    end
-end
-
-% determine file extension
+% manage input
 subdir='pff_data';
 extension='.pff';
-if strcmpi(varargin{1},'pff')
-    varargin=varargin(2:end);
-elseif strcmpi(varargin{1},'hdf')
-    subdir='hdf_data';
-    extension='.hdf';
-    varargin=varargin(2:end);
-end
+type='raw';
 
-assert(iscellstr(varargin),'ERROR: invalid signal label(s)');
-
-if CopyOnly
-    final=sprintf('ZDAS%d%s',shot,extension);
-    if exist(final,'file')
-        fprintf('Local archive found--overwrite exisiting file?\n');
-        result=input('   (y)es or [no]: ','s');
-        switch result
-            case {'y','yes'}
-                % continue
+Narg=numel(varargin);
+label={};
+for n=1:Narg
+    if varargin{n}(1)=='-'
+        switch lower(varargin{n})
+            case '-pff'
+                subdir='pff_data';
+                extension='.pff';
+            case '-hdf'
+                subdir='hdf_data';
+                extension='.hdf';
+            case '-jkmoore'
+                type='jkmoore';
+            case '-tcwagon'
+                type='tcwagon';
             otherwise
-                return;
+                error('ERROR: invalid option');
         end
+    else
+        label{end+1}=varargin{n}; %#ok<AGROW>
     end
 end
+assert(iscellstr(label),'ERROR: invalid signal label(s)');
 
 % copy remote file to a temporary local file
-tempfile=sprintf('.tempfileZ%d%s',shot,extension);
-tempfile=fullfile(pwd,tempfile);
-sourcefile=sprintf('pbfa2z_%d%s',shot,extension);
+
+switch type
+    case 'raw'
+        sourcefile=sprintf('pbfa2z_%d%s',shot,extension);
+        sourcefile=fullfile(subdir,'pbfa2z',sourcefile);
+    case {'jkmoore' 'tcwagon'}
+        sourcefile=sprintf('z%d_%s%s',shot,type,extension);
+        sourcefile=fullfile(subdir,'scratch',sourcefile);
+end
+
+[~,tempfile,ext]=fileparts(sourcefile);
+tempfile=sprintf('.tempfile_%s%s',tempfile,ext);
+
 if ispc
     %sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
     sourcefile=fullfile('\\york',subdir,'pbfa2z',sourcefile);
     copyfile(sourcefile,tempfile,'f');
 else
     %sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
-    sourcefile=fullfile('york:',subdir,'pbfa2z',sourcefile);
     commandwindow;
-    command=sprintf('scp "%s" "%s"',sourcefile,tempfile);
-    system(command);
+    command=sprintf('scp "york:/%s" "%s"',sourcefile,tempfile);
+    system(command,'-echo');
 end
+assert(exist(tempfile,'file')==2,'ERROR: requested file not found');
 
-if CopyOnly    
+
+if Nout==0 % copy only mode
+    final=tempfile(11:end);
+    if exist(final,'file')
+        fprintf('Overwrite exisiting file?\n');
+        result=input('   (y)es or [no]: ','s');
+        switch result
+            case {'y','yes'}
+                delete(final);
+        end
+    end
     movefile(tempfile,final,'f')
-    return
+    object=[];
+else % read signals and delete temporary local file
+    object=grabLocal(tempfile,label{:});
+    delete(tempfile);
 end
-
-% read signals and delete temporary local file
-object=grabLocal(tempfile,varargin{:});
-delete(tempfile);
 
 end
 
