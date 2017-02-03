@@ -197,7 +197,7 @@ RecordButton=addblock(object,'button',...
                     end
                     type=sprintf('%s (%s)',type,source);
                     set(Type,'String',type);
-                    if ismethod(source,'view')                                              
+                    if ismethod(source,'view') && logical(exist(source,'class'))                        
                         set(RecordButton(2),'String','View','Visible','on',...
                             'Callback',@viewRecord);
                     end
