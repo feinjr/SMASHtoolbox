@@ -27,7 +27,7 @@
 % defines the number of points in each region.
 %     points=(overlap+1)*skip
 %
-% See also PDV, configure
+% See also PDV
 %
 
 %
@@ -43,12 +43,12 @@ if (nargout==0)
         warning('SMASH:PDV',...
             'Partition settings are ignored in display mode');
     end
-    partition(object.Measurement);
+    partition(object.STFT);
     return;
 end
 
 % apply partition settings
-object.Measurement=partition(object.Measurement,varargin{:});
+object.STFT=partition(object.STFT,varargin{:});
 
 % manage output
 if nargout>0

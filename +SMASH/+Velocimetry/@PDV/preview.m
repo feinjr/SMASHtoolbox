@@ -51,14 +51,14 @@ else
     param=varargin{2};
 end
 
-previous.Partition=object.Measurement.Partition;
-object.Measurement=partition(object.Measurement,type,param);
+previous.Partition=object.STFT.Partition;
+object.STFT=partition(object.STFT,type,param);
 
-object.Preview=analyze(object.Measurement);
+object.Preview=analyze(object.STFT);
 object.Preview.Name='Preview spectrogram';
 object.Preview.GraphicOptions.Title='Preview spectrogram';
 
-object.Measurement=partition(object.Measurement,previous.Partition);
+object.STFT=partition(object.STFT,previous.Partition);
 
 % manage output
 varargout{1}=object;

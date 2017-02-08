@@ -14,6 +14,7 @@ classdef FFToptions
         RemoveDC = true; % Remove DC component (true or false)        
         FrequencyDomain = 'positive' % Frequency domain ('positive', 'negative', 'all'?)
         SpectrumType = 'power' % Spectrum type ('power', 'complex')
+        Normalization = 'parseval' % Spectal normalization ('parseval','none');
     end
     %% hidden methods
     methods (Hidden=true)
@@ -107,6 +108,16 @@ classdef FFToptions
                     object.SpectrumType=value;
                 otherwise
                     error('ERROR: invalid SpectrumType value');
+            end
+        end
+        function object=set.Normalization(object,value)
+            assert(ischar(value),'ERROR: invalid Normalization value');
+            value=lower(value);
+            switch value
+                case {'parseval' 'none'}
+                    object.Normalization=value;
+                otherwise
+                    error('ERROR: invalid Normalization value');
             end
         end
     end

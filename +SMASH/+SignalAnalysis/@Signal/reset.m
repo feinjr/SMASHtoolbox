@@ -48,6 +48,6 @@ object.Grid=Grid;
 object.Data=Data;
 object=limit(object,'all');
 
-object=updateHistory(object);
+%object=updateHistory(object);
 
 end

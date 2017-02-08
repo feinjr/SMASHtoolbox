@@ -1,8 +1,12 @@
 % analyze Perform history analysis
+% 
+% This method analyzes...
 %
 % object=analyze(object,'power');
 % object=analyze(object,'power',mode); % 'centroid'
 %
+
+
 % object=analyze(object,'sinusoid');
 % object=analyze(object,'sinusoid',name,value,...)
 % Valid names:
@@ -12,52 +16,36 @@
 %
 % 
 
-% This method performs PDV history analysis...
-%and stores the output in the
-% object's Results property.  The number of histories generated during the
-% analysis depends on the number of specified boundaries; if no boundaries
-% are defined, a single history with no frequency bounds is generated.
 
 
-
-% OLD SYNTAX
-% The default analysis calculates centroids for each boundary region.
-%     >> object=analyze(object);
-%     >> object=analyze(object,'centroid'); % same as above
-% Complex spectral fit analysis can also be requested.
-%     >> object=analyze(object,'fit');
-% Details of the latter approach are currently being revised
 %
-% See also PDV, bound, configure, convert, partition
+% See also PDV, bound, convert, partition
 %
 
 %
 % Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
-function object=analyze(object,AnalysisMode,varargin)
+function object=analyze(object,mode,varargin)
 
 %% manage input
-if (nargin<2) || isempty(AnalysisMode)
-    AnalysisMode='power';
+if (nargin<2) || isempty(mode)
+    mode='power';
 end
-assert(ischar(AnalysisMode),'ERROR: invalid analysis mode');
+assert(ischar(mode),'ERROR: invalid analysis mode');
+mode=lower(mode);
 
-%% verify partition settings
-if isempty(object.Measurement.Partition)
-    message{1}='ERROR: analysis partitions are undefined';
-    message{2}='       Use the "configure" method to define partitions';
-    error('%s\n',message{:});
-end
+%% update partitioning
+object=partition(object,'Points',[object.STFT.Partition.Points object.STFT.Partition.Skip]);
 
 %% manage boundaries and limits
-[xlimit,~]=limit(object.Measurement);
-M=numel(xlimit);
-xlimit=sort([xlimit(1) xlimit(end)]);
-SampleTime=diff(xlimit)/(M-1);
-NyquistFrequency=1/(2*SampleTime);
-
 boundary=object.Boundary;
 if isempty(boundary)
+    [xlimit,~]=limit(object.STFT.Measurement);
+    M=numel(xlimit);
+    xlimit=sort([xlimit(1) xlimit(end)]);
+    SampleTime=abs(diff(xlimit))/(M-1);
+    NyquistFrequency=1/(2*SampleTime);
+    %
     table=nan(2,3);    
     table(1,:)=[xlimit(1) NyquistFrequency/2 NyquistFrequency/2];
     table(2,:)=[xlimit(2) NyquistFrequency/2 NyquistFrequency/2];
@@ -65,42 +53,24 @@ if isempty(boundary)
     boundary.Label='Default boundary';
     boundary={boundary};
 end
-Nboundary=numel(boundary);
-
-xbound=[+inf -inf];
-for n=1:Nboundary
-    table=boundary{n}.Data;
-    if isempty(table)
-        continue
-    end
-    table=table(:,1);
-    table=[min(table) max(table)];
-    xbound(1)=min(xbound(1),table(1));
-    xbound(2)=max(xbound(2),table(2));
-end
-xbound(1)=max(xbound(1),xlimit(1));
-xbound(2)=min(xbound(2),xlimit(2));
-measurement=limit(object.Measurement,xbound);
 
 %% perform analysis
-setting=object.Settings;
-setting.SampleRate=object.SampleRate;
-setting.DomainScaling=object.DomainScaling;
-setting.EffectiveDuration=object.EffectiveDuration;
-setting.EffectiveWidth=object.EffectiveWidth;
-setting.RMSnoise=object.Settings.RMSnoise;
-switch lower(AnalysisMode)
-    case 'power'
-        object.RawOutput=analyzeSpectrum(measurement,boundary,...
-            setting,varargin{:});
-    case 'sinusoid'
-        object.RawOutput=analyzeSinusoid(measurement,boundary,...
-            setting,varargin{:});
-    otherwise
-        error('ERROR: %s is not a valid analysis mode',AnalysisMode);
-end
+param.RMSnoise=object.RMSnoise;
 
-%% convert raw output
-object=convert(object);
+t=object.STFT.Measurement.Grid;
+param.SampleInterval=abs(t(end)-t(1))/(numel(t)-1);
+
+data=object.STFT;
+switch lower(mode)
+    case 'power'
+        object.Frequency=analyzeSpectrum(data,boundary,...
+            param,varargin{:});
+    case 'sinusoid'
+        error('ERROR: sinusoid analysis is not ready yet');
+        %object.RawOutput=analyzeSinusoid(measurement,boundary,...
+        %    setting,varargin{:});
+    otherwise
+        error('ERROR: %s is not a valid analysis mode',mode);
+end
 
 end

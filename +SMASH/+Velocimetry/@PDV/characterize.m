@@ -1,103 +1,101 @@
-% characterize Determine settings from measurement
+% characterize Characterize measurement region.
 %
-% This method characterizes certain settings in a PDV object from the
-% meausured signal.  Characterization is performed over a rectangular
-% region of time-frequency space (t1 <= t <= t2 and f1 <= f <= f2).  This
-% region can be specified manually:
-%     >> object=characterize(object,mode,[t1 t2]); % use all frequencies
-%     >> object=characterize(object,mode,[t1 t2],[f1 f2]);
-% or by interactive selection using the preview image.
-%     >> object=characterize(object,mode);
-%
+% This method characterizes a time-frequency region in a PDV measurement.
 % Several characterization modes are supported:
-%    - 'bandwidth' approximates the frequency cutoff of the measurement.  
-%    - 'reference' determines the reference frequency, i.e. the
-%     beat frequency associated with zero velocity.  The characterization
-%     region should contain a single spectral peak at fixed frequency.  The
-%     frequency range should be as narrow as possible.
-%     - 'noise' determines the RMS noise of the signal.  The
-%     selected region should contain noise with *no* harmonic content.  The
-%     frequency range should be as wide as possible.
+%    -'reference' determines the reference frequency, i.e. the
+%     beat frequency associated with zero velocity. 
+%    -'noise' determines the RMS noise of the signal.
 %
-% See also PDV, configure
+% Characterization is performed over a manually specified or interactively
+% selected region.
+%    result=characterize(object,mode,...);
+% Name/value pairs specified after the mode control the time and frequency
+% bounds of the characterization region.  Several examples are shown below.
+%    f0=characterize(object,'reference'); % interactive selection
+%    f0=characterize(object,'reference','time',[t1 t2]); % use all frequencies
+%    f0=characterize(object,'reference','frequency',[f1 f2]); % use all times
+%    f0=characterize(object,'reference','time',[t1 t2],'frequency',[f1 f2]); 
+%
+% See also PDV
 %
 
 %
-% created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
-% modified May 5, 2015 by Daniel Dolan
-%   -Added noise amplitude characterization
+% revised Feburary 7, 2017 by Daniel Dolan (Sandia National Laboratory)
 %
-function object=characterize(object,mode,varargin)
+function result=characterize(object,mode,varargin)
 
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
 assert(ischar(mode),'ERROR: invalid mode request');
-
-tbound=[-inf +inf];
-fbound=[-inf +inf];
-
-switch lower(mode)    
-    case 'bandwidth'
-        label='Select bandwidth region';
-        manageRegion; 
-        warning('SMASH:PDV','Bandwidth characterization is very crude at this time');
-    case {'noise' 'rmsniose'}
-        label='Select noise region';
-        manageRegion;
-        mode='noise';
-    case {'reference' 'referencefrequency'}
-        label='Select reference region';
-        manageRegion;
-        mode='reference';
+mode=lower(mode);
+switch mode
+    case {'reference' 'noise'}
+        % valid modes
     otherwise
-        error('ERROR: %s is an invalid mode',mode);        
+        error('ERROR: invalid characterization mode');
 end
-    function manageRegion()
-        Narg=numel(varargin);
-        if Narg==0
-            assert(~isempty(object.Preview),...
-                'ERROR: interactive region selection cannot be performed without a preview image');
-            preview(object);
-            fig=gcf;
-            ha=gca;
-            hb=uicontrol('Style','pushbutton','String','Done',...
-                'Callback','delete(gcbo)');
-            warning off %#ok<WNOFF>
-            title(label);
-            warning on %#ok<WNON>
-            set(gcf,'Name','Select region','NumberTitle','off');
-            waitfor(hb);
-            tbound=xlim(ha);
-            fbound=ylim(ha);
-            close(fig);
-        else
-            if (Narg>=1) && ~isempty(varargin{1})
-                tbound=varargin{1};
-            end
-            if (Narg>=2) && ~isempty(varargin{2})     
-                fbound=varargin{2};
-            end
-        end
-    end
 
-% error checking
-assert(isnumeric(tbound) && (numel(tbound)==2),...
-    'ERROR: invalid time range');
-tbound=sort(tbound);
-assert(isnumeric(fbound) && (numel(fbound)==2),...
-    'ERROR: invalid frequency range');
-fbound=sort(fbound);
+Narg=numel(varargin);
+assert(rem(Narg,2)==0,'ERROR: unmatched name/value pair');
+
+option.Time=[];
+option.Frequency=[];
+for n=1:2:Narg
+    name=varargin{n};
+    assert(ischar(name),'ERROR: invalid option name');
+    value=varargin{n+1};
+    switch lower(name)
+        case 'time'
+            assert(isnumeric(value) && numel(value)==2,...
+                'ERROR: invalid time bound');
+            option.Time=sort(value);
+        case 'frequency'
+            assert(isnumeric(value) && numel(value)==2,...
+                'ERROR: invalid frequency bound');
+            option.Frequency=sort(value);            
+        otherwise
+            error('ERROR: invalid option name');
+    end
+end
+
+if isempty(option.Time) && isempty(option.Frequency)
+    assert(~isempty(object.Preview),...
+        'ERROR: interactive region selection cannot be performed without a preview image');
+    preview(object);
+    fig=gcf;
+    ha=gca;
+    hb=uicontrol('Style','pushbutton','String','Done',...
+        'Callback','delete(gcbo)');
+    warning off %#ok<WNOFF>
+    switch mode
+        case 'reference'
+            label='Select reference region';
+        case 'noise'
+            label='Select noise region';
+    end
+    title(label);
+    warning on %#ok<WNON>
+    set(gcf,'Name','Select region','NumberTitle','off');
+    waitfor(hb);
+    option.Time=xlim(ha);
+    option.Frequency=ylim(ha);
+    close(fig);
+elseif isempty(option.Time)
+    option.Time=[-inf +inf];
+elseif isempty(option.Frequency)
+    option.Frequency=[-inf +inf];
+end
 
 % process selected region
-selection=object.Measurement;
+selection=object.STFT;
 selection.Measurement=limit(selection.Measurement,'all');
-selection.Measurement=crop(selection.Measurement,tbound);
+selection.Measurement=crop(selection.Measurement,option.Time);
 
 selection.FFToptions.FrequencyDomain='positive';
 selection.FFToptions.SpectrumType='power';
 [f,P]=fft(selection.Measurement,selection.FFToptions);
 
-keep=(f>=fbound(1)) & (f<=fbound(2));
+keep=(f>=option.Frequency(1)) & (f<=option.Frequency(2));
 f=f(keep);
 P=P(keep);
 
@@ -106,47 +104,28 @@ T=abs(t(end)-t(1))/(numel(t)-1);
 fNyquist=1/(2*T);
 
 % perform characterization
-switch lower(mode)
-    case 'bandwidth'
-        object.Settings.Bandwidth=findTransition(f,P);       
+switch mode    
     case 'noise'        
         noisefloor=mean(P);
         % simulate noise
         noise=SMASH.SignalAnalysis.NoiseSignal(selection.Measurement.Grid); 
-        bandwidth=object.Settings.Bandwidth;
-        if isempty(bandwidth) || isnan(bandwidth)
+        if isempty(object.Bandwidth)
             bandwidth=fNyquist/2;
-            warning('SMASH:PDV','No bandwidth specified--asssuming half of Nyquist frequency');
-        end
+            warning('PDV:characterize',...
+                'Assuming bandwidth is half of the Nyquist frequency');
+        else
+            bandwidth=object.Bandwidth;
+        end  
         noise=defineTransfer(noise,'bandwidth',bandwidth);
         noise=generate(noise);                
         [f,P]=fft(noise.Measurement,selection.FFToptions);
-        keep=(f>=fbound(1)) & (f<fbound(2));
+        keep=(f>=option.Frequency(1)) & (f<option.Frequency(2));
         P=P(keep);
         correction=noisefloor/mean(P);
-        object.Settings.RMSnoise=sqrt(correction);
+        result=sqrt(correction);
     case 'reference'
         [~,index]=max(P);
-        object.Settings.ReferenceFrequency=f(index);   
+        result=f(index);   
 end
-
-end
-
-function f0=findTransition(f,P)
-
-fmin=min(f);
-fmax=max(f);
-center=(fmin+fmax)/2;
-amplitude=(fmax-fmin)/2;
-fit=nan(size(f));
-    function chi2=residual(slack)
-        f0=center+amplitude*sin(slack);
-        index=(f<f0);
-        fit(index)=mean(P(index));
-        index=(f>=f0);
-        fit(index)=mean(P(index));
-        chi2=mean((fit-P).^2);
-    end
-result=fminsearch(@residual,0,optimset('Display','iter')); %#ok<NASGU>
 
 end

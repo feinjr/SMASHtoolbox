@@ -16,7 +16,7 @@
 % revised March 17, 2016 by Daniel Dolan
 %    -removed custom map function feature (should be part of leapfrog class)
 %    -merged operations from the analyze method to clearly distinguish raw and processed results
-function object=convert(object)
+function object=convert(object,varargin)
 
 % make sure analysis has been performed
 message={};

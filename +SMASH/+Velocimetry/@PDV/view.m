@@ -3,7 +3,7 @@
 % This method displays PDV objects as line plots.  The default view is the
 % measured signal.
 %     >> view(object);
-%     >> view(object,'Measurement'); % same as above
+%     >> view(object,'signal'); % same as above
 % Results can be viewed *after* the analysis method has been used.
 %     >> view(object,'Velocity');
 %     >> view(object,'Frequency');
@@ -21,15 +21,15 @@ function varargout=view(object,mode)
 
 % manage input
 if (nargin<2) || isempty(mode)
-    mode='measurement';
+    mode='signal';
 end
 assert(ischar(mode),'ERROR: invalid mode');
 
 % generate plot
 SMASH.MUI.Figure;
 switch lower(mode)
-    case 'measurement'
-        h=view(object.Measurement,gca);
+    case 'signal'
+        h=view(object.STFT,gca);
         apply(object.GraphicOptions,h);
     case 'preview'
         h=view(object.Preview,'show',gca);

@@ -23,40 +23,118 @@
 %
 classdef PDV
     %%
-    properties (SetAccess=protected)
-        Measurement % PDV measurement (STFT object)
+    properties
+        STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
-        Settings % Analysis settings (structure)         
         Boundary = {} % ROI boundaries (BoundaryCurve object)
-        RawOutput % Raw analysis output
-        Frequency = {} % Analysis results (cell array of SignalGroup objects)       
+    end
+    properties (Dependent=true)
+        Window % FFT window name ('hann', 'hamming', 'boxcar')
+        RemoveDC % Remove DC level before FFT (logical)
+        NumberFrequencies % Number of frequency points in FFT [min max]
+    end
+    properties
+        Bandwidth % Measurement bandwidth
+        RMSnoise  % Time-domain RMS noise of the PDV measurement
+    end
+    properties (SetAccess=protected)           
+        Frequency = {} % Analysis results (cell array of SignalGroup objects)              
         Velocity = {} % Converted results (cell array of SignalGroup objects)       
     end
     properties
         GraphicOptions % Graphic options (GraphicOptions object)        
     end    
-    properties (SetAccess=protected,Hidden=true)        
-        SampleInterval
-        SampleRate
-        DomainScaling
-        Duration
-        EffectiveDuration
-        EffectiveWidth
-    end
+%     properties (SetAccess=protected,Hidden=true)        
+%         SampleInterval
+%         SampleRate
+%         DomainScaling
+%         Duration
+%         EffectiveDuration
+%         EffectiveWidth
+%     end
     %%
     methods (Hidden=true)
         function object=PDV(varargin)
             object=create(object,varargin{:});            
         end
-        %varargout=convert(varargin);
-    end
-    %%
+    end   
     methods (Access=protected, Hidden=true)
         varargout=create(varargin);
-        varargout=partition(varargin);
     end
     %%
     methods (Static=true, Hidden=true)
         varargout=restore(varargin);        
-    end   
+    end
+    %% setters
+    methods
+        function object=set.STFT(object,value)
+            assert(strcmpi(class(value),'SMASH.SignalAnalysis.STFT'),...
+                'ERROR: invalid STFT value');
+            object.STFT=value;
+        end
+        function object=set.Preview(object,value)
+            assert(strcmpi(class(value),'SMASH.ImageAnalysis.Image'),...
+                'ERROR: invalid Preview value');
+            object.Preview=value;
+        end
+        function object=set.Boundary(object,value)
+            assert(iscell(value),'ERROR: invalid Boundary value');
+            for n=1:numel(value)
+                assert(strcmpi(class(value{n}),'SMASH.ROI.BoundingCurve'),...
+                    'ERROR: invalid Boundary value');
+            end
+            object.Boundary=value;
+        end
+        function object=set.Bandwidth(object,value)
+            if isempty(value)
+                % do nothing
+            else
+                assert(isnumeric(value) && isscalar(value),...
+                    'ERROR: invalid Bandwidth value');
+            end
+            object.Bandwidth=abs(value);
+        end
+        function object=set.RMSnoise(object,value)
+            if isempty(value)
+                % do nothing
+            else
+                assert(isnumeric(value) && isscalar(value),...
+                    'ERROR: invalid RMSnoise value');
+            end
+            object.RMSnoise=abs(value);
+        end
+    end
+    %% setters/getters for dependent properties
+    methods
+        function value=get.Window(object)
+            value=object.STFT.FFToptions.Window;
+        end
+        function object=set.Window(object,value)
+            try
+                object.STFT.FFToptions.Window=value;
+            catch ME
+                throwAsCaller(ME);
+            end
+        end
+        function value=get.RemoveDC(object)
+            value=object.STFT.FFToptions.RemoveDC;
+        end
+        function object=set.RemoveDC(object,value)
+            try
+                object.STFT.FFToptions.RemoveDC=value;
+            catch ME
+                throwAsCaller(ME);
+            end
+        end
+        function value=get.NumberFrequencies(object)
+            value=object.STFT.FFToptions.NumberFrequencies;
+        end
+        function object=set.NumberFrequencies(object,value)
+            try
+                object.STFT.FFToptions.NumberFrequencies=value;
+            catch ME
+                throwAsCaller(ME);
+            end
+        end
+    end
 end

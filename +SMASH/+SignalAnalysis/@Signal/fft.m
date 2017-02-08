@@ -75,7 +75,8 @@ function varargout=fft(object,varargin)
 %% manage option
 option=struct('Window','Hann',...
     'RemoveDC',false,'NumberFrequencies',[100 inf],...
-    'SpectrumType','power','FrequencyDomain','positive');
+    'SpectrumType','power','FrequencyDomain','positive',...
+    'Normalization','parseval');
 Narg=numel(varargin);
 if Narg==1
     if isstruct(varargin{1})
@@ -191,14 +192,17 @@ signal=signal.*option.Window;
 if option.RemoveDC % repeat in case window interfered with DC removal
     signal=signal-mean(signal(:)); 
 end
-area1=trapz(time,signal.*conj(signal));
 
 frequency=(-N2/2):(+N2/2-1);
 frequency=frequency(:)/(N2*T);
 transform=fft(signal,N2);
 transform=fftshift(transform);
-area2=trapz(frequency,real(transform.*conj(transform)));
-transform=transform*sqrt(area1/area2); % Parsevel scaling
+
+if strcmpi(option.Normalization,'parseval')
+    area1=trapz(time,signal.*conj(signal));
+    area2=trapz(frequency,real(transform.*conj(transform)));
+    transform=transform*sqrt(area1/area2); % Parsevel scaling
+end
 
 Delta=(numpoints-1)*T/2;
 correction=exp(2i*pi*frequency*Delta);

@@ -44,7 +44,7 @@ end
         name=fieldnames(object.Settings);
         L=max(L,max(cellfun(@numel,name)));
         try
-            name=fieldnames(object.Measurement.Partition);
+            name=fieldnames(object.STFT.Partition);
             L=max(L,max(cellfun(@numel,name)));
         catch
             % do nothing
@@ -53,17 +53,17 @@ end
         fprintf('\n');
         % print partition setttings
         fprintf('Partition settings\n');
-        partition(object.Measurement);
+        partition(object.STFT);
         % print FFT options
         fprintf('FFT settings\n');
-        name=properties(object.Measurement.FFToptions);
+        name=properties(object.STFT.FFToptions);
         name=sort(name);
         for k=1:numel(name)
             if strcmpi(name{k},'FrequencyDomain') || strcmpi(name{k},'SpectrumType')
                 continue
             end
             fprintf(format,name{k});
-            printValue(object.Measurement.FFToptions.(name{k}));
+            printValue(object.STFT.FFToptions.(name{k}));
             fprintf('\n');
         end
         % print PDV settings
@@ -106,12 +106,12 @@ end
                     object.Settings.RMSnoise=value;
                 %% FFT options
                 case 'window'
-                    object.Measurement.FFToptions.Window=value;
+                    object.STFT.FFToptions.Window=value;
                     updateTransform=true;
                 case 'numberfrequencies'
-                    object.Measurement.FFToptions.NumberFrequencies=value;
+                    object.STFT.FFToptions.NumberFrequencies=value;
                 case 'removedc'
-                    object.Measurement.FFToptions.RemoveDC=value;
+                    object.STFT.FFToptions.RemoveDC=value;
                 %% partition configuration                
                 case {'block','blocks'}
                     assert(isnumeric(value) & any(numel(value)==[1 2]),...
