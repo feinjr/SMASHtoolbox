@@ -54,13 +54,27 @@ if isempty(boundary)
     boundary={boundary};
 end
 
+Nboundary=numel(boundary);
+start=nan(Nboundary,1);
+stop=start;
+for n=1:Nboundary
+    temp=boundary{n}.Data([1 end],1);   
+    temp=sort(temp);
+    start(n)=temp(1);
+    stop(n)=temp(2);
+end
+start=min(start);
+stop=max(stop);
+
+data=object.STFT;
+data.Measurement=crop(data.Measurement,[start stop]);
+
 %% perform analysis
 param.RMSnoise=object.RMSnoise;
 
 t=object.STFT.Measurement.Grid;
 param.SampleInterval=abs(t(end)-t(1))/(numel(t)-1);
 
-data=object.STFT;
 switch lower(mode)
     case 'power'
         object.Frequency=analyzeSpectrum(data,boundary,...
@@ -72,5 +86,7 @@ switch lower(mode)
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
+
+object.Velocity={}; 
 
 end

@@ -30,11 +30,11 @@ SMASH.MUI.Figure;
 switch lower(mode)
     case 'signal'
         h=view(object.STFT,gca);
-        apply(object.GraphicOptions,h);
+        %apply(object.GraphicOptions,h);
     case 'preview'
         h=view(object.Preview,'show',gca);
         h=h.image;
-        apply(object.GraphicOptions,h);
+        %apply(object.GraphicOptions,h);
     case 'frequency'
         N=numel(object.Frequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
@@ -49,7 +49,8 @@ switch lower(mode)
             h(n,2)=view(object.Frequency{n},2,gca);
             set(h(n,:),'Color',color(n,:));
         end
-        apply(object.GraphicOptions,h);
+        set(ha,'Box','on');
+        %apply(object.GraphicOptions,h);
         ylabel(ha(1),'Beat frequency');
         xlabel(ha(2),'Time');
         ylabel(ha(2),'Uncertainty');
@@ -72,7 +73,8 @@ switch lower(mode)
             h(n,2)=view(object.Velocity{n},2,gca);
             set(h(n,:),'Color',color(n,:));
         end
-        apply(object.GraphicOptions,h);
+        set(ha,'Box','on');
+        %apply(object.GraphicOptions,h);
         ylabel(ha(1),'Velocity');
         xlabel(ha(2),'Time');
         ylabel(ha(2),'Uncertainty');

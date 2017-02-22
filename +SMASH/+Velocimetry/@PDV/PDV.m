@@ -41,9 +41,9 @@ classdef PDV
         Frequency = {} % Analysis results (cell array of SignalGroup objects)              
         Velocity = {} % Converted results (cell array of SignalGroup objects)       
     end
-    properties
-        GraphicOptions % Graphic options (GraphicOptions object)        
-    end    
+    %properties
+    %    GraphicOptions % Graphic options (GraphicOptions object)        
+    %end    
 %     properties (SetAccess=protected,Hidden=true)        
 %         SampleInterval
 %         SampleRate

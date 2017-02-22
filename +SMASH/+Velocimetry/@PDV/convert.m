@@ -1,14 +1,13 @@
-% convert Convert raw output to frequency/velocity
+% convert Convert frequency to velocity
 %
-% This method converts raw analysis output to frequency and velocity
-% results.
-%    object=convert(object);
-% Conversion is automatically applied by the analyze mehtod and can be used
-% anytime thereafter.  The reason for doing so is to apply setting changes
-% (wavelength, reference frequency, RMS noise) *without* reanalyzing the
-% measurement.
+% This method converts beat frequency to velocity.
 %
-% See also PDV, analyze, characterize, configure
+%    object=convert(object,wavelength,offset);
+%
+%    object=convert(object,myfunc);
+
+
+% See also PDV, analyze, characterize
 %
 
 %
@@ -19,56 +18,52 @@
 function object=convert(object,varargin)
 
 % make sure analysis has been performed
-message={};
-message{end+1}='ERROR: no analysis output for conversion';
-message{end+1}='       Use "analyze" before calling this method';
-assert(~isempty(object.RawOutput),'%s\n',message{:});
-
-% conversion factors
-fs=object.SampleRate;
-tau=object.EffectiveDuration;
-sigma=object.Settings.RMSnoise;
-UncertaintyFactor=sqrt(6/fs/tau^3)*sigma/pi;
-
-VelocityFactor=object.Settings.Wavelength/2;
-
-% convert raw data
-N=object.RawOutput.NumberSignals/4;
-object.Frequency=cell(1,N);
-object.Velocity=cell(1,N);
-for n=1:N
-    % select results for current boundary
-    if n==1
-        index=1:4; % center, amplitude, chirp, unique
-    else
-        index=index+4;
-    end
-    % generate name
-    try
-        name=object.Boundary{m}.Label;
-    catch
-        name='(no name)';
-    end
-    % remove NaN entries
-    data=object.RawOutput.Data(:,index);
-    keep=~isnan(data(:,1));
-    data=data(keep,:);
-    time=object.RawOutput.Grid(keep);
-    % generate frequency results
-    data(:,2)=UncertaintyFactor./data(:,2); % convert amplitude to uncertainty
-    object.Frequency{n}=SMASH.SignalAnalysis.SignalGroup(time,data);
-    object.Frequency{n}.GridLabel='Time';
-    object.Frequency{n}.DataLabel='';
-    object.Frequency{n}.Legend={'Value' 'Uncertainty' 'Chirp' 'Unique'};
-    object.Frequency{n}.Name=name;
-    % generate velocity results
-    data(:,1)=VelocityFactor*(data(:,1)-object.Settings.ReferenceFrequency);
-    data(:,2)=VelocityFactor*data(:,2);
-    object.Velocity{n}=SMASH.SignalAnalysis.SignalGroup(time,data);
-    object.Velocity{n}.GridLabel='Time';
-    object.Velocity{n}.DataLabel='';
-    object.Velocity{n}.Legend={'Value' 'Uncertainty' 'Chirp' 'Unique'};
-    object.Velocity{n}.Name=name;
+if isempty(object.Frequency)
+    error('ERROR: analyze must be called before conversion');
 end
+
+% manage input
+Narg=numel(varargin);
+if (Narg==2) && (ischar(varargin{1}) || isa(varargin{1},'function_handle'))
+    % call user function
+    return
+end
+
+if (Narg<1) || isempty(varargin{1})
+    wavelength=1550e-9; % meters
+    assert(isnumeric(wavelength) && all(wavelength ~= 0),...
+        'ERROR: invalid wavelength');
+else 
+    wavelength=varargin{1};
+end
+if isscalar(wavelength)
+    wavelength=repmat(wavelength,size(object.Frequency));
+end
+assert(all(wavelength ~= 0),'ERROR: invalid wavelength value');
+
+if (Narg<2) || isempty(varargin{2})
+    offset=0; % Hz
+    assert(isnumeric(offset),'ERROR: invalid offset frequency');
+else
+    offset=varargin{2};
+end
+if isscalar(offset)
+    offset=repmat(offset,size(object.Frequency));
+end
+assert(numel(offset) == numel(object.Frequency),...
+    'ERROR: invalid number of offset frequencies')
+
+% apply conversions
+object.Velocity=object.Frequency;
+for n=1:numel(object.Velocity)
+    scale=wavelength(n)/2;
+    table=object.Velocity{n}.Data;
+    table(:,1)=(table(:,1)-offset(n))*scale;
+    table(:,2)=table(:,2)*scale;
+    object.Velocity{n}=reset(object.Velocity{n},[],table);
+end
+
+
+
 
 end

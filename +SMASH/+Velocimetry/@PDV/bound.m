@@ -175,6 +175,8 @@ end
 
 % manage output
 if nargout>0
+    object.Frequency={};
+    object.Velocity={};
     varargout{1}=object;
 end
 

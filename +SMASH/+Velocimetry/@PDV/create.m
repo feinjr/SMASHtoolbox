@@ -22,9 +22,9 @@ end
 % object.SampleRate=1/dt;
 
 % default settings
-object.GraphicOptions=SMASH.Graphics.GraphicOptions;
-object.GraphicOptions.Title='PDV measurement';
-object.GraphicOptions.Marker='none';
+%object.GraphicOptions=SMASH.Graphics.GraphicOptions;
+%object.GraphicOptions.Title='PDV measurement';
+%object.GraphicOptions.Marker='none';
 
 object.NumberFrequencies=1000;
 object.RemoveDC=true;
