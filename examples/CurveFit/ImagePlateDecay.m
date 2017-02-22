@@ -36,3 +36,7 @@ title(label)
 
 set(gca,'XScale','log');
 figure(gcf);
+
+%% uncertainty analysis
+report=analyze(object,[x(:) y(:)],10e3);
+confidence(report)

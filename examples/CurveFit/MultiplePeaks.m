@@ -58,3 +58,7 @@ text(report(4).Parameter(1),3.5,label,...
     'HorizontalAlignment','center');
 
 ylim([-0.5 4]);
+
+%%
+report=analyze(object,[x(:) y(:)],10e3);
+confidence(report);

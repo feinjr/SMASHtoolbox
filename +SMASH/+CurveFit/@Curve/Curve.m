@@ -29,7 +29,7 @@ classdef Curve
         FixScale = {} % Fixed scaling factor settings        
     end
     properties (Access=protected)
-        FitComplete = false
+        FitComplete = false % Indicates complete fit (logical)
     end    
     %% methods
     methods (Hidden=true)
