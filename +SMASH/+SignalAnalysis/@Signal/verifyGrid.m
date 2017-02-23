@@ -7,7 +7,7 @@
 % from this uniform case, GridUniform is set to true.
 %
 
-function object=verifyGrid(object)
+function [object,dxmean]=verifyGrid(object)
 
 % determine direction and mean spacing
 x=object.Grid;
