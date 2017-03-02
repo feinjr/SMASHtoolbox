@@ -21,6 +21,7 @@ switch option
         obj.GraphicOptions.Title = 'Raw Radiograph';
         obj.GraphicOptions.YDir = 'normal';
         view(obj)
+        
     case 'Transmission'
         obj = object.Transmission;
         obj.Grid1Label = 'Radial Distance [mm]';
