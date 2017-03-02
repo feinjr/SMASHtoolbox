@@ -58,10 +58,13 @@ for i = 1:Nchannels
         cfit=add(cfit,gaussian,[0 0.01],'lower',[-0.05 1e-4], 'upper',[0.05 0.5],'scale',1,'fixscale',false);
         cfit = fit(cfit,[lineout.Grid, lineout.Data]);        
         y = evaluate(cfit,lineout.Grid);
-        Integral(n,i) = trapz(lineout.Grid,y);
         
         width = cfit.Parameter{1}(2);
         peak = cfit.Parameter{1}(1);
+
+        signal = crop(lineout,[peak-4*width, peak+4*width]);
+        Integral(n,i) = trapz(signal.Grid/1e-4,signal.Data)/(dy/1e-4);
+        
         background1 = crop(lineout,[min(lineout.Grid), peak-3*width]);
         background2 = crop(lineout,[peak+3*width, max(lineout.Grid)]);
         Errors(n,i) = std([background1.Data; background2.Data])/sqrt(abs(Integral(n,i)^2)+1)/sqrt(length(y)/res_scale + hpts);
