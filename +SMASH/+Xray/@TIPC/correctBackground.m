@@ -43,6 +43,24 @@ imgs = object.Images;
 images_bkg = zeros(size(imgs.Data));
 X = imgs.Grid1; Y = imgs.Grid2;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%% create informative dialog box
+diaReg=SMASH.MUI.Dialog;
+diaReg.Hidden=true;
+diaReg.Name='Select Data Region';
+
+htxt1=addblock(diaReg,'text','Use pan/zoom to select region',[25]);
+htxt2=addblock(diaReg,'text','conatining image data',[25]);
+hReg=addblock(diaReg,'button',{' OK '});
+set(hReg(1),'Callback',@callbackOK);
+
+diaDone.Hidden=false;
+uiwait
+%%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for region selection
+    function callbackOK(varargin)
+        delete(diaReg);
+    end
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 for n = 1:object.Settings.NumberImages
     img = SMASH.ImageAnalysis.Image(imgs.Grid1,imgs.Grid2,imgs.Data(:,:,n));
     

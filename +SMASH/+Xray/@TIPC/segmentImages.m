@@ -43,6 +43,26 @@ xrect = [-BoxSize(1)/2, BoxSize(1)/2, BoxSize(1)/2, -BoxSize(1)/2, -BoxSize(1)/2
 yrect = [-BoxSize(2)/2, -BoxSize(2)/2, BoxSize(2)/2, BoxSize(2)/2, -BoxSize(2)/2];
 
 % Display and select approximate center of each image
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% create informative dialog box
+diaReg=SMASH.MUI.Dialog;
+diaReg.Hidden=true;
+diaReg.Name='Select Points';
+
+htxt1=addblock(diaReg,'text','Select point on each Image in order.',[25]);
+htxt2=addblock(diaReg,'text','Press enter when Done.',[25]);
+hReg=addblock(diaReg,'button',{' OK '});
+set(hReg(1),'Callback',@callbackOK);
+
+diaDone.Hidden=false;
+uiwait
+%%%%%%%%%%%%%%%%%%%%%%%%%% Callback functions for region selection
+    function callbackOK(varargin)
+        delete(diaReg);
+    end
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 object.Measurement.DataLim = DataLim;
 h = view(object.Measurement);
 hold all
@@ -78,7 +98,7 @@ I = zeros(length(grid2),length(grid1),Nchannels);
 
 for i = 1:Nchannels
    images{i} = regrid(images{i},grid1,grid2);
-   I(:,:,n) = images{n}.Data;
+   I(:,:,i) = images{i}.Data;
 end
 
 %  collect all images into an imagegroup object

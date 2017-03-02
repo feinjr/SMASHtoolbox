@@ -216,15 +216,16 @@ switch option
         end
         linkaxes(ax)
         
-        subplot('Position',[0.71,0.11,0.24,0.82])
+        subplot('Position',[0.69,0.11,0.26,0.82])
+        ax2 = gca;
+        set(ax2,'XScale','lin','YScale','lin',...
+            'FontSize',10,'box','on','FontWeight','normal','TickDir','out','FontName','Times','YDir','normal')
         hold all;
         barh(object.Summary.Yvalues, object.Summary.Intensity,'stacked')
-        ax2 = gca;
         legend(filter_label,'Location','SouthEast')
+        ax2.YTickLabel = '';
         ylim([obj.Grid2(1), obj.Grid2(end)])
-        % xlim([-0.1 0.5])
         xlabel('Intensity [A.U.]')
-        ylabel('Height [mm]')
         
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % view a bar chart showing the intensity of each slice of each image, as
@@ -232,7 +233,43 @@ switch option
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
               
     case 'Bins'
+        data = object.Summary;
+
+        filters = object.Settings.Filters;
+        filter_label = cell(object.Settings.NumberImages,1);
+        channel = object.Images.Legend;
         
+        for i = 1:object.Settings.NumberImages
+            if size(filters.Thickness,2) == 2
+                [~,thickness] = filters.Thickness.(channel{i});
+                [~,material] = filters.Material.(channel{i});
+            elseif size(filters.Thickness,2) == 1
+                thickness = filters.Thickness.(channel{i});
+                material = filters.Material.(channel{i});
+            end
+            filter_label{i} = [num2str(thickness), ' \mum ', material];
+        end
+        
+        xmid = zeros(object.Settings.NumberImages,1);
+        bh = zeros(object.Settings.NumberImages,1);
+        figure('Units','Inches','Position',[7,6,10,6],'Color','w','PaperPositionMode','auto')
+        hold all
+        ax1 = gca;
+        set(ax1,'XScale','lin','YScale','lin',...
+            'FontSize',16,'box','on','FontWeight','normal','TickDir','out','FontName','Times','YDir','normal')
+        colors = lines(object.Settings.NumberImages);
+        for i = 1:object.Settings.NumberImages
+            x = (1:object.Settings.Nslices) + 1.25*(i-1)*object.Settings.Nslices;
+            bh(i) = bar(x,data.Intensity(:,i),'FaceColor',colors(i,:));
+            errorbar(x,data.Intensity(:,i),5*data.Uncertainty(:,i),'linestyle','none','color','k')
+            xmid(i) = mean(x);            
+        end
+        ax1.XTick = xmid;
+        ax1.XTickLabel = channel;
+        xlim([min(xmid)-15 max(xmid)+15])
+        ylim([-0.25, 1.25*max(data.Intensity(:))])
+        legend(bh, filter_label,'Location','Best');
+        xlabel('Intensity')
 end
 varargout{1} = gcf;
 end
