@@ -65,7 +65,7 @@ frequency=frequency/(N2*spacing);
 try
     transfer=target(frequency);
 catch ME
-    throwAsCaller(ME);
+    rethrow(ME);
 end
 
 % perform transfer in the frequency domain, then transform back
