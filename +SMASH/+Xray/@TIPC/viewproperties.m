@@ -8,12 +8,15 @@ function [ varargout ] = viewproperties( object, varargin )
 %   keywords:
 %       'Data': View the full, raw TIPC image
 %       'Images': View each of the cropped TIPC images
-%       'Registered': View each of the cropped, background corrected and 
+%       'Registered': View each of the cropped, background corrected and
 %           registered TIPC images
-%       'Summary': View each of the cropped, background corrected and 
-%           registered TIPC images and a bar chart showing the integrated 
+%       'Fuse': View each of the registered images "fused" with the
+%           refernce image.  This view is good for determining how well
+%           registered the images are.
+%       'Summary': View each of the cropped, background corrected and
+%           registered TIPC images and a bar chart showing the integrated
 %           intensity of each bin
-%       'Bins': view a bar chart showing the intensity of each slice of 
+%       'Bins': view a bar chart showing the intensity of each slice of
 %           each image, as well as the uncertainties
 %
 %   output: optional output returns the figure handle
@@ -35,9 +38,9 @@ elseif Narg == 2
 end
 
 switch option
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
-% View the full, raw TIPC image
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % View the full, raw TIPC image
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Data'
         obj = object.Measurement;
         obj.Grid1Label = 'Radial Distance [mm]';
@@ -46,9 +49,9 @@ switch option
         obj.GraphicOptions.Title = 'Raw Image';
         obj.GraphicOptions.YDir = 'normal';
         view(obj)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% View each of the cropped TIPC images
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % View each of the cropped TIPC images
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
     case 'Images'
         obj = object.Images;
@@ -101,9 +104,9 @@ switch option
             ylim([obj.Grid2(1), obj.Grid2(end)])
         end
         linkaxes(ax)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% View each of the cropped, background corrected and registered TIPC images
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % View each of the cropped, background corrected and registered TIPC images
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
     case 'Registered'
         obj = object.RegisteredImages;
@@ -156,12 +159,79 @@ switch option
             ylim([obj.Grid2(1), obj.Grid2(end)])
         end
         linkaxes(ax)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% View each of the cropped, background corrected and registered TIPC images
-% and a bar chart showing the integrated intensity of each bin
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
-              
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % View the registered images fused with the reference image
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+    case 'Fuse'
+        obj = object.RegisteredImages;
+        obj.Grid1Label = 'Radial Distance [mm]';
+        obj.Grid2Label = 'Axial Distance [mm]';
+        obj.DataLabel = 'Exposure';
+        obj.GraphicOptions.Title = 'Transmission';
+        obj.GraphicOptions.YDir = 'normal';
+        if isempty(clims)
+            clims = [-100 6000];
+        end
+        filters = object.Settings.Filters;
+        filter_label = cell(object.Settings.NumberImages,1);
+        channel = object.Images.Legend;
+        
+        for i = 1:object.Settings.NumberImages
+            if size(filters.Thickness,2) == 2
+                [~,thickness] = filters.Thickness.(channel{i});
+                [~,material] = filters.Material.(channel{i});
+            elseif size(filters.Thickness,2) == 1
+                thickness = filters.Thickness.(channel{i});
+                material = filters.Material.(channel{i});
+            end
+            filter_label{i} = [num2str(thickness), ' \mum ', material];
+        end
+        
+        ref = obj.Data(:,:,object.Settings.ReferenceImage);
+        figure('Units','Inches','Position',[7,6,10,6],'Color','w','PaperPositionMode','auto')
+        for i = 1:object.Settings.NumberImages
+            subplot('Position',[0.075+(i-1)*0.18,0.11, 0.15,0.82])
+            ax(i) = gca;
+            set(ax(i),'XScale','lin','YScale','lin',...
+                'FontSize',10,'box','on','FontWeight','normal','TickDir','out','FontName','Times','YDir','normal')
+            hold on
+            if i == object.Settings.ReferenceImage
+                reg = obj.Data(:,:,i);
+                im_fused = fuse(ref,reg);
+                
+                imagesc(obj.Grid1,obj.Grid2,im_fused)
+                axis equal
+                
+            elseif i ~= object.Settings.ReferenceImage
+                
+                reg = obj.Data(:,:,i);
+                im_fused = fuse(ref,reg);
+                imagesc(obj.Grid1,obj.Grid2,im_fused)
+                axis equal
+                
+            end
+            thl = title([channel{i},'/',channel{object.Settings.ReferenceImage}]);
+            thl.FontSize = 12;
+            if i == 1
+                ylabel('Height [cm]')
+                xlh = xlabel('Radial Position [cm]');
+                xlh.Position = [1 -0.6692 -1];
+            end
+            if i ~= 1
+                ax(i).YTickLabel = '';
+            end
+            xlim([obj.Grid1(1), obj.Grid1(end)])
+            ylim([obj.Grid2(1), obj.Grid2(end)])
+            
+        end
+        linkaxes(ax)
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % View each of the cropped, background corrected and registered TIPC images
+        % and a bar chart showing the integrated intensity of each bin
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
     case 'Summary'
         obj = object.RegisteredImages;
         obj.Grid1Label = 'Radial Distance [mm]';
@@ -195,7 +265,7 @@ switch option
                 'FontSize',10,'box','on','FontWeight','normal','TickDir','out','FontName','Times','YDir','normal')
             hold on
             imagesc(obj.Grid1,obj.Grid2,obj.Data(:,:,i))
-%             axis equal
+            %             axis equal
             thl = title(filter_label{i});
             thl.FontSize = 12;
             
@@ -227,14 +297,14 @@ switch option
         ylim([obj.Grid2(1), obj.Grid2(end)])
         xlabel('Intensity [A.U.]')
         
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-% view a bar chart showing the intensity of each slice of each image, as
-% well as the uncertainties
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
-              
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % view a bar chart showing the intensity of each slice of each image, as
+        % well as the uncertainties
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
     case 'Bins'
         data = object.Summary;
-
+        
         filters = object.Settings.Filters;
         filter_label = cell(object.Settings.NumberImages,1);
         channel = object.Images.Legend;
@@ -261,8 +331,8 @@ switch option
         for i = 1:object.Settings.NumberImages
             x = (1:object.Settings.Nslices) + 1.25*(i-1)*object.Settings.Nslices;
             bh(i) = bar(x,data.Intensity(:,i),'FaceColor',colors(i,:));
-            errorbar(x,data.Intensity(:,i),5*data.Uncertainty(:,i),'linestyle','none','color','k')
-            xmid(i) = mean(x);            
+            errorbar(x,data.Intensity(:,i),1*data.Uncertainty(:,i),'linestyle','none','color','k')
+            xmid(i) = mean(x);
         end
         ax1.XTick = xmid;
         ax1.XTickLabel = channel;

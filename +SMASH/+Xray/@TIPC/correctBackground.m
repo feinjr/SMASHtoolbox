@@ -78,7 +78,7 @@ for n = 1:object.Settings.NumberImages
     yy = Y(y_keep);
     zz = zeros(size(x_keep));
     
-    img_smooth = smooth(img,'mean',[5,5]);
+    img_smooth = smooth(img,'mean',[8,8]);
     
     for i = 1:length(x_keep)
         zz(i) = img_smooth.Data(y_keep(i),x_keep(i));

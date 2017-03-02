@@ -1,4 +1,4 @@
-function MI = ent(J,K)
+function MI = mutualinformation(J,K)
 %takes two images of equal size and pixel value ranges and returns the
 %joint histogram, joint entropy, and mutual information. No error checking
 %used, as this function is built for speed. For additional speed,

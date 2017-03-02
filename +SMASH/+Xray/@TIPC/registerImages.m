@@ -113,7 +113,7 @@ for i = 1:Nchannels
         zgrid = RegularizeData3D(X_off,Y_off,mutualInfo,1:1:(size(im2,2)-size(im1,2)),1:1:(size(im2,1)-size(im1,1)),'smoothness',0.0001, 'interp', 'bicubic');
         [X,Y] = meshgrid(1:1:(size(im2,2)-size(im1,2)),1:1:(size(im2,1)-size(im1,1)));
         
-        if showMI
+        if showMI        
             figure
             pcolor(X,Y,log10(1./zgrid))
             shading flat
@@ -129,8 +129,8 @@ for i = 1:Nchannels
         im_matched=img2_interp.Data(I:(I+size(im1,1)-1),J:(J+size(im1,2)-1));
         
         if showFuse
-            c = imfuse(img1_interp.Data, im_matched, 'falsecolor');
-            figure; imshow(c);
+            im_fused = fuse(img1_interp.Data,im_matched);
+            figure; imagesc(im_fused);
         end
         
         images_reg(:,:,i) = im_matched;
@@ -138,6 +138,12 @@ for i = 1:Nchannels
 end
 
 imgs_reg = SMASH.ImageAnalysis.ImageGroup(img1_interp.Grid1,img1_interp.Grid2,images_reg);
+dx = (img1.Grid1(2) - img1.Grid1(1));
+X = img1_interp.Grid1(1):dx:img1_interp.Grid1(end);
+Y = img1_interp.Grid2(1):dx:img1_interp.Grid2(end);
+
+imgs_reg = regrid(imgs_reg, X, Y);
+
 imgs_reg.GraphicOptions.AspectRatio = 'equal';
 imgs_reg.GraphicOptions.YDir = 'normal';
 object.RegisteredImages = imgs_reg;
