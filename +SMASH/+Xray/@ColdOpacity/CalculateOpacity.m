@@ -22,6 +22,8 @@ for n = 1:numel(material)
     
     if isempty(object.Settings.Density)
         density{n} = op.data(1,idx);
+    else
+        density{n} = object.Settings.Density;
     end
     
     kappa = op.data(2:end,idx);

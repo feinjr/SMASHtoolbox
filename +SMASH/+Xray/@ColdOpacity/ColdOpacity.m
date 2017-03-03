@@ -50,6 +50,7 @@ classdef ColdOpacity
                 object.Settings = p;
 
                 object = CalculateOpacity(object);
+                object = CalculateTransmission(object);
                 
             elseif (nargin == 1) && isobject(varargin{1});
                 p.Energy = [min(varargin{1}.Grid), max(varargin{1}.Grid), numel(varargin{1}.Grid)];
@@ -73,14 +74,14 @@ classdef ColdOpacity
                     if strcmp(varargin{i},'Density');   density = varargin{i+1};    end
                 end
                 
-                p.material = material;
+                p.Material = material;
                 p.Thickness = thickness;
                 p.Energy = energy;
-                p.density = density;
+                p.Density = density;
                 object.Settings = p;
                 
                 object = CalculateOpacity(object);
-                             
+                object = CalculateTransmission(object);             
             end
         end
     end
