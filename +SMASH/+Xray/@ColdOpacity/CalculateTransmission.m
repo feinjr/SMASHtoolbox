@@ -8,13 +8,13 @@ function object = CalculateTransmission(object,varargin)
 % 
 % Created May 30, 2014 by Patrick Knapp (Sandia National Laboratories)
 %%
-if isempty(varargin) && isempty(object.Thickness)
+if isempty(varargin) && isempty(object.Settings.Thickness)
     diaTx=SMASH.MUI.Dialog;
     diaTx.Hidden=true;
     diaTx.Name='Calculate Transmission';
     set(diaTx.Handle,'Tag','guiTx');
     
-    setappdata(diaTx, 'thickness', []);
+    setappdata(diaTx.Handle, 'thickness', []);
     
     addblock(diaTx,'edit',' Enter Material Thickness in microns',20); % Edit box to input rotation angle
     
@@ -26,16 +26,30 @@ if isempty(varargin) && isempty(object.Thickness)
     
 elseif length(varargin) == 1
     thickness = varargin{1};
-elseif ~isempty(object.Thickness)
-    thickness = object.Thickness;
+elseif ~isempty(object.Settings.Thickness)
+    thickness = object.Settings.Thickness;
 end
 
 L = thickness;
-Tx = exp(-1e-4*L*object.Data*object.Density);
-object.Data = Tx;
-object.Thickness = L;
-object.DataLabel = 'Transmission';
-object.Title = ['Transmission: ',num2str(L),' \mum ',object.Material];
+if numel(L) == 1
+    Tx = SMASH.SignalAnalysis.Signal(object.Opacity.Grid,exp(-1e-4*L*object.Opacity.Data*object.Settings.Density));
+    Tx.DataLabel = 'Transmission';
+    Tx.GridLabel = 'Photon Energy [eV]';
+    object.Transmission = Tx;
+    object.Settings.Thickness = L;
+    
+elseif numel(L) > 1
+    Tx = zeros(size(object.Opacity.Data));
+    label = cell(numel(L)+1,1);
+    for n = 1:numel(L)
+       Tx(:,n) =  exp(-1e-4*L{n}*object.Opacity.Data(:,n)*object.Settings.Density{n});
+       label{n} = [int2str(L{n}),' um ', object.Settings.Material{n}];
+    end
+    Txtotal = prod(Tx,2);
+    object.Transmission = SMASH.SignalAnalysis.SignalGroup(object.Opacity.Grid,[Tx,Txtotal]);
+    label{n+1} = 'Total';
+    object.Transmission.Legend = label;
+end
 
     function DoneCallback(varargin)
         value=probe(diaTx);

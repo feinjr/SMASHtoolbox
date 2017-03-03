@@ -21,57 +21,67 @@
 % See also Xray, Spectrum
 %
 %
-% created May 30, 2014 by Patrick Knapp (Sandia National Laboratories)
+% created March 3, 2017 by Patrick Knapp (Sandia National Laboratories)
 %
-classdef ColdOpacity < SMASH.Spectroscopy.Spectrum
+classdef ColdOpacity
     %% properties
     properties (SetAccess={?SMASH.DataClass}) % core data
-        
+        Opacity
+        Transmission
     end
     
     properties
-        Material = [];
-        Thickness = []; %microns
-        Density = [];
+        Settings
     end
     %% constructor
     methods (Hidden=true)
         function object=ColdOpacity(varargin)
-            object=object@SMASH.Spectroscopy.Spectrum(varargin{:});
-            if nargin > 0 && strcmpi(varargin{1},'restore')
-                % Do nothing
-            elseif length(varargin) == 1
-                if ~isempty(varargin{1})
-                    
-                    object.GridType = 'Energy';
-                    object.Material = varargin{1};
-                    
-                    object.Grid = [];
-                    object = CalculateOpacity(object);
-                    object.DataLabel = 'Opacity [cm^2/g]';
-                    
-                elseif isempty(varargin{1})
-                    
-                    object.GridType = 'Energy';
-                    object = ChooseOpacity(object);
-                    object = CalculateOpacity(object);
-                    object.DataLabel = 'Opacity [cm^2/g]';
-                    
-                    
-                end
-            elseif length(varargin) == 2
-                object.GridType = 'Energy';
-                object.Material = varargin{1};
-                E = varargin{2};
-                hnu = linspace(E(1),E(2),E(3));
-                
-                object.Grid = hnu;
+            p = struct();
+            if isempty(varargin)
+                object = ChooseOpacity(object);
                 object = CalculateOpacity(object);
-                object.DataLabel = 'Opacity [cm^2/g]';
+                object = CalculateTransmission(object);
+                             
+            elseif (nargin == 1) && ( ischar(varargin{1}) || iscell(varargin{1}))
+                p.Material =  varargin{1};      % string containing the material
+                p.Energy = [10, 30000, 1000];   % min, max, and Npts [eV]
+                p.Thickness = [];               % thickness in microns
+                p.Density = '';                 % density in g/cm^3
+                object.Settings = p;
+
+                object = CalculateOpacity(object);
                 
+            elseif (nargin == 1) && isobject(varargin{1});
+                p.Energy = [min(varargin{1}.Grid), max(varargin{1}.Grid), numel(varargin{1}.Grid)];
+                p.Density = '';
+                p.Thickness = [];
+                object.Settings = p;
+                
+                varargin{1}=SMASH.SignalAnalysis.Signal(varargin{1}.Grid,varargin{1}.Data);
+                object.Opacity=varargin{1};
+                
+            elseif nargin > 1
+                material = '';
+                thickness = [];
+                density = [];
+                energy = [10, 30000, 1000];
+                
+                for i = 1:nargin
+                    if strcmp(varargin{i},'Material');  material = varargin{i+1};   end
+                    if strcmp(varargin{i},'Energy');    energy = varargin{i+1};     end
+                    if strcmp(varargin{i},'Thickness'); thickness = varargin{i+1};  end
+                    if strcmp(varargin{i},'Density');   density = varargin{i+1};    end
+                end
+                
+                p.material = material;
+                p.Thickness = thickness;
+                p.Energy = energy;
+                p.density = density;
+                object.Settings = p;
+                
+                object = CalculateOpacity(object);
+                             
             end
-            object.Name='Cold Opacity Object';
-            object.Title='Cold Opacity Object';
         end
     end
     %%

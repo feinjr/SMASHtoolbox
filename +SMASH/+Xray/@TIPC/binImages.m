@@ -27,7 +27,6 @@ Nchannels = object.Settings.NumberImages;
 
 res_orig = (object.Measurement.Grid1(end)-object.Measurement.Grid1(1))/(numel(object.Measurement.Grid1)-1);
 res_final = (object.Images.Grid1(end)-object.Images.Grid1(1))/(numel(object.Images.Grid1)-1);
-res_scale = res_final/res_orig;
 
 for i = 1:length(varargin)
     if strcmp(varargin{i},'yLimits'); yLimits = varargin{i+1};
@@ -48,7 +47,7 @@ for i = 1:Nchannels
            YY(n) = mean(yCrop); 
         end
         temp = crop(object.Images,[],[yCrop(2) yCrop(1)]);
-        hpts = length(temp.Grid2)/res_scale;
+        hpts = length(temp.Grid2);
         
         lineout = SMASH.SignalAnalysis.Signal(temp.Grid1, trapz(temp.Grid2,temp.Data(:,:,i),1));
         
@@ -57,17 +56,17 @@ for i = 1:Nchannels
 
         cfit=add(cfit,gaussian,[0 0.01],'lower',[-0.05 1e-4], 'upper',[0.05 0.5],'scale',1,'fixscale',false);
         cfit = fit(cfit,[lineout.Grid, lineout.Data]);        
-        y = evaluate(cfit,lineout.Grid);
+        %y = evaluate(cfit,lineout.Grid);
         
         width = cfit.Parameter{1}(2);
         peak = cfit.Parameter{1}(1);
 
         signal = crop(lineout,[peak-4*width, peak+4*width]);
-        Integral(n,i) = trapz(signal.Grid/1e-4,signal.Data)/(dy/1e-4);
+        Integral(n,i) = trapz(signal.Grid,signal.Data);
         
-        background1 = crop(lineout,[min(lineout.Grid), peak-3*width]);
-        background2 = crop(lineout,[peak+3*width, max(lineout.Grid)]);
-        Errors(n,i) = std([background1.Data; background2.Data])/sqrt(abs(Integral(n,i)^2)+1)/sqrt(length(y)/res_scale + hpts);
+        background1 = crop(lineout,[min(lineout.Grid), peak-4*width]);
+        background2 = crop(lineout,[peak+4*width, max(lineout.Grid)]);
+        Errors(n,i) = std([background1.Data; background2.Data])/sqrt(Integral(n,i)+1)/sqrt(length(signal.Data))/sqrt(1*hpts);
     end
 end
 output.Yvalues = YY;

@@ -64,11 +64,11 @@ img1 = SMASH.ImageAnalysis.Image(object.Images.Grid1,object.Images.Grid2,object.
 % shift and regrid reference image
 findmean1 = mean(img1,'Grid2',[]);
 report1 = locate(findmean1,'peak');
-img1=shift(img1,'Grid1',-report1.Location);
+img1=shift(img1,'Grid1',-0*report1.Location);
 findmid1 = mean(img1,'Grid1',[]);
 new1 = differentiate(findmid1);
 midpoint1 = (max(new1.Grid) + min(new1.Grid))/2;
-img1 = shift(img1,'Grid2',-midpoint1);
+img1 = shift(img1,'Grid2',-0*midpoint1);
 img1 = crop(img1,Parameters.FinalImageXLims,Parameters.FinalImageYLims);
 
 dx_new = (img1.Grid1(2) - img1.Grid1(1))/res_scale;
@@ -86,13 +86,13 @@ for i = 1:Nchannels
         findmean2 = mean(limit(img2,[xmid - 0.3, xmid + 0.3],'all'),'Grid2',[]);
         report2 = locate(findmean2,'peak');
         %Set images to zero axis. X-axis first
-        filterI2=shift(img2,'Grid1',-report2.Location);
+        filterI2=shift(img2,'Grid1',-0*report2.Location);
         %y-axis shift
         findmid2 = mean(img2,'Grid1',[]);
         new2 = differentiate(findmid2);
         %New grid final
         midpoint2 = (max(new2.Grid) + min(new2.Grid))/2;
-        finalshift2 = shift(filterI2,'Grid2',-midpoint2);
+        finalshift2 = shift(filterI2,'Grid2',-0*midpoint2);
         finalshift2 = crop(finalshift2,Parameters.IntermediateImageXLims,Parameters.IntermediateImageYLims);
 
         img2_interp = regrid(finalshift2, finalshift2.Grid1(1):dx_new:finalshift2.Grid1(end),finalshift2.Grid2(1):dx_new:finalshift2.Grid2(end));
