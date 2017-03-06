@@ -34,7 +34,13 @@ Parameters.InterpolationMethod = 'bicubic';
 show = false;
 
 for i = 1:length(varargin)
-    if strcmp(varargin{i},'Parameters'); Parameters = varargin{i+1};
+    if strcmp(varargin{i},'Parameters'); 
+        newparams = varargin{i+1};
+        fields = fieldnames(newparams);
+        for n = 1:numel(fields)
+           Parameters.(fields{n}) = newparams.(fields{n}); 
+        end
+
     elseif strcmp(varargin{i},'ShowPlot'); show = true;
     end    
 end
@@ -91,6 +97,12 @@ for n = 1:object.Settings.NumberImages
         imagesc(X,Y, zgrid)
     end
     images_bkg(:,:,n) = img.Data - zgrid;
+    
+%     figure; hold all
+%     imagesc(X,Y, img.Data)%, [-100 500])
+%     scatter(xx,yy,'m')
+%     plot(X([xlims(1), xlims(2), xlims(2), xlims(1), xlims(1)]), Y([ylims(1), ylims(1), ylims(2), ylims(2), ylims(1)]),'Color','w')
+    
 end
 
 imgs_bkg = SMASH.ImageAnalysis.ImageGroup(X,Y,images_bkg);

@@ -47,7 +47,12 @@ showMI = false;
 showFuse = false;
 
 for i = 1:length(varargin)
-    if strcmp(varargin{i},'Parameters'); Parameters = varargin{i+1};
+    if strcmp(varargin{i},'Parameters'); 
+        newparams = varargin{i+1};
+        fields = fieldnames(newparams);
+        for n = 1:numel(fields)
+           Parameters.(fields{n}) = newparams.(fields{n}); 
+        end
     elseif strcmp(varargin{i},'ShowMI'); showMI = true;
     elseif strcmp(varargin{i},'ShowFuse'); showFuse = true;
     end    
