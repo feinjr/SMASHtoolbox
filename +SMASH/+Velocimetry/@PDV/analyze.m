@@ -1,12 +1,17 @@
 % analyze Perform history analysis
-% 
-% This method analyzes...
 %
-% object=analyze(object,'power');
-% object=analyze(object,'power',mode); % 'centroid'
+%
+% This method performs PDV history analysis.
+%
+%
+% See also PDV, bound, convert, partition
 %
 
+%
+% Created March 6, 2017 by Daniel Dolan (Sandia National Laboratories)
 
+
+% UNDER CONSTRUCTION
 % object=analyze(object,'sinusoid');
 % object=analyze(object,'sinusoid',name,value,...)
 % Valid names:
@@ -16,20 +21,11 @@
 %
 % 
 
-
-
-%
-% See also PDV, bound, convert, partition
-%
-
-%
-% Created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
-%
 function object=analyze(object,mode,varargin)
 
 %% manage input
 if (nargin<2) || isempty(mode)
-    mode='power';
+    mode='robust';
 end
 assert(ischar(mode),'ERROR: invalid analysis mode');
 mode=lower(mode);
@@ -70,15 +66,22 @@ data=object.STFT;
 data.Measurement=crop(data.Measurement,[start stop]);
 
 %% perform analysis
+param.Bandwidth=object.Bandwidth;
 param.RMSnoise=object.RMSnoise;
 
 t=object.STFT.Measurement.Grid;
 param.SampleInterval=abs(t(end)-t(1))/(numel(t)-1);
 
 switch lower(mode)
-    case 'power'
-        object.Frequency=analyzeSpectrum(data,boundary,...
-            param,varargin{:});
+    case 'robust' 
+        if nargin > 2
+            warning('SMASH:PDV','Extra inputs are not passed in robust analysis');
+        end
+        object.Frequency=analyzeRobust(data,boundary,param);
+    case 'power'        
+        %object.Frequency=analyzeSpectrum(data,boundary,...
+        %    param,varargin{:});
+        error('ERROR: power analysis is not ready yet');
     case 'sinusoid'
         error('ERROR: sinusoid analysis is not ready yet');
         %object.RawOutput=analyzeSinusoid(measurement,boundary,...

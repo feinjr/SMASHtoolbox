@@ -5,8 +5,7 @@
 %    object=convert(object,wavelength,offset);
 %
 %    object=convert(object,myfunc);
-
-
+%
 % See also PDV, analyze, characterize
 %
 
@@ -62,8 +61,5 @@ for n=1:numel(object.Velocity)
     table(:,2)=table(:,2)*scale;
     object.Velocity{n}=reset(object.Velocity{n},[],table);
 end
-
-
-
 
 end

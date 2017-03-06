@@ -41,17 +41,6 @@ classdef PDV
         Frequency = {} % Analysis results (cell array of SignalGroup objects)              
         Velocity = {} % Converted results (cell array of SignalGroup objects)       
     end
-    %properties
-    %    GraphicOptions % Graphic options (GraphicOptions object)        
-    %end    
-%     properties (SetAccess=protected,Hidden=true)        
-%         SampleInterval
-%         SampleRate
-%         DomainScaling
-%         Duration
-%         EffectiveDuration
-%         EffectiveWidth
-%     end
     %%
     methods (Hidden=true)
         function object=PDV(varargin)
@@ -113,7 +102,7 @@ classdef PDV
             try
                 object.STFT.FFToptions.Window=value;
             catch ME
-                throwAsCaller(ME);
+                rethrow(ME);
             end
         end
         function value=get.RemoveDC(object)
@@ -123,7 +112,7 @@ classdef PDV
             try
                 object.STFT.FFToptions.RemoveDC=value;
             catch ME
-                throwAsCaller(ME);
+                rethrow(ME);
             end
         end
         function value=get.NumberFrequencies(object)
@@ -133,7 +122,7 @@ classdef PDV
             try
                 object.STFT.FFToptions.NumberFrequencies=value;
             catch ME
-                throwAsCaller(ME);
+                rethrow(ME);
             end
         end
     end

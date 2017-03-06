@@ -26,18 +26,18 @@ end
 assert(ischar(mode),'ERROR: invalid mode');
 
 % generate plot
-SMASH.MUI.Figure;
 switch lower(mode)
     case 'signal'
+        SMASH.MUI.Figure;
         h=view(object.STFT,gca);
-        %apply(object.GraphicOptions,h);
     case 'preview'
+        SMASH.MUI.Figure;
         h=view(object.Preview,'show',gca);
         h=h.image;
-        %apply(object.GraphicOptions,h);
     case 'frequency'
         N=numel(object.Frequency);
         assert(N>0,'ERROR: beat frequency has not been calculated yet');
+        SMASH.MUI.Figure;
         color=lines(N);        
         h=nan(N,2);
         label=cell(1,N);
@@ -50,7 +50,6 @@ switch lower(mode)
             set(h(n,:),'Color',color(n,:));
         end
         set(ha,'Box','on');
-        %apply(object.GraphicOptions,h);
         ylabel(ha(1),'Beat frequency');
         xlabel(ha(2),'Time');
         ylabel(ha(2),'Uncertainty');
@@ -61,7 +60,8 @@ switch lower(mode)
         warning on; %#ok<WNON>
     case 'velocity'
         N=numel(object.Velocity);
-        assert(N>0,'ERROR: beat frequency has not been calculated yet');
+        assert(N>0,'ERROR: velocity has not been calculated yet');
+        SMASH.MUI.Figure;
         color=lines(N);        
         h=nan(N,2);
         label=cell(1,N);
@@ -74,7 +74,6 @@ switch lower(mode)
             set(h(n,:),'Color',color(n,:));
         end
         set(ha,'Box','on');
-        %apply(object.GraphicOptions,h);
         ylabel(ha(1),'Velocity');
         xlabel(ha(2),'Time');
         ylabel(ha(2),'Uncertainty');
