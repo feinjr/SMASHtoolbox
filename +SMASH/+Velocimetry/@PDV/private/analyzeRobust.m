@@ -4,6 +4,10 @@ function history=analyzeRobust(data,boundary,param)
 data.FFToptions.FrequencyDomain='positive';
 data.FFToptions.SpectrumType='power';
 
+if isempty(param.RMSnoise)
+    param.RMSnoise=nan;
+end
+
 % perform calibration
 duration=data.Partition.Duration;
 T=param.SampleInterval;
