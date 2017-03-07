@@ -112,7 +112,8 @@ tempfile=sprintf('.tempfile_%s%s',tempfile,ext);
 
 if ispc
     %sourcefile=fullfile('\\sasn898',subdir,'pbfa2z',sourcefile);
-    sourcefile=fullfile('\\york',subdir,'pbfa2z',sourcefile);
+    %sourcefile=fullfile('\\york',subdir,'pbfa2z',sourcefile);
+    sourcefile=fullfile('\\york',sourcefile);
     copyfile(sourcefile,tempfile,'f');
 else
     %sourcefile=fullfile('sasn898:',subdir,'pbfa2z',sourcefile);
