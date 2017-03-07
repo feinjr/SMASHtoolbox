@@ -21,7 +21,7 @@ Narg=numel(varargin);
 % reveal configuration
 if nargout==0
     if Narg>0
-        warning('SMASH:TIPC','Configuration changes ignored in reveal mode');
+        warning('SMASH:NTOF','Configuration changes ignored in reveal mode');
     end
     % determine label format
     name=fieldnames(object.Settings);
