@@ -52,7 +52,7 @@ classdef CrystalImager
   
     methods (Hidden=false)
         varargout=correctBackground(varargin)
-        varargout=binImages(varargin)
+        varargout=summarize(varargin)
         varargout=exportSummary(varargin)
         varargout = viewproperties(varargin)
     end

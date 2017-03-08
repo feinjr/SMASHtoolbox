@@ -79,8 +79,7 @@ switch Method
         xlims = [mask.LimitIndex1(1), mask.LimitIndex1(end)];
         ylims = [mask.LimitIndex2(1), mask.LimitIndex2(end)];
         
-        img_bin = bin(img,5);
-        X = img_bin.Grid1; Y = img_bin.Grid2;
+        X = img.Grid1; Y = img.Grid2;
 
         xpts = round((length(X)-1)*rand(Parameters.Npts,1))+1;
         ypts = round((length(Y)-1)*rand(Parameters.Npts,1))+1;
@@ -92,7 +91,7 @@ switch Method
         yy = Y(y_keep);
         zz = zeros(size(x_keep));
         
-        img_smooth = smooth(img_bin,'mean',[4,4]);
+        img_smooth = smooth(img,'mean',[8,8]);
         
         for i = 1:length(x_keep)
             zz(i) = img_smooth.Data(y_keep(i),x_keep(i));
@@ -105,9 +104,7 @@ switch Method
             imagesc(X,Y, zgrid)
         end
         
-        bkg = SMASH.ImageAnalysis.Image(X,Y,zgrid);
-        bkg = regrid(bkg, img.Grid1, img.Grid2);
-        img_bkg = SMASH.ImageAnalysis.Image(img.Grid1, img.Grid2, img.Data - bkg.Data);
+        img_bkg = SMASH.ImageAnalysis.Image(X, Y, img.Data - zgrid);
         
     case 'Polynomial'
         Parameters = struct();
