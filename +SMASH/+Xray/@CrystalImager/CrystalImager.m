@@ -21,8 +21,9 @@ classdef CrystalImager
             p.Shot = 9999;
             p.DecayTime = 720;  % minutes from shot time to scan time
             p.Detector = 'Image Plate';
-            p.Magnification = 5.8;
             p.Nslices = 20;           
+
+            p.Magnification = 5.8;
             p.BraggAngle = 82.91;
             p.Crystal = 'Ge 220';
             

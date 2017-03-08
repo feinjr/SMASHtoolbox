@@ -31,6 +31,7 @@ Levels = [];
 AspectRatio_in = [];
 xlims = [-0.05, 0.05];
 ylims = [-0.45, 0.45];
+DataScale = 'lin';
 
 if Narg == 0
     view(object.Measurement)
