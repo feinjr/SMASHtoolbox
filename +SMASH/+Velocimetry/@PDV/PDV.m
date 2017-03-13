@@ -14,8 +14,8 @@
 % processing, frequency bounding, and setting configuration is complete,
 % the "analyze" method tracks spectral features as a function of time.
 %
-% See also Velocimetry, FileAccess.readFile, SignalAnalysis.STFT,
-% ImageAnalysis.Image, SignalAnalysis.SignalGroup
+% See also SMASH.Velocimetry, SMASH.FileAccess.readFile, SMASH.SignalAnalysis.STFT,
+% SMASH.ImageAnalysis.Image, SMASH.SignalAnalysis.SignalGroup
 %
 
 %

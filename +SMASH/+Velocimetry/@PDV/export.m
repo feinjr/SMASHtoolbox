@@ -1,4 +1,7 @@
+% export Export results to a text file
 %
+% This method exports velocity results to a text file
+%    export(object,filename,
 %
 
 %
@@ -33,8 +36,8 @@ CU=onCleanup(@() fclose(fid));
 fprintf(fid,'PDV data exported %s\n',datestr(now));
 fprintf(fid,'Column format: Time Velocity Uncertainty \n');
 
-for m=1:Nboundary
-    result=object.Velocity{m};
+for m=1:numel(index)
+    result=object.Velocity{index(m)};
     fprintf(fid,'\nResults for "%s"\n',result.Name);    
     data=[result.Grid result.Data];
     fprintf(fid,format,transpose(data));
