@@ -42,6 +42,7 @@ if isempty(X) || isempty(Y) || isempty(Z)
     diaReg.Hidden=true;
     diaReg.Name='Select Region of Background Exposure';
     
+    htxt1=addblock(diaReg,'text','Use mouse to select region of background exposure',[25]);
     hReg=addblock(diaReg,'button',{' OK ', '  Exit  '});
     set(hReg(1),'Callback',@callbackOK);
     set(hReg(2),'Callback',@callbackExit);
@@ -62,6 +63,7 @@ if isempty(X) || isempty(Y) || isempty(Z)
         diaDone.Hidden=true;
         diaDone.Name='Select Another Region?';
         
+        htxt2=addblock(diaDone,'text','Do you want to select another region?',[25]);
         hDone=addblock(diaDone,'button',{' Yes ', '  No  '});
         set(hDone(1),'Callback',@callback1);
         set(hDone(2),'Callback',@callback2);
