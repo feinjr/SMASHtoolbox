@@ -14,11 +14,11 @@ function object=crop(object,varargin)
 if (nargin==1) || isnumeric(varargin{1})
     try
         object.STFT.Measurement=crop(object.STFT.Measurement,varargin{:});
+        t=object.STFT.Measurement.Grid;
+        object.Preview=crop(object.Preview,[min(t) max(t)],[]);
     catch
         return
     end
-    t=object.STFT.Measurment.Grid;
-    object.Preview=crop(object.Preview,[min(t) max(t)],[]);
 elseif strcmpi(varargin{1},'preview')
     if isempty(object.Preview)
         object=preview(object);
