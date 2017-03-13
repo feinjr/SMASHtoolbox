@@ -33,7 +33,7 @@ elseif (Narg==1) && strcmpi(varargin{1},'manual')
     close(gcf);
     object=limit(object,bound);    
 else
-    object.Measurement=limit(object.Measurement,varargin{:});
+    object.STFT.Measurement=limit(object.STFT.Measurement,varargin{:});
 end
 
 end
