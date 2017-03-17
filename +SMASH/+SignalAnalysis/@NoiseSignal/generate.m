@@ -30,14 +30,14 @@ table=object.TransferTable;
 table=sortrows(table,1);
 transfer=interp1(table(:,1),table(:,2),...
     abs(object.ReciprocalGrid));
+transfer(isnan(transfer))=0;
 transform=transform.*transfer;
 noise=ifft(transform);
 noise=real(noise(1:object.Npoints));
 
 %
 Data=noise*(object.Amplitude/std(noise));
-Grid=object.Measurement.Grid;
-object.Measurement=reset(object.Measurement,Grid,Data);
+object.Measurement=reset(object.Measurement,[],Data);
 
 % restore previous random state
 if ~isempty(object.SeedValue)

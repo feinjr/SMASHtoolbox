@@ -22,7 +22,7 @@
 % created February 18, 2015 by Daniel Dolan (Sandia National Laboratories)
 %
 classdef PDV
-    %%
+    %%    
     properties
         STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
@@ -32,18 +32,23 @@ classdef PDV
         Window % FFT window name ('hann', 'hamming', 'boxcar')
         RemoveDC % Remove DC level before FFT (logical)
         NumberFrequencies % Number of frequency points in FFT [min max]
+        NoiseAmplitude  % Time-domain RMS noise of the PDV measurement
     end
     properties
         AnalysisMode = 'robust' % Analysis mode
-        Bandwidth % Measurement bandwidth
-        RMSnoise  % Time-domain RMS noise of the PDV measurement
+        Wavelength = 1550e-9 % Target wavelength
+        ReferenceFrequency = 0 % Reference frequency
     end
-    properties (Dependent=true)  
+    properties (Dependent=true)        
         Amplitude = {}   % Amplitude results (cell array of Signal objects)
         Frequency = {}   % Frequency results (cell array of Signal objects)
         Uncertainty = {} % Uncertainty results (cell array of Signal objects)
     end
     properties (SetAccess=protected,Hidden=true)
+        NoiseDefined=false % Indicates if noise has been defined
+        NoiseCharacterized=false % Indicates if noise has been characterized
+        NoiseSignal % NoiseSignal object
+        Analyzed=false; % Indicates if analysis has been performed
         AnalysisResult % cell array of SignalGroup objects [peak_location signal_amplitude effective_duration]
     end
     %%
@@ -89,25 +94,23 @@ classdef PDV
                     error('ERROR: invalid analysis mode');
             end
         end
-        function object=set.Bandwidth(object,value)
+        function object=set.Wavelength(object,value)
             if isempty(value)
                 % do nothing
             else
-                assert(isnumeric(value) && isscalar(value) ...
-                    && ~isnan(value) && (value > 0),...
-                    'ERROR: invalid Bandwidth value');
+                assert(isnumeric(value) && isscalar(value) && isfinite(value),...
+                    'ERROR: invalid Wavelength value');
             end
-            object.Bandwidth=value;
+            object.Wavelength=value;
         end
-        function object=set.RMSnoise(object,value)
+        function object=set.ReferenceFrequency(object,value)
             if isempty(value)
                 % do nothing
             else
-                assert(isnumeric(value) && isscalar(value) ...
-                    && ~isnan(value) && (value > 0), ...
-                    'ERROR: invalid RMSnoise value');
+                assert(isnumeric(value) && isscalar(value) && isfinite(value), ...
+                    'ERROR: invalid ReferenceFrequency value');
             end
-            object.RMSnoise=value;
+            object.ReferenceFrequency=value;
         end
     end
     %% setters/getters for dependent properties
@@ -142,37 +145,59 @@ classdef PDV
                 rethrow(ME);
             end
         end
-        function value=get.Frequency(object)            
-            value=object.AnalysisResult;
-            if isempty(value)
-                fprintf('Frequency is empty\n');
+        function object=set.NoiseAmplitude(object,value)
+            try
+                object.NoiseSignal.Amplitude=value;
+            catch
+                error('ERROR: invalid NoiseAmplitude value');
+            end   
+            object.NoiseDefined=true;
+        end
+        function value=get.NoiseAmplitude(object)
+            if object.NoiseDefined
+                value=object.NoiseSignal.Amplitude;
+            else
+                error('ERROR: NoiseAmplitude has not been defined yet');
             end
-            for n=1:numel(value)
-                temp=split(value{n});
-                value{n}=temp;
+        end
+        function value=get.Frequency(object)
+            if object.Analyzed
+                value=object.AnalysisResult;
+                for n=1:numel(value)
+                    temp=split(value{n});
+                    value{n}=temp;
+                end
+            else
+                error('ERROR: analysis has not been performed yet');
             end
         end
         function value=get.Amplitude(object)
-            value=object.AnalysisResult;
-            for n=1:numel(value)
-                [~,temp]=split(value{n});
-                value{n}=temp;
+            if object.Analyzed
+                value=object.AnalysisResult;
+                for n=1:numel(value)
+                    [~,temp]=split(value{n});
+                    value{n}=temp;
+                end
+            else
+                error('ERROR: analysis has not been performed yet');
             end
         end
         function value=get.Uncertainty(object)
-            if isempty(object.RMSnoise)
-                value=[];
-                return
-            end            
-            t=object.STFT.Measurement.Grid;
-            T=abs(t(end)-t(1))/(numel(t)-1);
-            fs=1/T;
-            value=object.AnalysisResult;
-            for n=1:numel(value)
-                [~,amplitude,duration]=split(value{n});
-                value{n}=amplitude; % object copy
-                temp=sqrt(6./(fs*(duration.Data).^3))*object.RMSnoise./amplitude.Data/pi;                
-                value{n}=reset(value{n},[],temp);
+            if object.Analyzed
+                assert(object.NoiseDefined,'ERROR: noise amplitude is undefined');                
+                t=object.STFT.Measurement.Grid;
+                T=abs(t(end)-t(1))/(numel(t)-1);
+                fs=1/T;
+                value=object.AnalysisResult;
+                for n=1:numel(value)
+                    [~,amplitude,duration]=split(value{n});
+                    value{n}=amplitude; % object copy
+                    temp=sqrt(6./(fs*(duration.Data).^3))*object.NoiseAmplitude./amplitude.Data/pi;
+                    %temp(isinf(temp))=fs/2;
+                    value{n}=reset(value{n},[],temp);
+                end
+            else
+                error('ERROR: analysis has not been performed yet');
             end
         end        
     end

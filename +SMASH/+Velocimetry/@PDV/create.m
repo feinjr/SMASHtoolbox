@@ -15,20 +15,12 @@ else
     object.STFT=source;
 end
 
-% % determine sample rate
-% t=object.STFT.Measurement.Grid;
-% dt=(max(t)-min(t))/(numel(t)-1);
-% object.SampleInterval=dt;
-% object.SampleRate=1/dt;
-
-% default settings
-%object.GraphicOptions=SMASH.Graphics.GraphicOptions;
-%object.GraphicOptions.Title='PDV measurement';
-%object.GraphicOptions.Marker='none';
-
 object.NumberFrequencies=1000;
 object.RemoveDC=true;
 object.Window='hann';
 object=partition(object,'block',1000);
+object.STFT.FFToptions.Normalization='none';
+
+object.NoiseSignal=SMASH.SignalAnalysis.NoiseSignal(1:16);
 
 end

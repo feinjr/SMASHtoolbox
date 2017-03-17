@@ -22,7 +22,7 @@
 % updated March 14, 2017 by Daniel Dolan
 %   -clarified documentation
 %
-function result=characterize(object,mode,varargin)
+function object=characterize(object,mode,varargin)
 
 % manage input
 assert(nargin>=2,'ERROR: insufficient input');
@@ -66,14 +66,14 @@ if isempty(option.Time) && isempty(option.Frequency)
     preview(object);
     fig=gcf;
     ha=gca;
-    hb=uicontrol('Style','pushbutton','String','Done',...
-        'Callback','delete(gcbo)');
+    hb=uicontrol('Style','pushbutton','String','Done');
+    set(hb,'Callback',@(~,~) delete(hb));
     warning off %#ok<WNOFF>
     switch mode
         case 'reference'
             label='Select reference region';
         case 'noise'
-            label='Select noise region';
+            label='Select noise region';            
     end
     title(label);
     warning on %#ok<WNON>
@@ -96,10 +96,15 @@ selection.Measurement=crop(selection.Measurement,option.Time);
 selection.FFToptions.FrequencyDomain='positive';
 selection.FFToptions.SpectrumType='power';
 [f,P]=fft(selection.Measurement,selection.FFToptions);
+fNyquist=f(end);
+    function G=transfer(f)
+        G=interp1(fk,Pk,abs(f),'linear');
+    end
 
 keep=(f>=option.Frequency(1)) & (f<=option.Frequency(2));
-f=f(keep);
-P=P(keep);
+fk=f(keep);
+Pk=P(keep);
+area1=trapz(fk,Pk);
 
 t=selection.Measurement.Grid;
 T=abs(t(end)-t(1))/(numel(t)-1);
@@ -107,29 +112,32 @@ fNyquist=1/(2*T);
 
 % perform characterization
 switch mode    
-    case 'noise'        
-        noisefloor=mean(P);
-        % simulate noise
-        noise=SMASH.SignalAnalysis.NoiseSignal(selection.Measurement.Grid); 
-        if isempty(object.Bandwidth)
-            bandwidth=fNyquist/2;
-            warning('PDV:characterize',...
-                'No bandwidth given--assuming half of the Nyquist frequency');
-        else
-            bandwidth=object.Bandwidth;
-        end  
-        noise=defineTransfer(noise,'bandwidth',bandwidth);
-        noise=generate(noise);                
-        [f,P]=fft(noise.Measurement,selection.FFToptions);
+    case 'noise'
+        if fk(1) > 0
+            fk(2:end+1)=fk;
+            fk(1)=0;
+            Pk(2:end+1)=Pk;
+            Pk(1)=0;
+        end
+        if fk(end) < fNyquist
+            fk(end+1)=fNyquist;
+            Pk(end+1)=0;
+        end     
+        object.NoiseSignal.Amplitude=1;
+        object.NoiseSignal=defineGrid(object.NoiseSignal,selection.Measurement.Grid);
+        object.NoiseSignal=defineTransfer(object.NoiseSignal,'function',@transfer);
+        object.NoiseSignal=generate(object.NoiseSignal);
+        [f,P]=fft(object.NoiseSignal.Measurement,selection.FFToptions);
         keep=(f>=option.Frequency(1)) & (f<option.Frequency(2));
-        P=P(keep);
-        correction=noisefloor/mean(P);
-        result=sqrt(correction);
-    case 'reference'       
+        area2=trapz(f(keep),P(keep));
+        object.NoiseSignal.Amplitude=sqrt(area1/area2);      
+        object.NoiseCharacterized=true;
+        object.NoiseDefined=true;
+    case 'reference'
         index=(P >= (0.50*max(P)));
         f=f(index);
         P=P(index);
-        result=trapz(f,f.*P)/trapz(f,P);
+        object.ReferenceFrequency=trapz(f,f.*P)/trapz(f,P);
 end
 
 end

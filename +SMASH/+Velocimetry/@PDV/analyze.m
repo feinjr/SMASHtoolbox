@@ -2,8 +2,10 @@
 %
 % This method performs PDV history analysis.
 %    object=analyze(object);
-% The current analysis mode is 'robust', which uses centroid calculations
-% for broad features and parabolic refinement for narrow features.
+% The current analysis mode is 'robust', which uses an interative centroid
+% calculation.
+% UNDER CONSTRUCTION
+
 %
 % Calling this method updates the Frequency and Amplitude properties and
 % resets the Velocity property.  The Frequency property has at least one
@@ -79,7 +81,7 @@ switch lower(mode)
             warning('SMASH:PDV',...
                 'Extra inputs are not passed in robust analysis');
         end
-        [object.AnalysisResult,extra]=analyzeRobust(data,boundary);
+        [object.AnalysisResult,extra]=analyzeRobust(data,boundary,object.NoiseSignal);
         object.STFT.FFToptions.NumberFrequencies=extra.NumberFrequencies;
     case 'power'        
         %object.Frequency=analyzeSpectrum(data,boundary,...
@@ -92,5 +94,7 @@ switch lower(mode)
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
+
+object.Analyzed=true;
 
 end
