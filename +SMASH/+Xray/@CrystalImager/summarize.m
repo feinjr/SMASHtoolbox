@@ -19,6 +19,7 @@ YY = zeros(Nslices,1);
 Integral = zeros(Nslices, 1);
 COM = zeros(Nslices, 1);
 width = zeros(Nslices, 2);
+Lineouts = zeros(length(object.Image.Grid1), Nslices);
 
 dy = diff(yLimits)/Nslices;
 
@@ -27,8 +28,9 @@ for n = 1:Nslices
     yCrop = [yLimits(1) + (n-1)*dy, yLimits(1) + n*dy];
     YY(n) = mean(yCrop);
     temp = crop(object.Image,[],[yCrop(1) yCrop(2)]);    
-    lineout = SMASH.SignalAnalysis.Signal(temp.Grid1, trapz(temp.Grid2,temp.Data,1));    
-    
+    lineout = SMASH.SignalAnalysis.Signal(temp.Grid1, abs(trapz(temp.Grid2,temp.Data,1)));    
+    Lineouts(:,n) = lineout.Data;
+
     %%%% create a gaussian fit to the lineout and find the peak and width
     cfit = SMASH.CurveFit.Curve;
     gaussian=SMASH.CurveFit.makePeak('gaussian');
@@ -81,6 +83,9 @@ p.RadiusDeviation = std(p.Width/2);
 
 p.PositionDeviation = std(p.Center);
 p.RmsPostion = sqrt(mean(p.Center.^2));
+
+p.Lineouts = Lineouts;
+p.Axis = object.Image.Grid1;
 
 object.Summary = p;
 

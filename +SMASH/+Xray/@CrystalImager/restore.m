@@ -2,7 +2,7 @@
 
 function object=restore(data)
 
-object=SMASH.Xray.TIPC([],NaN);
+object=SMASH.Xray.CrystalImager([],NaN);
 
 name=fieldnames(data);
 for n=1:numel(name)

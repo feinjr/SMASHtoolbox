@@ -27,7 +27,7 @@ function [ object ] = registerImages( object, varargin )
 %           This must be larger than FinalImageXLims and YLims.
 %       p.Optimize:  true or false.  Setting to true will enable a further
 %           optimization of the image registration once the initial maximum
-%           value of MI is found.  Not yet implemented.
+%           value of MI is found.
 %
 % See also TIPC, Xray, Image, Radiography
 % created March 1, 2017 by Patrick Knapp (Sandia National Laboratories)

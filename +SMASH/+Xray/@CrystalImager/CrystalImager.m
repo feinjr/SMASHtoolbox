@@ -23,9 +23,11 @@ classdef CrystalImager
             p.Detector = 'Image Plate';
             p.Nslices = 20;           
 
+            p.Configuration = 'continuum';
             p.Magnification = 5.8;
             p.BraggAngle = 82.91;
             p.Crystal = 'Ge 220';
+            p.TwoD = 3.939;
             
             p.Filters = struct();
             p.Filters.Material = {'Kapton', 'Beryllium'};
