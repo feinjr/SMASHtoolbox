@@ -34,12 +34,17 @@ classdef PDV
         NumberFrequencies % Number of frequency points in FFT [min max]
     end
     properties
+        AnalysisMode = 'robust' % Analysis mode
         Bandwidth % Measurement bandwidth
         RMSnoise  % Time-domain RMS noise of the PDV measurement
     end
-    properties (SetAccess=protected)           
-        Frequency = {} % Analysis results (cell array of SignalGroup objects)              
-        Velocity = {} % Converted results (cell array of SignalGroup objects)       
+    properties (Dependent=true)  
+        Amplitude = {}   % Amplitude results (cell array of Signal objects)
+        Frequency = {}   % Frequency results (cell array of Signal objects)
+        Uncertainty = {} % Uncertainty results (cell array of Signal objects)
+    end
+    properties (SetAccess=protected,Hidden=true)
+        AnalysisResult % cell array of SignalGroup objects [peak_location signal_amplitude effective_duration]
     end
     %%
     methods (Hidden=true)
@@ -74,23 +79,35 @@ classdef PDV
             end
             object.Boundary=value;
         end
+        function object=set.AnalysisMode(object,value)
+            assert(ischar(value),'ERROR: invalid analysis mode');
+            value=lower(value);
+            switch value
+                case {'robust'}
+                    % valid choice
+                otherwise
+                    error('ERROR: invalid analysis mode');
+            end
+        end
         function object=set.Bandwidth(object,value)
             if isempty(value)
                 % do nothing
             else
-                assert(isnumeric(value) && isscalar(value),...
+                assert(isnumeric(value) && isscalar(value) ...
+                    && ~isnan(value) && (value > 0),...
                     'ERROR: invalid Bandwidth value');
             end
-            object.Bandwidth=abs(value);
+            object.Bandwidth=value;
         end
         function object=set.RMSnoise(object,value)
             if isempty(value)
                 % do nothing
             else
-                assert(isnumeric(value) && isscalar(value),...
+                assert(isnumeric(value) && isscalar(value) ...
+                    && ~isnan(value) && (value > 0), ...
                     'ERROR: invalid RMSnoise value');
             end
-            object.RMSnoise=abs(value);
+            object.RMSnoise=value;
         end
     end
     %% setters/getters for dependent properties
@@ -125,5 +142,38 @@ classdef PDV
                 rethrow(ME);
             end
         end
+        function value=get.Frequency(object)            
+            value=object.AnalysisResult;
+            if isempty(value)
+                fprintf('Frequency is empty\n');
+            end
+            for n=1:numel(value)
+                temp=split(value{n});
+                value{n}=temp;
+            end
+        end
+        function value=get.Amplitude(object)
+            value=object.AnalysisResult;
+            for n=1:numel(value)
+                [~,temp]=split(value{n});
+                value{n}=temp;
+            end
+        end
+        function value=get.Uncertainty(object)
+            if isempty(object.RMSnoise)
+                value=[];
+                return
+            end            
+            t=object.STFT.Measurement.Grid;
+            T=abs(t(end)-t(1))/(numel(t)-1);
+            fs=1/T;
+            value=object.AnalysisResult;
+            for n=1:numel(value)
+                [~,amplitude,duration]=split(value{n});
+                value{n}=amplitude; % object copy
+                temp=sqrt(6./(fs*(duration.Data).^3))*object.RMSnoise./amplitude.Data/pi;                
+                value{n}=reset(value{n},[],temp);
+            end
+        end        
     end
 end

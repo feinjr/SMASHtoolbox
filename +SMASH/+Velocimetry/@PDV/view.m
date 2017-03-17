@@ -2,21 +2,24 @@
 %
 % This method displays PDV objects as line plots.  The default view is the
 % measured signal.
-%     >> view(object);
-%     >> view(object,'signal'); % same as above
-% Results can be viewed *after* the analysis method has been used.
-%     >> view(object,'Velocity');
-%     >> view(object,'Frequency');
+%    view(object);
+%    view(object,'signal'); % same as above
+% Frequency results can be viewed *after* the analysis method has been used.
+%    view(object,'Frequency');
+%    view(object,'Amplitude);
+% Velocity results can be viewed *after* the convert method has been used.
+%    view(object,'Velocity');
 %
 % Specifying an output returns graphic handles for lines from this method.
 %     >> h=view(...);
 % 
-% See also PDV, analyze, preview
+% See also PDV, analyze, convert, preview
 %
 
 % 
 % created March 2, 2015 by Daniel Dolan (Sandia National Laboratories)
-%
+% revised March 14, 2017 by Daniel Dolan
+%    -Added Amplitude view and revised documentation
 function varargout=view(object,mode)
 
 % manage input
@@ -36,52 +39,55 @@ switch lower(mode)
         h=h.image;
     case 'frequency'
         N=numel(object.Frequency);
-        assert(N>0,'ERROR: beat frequency has not been calculated yet');
+        assert(N>0,'ERROR: frequency has not been calculated yet.  Use the "analyze" method.');
         SMASH.MUI.Figure;
-        color=lines(N);        
-        h=nan(N,2);
-        label=cell(1,N);
+        axes('Box','on');
+        color=lines(N);
+        h=nan(N,1);
+        label=cell(N,1);
         for n=1:N
             label{n}=object.Frequency{n}.Name;
-            ha(1)=subplot(2,1,1);
-            h(n,1)=view(object.Frequency{n},1,gca);           
-            ha(2)=subplot(2,1,2);
-            h(n,2)=view(object.Frequency{n},2,gca);
-            set(h(n,:),'Color',color(n,:));
+            h(n)=view(object.Frequency{n},gca);
+            set(h(n),'Color',color(n,:));
         end
-        set(ha,'Box','on');
-        ylabel(ha(1),'Beat frequency');
-        xlabel(ha(2),'Time');
-        ylabel(ha(2),'Uncertainty');
-        legend(h(:,1),label,'Location','best');
-        title(ha(2),'');
-        warning off; %#ok<WNOFF>
-        linkaxes(ha,'x');
-        warning on; %#ok<WNON>
-    case 'velocity'
-        N=numel(object.Velocity);
-        assert(N>0,'ERROR: velocity has not been calculated yet');
+        ylabel('Frequency');
+        xlabel('Time');
+        legend(h,label,'Location','best');
+    case 'amplitude'
+        N=numel(object.Amplitude);
+        assert(N>0,'ERROR: amplitude has not been calculated yet.  Use the "analyze" method.');                
         SMASH.MUI.Figure;
-        color=lines(N);        
-        h=nan(N,2);
-        label=cell(1,N);
+        axes('Box','on');
+        color=lines(N);       
+        h=nan(N,1);
+        label=cell(N,1);       
         for n=1:N
-            label{n}=object.Velocity{n}.Name;
-            ha(1)=subplot(2,1,1);
-            h(n,1)=view(object.Velocity{n},1,gca);           
-            ha(2)=subplot(2,1,2);
-            h(n,2)=view(object.Velocity{n},2,gca);
-            set(h(n,:),'Color',color(n,:));
+            label{n}=object.Amplitude{n}.Name;       
+            h(n)=view(object.Amplitude{n},gca);            
+            set(h(n),'Color',color(n,:));
+        end    
+        ylabel('Signal amplitude');        
+        xlabel('Time');
+        legend(h,label,'Location','best');
+    case 'uncertainty'
+        N=numel(object.Uncertainty);
+        if N==0
+            assert(~isempty(object.RMSnoise),'ERROR: uncertainty not calculated because RMSnoise is not defined');
+            error('ERROR: uncertainty has not been calculated yet.  Use the "analyze" method.');
+        end        
+        SMASH.MUI.Figure;
+        axes('Box','on');
+        color=lines(N);
+        h=nan(N,1);
+        label=cell(N,1);
+        for n=1:N
+            label{n}=object.Uncertainty{n}.Name;
+            h(n)=view(object.Uncertainty{n},gca);
+            set(h(n),'Color',color(n,:));
         end
-        set(ha,'Box','on');
-        ylabel(ha(1),'Velocity');
-        xlabel(ha(2),'Time');
-        ylabel(ha(2),'Uncertainty');
-        legend(h(:,1),label,'Location','best');
-        warning off; %#ok<WNOFF>
-        title(ha(2),'');        
-        linkaxes(ha,'x');
-        warning on; %#ok<WNON>
+        ylabel('Uncertainty');
+        xlabel('Time');
+        legend(h,label,'Location','best');
     otherwise
         error('ERROR: invalid view mode');
 end

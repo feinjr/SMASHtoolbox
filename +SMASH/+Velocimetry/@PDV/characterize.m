@@ -2,25 +2,25 @@
 %
 % This method characterizes a time-frequency region in a PDV measurement.
 % Several characterization modes are supported:
-%    -'reference' determines the reference frequency, i.e. the
-%     beat frequency associated with zero velocity. 
+%    -'reference' determines the reference frequency.
 %    -'noise' determines the RMS noise of the signal.
-%
-% Characterization is performed over a manually specified or interactively
-% selected region.
-%    result=characterize(object,mode,...);
-% Name/value pairs specified after the mode control the time and frequency
+% The characterization time and frequency range can be selected
+% interactively.
+%    f0=characterize(object,'reference');
+%    RMS=characterize(object,'noise');
+% Manually specifed time and frequency ranges can also be specified.
 % bounds of the characterization region.  Several examples are shown below.
-%    f0=characterize(object,'reference'); % interactive selection
 %    f0=characterize(object,'reference','time',[t1 t2]); % use all frequencies
-%    f0=characterize(object,'reference','frequency',[f1 f2]); % use all times
+%    RMS=characterize(object,'noise','frequency',[f1 f2]); % use all times
 %    f0=characterize(object,'reference','time',[t1 t2],'frequency',[f1 f2]); 
 %
-% See also PDV
+% See also PDV, analyze
 %
 
 %
 % revised Feburary 7, 2017 by Daniel Dolan (Sandia National Laboratory)
+% updated March 14, 2017 by Daniel Dolan
+%   -clarified documentation
 %
 function result=characterize(object,mode,varargin)
 
@@ -59,8 +59,10 @@ for n=1:2:Narg
 end
 
 if isempty(option.Time) && isempty(option.Frequency)
-    assert(~isempty(object.Preview),...
-        'ERROR: interactive region selection cannot be performed without a preview image');
+    if isempty(object.Preview);
+        warning('SMASH:PDV','Generating preview image because none was found');
+        object=preview(object);
+    end
     preview(object);
     fig=gcf;
     ha=gca;
@@ -112,7 +114,7 @@ switch mode
         if isempty(object.Bandwidth)
             bandwidth=fNyquist/2;
             warning('PDV:characterize',...
-                'Assuming bandwidth is half of the Nyquist frequency');
+                'No bandwidth given--assuming half of the Nyquist frequency');
         else
             bandwidth=object.Bandwidth;
         end  
@@ -123,9 +125,11 @@ switch mode
         P=P(keep);
         correction=noisefloor/mean(P);
         result=sqrt(correction);
-    case 'reference'
-        [~,index]=max(P);
-        result=f(index);   
+    case 'reference'       
+        index=(P >= (0.50*max(P)));
+        f=f(index);
+        P=P(index);
+        result=trapz(f,f.*P)/trapz(f,P);
 end
 
 end

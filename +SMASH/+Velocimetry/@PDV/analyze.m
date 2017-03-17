@@ -1,10 +1,17 @@
 % analyze Perform history analysis
 %
-%
 % This method performs PDV history analysis.
+%    object=analyze(object);
+% The current analysis mode is 'robust', which uses centroid calculations
+% for broad features and parabolic refinement for narrow features.
 %
+% Calling this method updates the Frequency and Amplitude properties and
+% resets the Velocity property.  The Frequency property has at least one
+% data set per boundary selection.  The second data set, which descibes
+% uncertainty, is only generated if the RMSnoise property has been
+% specified.
 %
-% See also PDV, bound, convert, partition
+% See also PDV, bound, characterize,convert, partition
 %
 
 %
@@ -66,18 +73,14 @@ data=object.STFT;
 data.Measurement=crop(data.Measurement,[start stop]);
 
 %% perform analysis
-param.Bandwidth=object.Bandwidth;
-param.RMSnoise=object.RMSnoise;
-
-t=object.STFT.Measurement.Grid;
-param.SampleInterval=abs(t(end)-t(1))/(numel(t)-1);
-
 switch lower(mode)
     case 'robust' 
         if nargin > 2
-            warning('SMASH:PDV','Extra inputs are not passed in robust analysis');
+            warning('SMASH:PDV',...
+                'Extra inputs are not passed in robust analysis');
         end
-        object.Frequency=analyzeRobust(data,boundary,param);
+        [object.AnalysisResult,extra]=analyzeRobust(data,boundary);
+        object.STFT.FFToptions.NumberFrequencies=extra.NumberFrequencies;
     case 'power'        
         %object.Frequency=analyzeSpectrum(data,boundary,...
         %    param,varargin{:});
@@ -89,7 +92,5 @@ switch lower(mode)
     otherwise
         error('ERROR: %s is not a valid analysis mode',mode);
 end
-
-object.Velocity={}; 
 
 end

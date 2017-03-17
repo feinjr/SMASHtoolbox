@@ -59,7 +59,7 @@ switch lower(type)
             'ERROR: invalid transfer table');
         frequency=value(:,1);
         transfer=value(:,2);
-        temp=interp1(frequency,transfer,[0 object.NyquistValue]);
+        temp=interp1(abs(frequency),transfer,[0 object.NyquistValue]);
         assert(~any(isnan(temp)),...
             'ERROR: transfer table does not span the complete frequency range');
     case 'function'
@@ -68,7 +68,7 @@ switch lower(type)
         end
         assert(isa(value,'function_handle'),'ERROR: invalid transfer function');
         frequency=object.TransferTable(:,1);
-        transfer=value(frequency);
+        transfer=value(abs(frequency));
     otherwise
         error('ERROR: invalid transfer mode');
 end
