@@ -82,6 +82,30 @@ for n=1:2:Narg
             object.Settings.Filters = value;
             
         case 'configuration'
+            assert(ischar(value), 'ERROR: Configuration name must be a string');
+            switch value
+                case {'DCI-L', 'DCIL', 'DCXI-L', 'DCXIL'}
+                    object.Settings.BraggAngle = 81.51;
+                    object.Settings.Crystal = 'Ge 220';
+                    object.Settings.TwoD =  3.939;
+                    object.Settings.Magnification = 5.8;
+                    object.Settings.Configuration = value;
+                    
+                case {'DCI-R', 'DCIR', 'DCXI-R', 'DCXIR'}
+                    object.Settings.BraggAngle = 82.83;
+                    object.Settings.Crystal = 'Ge 220';
+                    object.Settings.TwoD =  3.939;
+                    object.Settings.Magnification = 5.8;
+                    object.Settings.Configuration = value;
+                    
+                case {'continuum', 'CXI'}
+                    object.Settings.BraggAngle = 82.91;
+                    object.Settings.Crystal = 'Ge 220';
+                    object.Settings.TwoD =  3.939;
+                    object.Settings.Magnification = 5.8;
+                    object.Settings.Configuration = value;
+                    
+            end
             
         case {'bragg angle', 'braggangle'}
             assert(isnumeric(value) && isscalar(value),...
@@ -91,7 +115,7 @@ for n=1:2:Narg
         case 'magnification'
             assert(isnumeric(value) && isscalar(value),...
                 'ERROR: Magnification must be scalar numeric value');
-            object.Settings.BraggAngle=value;            
+            object.Settings.Magnification=value;            
         
         case 'crystal'
             assert(ischar(value), 'Error: Crystal must be a string');
