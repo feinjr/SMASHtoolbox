@@ -126,7 +126,7 @@ switch option
         obj_smooth = smooth(obj,'mean',[4,4]);
         
         if isempty(clims)
-            clims = [-100 8000];
+            clims = [-100 10000];
         end
         if isempty(Levels)
             Levels = [0.05, 0.1, 0.2, 0.4];
@@ -170,7 +170,7 @@ switch option
         p = object.Summary;
         
         if isempty(clims)
-            clims = [-100 8000];
+            clims = [-100 10000];
         end
         
         if isempty(AspectRatio_in)

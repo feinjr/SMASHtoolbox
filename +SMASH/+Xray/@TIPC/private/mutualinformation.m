@@ -12,6 +12,9 @@ dimen = 256;
 J = round((dimen-1)*(J - min(J(:)))/(max(J(:)) - min(J(:))));
 K = round((dimen-1)*(K - min(K(:)))/(max(K(:)) - min(K(:))));
 
+J(isnan(J)) = 0;
+K(isnan(K)) = 0;
+
 % J = round((dimen-1)*J/max(J(:)));
 % K = round((dimen-1)*K/max(K(:)));
 
