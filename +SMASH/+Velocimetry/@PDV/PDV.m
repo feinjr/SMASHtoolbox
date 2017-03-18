@@ -23,7 +23,11 @@
 %
 classdef PDV
     %%    
+    properties (SetAccess=protected)
+        Comments = '' % User comments (long description)
+    end
     properties
+        Name = 'PDV object' % Object name (short description) 
         STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
         Boundary = {} % ROI boundaries (BoundaryCurve object)
@@ -42,7 +46,9 @@ classdef PDV
     properties (Dependent=true)        
         Amplitude = {}   % Amplitude results (cell array of Signal objects)
         Frequency = {}   % Frequency results (cell array of Signal objects)
-        Uncertainty = {} % Uncertainty results (cell array of Signal objects)
+        FrequencyUncertainty = {} % Frequency uncertainty results (cell array of Signal objects)
+        Velocity = {} % Velocity results (cell array of Signal objects)
+        VelocityUncertainty = {} % Velocity uncertainty results (cell array of Signal objects)
     end
     properties (SetAccess=protected,Hidden=true)
         NoiseDefined=false % Indicates if noise has been defined
@@ -66,6 +72,10 @@ classdef PDV
     end
     %% setters
     methods
+        function object=set.Name(object,value)
+            assert(ischar(value),'ERROR: invalid Name');
+            object.Name=value;
+        end
         function object=set.STFT(object,value)
             assert(strcmpi(class(value),'SMASH.SignalAnalysis.STFT'),...
                 'ERROR: invalid STFT value');
@@ -150,7 +160,7 @@ classdef PDV
                 object.NoiseSignal.Amplitude=value;
             catch
                 error('ERROR: invalid NoiseAmplitude value');
-            end   
+            end
             object.NoiseDefined=true;
         end
         function value=get.NoiseAmplitude(object)
@@ -160,45 +170,78 @@ classdef PDV
                 error('ERROR: NoiseAmplitude has not been defined yet');
             end
         end
-        function value=get.Frequency(object)
-            if object.Analyzed
-                value=object.AnalysisResult;
-                for n=1:numel(value)
-                    temp=split(value{n});
-                    value{n}=temp;
-                end
-            else
-                error('ERROR: analysis has not been performed yet');
-            end
-        end
         function value=get.Amplitude(object)
             if object.Analyzed
                 value=object.AnalysisResult;
                 for n=1:numel(value)
+                    name=value{n}.Name;
                     [~,temp]=split(value{n});
                     value{n}=temp;
+                    value{n}.Name=name;
                 end
             else
                 error('ERROR: analysis has not been performed yet');
             end
         end
-        function value=get.Uncertainty(object)
-            if object.Analyzed
-                assert(object.NoiseDefined,'ERROR: noise amplitude is undefined');                
-                t=object.STFT.Measurement.Grid;
-                T=abs(t(end)-t(1))/(numel(t)-1);
-                fs=1/T;
+        function value=get.Frequency(object)
+            if object.Analyzed               
                 value=object.AnalysisResult;
                 for n=1:numel(value)
-                    [~,amplitude,duration]=split(value{n});
-                    value{n}=amplitude; % object copy
-                    temp=sqrt(6./(fs*(duration.Data).^3))*object.NoiseAmplitude./amplitude.Data/pi;
-                    %temp(isinf(temp))=fs/2;
-                    value{n}=reset(value{n},[],temp);
+                    name=value{n}.Name;
+                    temp=split(value{n});
+                    value{n}=temp;
+                    value{n}.Name=name;
                 end
             else
                 error('ERROR: analysis has not been performed yet');
             end
         end        
+        function value=get.FrequencyUncertainty(object)
+            if object.Analyzed
+                assert(object.NoiseDefined,'ERROR: noise amplitude is undefined');
+                t=object.STFT.Measurement.Grid;
+                T=abs(t(end)-t(1))/(numel(t)-1);
+                fs=1/T;
+                value=object.AnalysisResult;
+                for n=1:numel(value)
+                    name=value{n}.Name;
+                    [~,amplitude,duration]=split(value{n});
+                    value{n}=amplitude; % object copy
+                    temp=sqrt(6./(fs*(duration.Data).^3))*object.NoiseAmplitude./amplitude.Data/pi;
+                    %temp(isinf(temp))=fs/2;
+                    value{n}=reset(value{n},[],temp);
+                    value{n}.DataLabel='Frequency uncertainty';
+                    value{n}.Name=name;
+                end
+            else
+                error('ERROR: analysis has not been performed yet');
+            end
+        end
+        function value=get.Velocity(object)
+            if object.Analyzed
+                value=object.Frequency;
+                for n=1:numel(value)
+                    name=value{n}.Name;
+                    value{n}=object.Wavelength/2*(value{n}-object.ReferenceFrequency);
+                    value{n}.DataLabel='Velocity';
+                    value{n}.Name=name;
+                end
+            else
+                error('ERROR: analysis has not been performed yet'); 
+            end
+        end
+        function value=get.VelocityUncertainty(object)
+            if object.Analyzed
+                value=object.FrequencyUncertainty;
+                for n=1:numel(value)
+                    name=value{n}.Name;
+                    value{n}=object.Wavelength/2*value{n};
+                    value{n}.DataLabel='Velocity uncertainty';
+                    value{n}.Name=name;
+                end
+            else
+                error('ERROR: analysis has not been performed yet'); 
+            end
+        end
     end
 end

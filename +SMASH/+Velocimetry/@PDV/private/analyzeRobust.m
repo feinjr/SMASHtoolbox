@@ -34,7 +34,9 @@ AmplitudeCalibration=AmplitudeCalibration(2);
 extra.NumberFrequencies=data.FFToptions.NumberFrequencies;
 
 % 
-noise=defineGrid(noise,t);
+if ~isempty(noise)
+    noise=defineGrid(noise,t);
+end
 
 % analyze boundary regions
 Nboundary=numel(boundary);
@@ -54,12 +56,14 @@ raw=analyze(data,@processBlock);
             temp=crop(spectrum,[left right]);
             value=findPeak(temp.Grid,temp.Data);
             % estimate artifact density
-            noise=generate(noise);
-            [f,P]=fft(noise.Measurement,data.FFToptions);
-            keep=(f >= left) & (f <= right);
-            artifact=findPeak(f(keep),P(keep));
-            value(2)=value(2)-artifact(2);
-            value(2)=max(value(2),0);
+            if ~isempty(noise)
+                noise=generate(noise);
+                [f,P]=fft(noise.Measurement,data.FFToptions);
+                keep=(f >= left) & (f <= right);
+                artifact=findPeak(f(keep),P(keep));
+                value(2)=value(2)-artifact(2);
+                value(2)=max(value(2),0);
+            end
             value(3)=duration;
             parameter(:,nn)=value;
         end
@@ -104,8 +108,7 @@ while true
     area=trapz(xi,yi);
     wi=yi/area;
     center=trapz(xi,wi.*xi);
-    width=sqrt(trapz(xi,wi.*(xi-center).^2));
-    %fprintf('%d : %g %g\n',iteration,center,width);    
+    width=sqrt(trapz(xi,wi.*(xi-center).^2)); 
     minwidth=4*width;
     keep= (abs(x-center) < (minwidth));    
     if iteration==1

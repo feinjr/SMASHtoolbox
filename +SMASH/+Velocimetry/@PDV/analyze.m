@@ -74,6 +74,13 @@ stop=max(stop);
 data=object.STFT;
 data.Measurement=crop(data.Measurement,[start stop]);
 
+%%
+if object.NoiseCharacterized
+    noise=object.NoiseSignal;
+else
+    noise=[];
+end
+
 %% perform analysis
 switch lower(mode)
     case 'robust' 
@@ -81,7 +88,7 @@ switch lower(mode)
             warning('SMASH:PDV',...
                 'Extra inputs are not passed in robust analysis');
         end
-        [object.AnalysisResult,extra]=analyzeRobust(data,boundary,object.NoiseSignal);
+        [object.AnalysisResult,extra]=analyzeRobust(data,boundary,noise);
         object.STFT.FFToptions.NumberFrequencies=extra.NumberFrequencies;
     case 'power'        
         %object.Frequency=analyzeSpectrum(data,boundary,...
