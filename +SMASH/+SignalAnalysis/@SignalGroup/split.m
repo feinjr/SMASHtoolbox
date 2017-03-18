@@ -23,6 +23,8 @@ for n=1:object.NumberSignals
     varargout{n}=SMASH.SignalAnalysis.Signal(object.Grid,object.Data(:,n));
     varargout{n}=limit(varargout{n},bound);
     varargout{n}.Source='SignalGroup split';    
+    varargout{n}.GridLabel=object.GridLabel;
+    varargout{n}.DataLabel=object.Legend{n};
 end
 
 end
