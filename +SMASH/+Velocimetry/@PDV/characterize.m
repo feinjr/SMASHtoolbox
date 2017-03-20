@@ -1,18 +1,19 @@
 % characterize Characterize measurement region.
 %
 % This method characterizes a time-frequency region in a PDV measurement.
+%    object=characterize(object,mode);
 % Several characterization modes are supported:
 %    -'reference' determines the reference frequency.
-%    -'noise' determines the RMS noise of the signal.
-% The characterization time and frequency range can be selected
-% interactively.
-%    f0=characterize(object,'reference');
-%    RMS=characterize(object,'noise');
-% Manually specifed time and frequency ranges can also be specified.
-% bounds of the characterization region.  Several examples are shown below.
-%    f0=characterize(object,'reference','time',[t1 t2]); % use all frequencies
-%    RMS=characterize(object,'noise','frequency',[f1 f2]); % use all times
-%    f0=characterize(object,'reference','time',[t1 t2],'frequency',[f1 f2]); 
+%    -'noise' determines the noise amplitude (and spectrum)
+% By default, the characterization time and frequency range are selected
+% interactively.  
+%    objct=characterize(object,'reference');
+%    object=characterize(object,'noise');
+% Characterization time and frequency ranges can also be specified
+% directly.
+%    object=characterize(object,mode,'time',[t1 t2]); % use all frequencies
+%    object=characterize(object,mode,'frequency',[f1 f2]); % use all times
+%    object=characterize(object,mode,'time',[t1 t2],'frequency',[f1 f2]); 
 %
 % See also PDV, analyze
 %

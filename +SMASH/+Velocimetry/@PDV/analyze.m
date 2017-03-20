@@ -2,9 +2,10 @@
 %
 % This method performs PDV history analysis.
 %    object=analyze(object);
-% The current analysis mode is 'robust', which uses an interative centroid
-% calculation.
-% UNDER CONSTRUCTION
+%
+% See also characterize, partition, view
+%
+
 
 %
 % Calling this method updates the Frequency and Amplitude properties and
@@ -55,7 +56,7 @@ if isempty(boundary)
     table(1,:)=[xlimit(1) NyquistFrequency/2 NyquistFrequency/2];
     table(2,:)=[xlimit(2) NyquistFrequency/2 NyquistFrequency/2];
     boundary=SMASH.ROI.BoundingCurve('horizontal',table);
-    boundary.Label='Default boundary';
+    boundary.Label='Default';
     boundary={boundary};
 end
 

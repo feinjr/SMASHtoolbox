@@ -49,6 +49,7 @@ end
 
 % apply partition settings
 object.STFT=partition(object.STFT,varargin{:});
+object.Analyzed=false;
 
 % manage output
 if nargout>0

@@ -50,13 +50,20 @@ classdef NoiseSignal
     methods (Hidden=true)
         function object=NoiseSignal(Grid)
             assert(nargin>=1,'ERROR: no Grid specified');
-            assert(numel(Grid) >= 16,'ERROR: not enough Grid points');
-            object.Measurement=SMASH.SignalAnalysis.Signal([],nan);           
+            if isempty(Grid)
+                Grid=1:16;
+            else
+                assert(numel(Grid) >= 16,'ERROR: not enough Grid points');
+            end            
+            object.Measurement=SMASH.SignalAnalysis.Signal([],nan);
             object=defineGrid(object,Grid);
             object=defineTransfer(object);
             object=generate(object);
         end
-    end  
+    end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin)
+    end
     %%
     methods
         function object=set.Amplitude(object,value)

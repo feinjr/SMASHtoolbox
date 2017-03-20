@@ -4,7 +4,12 @@
 % exported by default; specific results can be requested by index.
 %    export(object,filename)
 %    export(object,filename,index);
-% The defau
+% The input "index" can be an array of integers or the string 'all'.
+%
+% Five significant digits per column are written by default.  Custom
+% formats may also be specified
+%    export(object,filename,'%#.10g %#.10g'); % two columns with ten signficant digits
+% NOTE: the number of columns 
 %
 
 %

@@ -2,24 +2,23 @@
 % (PDV) measurements.  
 %
 % PDV objects can be constructed from numeric input:
-%     >> object=PDV(time,signal); % time/signal are 1D arrays
+%    object=PDV(time,signal); % time/signal are 1D arrays
 % or by loading data from a file.
-%     >> object=PDV(filename,format,record); % inputs passed to "readFile" 
-% The actual PDV signal is stored in the object's Measurement property as a
-% STFT sub-object. A preview spectrogram can be stored in a separate
-% property as an Image sub-object.  Settings and results are stored in
-% separate structure arrays.
-%
-% History extraction is the ultimate purpose of the PDV class.  Once signal
-% processing, frequency bounding, and setting configuration is complete,
-% the "analyze" method tracks spectral features as a function of time.
+%    object=PDV(filename,format,record); % inputs passed to "readFile" 
+% The actual PDV signal is stored as an object in the STFT property;
+% preview spectrogram can also stored.  
+% 
+% The ultimate purpose of this class is the "analyze" method, which
+% processes signal data to determine beat frequency/amplitude and velocity.
+% Analysis results are stored as cell arrays of Signal objects.
 %
 % See also SMASH.Velocimetry, SMASH.FileAccess.readFile, SMASH.SignalAnalysis.STFT,
-% SMASH.ImageAnalysis.Image, SMASH.SignalAnalysis.SignalGroup
+% SMASH.ImageAnalysis.Image, SMASH.SignalAnalysis.Signal
 %
 
 %
 % created February 18, 2015 by Daniel Dolan (Sandia National Laboratories)
+% substantially revised March 20, 2017 by Daniel Dolan
 %
 classdef PDV
     %%    
@@ -40,13 +39,17 @@ classdef PDV
     end
     properties
         AnalysisMode = 'robust' % Analysis mode
-        Wavelength = 1550e-9 % Target wavelength
-        ReferenceFrequency = 0 % Reference frequency
     end
-    properties (Dependent=true)        
+    properties (Dependent=true,SetAccess=protected)        
         Amplitude = {}   % Amplitude results (cell array of Signal objects)
         Frequency = {}   % Frequency results (cell array of Signal objects)
         FrequencyUncertainty = {} % Frequency uncertainty results (cell array of Signal objects)
+    end
+    properties
+        Wavelength = 1550e-9 % Target wavelength
+        ReferenceFrequency = 0 % Reference frequency
+    end
+    properties (Dependent=true,SetAccess=protected)
         Velocity = {} % Velocity results (cell array of Signal objects)
         VelocityUncertainty = {} % Velocity uncertainty results (cell array of Signal objects)
     end
@@ -129,30 +132,42 @@ classdef PDV
             value=object.STFT.FFToptions.Window;
         end
         function object=set.Window(object,value)
+            old=object.STFT.FFToptions.Window;
             try
                 object.STFT.FFToptions.Window=value;
             catch ME
                 rethrow(ME);
+            end
+            if strcmpi(old,value)
+                object.Analyzed=false;
             end
         end
         function value=get.RemoveDC(object)
             value=object.STFT.FFToptions.RemoveDC;
         end
         function object=set.RemoveDC(object,value)
+            old=object.STFT.FFToptions.RemoveDC;
             try
                 object.STFT.FFToptions.RemoveDC=value;
             catch ME
                 rethrow(ME);
+            end
+            if strcmp(old,value)
+                object.Analyzed=false;
             end
         end
         function value=get.NumberFrequencies(object)
             value=object.STFT.FFToptions.NumberFrequencies;
         end
         function object=set.NumberFrequencies(object,value)
+            old=object.STFT.FFToptions.NumberFrequencies;
             try
                 object.STFT.FFToptions.NumberFrequencies=value;
             catch ME
                 rethrow(ME);
+            end
+            if strcmp(old,value)
+                object.Analyzed=false;
             end
         end
         function object=set.NoiseAmplitude(object,value)
@@ -162,12 +177,15 @@ classdef PDV
                 error('ERROR: invalid NoiseAmplitude value');
             end
             object.NoiseDefined=true;
+            if ~object.NoiseCharacterized
+                warning('SMASH:PDV','Setting noise amplitude without characterization may yield invalid uncertainties');
+            end
         end
         function value=get.NoiseAmplitude(object)
             if object.NoiseDefined
                 value=object.NoiseSignal.Amplitude;
             else
-                error('ERROR: NoiseAmplitude has not been defined yet');
+                value='(undefined)';
             end
         end
         function value=get.Amplitude(object)
@@ -193,12 +211,15 @@ classdef PDV
                     value{n}.Name=name;
                 end
             else
-                error('ERROR: analysis has not been performed yet');
+                value='(not analyzed yet)';                
             end
         end        
         function value=get.FrequencyUncertainty(object)
             if object.Analyzed
-                assert(object.NoiseDefined,'ERROR: noise amplitude is undefined');
+                if ~object.NoiseDefined
+                    value='(undefined)';
+                    return
+                end
                 t=object.STFT.Measurement.Grid;
                 T=abs(t(end)-t(1))/(numel(t)-1);
                 fs=1/T;
@@ -214,7 +235,7 @@ classdef PDV
                     value{n}.Name=name;
                 end
             else
-                error('ERROR: analysis has not been performed yet');
+                value='(not analyzed yet)';
             end
         end
         function value=get.Velocity(object)
@@ -227,11 +248,15 @@ classdef PDV
                     value{n}.Name=name;
                 end
             else
-                error('ERROR: analysis has not been performed yet'); 
+                value='(not analyzed yet)'; 
             end
         end
         function value=get.VelocityUncertainty(object)
             if object.Analyzed
+                if ~object.NoiseDefined
+                    value='(undefined)';
+                    return
+                end
                 value=object.FrequencyUncertainty;
                 for n=1:numel(value)
                     name=value{n}.Name;
@@ -240,7 +265,7 @@ classdef PDV
                     value{n}.Name=name;
                 end
             else
-                error('ERROR: analysis has not been performed yet'); 
+                value='(not analyzed yet)';     
             end
         end
     end

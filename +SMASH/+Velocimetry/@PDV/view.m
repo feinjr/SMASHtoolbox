@@ -44,7 +44,7 @@ switch lower(mode)
         h=h.image;
     case 'frequency'
         assert(object.Analyzed,...
-            'ERROR: frequency has not been calculated yet.  Use the "analyze" method.');
+            'ERROR: frequency not available until after the "analyze" method.');
         N=numel(object.Frequency);
         color=lines(N);
         h=nan(N,1);
@@ -69,12 +69,15 @@ switch lower(mode)
                 ylabel('Frequency');
             end
         end
-        ha=findobj(gcf,'Type','axes');
-        set(ha,'Box','on');
+        haxes=findobj(gcf,'Type','axes');
+        set(haxes,'Box','on');
+        if numel(haxes > 1)
+            linkaxes(haxes,'x');
+        end
         legend(h,label,'Location','best');
     case 'velocity'
         assert(object.Analyzed,...
-            'ERROR: frequency has not been calculated yet.  Use the "analyze" method.');
+            'ERROR: velocity not available until after the "analyze" method.');
         N=numel(object.Velocity);
         color=lines(N);
         h=nan(N,1);
@@ -99,12 +102,15 @@ switch lower(mode)
                 ylabel('Velocity');
             end
         end
-        ha=findobj(gcf,'Type','axes');
-        set(ha,'Box','on');
+        haxes=findobj(gcf,'Type','axes');
+        set(haxes,'Box','on');
+        if numel(haxes > 1)
+            linkaxes(haxes,'x');
+        end
         legend(h,label,'Location','best');
     case 'amplitude'
         N=numel(object.Amplitude);
-        assert(N>0,'ERROR: amplitude has not been calculated yet.  Use the "analyze" method.');
+        assert(N>0,'ERROR: amplitude not available until after the "analyze" method.');
         SMASH.MUI.Figure;
         axes('Box','on');
         color=lines(N);
@@ -117,7 +123,44 @@ switch lower(mode)
         end
         ylabel('Signal amplitude');
         xlabel('Time');
-        legend(h,label,'Location','best');        
+        legend(h,label,'Location','best');     
+        haxes=gca;
+    case 'results'
+        SMASH.MUI.Figure;
+        newfig=gcf;
+        try
+            [~,hA]=view(object,'Amplitude');
+            [~,hF]=view(object,'Frequency');
+            [~,hV]=view(object,'Velocity');
+        catch
+            delete(newfig);
+            error('ERROR: results not available until after the "analyze" method.');
+        end
+        old=ancestor([hA; hF(1); hV(1);],'figure');
+        if numel(hF)==1
+            height=1/2;
+        elseif numel(hF)==2
+            height=1/3;
+        end        
+        new=copyobj(hA,newfig);
+        y=1-height;
+        set(new,'Units','normalized','OuterPosition',[0.25 y 0.50 height]);
+        new=copyobj(hF,newfig);
+        for n=1:numel(new)
+            y=y-height;
+            set(new(n),'Units','normalized','OuterPosition',[0 y 0.50 height]);
+        end
+        new=copyobj(hV,newfig);
+        y=1-height;
+        for n=1:numel(new)
+            y=y-height;
+            set(new(n),'Units','normalized','OuterPosition',[0.50 y 0.50 height]);
+        end        
+        ha=findobj(newfig,'Type','axes');
+        linkaxes(ha,'x');
+        for n=1:numel(old)
+            delete(old{n})
+        end
     otherwise
         error('ERROR: invalid view mode');
 end
@@ -125,6 +168,7 @@ end
 % manage output
 if nargout>0
     varargout{1}=h;
+    varargout{2}=haxes(end:-1:1);
 end
 
 end
