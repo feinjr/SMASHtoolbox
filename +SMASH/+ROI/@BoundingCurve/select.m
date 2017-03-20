@@ -205,8 +205,8 @@ addblock(dlg,'text','Control-click on plot returns to this dialog');
 h=addblock(dlg,'edit_button',{'Default width:','Set all to default'});
 setappdata(dlg.Handle,'DefaultWidth',h(2));
 makeBold(h(1));
-set(h(2),'HorizontalAlignment','center');
-set(h(end),'Callback',{@useWidth,dlg.Handle})
+set(h(2),'HorizontalAlignment','center','Callback',{@updateWidth,dlg.Handle});
+set(h(3),'Callback',{@useWidth,dlg.Handle})
 object2width(object,h(2));
 
 h=addblock(dlg,'button',{'Cancel','Cancel','Cancel'});
@@ -354,6 +354,23 @@ function showPlot(~,~,db)
 
 fig=getappdata(db,'TargetFigure');
 figure(fig);
+
+end
+
+
+function updateWidth(~,~,db)
+
+object=getappdata(db,'CurrentObject');
+dw=getappdata(db,'DefaultWidth');
+
+[value,count]=sscanf(get(dw,'String'),'%g');
+if (count~=1) || (value<0)
+    value=object.DefaultWidth;
+end
+object.DefaultWidth=value;
+object2width(object,dw);
+
+setappdata(db,'CurrentObject',object);
 
 end
 
