@@ -1,4 +1,4 @@
-function [result,extra]=analyzeRobust(data,boundary,noise)
+function [result,extra]=analyzeRobust(data,boundary,BoundaryType,noise)
 
 % initial preparations
 data.FFToptions.FrequencyDomain='positive';
@@ -50,9 +50,15 @@ raw=analyze(data,@processBlock);
             if isnan(fA)
                 continue
             end
-            center=(fA+fB)/2;
-            left=min(fA,center-minwidth);
-            right=max(fB,center+minwidth);
+            switch BoundaryType
+                case 'loose'
+                    center=(fA+fB)/2;
+                    left=min(fA,center-minwidth);
+                    right=max(fB,center+minwidth);
+                case 'strict'
+                    left=fA;
+                    right=fB;
+            end
             temp=crop(spectrum,[left right]);
             value=findPeak(temp.Grid,temp.Data);
             % estimate artifact density

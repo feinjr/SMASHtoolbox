@@ -30,6 +30,7 @@ classdef PDV
         STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
         Boundary = {} % ROI boundaries (BoundaryCurve object)
+        BoundaryType = 'loose' % Boundary type: 'loose' or 'strict'
     end
     properties (Dependent=true)
         Window % FFT window name ('hann', 'hamming', 'boxcar')
@@ -96,6 +97,16 @@ classdef PDV
                     'ERROR: invalid Boundary value');
             end
             object.Boundary=value;
+        end
+        function object=set.BoundaryType(object,value)
+            assert(ischar(value),'ERROR: invalid boundary type');
+            value=lower(value);
+            switch value
+                case {'loose' 'strict'}
+                    object.BoundaryType=value;
+                otherwise
+                    error('ERROR: invalid boundary type');
+            end
         end
         function object=set.AnalysisMode(object,value)
             assert(ischar(value),'ERROR: invalid analysis mode');
@@ -198,7 +209,7 @@ classdef PDV
                     value{n}.Name=name;
                 end
             else
-                error('ERROR: analysis has not been performed yet');
+                value='(undefined)';
             end
         end
         function value=get.Frequency(object)

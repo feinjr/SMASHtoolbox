@@ -136,9 +136,13 @@ switch mode
         object.NoiseDefined=true;
     case 'reference'
         index=(P >= (0.50*max(P)));
-        f=f(index);
-        P=P(index);
-        object.ReferenceFrequency=trapz(f,f.*P)/trapz(f,P);
+        if sum(index) > 1
+            f=f(index);
+            P=P(index);
+            object.ReferenceFrequency=trapz(f,f.*P)/trapz(f,P);
+        else
+            object.ReferenceFrequency=f(index);
+        end                   
 end
 
 end
