@@ -26,31 +26,42 @@ classdef PDV
         Comments = '' % User comments (long description)
     end
     properties
-        Name = 'PDV object' % Object name (short description) 
+        Name = 'PDV object' % Object name (short description)
+    end
+    %%
+    properties (Dependent=true)
         STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
         Boundary = {} % ROI boundaries (BoundaryCurve object)
-        BoundaryType = 'loose' % Boundary type: 'loose' or 'strict'
+        BoundaryType  % Boundary type: 'loose' or 'strict'
+        AnalysisMode % Analysis mode : 'robust'
     end
+    properties (SetAccess=protected, Dependent=true)
+        Analyzed % Indicates if analysis performed and current (logical)
+    end
+    properties (Access=private)
+        PrivateSTFT
+        % Private Preview property not needed
+        PrivateBoundary
+        PrivateBoundaryType = 'loose'
+        PrivateAnalysisMode = 'robust'
+        PrivateAnalyzed=false
+    end
+    %%
     properties (Dependent=true)
         Window % FFT window name ('hann', 'hamming', 'boxcar')
         RemoveDC % Remove DC level before FFT (logical)
         NumberFrequencies % Number of frequency points in FFT [min max]
-        NoiseAmplitude  % Time-domain RMS noise of the PDV measurement
-    end
-    properties
-        AnalysisMode = 'robust' % Analysis mode
+        NoiseAmplitude  % Time-domain RMS noise of the PDV measurement    
+    end 
+     properties
+        Wavelength = 1550e-9 % Target wavelength
+        ReferenceFrequency = 0 % Reference frequency
     end
     properties (Dependent=true,SetAccess=protected)        
         Amplitude = {}   % Amplitude results (cell array of Signal objects)
         Frequency = {}   % Frequency results (cell array of Signal objects)
         FrequencyUncertainty = {} % Frequency uncertainty results (cell array of Signal objects)
-    end
-    properties
-        Wavelength = 1550e-9 % Target wavelength
-        ReferenceFrequency = 0 % Reference frequency
-    end
-    properties (Dependent=true,SetAccess=protected)
         Velocity = {} % Velocity results (cell array of Signal objects)
         VelocityUncertainty = {} % Velocity uncertainty results (cell array of Signal objects)
     end
@@ -58,7 +69,6 @@ classdef PDV
         NoiseDefined=false % Indicates if noise has been defined
         NoiseCharacterized=false % Indicates if noise has been characterized
         NoiseSignal % NoiseSignal object
-        Analyzed=false; % Indicates if analysis has been performed
         AnalysisResult % cell array of SignalGroup objects [peak_location signal_amplitude effective_duration]
     end
     %%
@@ -80,34 +90,59 @@ classdef PDV
             assert(ischar(value),'ERROR: invalid Name');
             object.Name=value;
         end
+        %%
         function object=set.STFT(object,value)
             assert(strcmpi(class(value),'SMASH.SignalAnalysis.STFT'),...
                 'ERROR: invalid STFT value');
-            object.STFT=value;
+            object.PrivateSTFT=value;
+            object.Analyzed=false;
         end
+        function value=get.STFT(object)
+            value=object.PrivateSTFT;
+        end 
+        %%
         function object=set.Preview(object,value)
-            assert(strcmpi(class(value),'SMASH.ImageAnalysis.Image'),...
-                'ERROR: invalid Preview value');
+            if isempty(value)
+                % continue
+            else
+                assert(strcmpi(class(value),'SMASH.ImageAnalysis.Image'),...
+                    'ERROR: invalid Preview value');
+            end
             object.Preview=value;
         end
+        %%
         function object=set.Boundary(object,value)
-            assert(iscell(value),'ERROR: invalid Boundary value');
-            for n=1:numel(value)
-                assert(strcmpi(class(value{n}),'SMASH.ROI.BoundingCurve'),...
-                    'ERROR: invalid Boundary value');
+            if isempty(value)
+                % continue
+            else
+                assert(iscell(value),'ERROR: invalid Boundary value');
+                for n=1:numel(value)
+                    assert(strcmpi(class(value{n}),'SMASH.ROI.BoundingCurve'),...
+                        'ERROR: invalid Boundary value');
+                end
             end
-            object.Boundary=value;
+            object.PrivateBoundary=value;
+            object.Analyzed=false;
         end
+        function value=get.Boundary(object)
+            value=object.PrivateBoundary;
+        end
+        %%
         function object=set.BoundaryType(object,value)
             assert(ischar(value),'ERROR: invalid boundary type');
             value=lower(value);
             switch value
                 case {'loose' 'strict'}
-                    object.BoundaryType=value;
+                    object.PrivateBoundaryType=value;
                 otherwise
                     error('ERROR: invalid boundary type');
             end
+            object.Analyzed=false;
         end
+        function value=get.BoundaryType(object)
+            value=object.PrivateBoundaryType;
+        end
+        %%
         function object=set.AnalysisMode(object,value)
             assert(ischar(value),'ERROR: invalid analysis mode');
             value=lower(value);
@@ -117,7 +152,24 @@ classdef PDV
                 otherwise
                     error('ERROR: invalid analysis mode');
             end
+            object.PrivateAnalysisMode=value;
+            object.Analyzed=false;
         end
+        function value=get.AnalysisMode(object)
+            value=object.PrivateAnalysisMode;
+        end
+        %%
+        function object=set.Analyzed(object,value)
+            assert(islogical(value),'ERROR: invalid Analyzed value');
+            object.PrivateAnalyzed=value;
+            if ~value
+                object.AnalysisResult=[];
+            end
+        end
+        function value=get.Analyzed(object)
+            value=object.PrivateAnalyzed;
+        end
+        %%
         function object=set.Wavelength(object,value)
             if isempty(value)
                 % do nothing
@@ -149,7 +201,7 @@ classdef PDV
             catch ME
                 rethrow(ME);
             end
-            if strcmpi(old,value)
+            if ~strcmpi(old,value)       
                 object.Analyzed=false;
             end
         end
@@ -163,7 +215,7 @@ classdef PDV
             catch ME
                 rethrow(ME);
             end
-            if strcmp(old,value)
+            if ~strcmp(old,value)
                 object.Analyzed=false;
             end
         end
@@ -177,7 +229,7 @@ classdef PDV
             catch ME
                 rethrow(ME);
             end
-            if strcmp(old,value)
+            if ~strcmp(old,value)
                 object.Analyzed=false;
             end
         end
