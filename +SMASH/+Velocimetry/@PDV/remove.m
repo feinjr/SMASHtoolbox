@@ -57,7 +57,7 @@ if (nargin<5) || isempty(options)
 end
 
 % analyze reference domain
-local=limit(object.Measurement,reference);
+local=limit(object.STFT.Measurement,reference);
 [f,P]=fft(local,'RemoveDC',true,'NumberFrequencies',1e6);
 
 keep= (f>=bound(1)) & (f<=bound(2));
@@ -92,11 +92,14 @@ signal=signal(:);
 f0=fminbnd(@residual,fA,fB,options);
 [~,amplitude]=residual(f0);
 
-time=object.Measurement.Grid;
-signal=object.Measurement.Data;
+time=object.STFT.Measurement.Grid;
+signal=object.STFT.Measurement.Data;
 fit=amplitude(1)*cos(2*pi*f0*time)+amplitude(2)*sin(2*pi*f0*time);
-object.Measurement=object.Measurement-fit;
+object.STFT.Measurement=object.STFT.Measurement-fit;
 
 param=[f0 amplitude(1) amplitude(2)];
+
+object.Analyzed=false;
+object.Preview=[];
 
 end
