@@ -175,6 +175,7 @@ end
 
 % manage output
 if nargout>0
+    object.Analyzed=false;    
     varargout{1}=object;
 end
 
