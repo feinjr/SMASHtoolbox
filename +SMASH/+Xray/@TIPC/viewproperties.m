@@ -42,7 +42,11 @@ switch option
     % View the full, raw TIPC image
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Data'
+        if isempty(clims)
+            clims = [-100 6000];
+        end
         obj = object.Measurement;
+        obj.DataLim = clims;
         obj.Grid1Label = 'Radial Distance [mm]';
         obj.Grid2Label = 'Axial Distance [mm]';
         obj.DataLabel = 'Exposure';

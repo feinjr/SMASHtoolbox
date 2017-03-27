@@ -69,6 +69,7 @@ uiwait
 
 for n = 1:object.Settings.NumberImages
     img = SMASH.ImageAnalysis.Image(imgs.Grid1,imgs.Grid2,imgs.Data(:,:,n));
+    img.DataLim = imgs.DataLim;
     
     mask = limit(img,'manual');
     xlims = [mask.LimitIndex1(1), mask.LimitIndex1(end)];
