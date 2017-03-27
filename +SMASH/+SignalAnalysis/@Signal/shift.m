@@ -1,7 +1,9 @@
 % SHIFT Shift object Grid array
 %
 % This method adds a Signal object's Grid array with a scalar value,
-% stretching or compressing the horizontal axis.
+% shifting the horizontal axis.
+%    object=shift(object,value);
+% 
 %
 % See also Signal, map, scale
 %

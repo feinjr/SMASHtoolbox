@@ -2,6 +2,7 @@
 %
 % This method multiplies a Signal object's Grid array by a scalar value,
 % stretching or compressing the horizontal axis.
+%    object=scale(object,value);
 %
 % See also Signal, map, shift
 %

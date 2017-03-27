@@ -38,7 +38,7 @@ classdef PDV
     properties
         Name = 'PDV object' % Object name (short description)
     end
-    %%
+    %%    
     properties (Dependent=true)
         STFT % PDV measurement (STFT object)
         Preview % Preview spectrogram (Image object)
@@ -51,7 +51,7 @@ classdef PDV
     end
     properties (Access=private)
         PrivateSTFT
-        % Private Preview property not needed
+        PrivatePreview
         PrivateBoundary
         PrivateBoundaryType = 'loose'
         PrivateAnalysisMode = 'robust'
@@ -118,7 +118,10 @@ classdef PDV
                 assert(strcmpi(class(value),'SMASH.ImageAnalysis.Image'),...
                     'ERROR: invalid Preview value');
             end
-            object.Preview=value;
+            object.PrivatePreview=value;
+        end
+        function value=get.Preview(object)
+            value=object.PrivatePreview;
         end
         %%
         function object=set.Boundary(object,value)
