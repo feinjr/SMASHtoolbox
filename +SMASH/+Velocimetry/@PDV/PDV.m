@@ -12,6 +12,16 @@
 % processes signal data to determine beat frequency/amplitude and velocity.
 % Analysis results are stored as cell arrays of Signal objects.
 %
+% NOTE: property changes may reset analysis results stored in the object.
+% These changes may be explicit:
+%    object.BoundaryType='loose';
+% or implicit.
+%    object=bound(object);
+% The Analyzed property indicates if analysis has been performed for the
+% current property state.  Property changes that do *not* require
+% reanalysis include Comments (via the comment method), Name, Preview,
+% NoiseAmplitude, Wavelength, and ReferenceFrequency.
+%
 % See also SMASH.Velocimetry, SMASH.FileAccess.readFile, SMASH.SignalAnalysis.STFT,
 % SMASH.ImageAnalysis.Image, SMASH.SignalAnalysis.Signal
 %
@@ -45,7 +55,7 @@ classdef PDV
         PrivateBoundary
         PrivateBoundaryType = 'loose'
         PrivateAnalysisMode = 'robust'
-        PrivateAnalyzed=false
+        PrivateAnalyzed = false
     end
     %%
     properties (Dependent=true)

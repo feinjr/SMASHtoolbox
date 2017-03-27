@@ -89,8 +89,9 @@ switch lower(mode)
             warning('SMASH:PDV',...
                 'Extra inputs are not passed in robust analysis');
         end
-        [object.AnalysisResult,extra]=analyzeRobust(data,boundary,object.BoundaryType,noise);
+        [result,extra]=analyzeRobust(data,boundary,object.BoundaryType,noise);
         object.STFT.FFToptions.NumberFrequencies=extra.NumberFrequencies;
+        object.AnalysisResult=result;
     case 'power'        
         %object.Frequency=analyzeSpectrum(data,boundary,...
         %    param,varargin{:});

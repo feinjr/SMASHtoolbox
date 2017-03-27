@@ -15,6 +15,9 @@
 % the characterize method, view shows the calculated result (frequency or
 % velocity) along with the estimated uncertainty.
 %
+% To view all results:
+%    view(object,'Results');
+%
 % Specifying an output returns graphic handles for lines from this method.
 %     >> h=view(...);
 %
