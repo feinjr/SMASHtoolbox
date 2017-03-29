@@ -27,6 +27,10 @@ function [ varargout ] = viewproperties( object, varargin )
 %%
 Narg=numel(varargin);
 clims = [];
+AspectRatio_in = [];
+xlims = [-0.05, 0.05];
+ylims = [-0.45, 0.45];
+DataScale = 'lin';
 
 if Narg == 0
     view(object.Measurement)
@@ -35,6 +39,17 @@ elseif Narg == 1
 elseif Narg == 2
     option = varargin{1};
     clims = varargin{2};
+elseif Narg > 2
+    option = varargin{1};
+    clims = varargin{2};
+    for i = 1:length(varargin)
+        if strcmp(varargin{i},'Levels'); Levels = varargin{i+1};
+        elseif strcmp(varargin{i},'AspectRatio'); AspectRatio_in = varargin{i+1};
+        elseif strcmp(varargin{i},'XLims'); xlims = varargin{i+1};
+        elseif strcmp(varargin{i},'YLims'); ylims = varargin{i+1};
+        elseif strcmp(varargin{i},'DataScale'); DataScale = varargin{i+1};
+        end
+    end
 end
 
 switch option
@@ -67,6 +82,15 @@ switch option
         if isempty(clims)
             clims = [-100 6000];
         end
+        if isempty(AspectRatio_in)
+            obj.GraphicOptions.AspectRatio = 'auto';
+        else
+            obj.GraphicOptions.AspectRatio = AspectRatio_in;
+        end
+        
+        if isempty(xlims); xlims = [obj.Grid1(1), obj.Grid1(end)]; end
+        if isempty(ylims); ylims = [obj.Grid2(1), obj.Grid2(end)]; end
+        
         filters = object.Settings.Filters;
         filter_label = cell(object.Settings.NumberImages,1);
         channel = object.Images.Legend;
@@ -104,8 +128,8 @@ switch option
                 ax(i).YTickLabel = '';
             end
             set(gca,'CLim',clims)
-            xlim([obj.Grid1(1), obj.Grid1(end)])
-            ylim([obj.Grid2(1), obj.Grid2(end)])
+            xlim(xlims)
+            ylim(ylims)
         end
         linkaxes(ax)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,6 +146,14 @@ switch option
         if isempty(clims)
             clims = [-100 6000];
         end
+        if isempty(xlims); xlims = [obj.Grid1(1), obj.Grid1(end)]; end
+        if isempty(ylims); ylims = [obj.Grid2(1), obj.Grid2(end)]; end
+        if isempty(AspectRatio_in)
+            obj.GraphicOptions.AspectRatio = 'auto';
+        else
+            obj.GraphicOptions.AspectRatio = AspectRatio_in;
+        end
+       
         filters = object.Settings.Filters;
         filter_label = cell(object.Settings.NumberImages,1);
         channel = object.Images.Legend;
@@ -159,8 +191,8 @@ switch option
                 ax(i).YTickLabel = '';
             end
             set(gca,'CLim',clims)
-            xlim([obj.Grid1(1), obj.Grid1(end)])
-            ylim([obj.Grid2(1), obj.Grid2(end)])
+            xlim(xlims)
+            ylim(ylims)
         end
         linkaxes(ax)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,6 +209,14 @@ switch option
         if isempty(clims)
             clims = [-100 6000];
         end
+        if isempty(xlims); xlims = [obj.Grid1(1), obj.Grid1(end)]; end
+        if isempty(ylims); ylims = [obj.Grid2(1), obj.Grid2(end)]; end
+        if isempty(AspectRatio_in)
+            obj.GraphicOptions.AspectRatio = 'auto';
+        else
+            obj.GraphicOptions.AspectRatio = AspectRatio_in;
+        end
+
         filters = object.Settings.Filters;
         filter_label = cell(object.Settings.NumberImages,1);
         channel = object.Images.Legend;
@@ -225,8 +265,8 @@ switch option
             if i ~= 1
                 ax(i).YTickLabel = '';
             end
-            xlim([obj.Grid1(1), obj.Grid1(end)])
-            ylim([obj.Grid2(1), obj.Grid2(end)])
+            xlim(xlims)
+            ylim(xlims)
             
         end
         linkaxes(ax)
@@ -246,6 +286,9 @@ switch option
         if isempty(clims)
             clims = [-100 6000];
         end
+        if isempty(xlims); xlims = [obj.Grid1(1), obj.Grid1(end)]; end
+        if isempty(ylims); ylims = [obj.Grid2(1), obj.Grid2(end)]; end
+
         filters = object.Settings.Filters;
         filter_label = cell(object.Settings.NumberImages,1);
         channel = object.Images.Legend;
@@ -285,8 +328,8 @@ switch option
                 ax(i).YTickLabel = '';
             end
             set(gca,'CLim',clims)
-            xlim([obj.Grid1(1), obj.Grid1(end)])
-            ylim([obj.Grid2(1), obj.Grid2(end)])
+            xlim(xlims)
+            ylim(ylims)
         end
         linkaxes(ax)
         
@@ -298,7 +341,7 @@ switch option
         barh(object.Summary.Yvalues, object.Summary.Intensity,'stacked')
         legend(filter_label,'Location','SouthEast')
         ax2.YTickLabel = '';
-        ylim([obj.Grid2(1), obj.Grid2(end)])
+        ylim(ylims)
         xlabel('Intensity [A.U.]')
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

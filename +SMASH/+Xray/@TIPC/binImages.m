@@ -32,7 +32,6 @@ for i = 1:length(varargin)
     if strcmp(varargin{i},'yLimits'); yLimits = varargin{i+1};
     end    
 end
-
 YY = zeros(Nslices,1);
 
 Integral = zeros(Nslices, Nchannels);
@@ -46,11 +45,10 @@ for i = 1:Nchannels
         if i == 1
            YY(n) = mean(yCrop); 
         end
-        temp = crop(object.Images,[],[yCrop(2) yCrop(1)]);
+        temp = crop(object.RegisteredImages,[],[yCrop(2) yCrop(1)]);
         hpts = length(temp.Grid2);
         
         lineout = SMASH.SignalAnalysis.Signal(temp.Grid1, trapz(temp.Grid2,temp.Data(:,:,i),1));
-        
         cfit = SMASH.CurveFit.Curve;
         gaussian=SMASH.CurveFit.makePeak('gaussian');        
 
