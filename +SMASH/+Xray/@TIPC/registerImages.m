@@ -86,7 +86,7 @@ if manual
         img1 = shift(img1,'Grid2',-1*midpoint1);
         xs = [-1*report1.Location; -1*midpoint1];
         
-    else xs = object.Settings.Shifts(:,i);
+    else xs = object.Settings.Shifts(:,ref);
         img1 = shift(img1,'Grid1',xs(1));
         img1 = shift(img1,'Grid2',xs(2));
     end
@@ -97,6 +97,7 @@ if manual
     
     for i = 1:Nchannels;
         if i ~= ref
+            xs = object.Settings.Shifts(:,i);
             moving = SMASH.ImageAnalysis.Image(object.Images.Grid1,object.Images.Grid2,object.Images.Data(:,:,i));
             moving = shift(moving,'Grid1',xs(1)); moving = shift(moving,'Grid2',xs(2));
             
