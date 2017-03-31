@@ -63,7 +63,7 @@ for n=1:2:Narg
              assert(isnumeric(value) & isscalar(value),'ERROR: invalid scale'); 
              object.Scale{index}=value;
         case 'fixscale'
-            assert(islogial(value) & isscalar(value),'ERROR: invalid FixScale value');
+            assert(islogical(value) & isscalar(value),'ERROR: invalid FixScale value');
             object.FixScale{index}=value;
         otherwise
             error('ERROR: "%s" is an invalid name');
