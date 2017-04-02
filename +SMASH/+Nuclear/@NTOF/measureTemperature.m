@@ -36,7 +36,7 @@ options = struct(   'InstrumentResponse',   p.InstrumentResponse,...
                     );                
 cfit = SMASH.CurveFit.Curve;
 basis = @(p,t) propagatemodel( p(1), p(2) , t, options);
-cfit = add(cfit,basis,InitialGuess,'lower',[3.05e-6, 0.5],'upper',[3.13e-6, 6],'scale',1.0,'fixscale',false);
+cfit = add(cfit,basis,InitialGuess,'lower',[3.05e-6, 0.5],'upper',[3.13e-6, 6],'scale',1.0,'fixscale',true);
 
 if isempty(object.Settings.FitSignal)
     %do nothing
@@ -62,6 +62,9 @@ else
     object.Settings.BangTime = cfit.Parameter{1}(1);
     object.Settings.Fit = cfit;
     object.Settings.FinalSignal = good;
+    
+    report = analyze(cfit, Data, 1e4)
+    view(report)
 end
 
 % handle output

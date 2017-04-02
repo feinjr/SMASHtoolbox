@@ -117,11 +117,11 @@ else
     % shift and regrid reference image
     findmean1 = mean(img1,'Grid2',[]);
     report1 = locate(findmean1,'peak');
-    img1=shift(img1,'Grid1',-1*report1.Location);
+    img1=shift(img1,'Grid1',-0*report1.Location);
     findmid1 = mean(img1,'Grid1',[]);
     new1 = differentiate(findmid1);
     midpoint1 = (max(new1.Grid) + min(new1.Grid))/2;
-    img1 = shift(img1,'Grid2',-1*midpoint1);
+    img1 = shift(img1,'Grid2',-0*midpoint1);
     img1 = crop(img1,xCrop,yCrop);
     
     dx_new = (img1.Grid1(2) - img1.Grid1(1))/res_scale;
@@ -130,7 +130,7 @@ else
     
     images_reg = zeros(size(img1_interp.Data,1),size(img1_interp.Data,2),Nchannels);
     images_reg(:,:,ref) = img1_interp.Data;
-    shifts(:,ref) = [-1*report1.Location; -1*midpoint1];
+    shifts(:,ref) = [-0*report1.Location; -0*midpoint1];
     
     for i = 1:Nchannels
         if i ~= ref

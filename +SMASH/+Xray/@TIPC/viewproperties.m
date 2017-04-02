@@ -28,7 +28,7 @@ function [ varargout ] = viewproperties( object, varargin )
 Narg=numel(varargin);
 clims = [];
 AspectRatio_in = [];
-xlims = [-0.05, 0.05];
+xlims = [-0.2, 0.2];
 ylims = [-0.45, 0.45];
 DataScale = 'lin';
 
