@@ -73,21 +73,8 @@ for m=1:Nbasis
 end
 Nfull=numel(full);
 
-% perform analysis
-    function chi2=residual(local)
-        % parameter conversion
-        for j=1:Nbasis
-            object.Parameter{j}=local(start(j):stop(j));
-            object.Scale{j}=local(end-Nbasis+j);
-        end
-        fit=evaluate(object,x);   
-        % residual calculation with complex values and weight support
-        chi2=y-fit;
-        chi2=real(chi2.*conj(chi2));
-        chi2=sum(chi2./Dy.^2);
-    end
-
- function [err,value]=scan(index,direction,value)
+% estimate parameter variation
+function [err,value]=scan(index,direction,value)
         local=full;
         value=local(index)+direction*value^2;
         local(index)=value;
@@ -104,6 +91,20 @@ for m=1:Nfull
     [~,fullLower]=scan(m,-1,q);
     fullWidth(m)=(fullUpper-fullLower)/2;
 end
+
+% perform analysis
+    function chi2=residual(local)
+        % parameter conversion
+        for j=1:Nbasis
+            object.Parameter{j}=local(start(j):stop(j));
+            object.Scale{j}=local(end-Nbasis+j);
+        end
+        fit=evaluate(object,x);   
+        % residual calculation with complex values and weight support
+        chi2=y-fit;
+        chi2=real(chi2.*conj(chi2));
+        chi2=sum(chi2./Dy.^2);
+    end
 
 draw=rand(iterations,1);
 table=nan(iterations,Nfull);
