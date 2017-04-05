@@ -53,7 +53,7 @@ else
     
     norm = max(fitData.Data-baseline);
     
-    Data = [fitData.Grid, (fitData.Data-baseline)/norm, W];
+    Data = [fitData.Grid, (fitData.Data-baseline)/norm, W/norm];
     good = good-baseline;
     good = good/norm;
     
@@ -63,9 +63,6 @@ else
     object.Settings.Fit = cfit;
     object.Settings.FinalSignal = good;
     object.Settings.FitData = Data;
-    
-%     report = analyze(cfit, Data, 1e3)
-%     view(report)
 end
 
 % handle output
