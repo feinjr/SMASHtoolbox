@@ -47,10 +47,10 @@ else
     baseline = mean(noise.Data);
     sigma = std(noise.Data);
     
-    fitData = crop(good ,fitLims);
+    fitData = smooth(good,'mean',5);
+    fitData = crop(fitData ,fitLims);
     W = sigma./sqrt(fitData.Data-baseline+1);
     
-    fitData = smooth(fitData,'mean',5);
     norm = max(fitData.Data-baseline);
     
     Data = [fitData.Grid, (fitData.Data-baseline)/norm, W];
@@ -62,9 +62,10 @@ else
     object.Settings.BangTime = cfit.Parameter{1}(1);
     object.Settings.Fit = cfit;
     object.Settings.FinalSignal = good;
+    object.Settings.FitData = Data;
     
-    report = analyze(cfit, Data, 1e4)
-    view(report)
+%     report = analyze(cfit, Data, 1e3)
+%     view(report)
 end
 
 % handle output
