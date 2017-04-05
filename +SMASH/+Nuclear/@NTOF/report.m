@@ -55,13 +55,20 @@ if Narg == 6
     
     for n=1:Narg-1
         Fsig(n+1) =  varargin{n}.Settings.FitSignal;
-        X = varargin{n}.Settings.FinalSignal.Grid;
-        Tion(n+1) = varargin{n}.Settings.Fit.Parameter{1}(2);
-        bangtime(n+1) = 1e9*varargin{n}.Settings.Fit.Parameter{1}(1);
         
-        line(X,varargin{n}.Settings.FinalSignal.Data,'Color','b',...
-            'LineWidth',1,'LineStyle','-',...
-            'Parent',ax1)
+        if isnan(Fsig(n+1))
+            X = NaN;
+            Tion(n+1) = NaN;
+            bangtime(n+1) = NaN;
+            
+        else
+            X = varargin{n}.Settings.FinalSignal.Grid;
+            Tion(n+1) = varargin{n}.Settings.Fit.Parameter{1}(2);
+            bangtime(n+1) = 1e9*varargin{n}.Settings.Fit.Parameter{1}(1);
+            line(X,varargin{n}.Settings.FinalSignal.Data,'Color','b',...
+                'LineWidth',1,'LineStyle','-',...
+                'Parent',ax1)
+        end
         if ~isnan(Fsig(n+1))
             line(X,evaluate(varargin{n}.Settings.Fit,X),'Color','r',...
                 'LineWidth',1,'LineStyle','--',...

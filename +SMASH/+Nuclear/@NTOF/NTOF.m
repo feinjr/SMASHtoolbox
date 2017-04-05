@@ -34,7 +34,7 @@ classdef NTOF
             p.Reaction = 'DDn';         %   Nuclear reaction to be modeled
             p.Earray = [1.5, 3, 500];   %   Emin, Emax and Num pts for calculating the neutron spectrum
             p.FinalSignal = [];         %   Signal object containing the final signal (baseline subtracted and cropped)
-            
+            p.FitData = [];             %   N x 3 array containing the data and weights used for fitting
             object.Settings=p;
             
             % manage input

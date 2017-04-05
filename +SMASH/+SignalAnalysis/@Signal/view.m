@@ -23,6 +23,10 @@
 %
 function varargout=view(object,target)
 
+% error checking
+[time,value]=limit(object);
+assert(numel(time) > 0,'ERROR: object has no data');
+
 % handle input
 new=false;
 if (nargin<2) || isempty(target);
@@ -51,13 +55,12 @@ end
 axes(target);
 
 % create line with object's properties
-[time,value]=limit(object);
 if isreal(value)
     h=line(time,value);
 else
     value=[real(value) imag(value)];
     temp=SMASH.SignalAnalysis.SignalGroup(time,value);
-    view(temp,[],target);
+    h=view(temp,[],target);
     if new
         legend('Real part','Imaginary part');
     end

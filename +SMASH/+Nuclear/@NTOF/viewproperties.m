@@ -24,17 +24,16 @@ elseif Narg == 1
             T = object.Settings.Fit.Parameter{1}(2);
             figure
             hold all
-            plot(X,evaluate(object.Settings.Fit,X),'Color','r','LineWidth',2,'LineStyle','--')
-            plot(X,object.Settings.FinalSignal.Data,'Color','b')
-            
-            %X1 = linspace(object.Settings.FitLimits(1),object.Settings.FitLimits(2),500);
-            %plot(X1,evaluate(object.Settings.Fit,X1),'Color','g','LineWidth',2,'LineStyle','--')
+            plot(X,object.Settings.FinalSignal.Data)
+            fitsignal = crop(object.Settings.FinalSignal,[object.Settings.FitLimits(1),object.Settings.FitLimits(2)]);
+            hl1 = plot(fitsignal.Grid, fitsignal.Data,'LineWidth',3);
+            hl2 = plot(X,evaluate(object.Settings.Fit,X),'Color','k','LineWidth',2,'LineStyle','--');
             
             xlabel('Time [s]')
             ylabel('Normalized Signal')
             title(sprintf('Measured Signal and Fit: %s',object.Settings.Location))
             
-            legend(sprintf('Fit: T_i = %3.2f keV',T),'Measured','Location','NorthEast');
+            legend([hl1, hl2],'Measured',sprintf('Fit: T_i = %3.2f keV',T),'Location','NorthEast');
     end
 end
 
