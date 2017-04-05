@@ -65,6 +65,7 @@ classdef TIPC
             p.Magnification = p.PinholetoDetectorDistance/p.SourcetoPinholeDistance;
             p.ReferenceImage = 1;
             p.Nslices = 20;           
+            p.Shifts = [];
             
             p.Filters = struct();
             p.Filters.Material = struct('a',{'Kapton', 'Titanium'}, 'b', {'Kapton', 'Iron'},...

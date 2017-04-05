@@ -23,10 +23,12 @@ end
 value=varargin{1};
 
 % preview
-object.PrivatePreview=scale(object.PrivatePreview,'Grid1',value);
-frequency=object.PrivatePreview.Grid2;
-frequency=frequency/value;
-object.PrivatePreview=reset(object.PrivatePreview,[],frequency,[]);
+if ~isempty(object.PrivatePreview)
+    object.PrivatePreview=scale(object.PrivatePreview,'Grid1',value);
+    frequency=object.PrivatePreview.Grid2;
+    frequency=frequency/value;
+    object.PrivatePreview=reset(object.PrivatePreview,[],frequency,[]);
+end
 
 % bounds
 for n=1:numel(object.PrivateBoundary)

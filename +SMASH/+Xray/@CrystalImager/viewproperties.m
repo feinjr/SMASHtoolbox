@@ -78,8 +78,8 @@ switch option
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Image'
         obj = object.Image;
-        obj.Grid1Label = 'Radial Distance [mm]';
-        obj.Grid2Label = 'Axial Distance [mm]';
+        obj.Grid1Label = 'Radial Distance [cm]';
+        obj.Grid2Label = 'Axial Distance [cm]';
         obj.DataLabel = 'Exposure';
         obj.GraphicOptions.Title = 'Exposure';
         obj.GraphicOptions.YDir = 'normal';
@@ -116,8 +116,8 @@ switch option
 
     case 'Contour'
         obj = object.Image;
-        obj.Grid1Label = 'Radial Distance [mm]';
-        obj.Grid2Label = 'Axial Distance [mm]';
+        obj.Grid1Label = 'Radial Distance [cm]';
+        obj.Grid2Label = 'Axial Distance [cm]';
         obj.DataLabel = 'Exposure';
         obj.GraphicOptions.Title = 'Exposure';
         obj.GraphicOptions.YDir = 'normal';
@@ -160,8 +160,8 @@ switch option
         
     case 'Width'
         obj = object.Image;
-        obj.Grid1Label = 'Radial Distance [mm]';
-        obj.Grid2Label = 'Axial Distance [mm]';
+        obj.Grid1Label = 'Radial Distance [cm]';
+        obj.Grid2Label = 'Axial Distance [cm]';
         obj.DataLabel = 'Exposure';
         obj.GraphicOptions.Title = 'Exposure';
         obj.GraphicOptions.YDir = 'normal';
