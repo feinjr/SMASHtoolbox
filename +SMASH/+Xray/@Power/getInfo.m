@@ -5,18 +5,13 @@
 
 function object = getInfo(object)
 
-if nargin == 1
-    SignalName = object.RawSignal.Legend;
-    SignalNumber = size(object.RawSignal.Legend,2);
-else
-    SignalNumber = nargin-1;
-    for i=1:SignalNumber;
-    SignalName{i} = varargin{i};
-    end
-end
 
-object.Settings(1,2:SignalNumber+1)=SignalName(1,1:end)    ;
-object.AnalysisSummary(1,2:SignalNumber+1)=SignalName(1,1:end)  ;  
+SignalName = object.RawSignal.Legend
+SignalNumber = size(object.RawSignal.Legend,2);
+
+
+object.Settings(1,2:SignalNumber+1)=SignalName(1,1:end);
+object.AnalysisSummary(1,2:SignalNumber+1)=SignalName(1,1:end);  
 
 KeepSettings = any(~cellfun('isempty',object.Settings), 1);  % keep columns that don't only contain [] 
 object.Settings = object.Settings(:,KeepSettings);
@@ -156,17 +151,17 @@ LOSIdent = cellstr(Name(end-7:end-6));
 
 if strcmp(LOSIdent,'05')==1;
    SourceDistance = 18.17   ;
-   GeometryCorrection = [0.901 0.06];
+   GeometryCorrection = 0.901;
 elseif strcmp(LOSIdent,'17')==1;
-   SourceDistance =  [2.49 0.06];
+   SourceDistance =  2.49;
    GeometryCorrection = 0.892;
 elseif strcmp(LOSIdent,'21')==1;
    SourceDistance = 7.287  ;
-   GeometryCorrection = [0.901 0.06];
+   GeometryCorrection = 0.901;
 else
 end
 
-object.Settings{5,i+1}= num2cell(SourceDistance);
+object.Settings(5,i+1)= num2cell(SourceDistance);
 object.Settings(14,i+1)= num2cell(GeometryCorrection);
 
 

@@ -34,7 +34,7 @@ object.AnalysisSummary{9,i+1} = InTrapzSignal;
 
 %% Calculate energy absorbed by detector
 
-GeometryCorrection = cell2mat(object.Settings(14,i+1))
+GeometryCorrection = cell2mat(object.Settings(14,i+1));
 DistanceCorrection = cell2mat(object.Settings(15,i+1))
 ApertureCorrection = cell2mat(object.Settings(8,i+1))/cell2mat(object.Settings(9,i+1))
 CorrectionFactor = GeometryCorrection*DistanceCorrection*ApertureCorrection;

@@ -41,10 +41,8 @@ classdef Power
         end
     end
     methods (Hidden=false);
-        varargout = getNames(varargin);
         varargout = getInfo(varargin);
         varargout = calculateAbsorption(varargin);
-        varargout = attenuateSpectrum(varargin);
         varargout = calculatePower(varargin);
         varargout = restore(varargin);
         varargout = integrateSignal(varargin);  

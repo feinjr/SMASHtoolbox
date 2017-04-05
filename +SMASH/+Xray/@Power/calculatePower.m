@@ -41,10 +41,10 @@ end
 
 Element = cell2mat(object.Settings{3,i+1});
 ElementArea = Element(1)*1e-6;
-Distance = cell2mat(object.Settings{5,i+1});
-SourceDistance = Distance(1);
+SourceDistance = cell2mat(object.Settings(5,i+1));
 
 GeometryCorrection = cell2mat(object.Settings(14,i+1));
+
 DistanceCorrection = 4*3.141*SourceDistance^2/ElementArea;
 object.Settings{15,i+1} = DistanceCorrection;
 ApertureCorrection = cell2mat(object.Settings(8,i+1))/cell2mat(object.Settings(9,i+1));

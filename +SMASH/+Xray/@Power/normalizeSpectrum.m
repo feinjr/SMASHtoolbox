@@ -14,7 +14,7 @@ if (nargin>1)  && isobject(varargin{1})
     numarg = 3;
 else
     SpectrumGrid = object.Spectrum.Grid;
-    SpectrumData = object.Spectrum.Data;
+    SpectrumData = object.Spectrum.Data(:,1);
     numarg = 2;
 end
 
@@ -33,17 +33,16 @@ end
 
 AbsorptionGrid = object.AbsorptionCurve.Grid;
 
-SignalNumber = size(object.Settings,2)-1
-Signals = 1:SignalNumber
-j=0
-for i=Signals
+SignalNumber = size(object.Settings,2)-1;
+Signals = 1:SignalNumber;
+
+for i=Signals;
 
 AbsorptionData = object.AbsorptionCurve.Data(:,i);
 
 %Put absorption curve on same grid as Spectrum
 
 AbsorptionData = interp1(AbsorptionGrid,AbsorptionData,SpectrumGrid);
-AbsorptionGrid = SpectrumGrid;
 
 AttenuatedSpectrum = AbsorptionData.*SpectrumData;
 
@@ -53,17 +52,15 @@ IntegratedSpectrum = trapz(SpectrumGrid,AttenuatedSpectrum);
 
 %% Normalize spectrum wrt element energy
 
-NormFactor = object.SourceEnergy/IntegratedSpectrum;
+NormFactor = cell2mat(object.AnalysisSummary(9,i+1))/IntegratedSpectrum;
 
-object.SpectrumInfo.NormalizationFactor = NormFactor;
+object.AnalysisSummary{5,i+1} = NormFactor;
 
-NormSpectrum = SpectrumData*NormFactor;
+NormSpectrum = SpectrumData.*NormFactor;
 
-%% Input spectra into object.Spectrum
+%% Make matrix of attenuated spectra
 
-Spectra = [SpectrumData NormSpectrum AttenuatedSpectrum*NormFactor];
-
-object.Spectrum = SMASH.SignalAnalysis.SignalGroup(SpectrumGrid,Spectra);
+AttenuatedSpectra(:,i) = AttenuatedSpectrum.*NormFactor;
 
 %% Integrate normalized spectrum over all energies and spectrum bounds
 
@@ -74,10 +71,15 @@ IntegratedNormSpectrum = trapz(SpectrumGrid,NormSpectrum);
 
 IntegratedBoundSpectrum = trapz(SpectrumGrid(SpectrumStartInd:SpectrumEndInd),NormSpectrum(SpectrumStartInd:SpectrumEndInd));
 
-object.SpectrumInfo.SpectrumBounds = [SpectrumGrid(1) SpectrumGrid(end); SpectrumGrid(SpectrumStartInd) SpectrumGrid(SpectrumEndInd)];
-object.SpectrumInfo.SpectrumEnergy = [IntegratedNormSpectrum IntegratedBoundSpectrum];
+object.AnalysisSummary{6,i+1} = [SpectrumGrid(1) SpectrumGrid(end); SpectrumGrid(SpectrumStartInd) SpectrumGrid(SpectrumEndInd)];
+object.AnalysisSummary{10,i+1} = [IntegratedNormSpectrum IntegratedBoundSpectrum];
 
 end
-      
+
+%% Save input spectrum and normalized, attenuated spectra
+SpectrumGroup = SMASH.SignalAnalysis.SignalGroup(SpectrumGrid,AttenuatedSpectra);
+object.Spectrum = SMASH.SignalAnalysis.SignalGroup(SpectrumGrid,SpectrumData);
+object.Spectrum = gather(object.Spectrum,SpectrumGroup);
+
 end
 
