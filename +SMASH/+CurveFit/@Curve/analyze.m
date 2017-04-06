@@ -74,22 +74,28 @@ end
 Nfull=numel(full);
 
 % estimate parameter variation
-function [err,value]=scan(index,direction,value)
+    function [err,value]=scan(index,direction,value)        
         local=full;
-        value=local(index)+direction*value^2;
-        local(index)=value;
-        chi2=residual(local);        
-        err=exp((chi2min-chi2)/2)-cutoff;
+        local(index)=local(index)+direction*abs(value);
+        try
+            chi2=residual(local);
+            assert(isfinite(chi2) && isreal(chi2));
+            err=exp(-(chi2-chi2min)/2)-cutoff;
+        catch
+            err=(1-cutoff)*(1+abs(value)); % penalty function
+        end 
+        err=abs(err);
     end    
-
+   
 chi2min=residual(full);
 fullWidth=nan(size(full));
 for m=1:Nfull
-    q=fzero(@(x) scan(m,+1,x),0);
-    [~,fullUpper]=scan(m,+1,q);
-    q=fzero(@(x) scan(m,-1,x),0);
-    [~,fullLower]=scan(m,-1,q);
-    fullWidth(m)=(fullUpper-fullLower)/2;
+    q=fminsearch(@(x) scan(m,+1,x),0);            
+    [~,width1]=scan(m,+1,q);
+    q=fminsearch(@(x) scan(m,-1,x),0);
+    [~,width2]=scan(m,-1,q);
+    fullWidth(m)=(width1+width2)/2;
+    % warn if widths exceeds bounds?
 end
 
 % perform analysis
