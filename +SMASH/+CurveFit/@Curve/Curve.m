@@ -30,7 +30,10 @@ classdef Curve
     end
     properties (Access=protected)
         FitComplete = false % Indicates complete fit (logical)
-    end    
+    end
+    properties (SetAccess=protected)
+        FitTable = [] % table of parmameter values from optimization
+    end
     %% methods
     methods (Hidden=true)
         function object=Curve(varargin)

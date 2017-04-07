@@ -92,6 +92,7 @@ for m=1:Nbasis
     end
 end
 
+object.FitTable=[];
 if numel(guess) > 0
     slack=fminsearch(@residual,guess,options);
 else
@@ -119,8 +120,11 @@ end
         fit=fit_reduced+y_fixed;
         scale(~fixed)=scale_reduced;
         % residual calculation with complex values and weight support
-        chi2=weight.*(y-fit);
-        chi2=sum(real(chi2.*conj(chi2))); 
+        chi2=y-fit;
+        chi2=weight.*real(chi2.*conj(chi2)); 
+        chi2=sum(chi2);
+        temp=[param(:); scale(:)];
+        object.FitTable(:,end+1)=temp(:);
     end
 
 for m=1:Nbasis

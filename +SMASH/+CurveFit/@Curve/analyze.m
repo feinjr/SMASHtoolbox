@@ -37,6 +37,7 @@ assert(all(data(:,3) > 0),'ERROR: invalid uncertainty value(s)');
 x=data(:,1);
 y=data(:,2);
 Dy=data(:,3);
+weight=1./Dy.^2;
 
 if (nargin<3) || isempty(iterations)
     iterations=1000;
@@ -74,28 +75,47 @@ end
 Nfull=numel(full);
 
 % estimate parameter variation
-    function [err,value]=scan(index,direction,value)        
+    function err=scan(index,direction,value)        
+        %fprintf('%g\n',value)
         local=full;
         local(index)=local(index)+direction*abs(value);
         try
             chi2=residual(local);
             assert(isfinite(chi2) && isreal(chi2));
-            err=exp(-(chi2-chi2min)/2)-cutoff;
+            err=exp(-abs(chi2-chi2min)/2)-cutoff;
         catch
-            err=(1-cutoff)*(1+abs(value)); % penalty function
+            err=-(1-cutoff)*(1+abs(value)); % penalty function
         end 
-        err=abs(err);
+        %err=abs(err);
     end    
    
 chi2min=residual(full);
 fullWidth=nan(size(full));
 for m=1:Nfull
-    q=fminsearch(@(x) scan(m,+1,x),0);            
-    [~,width1]=scan(m,+1,q);
-    q=fminsearch(@(x) scan(m,-1,x),0);
-    [~,width2]=scan(m,-1,q);
-    fullWidth(m)=(width1+width2)/2;
-    % warn if widths exceeds bounds?
+    guess=std(object.FitTable(m,:));
+    if guess == 0
+        fullWidth(m)=fzero(@(x) scan(m,+1,x),0);
+    else
+        left=guess;
+        while true
+            if scan(m,+1,left) > 0
+                break
+            else
+                left=left/2;
+            end
+        end
+        right=guess;
+        while true
+            if scan(m,+1,right) < 0
+                break
+            else
+                right=2*right;
+            end
+        end
+        width1=fzero(@(x) scan(m,+1,x),[left right]);
+        width2=fzero(@(x) scan(m,-1,x),[left right]);
+        fullWidth(m)=(width1+width2)/2;
+    end    
 end
 
 % perform analysis
@@ -108,8 +128,9 @@ end
         fit=evaluate(object,x);   
         % residual calculation with complex values and weight support
         chi2=y-fit;
-        chi2=real(chi2.*conj(chi2));
-        chi2=sum(chi2./Dy.^2);
+        chi2=weight.*real(chi2.*conj(chi2));
+        plot(x,chi2);
+        chi2=sum(chi2);
     end
 
 draw=rand(iterations,1);
