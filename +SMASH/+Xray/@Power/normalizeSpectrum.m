@@ -38,12 +38,11 @@ Signals = 1:SignalNumber;
 
 for i=Signals;
 
-AbsorptionData = object.AbsorptionCurve.Data(:,i);
+AbsorptionData1 = object.AbsorptionCurve.Data(:,i);
 
 %Put absorption curve on same grid as Spectrum
 
-AbsorptionData = interp1(AbsorptionGrid,AbsorptionData,SpectrumGrid);
-
+AbsorptionData = interp1(AbsorptionGrid,AbsorptionData1,SpectrumGrid);
 AttenuatedSpectrum = AbsorptionData.*SpectrumData;
 
 %% Integrate absorbed spectrum over all energies
@@ -72,14 +71,19 @@ IntegratedNormSpectrum = trapz(SpectrumGrid,NormSpectrum);
 IntegratedBoundSpectrum = trapz(SpectrumGrid(SpectrumStartInd:SpectrumEndInd),NormSpectrum(SpectrumStartInd:SpectrumEndInd));
 
 object.AnalysisSummary{6,i+1} = [SpectrumGrid(1) SpectrumGrid(end); SpectrumGrid(SpectrumStartInd) SpectrumGrid(SpectrumEndInd)];
-object.AnalysisSummary{10,i+1} = [IntegratedNormSpectrum IntegratedBoundSpectrum];
-
+object.AnalysisSummary{10,i+1} = IntegratedNormSpectrum;
+object.AnalysisSummary{11,i+1} = IntegratedBoundSpectrum;
 end
 
 %% Save input spectrum and normalized, attenuated spectra
 SpectrumGroup = SMASH.SignalAnalysis.SignalGroup(SpectrumGrid,AttenuatedSpectra);
 object.Spectrum = SMASH.SignalAnalysis.SignalGroup(SpectrumGrid,SpectrumData);
 object.Spectrum = gather(object.Spectrum,SpectrumGroup);
+
+object.Spectrum.DataLabel = 'Energy (J/eV)';
+object.Spectrum.GridLabel = 'Photon energy (eV)';
+object.Spectrum.Legend{1} = 'Input spectrum';
+[object.Spectrum.Legend{2:end}] = deal(object.AnalysisSummary{1,2:end});
 
 end
 

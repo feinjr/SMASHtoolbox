@@ -26,29 +26,29 @@ classdef Power
         'Filter material';'Filter thickness (um)'; 'Source height';'Aperture height'; 'Noise limits';'Integration limits';'Baseline correction';'Noise RMS';...
         'Geometry correction';'Distance correction'}   
 
-    object.AnalysisSummary = cell(14,10)
-    object.AnalysisSummary(1:14,1) = {'Signal name';'Element type';'Filter material';'Filter thickness (um)';'Normalization factor';'Energy bounds (eV)';...
-        'Energy absorbed by detector (eV)';'Detector area (mm^2)';'Filtered energy into 4pi (J)';'Total energy into 4pi (J)';'Peak power into 4pi (J)'; 'Peak power time (ns)'; 'Power FWHM (ns)';'Fractional error'}   
+    object.AnalysisSummary = cell(15,10)
+    object.AnalysisSummary(1:15,1) = {'Signal name';'Element type';'Filter material';'Filter thickness (um)';'Normalization factor';'Energy bounds (eV)';...
+        'Energy absorbed by detector (J)';'Detector area (mm^2)';'Filtered energy into 4pi (J)';'Total energy into 4pi (J)';'Bound energy into 4pi (J)';'Peak power into 4pi (J)'; 'Peak power time (ns)'; 'Power FWHM (ns)';'Fractional error'}   
 
     
-            if (nargin==1) && ischar(varargin{1});
-                varargin{1}=SMASH.SignalAnalysis.SignalGroup(varargin{1});
-                object.RawSignal=varargin{1};
-                %object.BiasCorrectedSignal = SMASH.SignalAnalysis.Signal(varargin{:});
+            if (nargin==2) && isnumeric(varargin{1}) && ischar(varargin{2});
+                import SMASH.Z.*
+                object.RawSignal=grabSignal(varargin{1},char(varargin(2)));
             elseif (nargin == 1) && isobject(varargin{1});
                 object.RawSignal=varargin{1};
             end
         end
     end
     methods (Hidden=false);
+        varargout = grabSignal(varargin);
         varargout = getInfo(varargin);
+        varargout = subtractBaseline(varargin);
         varargout = calculateAbsorption(varargin);
         varargout = calculatePower(varargin);
-        varargout = restore(varargin);
         varargout = integrateSignal(varargin);  
         varargout = pickTimes(varargin);  
-        varargout = pickSignal(varargin);  
-        varargout = normalizeSpectrum(varargin);        
+        varargout = normalizeSpectrum(varargin); 
+        varargout = restore(varargin);
     end
     
 end

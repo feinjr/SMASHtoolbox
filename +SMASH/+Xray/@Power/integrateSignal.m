@@ -47,7 +47,5 @@ else
     disp('Integration limits are not valid')
 end
 
-%% Integrate standard deviation of noise standard deviation and use in error analysis   
-%BaselineIntegral = 
 end    
 end

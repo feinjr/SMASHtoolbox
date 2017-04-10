@@ -23,7 +23,7 @@ classdef Colorbar < handle
                     break
                 end
             end
-            hm=uicontextmenu(ancestor(hc,'figure'));
+            hm=uicontextmenu;%(ancestor(hc,'figure'));
             uimenu(hm,'Label','Adjust color scale',...
                 'Callback',{@AdjustScale,hc});
             set(hc,'UIContextMenu',hm);

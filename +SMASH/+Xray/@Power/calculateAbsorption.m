@@ -13,7 +13,7 @@ function object = calculateAbsorption(object,varargin)
 if (nargin==1) && isempty(object.Spectrum) 
          Energy = [100,100000,1000];
     elseif nargin
-         Energy = [min(object.Spectrum.Grid),max(object.Spectrum.Grid),1000];
+         Energy = [min(object.Spectrum.Grid),max(object.Spectrum.Grid)+1,1000];
     else
         Energy = varargin;
 end
@@ -62,7 +62,7 @@ ElementOpacity = SMASH.Xray.ColdOpacity('Material',ElementMaterial,'Thickness',.
 
 %% Calculate absorption curve
 j=j+1;
-TotalAbsorption(:,j) = FilterOpacity.Transmission.Data(:,end);%(1-ElementOpacity.Transmission.Data(:,end)).*FilterOpacity.Transmission.Data(:,end);
+TotalAbsorption(:,j) = (1-ElementOpacity.Transmission.Data(:,end)).*FilterOpacity.Transmission.Data(:,end);
 
 end
 EnergyGrid = ElementOpacity.Transmission.Grid;
