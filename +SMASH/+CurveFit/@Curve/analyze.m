@@ -129,7 +129,6 @@ end
         % residual calculation with complex values and weight support
         chi2=y-fit;
         chi2=weight.*real(chi2.*conj(chi2));
-        plot(x,chi2);
         chi2=sum(chi2);
     end
 
