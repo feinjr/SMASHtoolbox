@@ -31,9 +31,20 @@ classdef Power
         'Energy absorbed by detector (J)';'Detector area (mm^2)';'Filtered energy into 4pi (J)';'Total energy into 4pi (J)';'Bound energy into 4pi (J)';'Peak power into 4pi (J)'; 'Peak power time (ns)'; 'Power FWHM (ns)';'Fractional error'}   
 
     
-            if (nargin==2) && isnumeric(varargin{1}) && ischar(varargin{2});
+            if (nargin==2) && isnumeric(varargin{1}) && ischar(varargin{2}) && strcmpi(varargin{2},'all')==1
+                import SMASH.Z.*
+                object.RawSignal=grabSignal(varargin{1},'pcd');
+                TempSignal = grabSignal(varargin{1},'sid');
+                object.RawSignal = gather(object.RawSignal,TempSignal)
+                object.RawSignal.GridLabel = 'Time (s)'
+                object.RawSignal.DataLabel = 'Signal (V)'  
+                
+            elseif (nargin==2) && isnumeric(varargin{1}) && ischar(varargin{2});
                 import SMASH.Z.*
                 object.RawSignal=grabSignal(varargin{1},char(varargin(2)));
+                object.RawSignal.GridLabel = 'Time (s)'
+                object.RawSignal.DataLabel = 'Signal (V)'
+                
             elseif (nargin == 1) && isobject(varargin{1});
                 object.RawSignal=varargin{1};
             end
