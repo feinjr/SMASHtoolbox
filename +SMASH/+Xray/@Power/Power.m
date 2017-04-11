@@ -21,10 +21,10 @@ classdef Power
     methods;
         function object=Power(varargin);
             
-    object.Settings = cell(15,10)
-    object.Settings(1:15,1) = {'Signal name';'Element type';'Element size';'Element sensitivity (A/W)';'Source distance (m)';...
+    object.Settings = cell(16,10)
+    object.Settings(1:16,1) = {'Signal name';'Element type';'Element size';'Element sensitivity (A/W)';'Source distance (m)';...
         'Filter material';'Filter thickness (um)'; 'Source height';'Aperture height'; 'Noise limits';'Integration limits';'Baseline correction';'Noise RMS';...
-        'Geometry correction';'Distance correction'}   
+        'Geometry correction';'Distance correction';'Bias voltage'}   
 
     object.AnalysisSummary = cell(15,10)
     object.AnalysisSummary(1:15,1) = {'Signal name';'Element type';'Filter material';'Filter thickness (um)';'Normalization factor';'Energy bounds (eV)';...

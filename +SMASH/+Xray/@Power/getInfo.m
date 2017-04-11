@@ -29,6 +29,7 @@ ElementNumber = cellstr(Name(end-2:end));
 
 if strcmpi(ElementIdent,'pcd')==1;
     ElementType = 'Pcd';
+    Bias = 100;
     if strcmp(ElementNumber,'022')==1;
         ElementSize = [3,500];
         ElementSensitivity = [5e-5 0.11];
@@ -134,6 +135,7 @@ if strcmpi(ElementIdent,'pcd')==1;
     else
     end
 elseif strcmpi(ElementIdent,'sid')==1;
+    Bias = 50;
     ElementType = 'Sid';
     ElementSize = [0.28,22];
     ElementSensitivity = [0.274 0];
@@ -142,8 +144,9 @@ end
 % Identify source distance
   
 object.Settings{2,i+1}= ElementType;
-object.Settings{3,i+1}= num2cell(ElementSize);
+object.Settings{3,i+1}= ElementSize;
 object.Settings{4,i+1}= num2cell(ElementSensitivity);
+object.Settings{16,i+1}= Bias;
 
 object.AnalysisSummary{2,i+1}= ElementType;
 object.AnalysisSummary{8,i+1}= ElementSize(1);
