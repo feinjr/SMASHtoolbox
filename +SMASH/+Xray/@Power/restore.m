@@ -4,7 +4,7 @@ function object=restore(data)
 
 object=SMASH.Xray.Power([],NaN);
 
-name=fieldnames(data)
+name=fieldnames(data);
 for n=1:numel(name)
     if isprop(object,name{n})
         try

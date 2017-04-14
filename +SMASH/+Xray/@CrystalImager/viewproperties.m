@@ -138,7 +138,7 @@ switch option
             AspectRatio = AspectRatio_in;
         end
         
-        figure('Units','Inches','Position',[7,6,3,8],'Color','w','PaperPositionMode','auto')
+        figure('Units','Inches','Position',[7,6,3,6],'Color','w','PaperPositionMode','auto')
         hold on
         
         colormap('hot')
@@ -179,7 +179,7 @@ switch option
             AspectRatio = AspectRatio_in;
         end
         
-        figure('Units','Inches','Position',[7,6,3,8],'Color','w','PaperPositionMode','auto')
+        figure('Units','Inches','Position',[7,6,3,6],'Color','w','PaperPositionMode','auto')
         hold on
         
         colormap('hot')

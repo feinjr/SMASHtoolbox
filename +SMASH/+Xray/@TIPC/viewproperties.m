@@ -339,7 +339,7 @@ switch option
             'FontSize',10,'box','on','FontWeight','normal','TickDir','out','FontName','Times','YDir','normal')
         hold all;
         barh(object.Summary.Yvalues, object.Summary.Intensity,'stacked')
-        legend(filter_label,'Location','SouthEast')
+        legend(filter_label,'Location','Best')
         ax2.YTickLabel = '';
         ylim(ylims)
         xlabel('Intensity [A.U.]')
@@ -386,7 +386,7 @@ switch option
         xlim([min(xmid)-15 max(xmid)+15])
         ylim([-0.25, 1.25*max(data.Intensity(:))])
         legend(bh, filter_label,'Location','Best');
-        xlabel('Intensity')
+        ylabel('Intensity')
 end
 varargout{1} = gcf;
 end

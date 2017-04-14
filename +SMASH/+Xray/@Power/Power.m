@@ -19,16 +19,16 @@ classdef Power
     
     %% constructor
     methods;
-        function object=Power(varargin);
+        function object=Power(varargin)
             
-    object.Settings = cell(15,10)
+    object.Settings = cell(15,10);
     object.Settings(1:15,1) = {'Signal name';'Element type';'Element size';'Element sensitivity (A/W)';'Source distance (m)';...
         'Filter material';'Filter thickness (um)'; 'Source height';'Aperture height'; 'Noise limits';'Integration limits';'Baseline correction';'Noise RMS';...
-        'Geometry correction';'Distance correction'}   
+        'Geometry correction';'Distance correction'};
 
-    object.AnalysisSummary = cell(15,10)
+    object.AnalysisSummary = cell(15,10);
     object.AnalysisSummary(1:15,1) = {'Signal name';'Element type';'Filter material';'Filter thickness (um)';'Normalization factor';'Energy bounds (eV)';...
-        'Energy absorbed by detector (J)';'Detector area (mm^2)';'Filtered energy into 4pi (J)';'Total energy into 4pi (J)';'Bound energy into 4pi (J)';'Peak power into 4pi (J)'; 'Peak power time (ns)'; 'Power FWHM (ns)';'Fractional error'}   
+        'Energy absorbed by detector (J)';'Detector area (mm^2)';'Filtered energy into 4pi (J)';'Total energy into 4pi (J)';'Bound energy into 4pi (J)';'Peak power into 4pi (J)'; 'Peak power time (ns)'; 'Power FWHM (ns)';'Fractional error'};   
 
     
             if (nargin==2) && isnumeric(varargin{1}) && ischar(varargin{2});
