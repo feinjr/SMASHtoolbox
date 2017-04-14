@@ -1,7 +1,4 @@
 classdef ShotSummary
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
-    
     properties
         Shot
         Campaign
@@ -26,6 +23,9 @@ classdef ShotSummary
         function object = ShotSummary(varargin)
             object.Shot = varargin{1};
         end
+    end
+    methods (Static=true, Hidden=true)
+        varargout=restore(varargin);
     end
     methods(Hidden=false)
         varargout = print(varargin);
