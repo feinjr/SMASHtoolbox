@@ -6,14 +6,14 @@
 function object = subtractBaseline(object,varargin)
 
 if nargin == 1
-    SignalNumber = size(object.Settings,2)-1
-    Signals = 1:SignalNumber
+    SignalNumber = size(object.Settings,2)-1;
+    Signals = 1:SignalNumber;
 else
-    Signals = varargin{1}
+    Signals = varargin{1};
 end
 
 
-for i = Signals
+for i = Signals;
 Baseline =  object.Settings{12,i+1};  
 BaselineData(:,i) = object.RawSignal.Data(:,i)-Baseline;
 %BaselineData = BaselineData(~isnan(BaselineData)); %Remove NAN from data     

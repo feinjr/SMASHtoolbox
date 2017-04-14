@@ -26,12 +26,13 @@ TempData = object.ProcessedSignal.Data(:,i);
 
 % Apply bias corrections to signals and calculate energy absorbed
 
-if strcmpi(object.Settings{2,i+1},'Sid')==1
-    TempData=TempData./(1-(TempData/50));
+Bias = object.Settings{16,i+1};
+TempData=TempData./(1-(TempData/Bias));
+
+if strcmpi(object.Settings{2,i+1},'Sid')==1 
     TempData = 0.98*TempData./(TempImpedance*TempSensitivity); %0.98 accounts for fluorescence
     
-elseif strcmpi(object.Settings{2,i+1},'Pcd')==1
-    TempData=TempData./(1-(TempData/100));
+elseif strcmpi(object.Settings{2,i+1},'Pcd')==1    
     TempData = TempData./(TempImpedance*TempSensitivity);
 else
 end
@@ -39,7 +40,7 @@ end
 % Apply correction based on collection area and source distance and apply additional correction assuming radiator is
 % average of 4pi/lambertian
 
-Element = cell2mat(object.Settings{3,i+1});
+Element = object.Settings{3,i+1};
 ElementArea = Element(1)*1e-6;
 SourceDistance = cell2mat(object.Settings(5,i+1));
 
