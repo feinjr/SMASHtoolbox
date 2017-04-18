@@ -3,6 +3,7 @@
 %    CurveFit          - nonlinear curve fitting and common basis functions
 %    FileAccess        - file read/write support
 %    General           - general purpose routines
+%    Graphics          - special plotting routines
 %    ImageAnalysis     - 2D data processing
 %    MUI               - Manual User Interface creation
 %    ROI               - Region Of Interest selection
@@ -12,7 +13,7 @@
 % More specific packages are also provided.
 %    BayesCalibration  - Bayesian calibration (UNDER CONSTRUCTION)
 %    DynamicMaterials  - DMP routines (UNDER CONSTRUCTION)
-%    Graphics          - special plotting routines
+%    Instrument        - instrument control (UNDER CONSTRUCTION)
 %    MonteCarlo        - Monte Carlo routines (UNDER CONSTRUCTION)
 %    PDE               - Partial Differential Equation solvers (UNDER CONSTRUCTION)
 %    Radiometry        - radiometry analysis (UNDER CONSTRUCTION)
