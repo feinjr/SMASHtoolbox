@@ -1,31 +1,28 @@
-function arm(object)
+function arm(object,mode)
 
-%%
-if numel(object) > 1
-    for k=1:numel(object)
-        arm(object(k));
-    end
-    return
+% manage input
+if (nargin < 2) || isempty(mode)
+    mode='single';
 end
+assert(ischar(mode),'ERROR: invalid mode');
+mode=lower(mode);
 
-%%
-fopen(object.VISA);
+%
+communicate(object)
 fwrite(object.VISA,':ADER?'); % clear Acquisition Done Event Register
-
-fwrite(object.VISA,':single');
-fprintf('Waiting for trigger...');
-while true
-    fwrite(object.VISA,':ADER?');
-    done=fscanf(object.VISA,'%d');
-    if done
-        break
-    else
-        pause(0.1);
-    end
+clearScreen(object);
+switch mode
+    case 'single'
+        fwrite(object.VISA,':single');
+        object.State='single';
+    case 'run'
+        fwrite(object.VISA,':run');
+        object.State='run';
+    case 'stop'
+        fwrite(object.VISA,':stop');
+        object.State='stop';
+    otherwise
+        error('ERROR: invalid mode');
 end
-fprintf('done\n');
-
-fclose(object.VISA);
-
 
 end

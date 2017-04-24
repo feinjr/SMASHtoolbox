@@ -1,9 +1,11 @@
 classdef Digitizer < handle
     properties
         Name = '(unnamed digitizer)' % Digitizer name
+        ID % Digitizer ID
     end
     properties (SetAccess=protected)
         Address % IP address
+        State = 'stop' % Digitizer state ('single', 'run', or 'stop')
     end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
@@ -39,8 +41,7 @@ classdef Digitizer < handle
                 fopen(object.VISA);
             end
             fwrite(object.VISA,'*IDN?');
-            ID=strtrim(fscanf(object.VISA));
-            fprintf('Connected to:\n\t%s\n',ID);
+            object.ID=strtrim(fscanf(object.VISA));
         end
     end
     %%
