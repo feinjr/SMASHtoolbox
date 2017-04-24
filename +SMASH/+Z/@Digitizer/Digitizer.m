@@ -5,7 +5,6 @@ classdef Digitizer < handle
     end
     properties (SetAccess=protected)
         Address % IP address
-        State = 'stop' % Digitizer state ('single', 'run', or 'stop')
     end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
@@ -16,7 +15,7 @@ classdef Digitizer < handle
         Channel
     end
     properties (Dependent=true, SetAccess=protected)
-        Status
+        RunState
         Calibration
     end    
     %%
@@ -55,6 +54,7 @@ classdef Digitizer < handle
         varargout=getAcquisition(varargin)       
         varargout=getTrigger(varargin)
         varargout=getChannel(varargin)
+        varargout=getState(varargin)
         varargout=getCalibration(varargin)       
     end
     methods
@@ -66,6 +66,9 @@ classdef Digitizer < handle
         end      
         function value=get.Channel(object)
             value=getChannel(object);
+        end
+        function value=get.RunState(object)
+            value=getState(object);
         end
         function value=get.Calibration(object)
             value=getCalibration(object);

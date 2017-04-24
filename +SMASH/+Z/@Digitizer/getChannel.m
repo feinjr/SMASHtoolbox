@@ -1,5 +1,7 @@
 function value=getChannel(object)
 
+communicate(object);
+
 N=4;
 for n=1:N
     local=struct();
