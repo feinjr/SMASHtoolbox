@@ -1,4 +1,4 @@
-function value=getSampleRate(object)
+function value=getAcquisition(object)
 
 communicate(object);
 

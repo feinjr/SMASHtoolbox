@@ -4,19 +4,14 @@ classdef Digitizer < handle
     end
     properties (SetAccess=protected)
         Address % IP address
+    end
+    properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
     end
     properties (Dependent=true)
-        Bandwidth
-        SampleRate
-        NumberPoints
-        NumberAverages
+        Acquisition       
         Trigger
-        StartTime
-        Channel1 
-        Channel2
-        Channel3
-        Channel4
+        Channel
     end
     properties (Dependent=true, SetAccess=protected)
         Status
@@ -52,27 +47,24 @@ classdef Digitizer < handle
     methods (Static=true)
         varargout=ping(varargin)
         varargout=ipconfig(varargin)
+        varargout=reset(varargin)
     end
     %% getters 
     methods (Hidden=true)
-        varagout=getSampleRate(varargin)
-        varargout=getAverage(varargin)
-        varargout=getPoints(varargin)
-        varargout=getBandwidth(varargin) % may need to be moved
-        varargout=getCalibration(varargin)
+        varargout=getAcquisition(varargin)       
+        varargout=getTrigger(varargin)
+        varargout=getChannel(varargin)
+        varargout=getCalibration(varargin)       
     end
     methods
-        function value=get.SampleRate(object)
-            value=getSampleRate(object);
-        end
-        function value=get.NumberAverages(object)
-            value=getAverage(object);
-        end
-        function value=get.NumberPoints(object)
-            value=getPoints(object);
-        end
-        function value=get.Bandwidth(object)
-            value=getBandwidth(object);
+        function value=get.Acquisition(object)
+            value=getAcquisition(object);
+        end       
+        function value=get.Trigger(object)
+            value=getTrigger(object);
+        end      
+        function value=get.Channel(object)
+            value=getChannel(object);
         end
         function value=get.Calibration(object)
             value=getCalibration(object);
@@ -81,23 +73,23 @@ classdef Digitizer < handle
     
     %% setters
     methods (Hidden=true)
-        varargout=setSampleRate(varargin)
-        varargout=setAverage(varargin)
-        varargout=setPoints(varargin)
+        varargout=setAcquisition(varargin)
+        varargout=setTrigger(varargin)
+        varargout=setChannel(varargin)
     end
     methods
         function set.Name(object,value)
             assert(ischar(value),'ERROR: invalid name');
             object.Name=value;
         end
-        function set.SampleRate(object,value)
-            setSampleRate(object,value);
-        end                
-        function set.NumberAverages(object,value)
-            setAverage(object,value);
+        function set.Acquisition(object,value)
+            setAcquisition(object,value);
         end
-        function set.NumberPoints(object,value)
-            setPoints(object,value);
+        function set.Trigger(object,value)
+            setTrigger(object,value);
+        end
+        function set.Channel(object,value)
+            setChannel(object,value);
         end
     end
 end
