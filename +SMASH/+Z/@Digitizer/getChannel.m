@@ -26,11 +26,11 @@ for n=1:N
     temp=fscanf(object.VISA);
     local.Scale=sscanf(temp,'%g');
     %
-    command=sprintf('CHANNEL%d:LABEL?',n);
-    fwrite(object.VISA,command);
-    temp=fscanf(object.VISA);
-    local.Label=strtrim(temp);
-    local.Label=local.Label(2:end-1);
+    %command=sprintf('CHANNEL%d:LABEL?',n);
+    %fwrite(object.VISA,command);
+    %temp=fscanf(object.VISA);
+    %local.Label=strtrim(temp);
+    %local.Label=local.Label(2:end-1);
     %
     if n==1
         value=repmat(local,[4 1]);

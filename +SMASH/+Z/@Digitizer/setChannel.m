@@ -34,13 +34,13 @@ for n=1:numel(value)
     command=sprintf('CHANNEL%d:SCALE %g',n,temp);
     fwrite(object.VISA,command)
     %
-    temp=value(n).Label;
-    assert(ischar(temp),'ERROR: invalid label value');
-    if temp(1) ~= '"'
-        temp=['"' temp '"']; %#ok<AGROW>
-    end
-    command=sprintf('CHANNEL%d:LABEL %s',n,temp);
-    fwrite(object.VISA,command)
+    %temp=value(n).Label;
+    %assert(ischar(temp),'ERROR: invalid label value');
+    %if temp(1) ~= '"'
+    %    temp=['"' temp '"']; %#ok<AGROW>
+    %end
+    %command=sprintf('CHANNEL%d:LABEL %s',n,temp);
+    %fwrite(object.VISA,command)
 end
 
 end

@@ -1,41 +1,66 @@
 function result=grab(object)
 
-fwrite(obj,':WAVEFORM:PREAMBLE?');
-preamble=readPreamble(fscanf(obj,'%s'));
- 
-% set up time base
-tstop=preamble.XOrigin+preamble.XIncrement*(preamble.Points-1);
-time=preamble.XOrigin:preamble.XIncrement:tstop;
- 
+% set byte order
+fwrite(object.VISA,':WAVEFORM:BYTEORDER LSBFIRST'); % this is supposed to be faster
+fclose(object.VISA);
+object.VISA.ByteOrder='littleEndian';
+fopen(object.VISA);
+
+fwrite(object.VISA,':WAVEFORM:FORMAT WORD');
+fwrite(object.VISA,'WAVEFORM:STREAMING 1');
+
 % read data
 N=4;
 keep=false(1,N);
-data=nan(preamble.Points,N);
 label=cell(1,N);
+data=[];
+time=[];
 for n=1:N
     if ~object.Channel(n).Display
-        continue
-    end
-    keep(n)=true;
-    command=sprintf('WAVEFORM:SOURCE %d',n);
+        continue        
+    end    
+    command=sprintf('WAVEFORM:SOURCE CHANNEL%d',n);
     fwrite(object.VISA,command);
-    %
-    fwrite(object.VISA,':WAVEFORM:BYTEORDER LSBFIRST'); % this is supposed to be faster than MSBF
+    fwrite(object.VISA,'WAVEFORM:COMPLETE?');
+    complete=fscanf(object.VISA,'%g',1);
+    if complete == 0
+        continue
+    end    
+    fwrite(object.VISA,'WAVEFORM:PREAMBLE?');
+    preamble=fscanf(object.VISA);
+    preamble=readPreamble(preamble);
+    if isempty(time)
+        tstop=preamble.XOrigin+preamble.XIncrement*(preamble.Points-1);
+        time=preamble.XOrigin:preamble.XIncrement:tstop;
+        data=nan(numel(time),N);
+    end    
+    keep(n)=true;
+    %    
     fclose(object.VISA);
-    object.VISA.InputBufferSize=2*preamble.Points;
-    object.VISA.ByteOrder='littleEndian';    
+    object.VISA.InputBufferSize=2*preamble.Points;      
     fopen(object.VISA);
-    fwrite(object.VISA,'WAVEFORM:DATA');
+    %
+    fwrite(object.VISA,'WAVEFORM:DATA?');
+    start=fread(object.VISA,2,'uchar');
+    start=char(reshape(start,[],numel(start)));
+    assert(strcmp(start,'#0'),'ERROR: invalid stream start');
     temp=fread(object.VISA,[preamble.Points 1],'int16');
     temp=preamble.YOrigin+preamble.YIncrement*temp;
-    data(:,n)=temp(:);
-    label{n}=object.Channel(n).Label;
+    data(:,n)=temp(:); %#ok<AGROW>
+    fread(object.VISA,1,'uchar'); % termination character
+    label{n}=sprintf('Channel %d',n);
 end
 
-data=data(:,keep);
-label=label(keep);
-result=SMASH.SignalAnalysis.SignalGroup(time,data);
-result.Legend=label;
+if isempty(data)
+    error('ERROR: no signals to grab');
+else
+    data=data(:,keep);
+    label=label(keep);
+    result=SMASH.SignalAnalysis.SignalGroup(time,data);
+    result.Legend=label;
+    result.Name=object.Name;
+    result.GraphicOptions.Title=object.Name;
+end
 
 end
 
