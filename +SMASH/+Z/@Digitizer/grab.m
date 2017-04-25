@@ -1,37 +1,41 @@
 function result=grab(object)
 
-% fwrite(obj,':WAVEFORM:PREAMBLE?');
-% preamble=readPreamble(fscanf(obj,'%s'));
-% 
-% %% set up time base
-% tstop=preamble.XOrigin+preamble.XIncrement*(preamble.Points-1);
-% time=preamble.XOrigin:preamble.XIncrement:tstop;
-% 
-% %% read data
-% fwrite(obj,':WAVEFORM:SOURCE 1');
-% fprintf(obj,'%s',':WAVEFORM:SOURCE?');
-% Source=fscanf(obj);
-% 
-% fwrite(obj,':WAVEFORM:BYTEORDER?');
-% ByteOrder=strtrim(fscanf(obj));
-% fwrite(obj,':WAVEFORM:BYTEORDER LSBFIRST'); % this is supposed to be faster
-% 
-% fclose(obj);
-% obj.InputBufferSize=2*preamble.Points;
-% switch lower(ByteOrder)
-%     case 'msbf'
-%         obj.ByteOrder='bigEndian';
-%     case 'lsbf'
-%         obj.ByteOrder='littleEndian';
-% end
-% fopen(obj);
-% 
-% fprintf('Reading data...');
-% fprintf(obj,'%s',':WAVeform:DATA?');
-% fprintf('done\n');
-% data=fread(obj,[preamble.Points 1],'int16');
-% data=preamble.YOrigin+preamble.YIncrement*data;
+fwrite(obj,':WAVEFORM:PREAMBLE?');
+preamble=readPreamble(fscanf(obj,'%s'));
+ 
+% set up time base
+tstop=preamble.XOrigin+preamble.XIncrement*(preamble.Points-1);
+time=preamble.XOrigin:preamble.XIncrement:tstop;
+ 
+% read data
+N=4;
+keep=false(1,N);
+data=nan(preamble.Points,N);
+label=cell(1,N);
+for n=1:N
+    if ~object.Channel(n).Display
+        continue
+    end
+    keep(n)=true;
+    command=sprintf('WAVEFORM:SOURCE %d',n);
+    fwrite(object.VISA,command);
+    %
+    fwrite(object.VISA,':WAVEFORM:BYTEORDER LSBFIRST'); % this is supposed to be faster than MSBF
+    fclose(object.VISA);
+    object.VISA.InputBufferSize=2*preamble.Points;
+    object.VISA.ByteOrder='littleEndian';    
+    fopen(object.VISA);
+    fwrite(object.VISA,'WAVEFORM:DATA');
+    temp=fread(object.VISA,[preamble.Points 1],'int16');
+    temp=preamble.YOrigin+preamble.YIncrement*temp;
+    data(:,n)=temp(:);
+    label{n}=object.Channel(n).Label;
+end
 
+data=data(:,keep);
+label=label(keep);
+result=SMASH.SignalAnalysis.SignalGroup(time,data);
+result.Legend=label;
 
 end
 
@@ -70,7 +74,7 @@ output=struct();
 [output.YUnits,in]=nibble(in);
 
 [output.MaxBandWidth,in]=nibble(in);
-[output.MinBandWidth,in]=nibble(in);
+[output.MinBandWidth,~]=nibble(in);
 
 end
 
