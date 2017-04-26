@@ -66,6 +66,9 @@ else
     data=data(:,keep);
     label=label(keep);
     result=SMASH.SignalAnalysis.SignalGroup(time,data);
+    result.GridLabel='Time (s)';
+    result.DataLabel='Signal (V)';
+    result.Precision='single';
     result.Legend=label;
     result.Name=object.Name;
     result.GraphicOptions.Title=object.Name;
