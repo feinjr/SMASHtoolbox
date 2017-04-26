@@ -42,12 +42,19 @@ classdef Digitizer < handle
             fwrite(object.VISA,'*IDN?');
             object.ID=strtrim(fscanf(object.VISA));
         end
+        varargout=close(varargin)
+        varargout=open(varargin)
+        varargout=communicate(varargin)
     end
     %%
     methods (Static=true)
+        varargout=localhost(varargin)
         varargout=ping(varargin)
-        varargout=ipconfig(varargin)
         varargout=reset(varargin)
+        varargout=scan(varargin)
+    end
+    methods (Static=true, Hidden=true)
+        varargout=ipconfig(varargin)
     end
     %% getters 
     methods (Hidden=true)

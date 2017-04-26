@@ -7,9 +7,16 @@ end
 assert(ischar(mode),'ERROR: invalid mode');
 mode=lower(mode);
 
+% manage multiple digitizers
+if numel(object) > 1
+    for n=1:numel(object)
+        arm(object(n));
+    end
+    return
+end
+
 %
 communicate(object)
-%clearScreen(object);
 switch mode
     case 'single'
         fwrite(object.VISA,':single');

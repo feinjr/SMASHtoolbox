@@ -1,18 +1,22 @@
-function scan()
+%
+% object=scan('*');
+% object=scan('0-10');
+% 
+% object=scan('*.*');
 
-[~,report]=system('ipconfig');
-start=strfind(report,'IPv4 Address');
-report=report(start:end);
-while numel(report)>0
-    address=sscanf(report,':%d.%d.%d.%d',4);
-    if isempty(address)
-        report=report(2:end);
-        continue
-    end
-    break
+function object=scan(in)
+
+% manage input
+assert(ischar(in),'ERROR: invalid scan range');
+period=strfind(object,'.');
+Nperiod=numel(period);
+assert(any(Nperiod==0:3),'ERROR: invalid scan range');
+
+machine=SMASH.Z.Digitizer.localhost();
+address=cell(1,4);
+for k=1:4
+    if Nperiod
 end
-machine=sprintf('%d.',address);
-machine=machine(1:end-1);
 
 
 end

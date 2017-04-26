@@ -1,5 +1,14 @@
 function result=grab(object)
 
+% manage multiple digitizers
+if numel(object) > 1
+    result=nan(size(object));
+    for n=1:numel(object)
+        result{n}=grab(object(n));
+    end
+    return
+end
+
 % set byte order
 fwrite(object.VISA,':WAVEFORM:BYTEORDER LSBFIRST'); % this is supposed to be faster
 fclose(object.VISA);
