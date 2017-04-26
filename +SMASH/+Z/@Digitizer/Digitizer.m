@@ -1,30 +1,28 @@
 classdef Digitizer < handle
     properties
-        Name = '(unnamed digitizer)' % Digitizer name
-        ID % Digitizer ID
-    end
-    properties (SetAccess=protected)
-        Address % IP address
+        Name = '(unnamed digitizer)' % Digitizer name                
     end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
     end
+    properties (SetAccess=protected)
+        System % Digitizer system values (model, serial number, ...)
+    end
     properties (Dependent=true)
-        Acquisition       
-        Trigger
-        Channel
+        Acquisition % Acquisition settings (sample rate, points, ...)       
+        Trigger % Trigger settings (source, level, ...)
+        Channel % Channel settings (scale, offset, ...)
     end
     properties (Dependent=true, SetAccess=protected)
-        RunState
-        Calibration
+        RunState % Run state (single, run, stop)
+        Calibration % Calibration info
     end    
     %%
     methods (Hidden=true)
         function object=Digitizer(address)
             assert(nargin ==1 ,'ERROR: no IP address specified');            
-            delay=SMASH.Z.Digitizer.ping(address);
-            assert(~isnan(delay),'ERROR : invalid IP address');
-            object.Address=address;
+            delay=SMASH.System.ping(address);
+            assert(~isnan(delay),'ERROR : invalid IP address');      
             list=instrfind();
             for k=1:numel(list)
                 if strcmp(list(k).RemoteHost,address)
@@ -34,22 +32,21 @@ classdef Digitizer < handle
             end
             if isempty(object.VISA)
                 object.VISA=visa('AGILENT',...
-                    sprintf('TCPIP0::%s',object.Address));
+                    sprintf('TCPIP0::%s',address));
             end
             if strcmp(object.VISA.Status,'closed')
                 fopen(object.VISA);
             end
-            fwrite(object.VISA,'*IDN?');
-            object.ID=strtrim(fscanf(object.VISA));
+            fwrite(object.VISA,'SYSTEM:LONGFORM ON');
+            fwrite(object.VISA,'*IDN?');                       
+            object.System=setupSystem(strtrim(fscanf(object.VISA)),address);                        
         end
         varargout=close(varargin)
         varargout=open(varargin)
         varargout=communicate(varargin)
     end
     %%
-    methods (Static=true)
-        varargout=localhost(varargin)
-        varargout=ping(varargin)
+    methods (Static=true)      
         varargout=reset(varargin)
         varargout=scan(varargin)
     end

@@ -1,11 +1,23 @@
-% listIP4 Generate a list of private IP4 requestes
+% listIP4 Generate a list of private IP4 addresses
 %
-% This function generates a list of private IP4 requestes.
+% This function generates a list of private IP4 addresses. Full address
+% specification uses four blocks, separated by periods, with integers,
+% integer ranges, or wildcards.
+%    address=listIP4('192.168.0.*'); everything in 192.168.0
+%    address=listIP4('192.168.0.0-9'); first ten addresses in 192.168.0
 %
+% Partial address specification can also be used.  Missing blocks are
+% filled with information from the local host.  Suppose the local host
+% address is 192.168.0.1.
 %    list=listIP4('*'); % list everything in 192.168.0.*
-%    list=listIP4('*.*'); % list everything in 192.168.*.*
+%    list=listIP4('*.1'); % list everything in 192.168.*.1
 % 
+% See also SMASH.System, localhost, ping
 %
+
+%
+% created April 20, 2017 by Daniel Dolan (Sandia National Laboratories
+%   
 
 function list=listIP4(request)
 
@@ -52,7 +64,12 @@ end
     end
 
 % fill in missing blocks
-master={[192 192] [168 168] [0 0] [0 0]};
+local=SMASH.System.localhost();
+local=sscanf(local','%d.%d.%d.%d');
+master=cell(1,4);
+for k=1:4
+    master{k}=repmat(local(k),[1 2]);
+end
 master=master(end:-1:1);
 M=numel(master);
 assert(numel(block) <= M,errmsg);

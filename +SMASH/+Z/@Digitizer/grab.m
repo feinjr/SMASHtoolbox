@@ -2,7 +2,7 @@ function result=grab(object)
 
 % manage multiple digitizers
 if numel(object) > 1
-    result=nan(size(object));
+    result=cell(size(object));
     for n=1:numel(object)
         result{n}=grab(object(n));
     end

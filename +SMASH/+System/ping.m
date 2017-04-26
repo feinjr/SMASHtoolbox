@@ -13,7 +13,7 @@
 % returned as a second output.
 %    [delay,report]=ping(address);
 %
-% See also SMASH.Instrument
+% See also SMASH.System, listIP4, localhost
 %
 
 %
@@ -23,7 +23,7 @@ function varargout=ping(address,timeout)
 
 % manage input
 if (nargin < 1) || isempty(address)
-    address='localhost';
+    address=SMASH.System.localhost();
 end
 assert(ischar(address) || iscellstr(address),'Invalid address');
 
@@ -36,9 +36,13 @@ assert(isnumeric(timeout) && isscalar(timeout) && (timeout > 0),...
 % manage multiple IP addresses
 if iscellstr(address)
     delay=nan(size(address));
+    fprintf('Testing IP4 : ');
     for n=1:numel(address)
+        fprintf('%15s',address{n});
         delay(n)=SMASH.System.ping(address{n},timeout);
+        fprintf(repmat('\b',[1 15]));
     end
+    fprintf('done\n');
     varargout{1}=delay;
     return
 end
