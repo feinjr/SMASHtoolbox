@@ -15,13 +15,13 @@ function address=localhost()
 if ispc
     [~,result]=system('ping -n 1 localhost');
     result=sscanf(result,'%*s %s',1);
-    command=sprintf('ping -n 1 %s',result);
+    command=sprintf('ping -n 1 %s',strtrim(result));
     [~,result]=system(command);
     result=sscanf(result,'%*s %*s %s',1);
     address=result(2:end-1);
 else
     [~,result]=system('bash -c ''hostname''');
-    command=sprintf('bash -c ''ping -c 1 %s',result);
+    command=sprintf('bash -c ''ping -c 1 %s'' ',strtrim(result));
     [~,result]=system(command);
     result=sscanf(result,'%*s %*s %s',1);
     address=result(2:end-2);
