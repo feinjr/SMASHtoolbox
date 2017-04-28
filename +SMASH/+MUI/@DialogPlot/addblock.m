@@ -98,20 +98,13 @@
 %
 function varargout=addblock(object,varargin)
 
-assert(~object.Locked,'ERROR: block cannot be added because the dialog has been finished');
+assert(~object.Locked,'ERROR: block cannot be added to a finished dialog');
 
 h=addblock(object.DialogBox,varargin{:});
-new=copyobj(h,object.ControlPanel);
-
-
-for n=1:numel(h)
-    setappdata(h(n),'Copy',new(n));
-end
-
-for n=1:numel(object.DialogBox.Controls)
-    source=object.DialogBox.Controls(n);
-    target=getappdata(source,'Copy');
-    set(target,'Position',get(source,'Position'));
+N=numel(h);
+new=nan(N,1);
+for n=1:N
+    new(n)=copyobj(h(n),object.ControlPanel);
 end
 
 set(object.ControlPanel,'Units','pixels');
@@ -125,6 +118,19 @@ try
 catch
     feval(get(object.Figure,'ResizeFcn'));
 end
+
+for n=1:numel(h)
+    setappdata(h(n),'Copy',new(n));
+    setappdata(new(n),'Source',h(n));
+end
+
+copy=get(object.ControlPanel,'Children');
+for n=1:numel(copy)
+    source=getappdata(copy(n),'Source');    
+    set(copy(n),'Position',get(source,'Position'));
+end
+
+
 
 if nargin > 0
    varargout{1}=new;
