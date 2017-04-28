@@ -20,7 +20,7 @@ classdef Digitizer < handle
     %%
     methods (Hidden=true)
         function object=Digitizer(address)
-            assert(nargin ==1 ,'ERROR: no IP address specified');            
+            oassert(nargin ==1 ,'ERROR: no IP address specified');            
             delay=SMASH.System.ping(address);
             assert(~isnan(delay),'ERROR : invalid IP address');      
             list=instrfind();

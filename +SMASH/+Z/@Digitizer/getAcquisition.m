@@ -1,3 +1,4 @@
+
 function value=getAcquisition(object)
 
 communicate(object);
