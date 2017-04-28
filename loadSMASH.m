@@ -63,7 +63,7 @@ while numel(varargin)>0
         case '-silent'
             verbose=false;
             varargin=varargin(2:end);
-        case {'-program','-java','-example'}
+        case {'-program','programs','-java','-example'}
             assert(isempty(mode),'ERROR: mode conflict detected');
             mode=varargin{1};
             varargin=varargin(2:end);
@@ -85,7 +85,7 @@ assert(~isempty(name),'ERROR: no names specified');
 
 % load named directories
 switch mode
-    case '-program'
+    case {'-program' '-programs'}
         loadProgram(name,verbose);
     case '-example'
         loadExample(name,verbose);
