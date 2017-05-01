@@ -1,8 +1,9 @@
-function makeGUI()
+function makeGUI(fontsize)
 
-fig=SMASH.MUI.DialogPlot();
+fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
 fig.Name='Digitizer control';
 
+set(fig.Axes,'FontSize',fontsize);
 xlabel(fig.Axes,'Time (s)');
 ylabel(fig.Axes,'Signal (V)');
 
@@ -65,6 +66,7 @@ button=addblock(fig,'button',{'Clear screens'});
 df=addblock(fig,'edit_button',{'Base file name:' ' Save data '},[20 5]);
 set(df(1),'FontWeight','bold');
 
+finish(fig);
 movegui(fig.Figure,'center');
 
 end

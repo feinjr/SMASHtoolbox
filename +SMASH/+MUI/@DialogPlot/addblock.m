@@ -127,7 +127,9 @@ end
 copy=get(object.ControlPanel,'Children');
 for n=1:numel(copy)
     source=getappdata(copy(n),'Source');    
-    set(copy(n),'Position',get(source,'Position'));
+    set(copy(n),...
+        'Position',get(source,'Position'),...
+        'FontSize',get(source,'FontSize'));
 end
 
 

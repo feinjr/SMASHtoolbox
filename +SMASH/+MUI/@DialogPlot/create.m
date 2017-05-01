@@ -1,6 +1,13 @@
 function object=create(object,varargin)
 
 %%
+%%
+if nargin > 1
+    option=varargin;
+else
+    option={};
+end
+
 temp=SMASH.MUI.Figure('NumberTitle','off','Name',object.PrivateName);
 object.Figure=temp.Handle;
 try
@@ -9,15 +16,13 @@ catch
     set(object.Figure,'ResizeFcn',@resizeFigure);
 end
     function resizeFigure(varargin)
-        %
-        OldUnits=get(object.Figure,'Units');
         set(object.Figure,'Units','pixels');
         set(object.ControlPanel,'Units','pixels');
         set(object.PlotPanel,'Units','pixels');
         %
         FigPosition=get(object.Figure,'Position');
-        ControlPosition=get(object.ControlPanel,'Position');       
-        minwidth=2*ControlPosition(3);                
+        ControlPosition=get(object.ControlPanel,'Position');
+        minwidth=2*ControlPosition(3);
         if FigPosition(3) < minwidth
             FigPosition(3) = minwidth;
         end
@@ -28,6 +33,7 @@ end
             FigPosition(2) = y0-change;
             FigPosition(4) = minheight;
         end
+        FigPosition(3:4)=ceil(FigPosition(3:4));
         set(object.Figure,'Position',FigPosition);
         %
         ControlPosition(1)=0;
@@ -38,9 +44,7 @@ end
         PlotPosition(1)=ControlPosition(3);
         PlotPosition(3)=PlotPosition(3)-PlotPosition(1);
         PlotPosition(2)=0;
-        set(object.PlotPanel,'Position',PlotPosition);
-        %
-        set(object.Figure,'Units',OldUnits);
+        set(object.PlotPanel,'Position',PlotPosition);        
     end
 
 %%
@@ -54,12 +58,7 @@ object.PlotPanel=uipanel(...
 axes('Parent',object.PlotPanel,'Box','on');
 
 %%
-if nargin > 1
-    set(object.Figure,varargin{:});
-end
-
-%%
-object.DialogBox=SMASH.MUI.Dialog();
+object.DialogBox=SMASH.MUI.Dialog(option{:});
 object.DialogBox.Hidden=true;
 
 setappdata(object.Figure,'DialogPlot',object);
