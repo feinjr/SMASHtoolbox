@@ -37,7 +37,7 @@ acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],3);
 %acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],8);
 set(acquire(1),'FontWeight','bold');
 data=cell(8,2);
-data{1,1}='Sample rate (1/s)';
+data{1,1}='Sample rate (1/s) :';
 data{2,1}='Number samples';
 data{3,1}='Number averages';
 data{4,1}='Trigger source';
