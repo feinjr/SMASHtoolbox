@@ -2,19 +2,20 @@ function varargout=DigitizerControl(address,fontsize)
 
 % manage input
 if (nargin < 1) || isempty(address)
-    address='*';
+    address='';
 end
+assert(ischar(address) || iscellstr(address),...
+    'ERROR: invalid address list');
 
 if (nargin < 2)  || isempty(fontsize)
     fontsize=12;
 end
- 
-assert(ischar(address) || iscellstr(address),...
-    'ERROR: invalid address list');
 
 % select digitizers
-makeGUI(fontsize);
-%selectDigitizers(address);
+fig=makeGUI(fontsize);
+if ~isempty(address)
+    selectDigitizers([],[],fig,address);
+end
 
 % manage output
 if isdeployed

@@ -7,11 +7,24 @@
 function object=scan(request)
 
 % manage input
-try
-    list=SMASH.System.listIP4(request);
-catch
+if ischar(request)
+    try
+        list=SMASH.System.listIP4(request);
+    catch
+        error('ERROR: invalid IP request');
+    end
+elseif iscellstr(request)
+    object={};
+    for n=1:numel(request)
+        temp=SMASH.Z.Digitizer.scan(request{n});
+        object=[object temp(:)]; %#ok<AGROW>
+    end
+    return
+else
     error('ERROR: invalid IP request');
 end
+
+
 
 % look for digitizers
 delay=SMASH.System.ping(list);

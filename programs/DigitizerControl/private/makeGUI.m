@@ -1,7 +1,15 @@
-function makeGUI(fontsize)
+function fig=makeGUI(fontsize)
+
+h=findall(0,'Tag','DigitizerControl');
+if ishandle(h)
+    figure(h);
+    return
+end
 
 fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
+fig.Hidden=true;
 fig.Name='Digitizer control';
+fig.Figure.Tag='DigitizerControl';
 
 set(fig.Axes,'FontSize',fontsize);
 xlabel(fig.Axes,'Time (s)');
@@ -11,7 +19,8 @@ h=findobj(gcf,'Type','uitoggletool','Tag','standard');
 set(h,'Enable','off');
 
 hm=uimenu(fig.Figure,'Label','Program');
-uimenu(hm,'Label','Set up digitizers');
+uimenu(hm,'Label','Select digitizers',...
+    'Callback',{@selectDigitizers,fig,'',fontsize});
 uimenu(hm,'Label','Save configuration','Separator','on');
 uimenu(hm,'Label','Load configuration');
 uimenu(hm,'Label','Pull calibrations','Separator','on');
@@ -42,18 +51,18 @@ data{2,1}='Number samples :';
 data{3,1}='Number averages :';
 data{4,1}='Trigger source :';
 data{5,1}='Trigger slope :';
-data{6,1}='Trigger level (V)';
-data{7,1}='Reference type';
-data{8,1}='Reference position (s)';
+data{6,1}='Trigger level (V) :';
+data{7,1}='Reference type :';
+data{8,1}='Reference position (s) :';
 set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},'ColumnEditable',[false true]);
 
 channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
 set(channel(1),'Fontweight','bold');
 data=cell(3,5);
-data{1,1}='Scale (V/div)';
-data{2,1}='Offset (V)';
-data{3,1}='Enable';
+data{1,1}='Scale (V/div) :';
+data{2,1}='Offset (V) :';
+data{3,1}='Status :';
 set(channel(end),'Data',data,...
     'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
     'ColumnEditable',[false true true true true])
@@ -68,5 +77,6 @@ set(df(1),'FontWeight','bold');
 
 finish(fig);
 movegui(fig.Figure,'center');
+fig.Hidden=false;
 
 end

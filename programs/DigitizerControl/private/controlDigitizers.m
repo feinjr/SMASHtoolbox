@@ -1,3 +1,0 @@
-function controlDigitizers(digitizer)
-
-end
