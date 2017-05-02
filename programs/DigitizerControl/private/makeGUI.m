@@ -70,7 +70,29 @@ set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},'ColumnEditable',[false true]);
 set(acquire(end),'CellEditCallback',@changeSetting);
     function changeSetting(~,EventData)
-        why
+        index=get(digitizer(2),'Value');
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        row=EventData.Indices(1);
+        value=EventData.EditData;
+        switch row
+            case 1
+                value=sscanf(value,'%g',1);
+                try
+                    dig(index).Acquisition.SampleRate=value;
+                catch                    
+                end
+            case 2
+                dig(index).Acquisition.NumberSamples=sscanf(value,'%d',1);  
+            case 3
+                dig(index).Acquisition.SampleAverages=sscanf(value,'%d',1);                                
+            case 4
+                
+            case 5
+            case 6
+            case 7
+            case 8
+        end
+        updateControls(fig);
     end
 
 channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
