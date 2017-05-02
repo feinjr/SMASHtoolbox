@@ -14,7 +14,8 @@ end
 % select digitizers
 fig=makeGUI(fontsize);
 if ~isempty(address)
-    selectDigitizers([],[],fig,address);
+    dig=SMASH.Z.Digitizer.scan(address);    
+    updateControls(fig,dig);
 end
 
 % manage output

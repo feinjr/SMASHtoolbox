@@ -6,6 +6,8 @@ if ishandle(h)
     return
 end
 
+dig=[];
+
 fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
 fig.Hidden=true;
 fig.Name='Digitizer control';
@@ -19,8 +21,12 @@ h=findobj(gcf,'Type','uitoggletool','Tag','standard');
 set(h,'Enable','off');
 
 hm=uimenu(fig.Figure,'Label','Program');
-uimenu(hm,'Label','Select digitizers',...
-    'Callback',{@selectDigitizers,fig,'',fontsize});
+uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
+    function menuSelectDigitizers(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        selectDigitizers(fig,dig,fontsize);
+    end
+
 uimenu(hm,'Label','Save configuration','Separator','on');
 uimenu(hm,'Label','Load configuration');
 uimenu(hm,'Label','Pull calibrations','Separator','on');
@@ -37,14 +43,20 @@ uimenu(hm,'Label','Frequency spectrum');
 uimenu(hm,'Label','Time-frequency spectrogram');
 
 digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
-    {'Digitizer 1' 'Digitizer 2' 'Digitizer 3' 'Digitizer 4'},20);
+    {''},20);
 set(digitizer(1),'FontWeight','bold');
+setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
+set(digitizer(end),'Callback',@readDigitizer);
+    function readDigitizer(varargin)
+        updateControls(fig);
+    end
 
 common=addblock(fig,'check','Common digitizer settings');
 
-acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],3);
-%acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],8);
+%acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],3);
+acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],8);
 set(acquire(1),'FontWeight','bold');
+setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
 data=cell(8,2);
 data{1,1}='Sample rate (1/s) :';
 data{2,1}='Number samples :';
@@ -56,9 +68,14 @@ data{7,1}='Reference type :';
 data{8,1}='Reference position (s) :';
 set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},'ColumnEditable',[false true]);
+set(acquire(end),'CellEditCallback',@changeSetting);
+    function changeSetting(~,EventData)
+        why
+    end
 
 channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
 set(channel(1),'Fontweight','bold');
+setappdata(fig.ControlPanel,'ChannelTable',channel(end));
 data=cell(3,5);
 data{1,1}='Scale (V/div) :';
 data{2,1}='Offset (V) :';
@@ -70,7 +87,7 @@ set(channel(end),'Data',data,...
 button=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
 set(button(1:2),'Style','toggle');
 
-button=addblock(fig,'button',{'Clear screens'});
+button=addblock(fig,'button',{'Clear screens' 'Force trigger'});
 
 df=addblock(fig,'edit_button',{'Base file name:' ' Save data '},[20 5]);
 set(df(1),'FontWeight','bold');
