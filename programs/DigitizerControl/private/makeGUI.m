@@ -40,8 +40,10 @@ uimenu(hm,'Label','Load configuration');
 uimenu(hm,'Label','Exit','Separator','on');
 
 hm=uimenu(fig.Figure,'Label','Data');
-uimenu(hm,'Label','Save all digitizers');
-uimenu(hm,'Label','Save current digitizer');
+uimenu(hm,'Label','Save all digitizers',...
+    'Callback',@(~,~) saveData(fig,'all'));
+uimenu(hm,'Label','Save current digitizer',...
+    'Callback',@(~,~) saveData(fig,'current'));
 
 hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
 MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...

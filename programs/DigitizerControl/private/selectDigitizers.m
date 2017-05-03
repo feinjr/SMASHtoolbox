@@ -62,6 +62,10 @@ waitfor(box.Handle);
     function updateDialog(varargin)
         data=get(table(end),'Data');
         for row=1:maxrows
+            
+        end
+        
+        for row=1:maxrows
             if isempty(data{row,1})
                 data{row,2}='';
                 data{row,3}='';
@@ -82,7 +86,7 @@ waitfor(box.Handle);
     function done(varargin)
         updateDialog();
         data=get(table(end),'Data');
-        address=data(:,1);
+        address=data(:,1);       
         name=data(:,4);
         keep=true(size(address));
         for row=1:numel(address)
@@ -93,7 +97,7 @@ waitfor(box.Handle);
         address=address(keep);
         name=name(keep);
         dig=SMASH.Z.Digitizer.scan(address);
-        for row=1:numel(dig)
+        for row=1:numel(dig)            
             dig(row).Name=name{row};
         end
         updateControls(fig,dig);
@@ -120,5 +124,14 @@ address=cell(size(dig));
 for n=1:numel(address)
     address{n}=dig.System.Address;
 end
+
+end
+
+%%
+function object=table2object(object,table)
+
+end
+
+function object2table(object,table)
 
 end
