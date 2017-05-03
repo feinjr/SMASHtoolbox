@@ -1,6 +1,6 @@
 classdef Digitizer < handle
     properties
-        Name = '(unnamed digitizer)' % Digitizer name                
+        Name = 'UnnamedDigitizer' % Digitizer name                
     end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object

@@ -63,7 +63,7 @@ end
 
 if isempty(data)
     result=[];
-    warning('SMASH:Digitizer','No signals to grab');
+    %warning('SMASH:Digitizer','No signals to grab');
 else
     data=data(:,keep);
     label=label(keep);

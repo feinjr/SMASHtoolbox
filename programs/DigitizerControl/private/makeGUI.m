@@ -1,13 +1,13 @@
 function fig=makeGUI(fontsize)
 
-Nchannel=4;
-
+%%
 h=findall(0,'Tag','DigitizerControl');
 if ishandle(h)
     figure(h);
     return
 end
 
+Nchannel=4;
 fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
 fig.Hidden=true;
 fig.Name='Digitizer control';
@@ -35,12 +35,13 @@ uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
         dig=getappdata(fig.Figure,'DigitizerObject');
         selectDigitizers(fig,dig,fontsize);        
     end
-
 uimenu(hm,'Label','Save configuration','Separator','on');
 uimenu(hm,'Label','Load configuration');
-uimenu(hm,'Label','Pull calibrations','Separator','on');
-uimenu(hm,'Label','Push calibrations');
 uimenu(hm,'Label','Exit','Separator','on');
+
+hm=uimenu(fig.Figure,'Label','Data');
+uimenu(hm,'Label','Save all digitizers');
+uimenu(hm,'Label','Save current digitizer');
 
 hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
 MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...
@@ -48,11 +49,11 @@ MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...
     function lockControls(varargin)
         if strcmpi(get(MenuLockControls,'Checked'),'off')
             dig=getappdata(fig.Figure,'DigitizerObject');
-            lock(dig);
+            dig.lock();
             set(MenuLockControls,'Checked','on');
         else
             dig=getappdata(fig.Figure,'DigitizerObject');
-            unlock(dig);
+            dig.unlock();
             set(MenuLockControls,'Checked','off');
         end        
     end
@@ -61,11 +62,11 @@ MenuLockScreens=uimenu(hm,'Label','Lock digitizer screens',...
     function lockScreens(varargin)
         if strcmpi(get(MenuLockScreens,'Checked'),'off')
             dig=getappdata(fig.Figure,'DigitizerObject');
-            lock(dig,'gui');
+            dig.lock('gui');
             set(MenuLockScreens,'Checked','on');
         else
             dig=getappdata(fig.Figure,'DigitizerObject');
-            unlock(dig,'gui');
+            dig.unlock('gui');
             set(MenuLockScreens,'Checked','off');
         end
     end
@@ -75,52 +76,32 @@ uimenu(hm,'Label','Unlock digitizers','Separator','on',...
         dig=getappdata(fig.Figure,'DigitizerObject');
         set(MenuLockControls,'Checked','off');
         set(MenuLockScreens,'Checked','off');
-        unlock(dig);
+        dig.unlock;
     end
+
+hm=uimenu(fig.Figure,'Label','Calibration');
+uimenu(hm,'Label','Pull files');
+uimenu(hm,'Label','Push files');
+uimenu(hm,'Label','Check status','Separator','on');
 
 hm=uimenu(fig.Figure,'Label','Analysis');
 uimenu(hm,'Label','Frequency spectrum');
 uimenu(hm,'Label','Time-frequency spectrogram');
 
-digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
-    {''},20);
-set(digitizer(1),'FontWeight','bold');
-setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
-set(digitizer(end),'Callback',@readDigitizer);
-    function readDigitizer(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        updateControls(fig);
-        index=get(digitizer(2),'Value');
-        result=grab(dig(index));
-        kk=0;
-        label=cell(size(result));
-        h=nan(size(result));
-        for nn=1:Nchannel
-            if dig(index).Channel(nn).Display
-                kk=kk+1;
-                try
-                    x=result.Grid;
-                    y=result.Data(:,kk);
-                catch
-                    return
-                end
-                set(ChannelLine(nn),'Visible','on',...
-                    'XData',x,'YData',y)
-                h(kk)=ChannelLine(nn);
-                label{kk}=sprintf('Channel %d',nn);
-            else
-                set(ChannelLine(nn),'Visible','off');
-            end
-        end
-        if ~isempty(label)
-            legend(h,label,'Location','best');
+%%
+common=addblock(fig,'check',' Global settings');
+set(common,'Callback',@globalSettings)
+    function globalSettings(varargin)
+        if get(common,'Value')
+            set(acquire(1),'String','Global digitizer settings:');
+        else
+            set(acquire(1),'String','Current digitizer settings:');
         end
     end
 
-common=addblock(fig,'check',' Apply settings to all');
-
 %acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],3);
 acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],8);
+globalSettings();
 set(acquire(1),'FontWeight','bold');
 setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
 data=cell(8,2);
@@ -154,6 +135,139 @@ set(acquire(end),'Data',data,...
         %updateControls(fig);
     end
 
+digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
+    {''},20);
+set(digitizer(1),'FontWeight','bold');
+setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
+set(digitizer(2),'Callback',@changeDigitizer)
+    function changeDigitizer(varargin)
+        updateControls(fig);
+        set(ChannelLine,'Visible','off');
+    end
+set(digitizer(end),'Callback',@readDigitizer);
+    function readDigitizer(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        updateControls(fig);
+        index=get(digitizer(2),'Value');
+        result=grab(dig(index));
+        kk=0;
+        label=cell(size(result));
+        h=nan(size(result));
+        for nn=1:Nchannel
+            if dig(index).Channel(nn).Display
+                kk=kk+1;
+                try
+                    x=result.Grid;
+                    y=result.Data(:,kk);
+                catch
+                    return
+                end
+                set(ChannelLine(nn),'Visible','on',...
+                    'XData',x,'YData',y)
+                h(kk)=ChannelLine(nn);
+                label{kk}=sprintf('Channel %d',nn);
+            else
+                set(ChannelLine(nn),'Visible','off');
+            end
+        end
+        if ~isempty(label)
+            legend(h,label,'Location','best');
+        end
+    end
+
+arm=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
+DefaultBackground=get(arm(1),'BackgroundColor');
+set(arm(1),'Callback',@runMode);
+    function runMode(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if isempty(dig)
+            stopMode();
+            return
+        end
+        set(arm(1),'BackgroundColor','g','Fontweight','bold');        
+        set(arm(2:3),'BackgroundColor',DefaultBackground,...
+            'Fontweight','normal');        
+        dig.arm('run');
+        while true      
+            pause(0.2);
+            switch lower(dig(1).RunState)
+                case 'single'
+                    singleMode();
+                case 'run'
+                    readDigitizer();
+                    continue
+                case 'stop'
+                    stopMode();
+                    drawnow();
+                    break
+            end
+        end
+    end
+set(arm(2),'Callback',@singleMode)
+    function singleMode(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        set(arm(2),'BackgroundColor','g','Fontweight','bold');
+        set(arm([1 3]),'BackgroundColor',DefaultBackground,...
+            'Fontweight','normal');
+        if isempty(dig)
+            return
+        end
+        dig.arm('single'); % avoid confusion with variable "arm"        
+        while true
+           pause(0.2); 
+           switch lower(dig(1).RunState)
+               case 'single'
+                   continue
+               case 'stop'
+                   stopMode();
+                   drawnow();
+                   readDigitizer();
+                   break
+               case 'run'
+                   runMode();
+           end          
+        end
+    end
+set(arm(3),'Callback',@stopMode)
+    function stopMode(varargin) 
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        set(arm(3),'BackgroundColor','r','FontWeight','bold');
+        set(arm(1:2),'BackgroundColor',DefaultBackground,...
+            'FontWeight','normal');
+        if numel(dig) > 0
+            dig.arm('stop');
+        end
+    end
+stopMode();
+
+override=addblock(fig,'button',{'Clear display' 'Force trigger'});
+set(override(1),'Callback',@clearDisplays)
+    function clearDisplays(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        clearDisplay(dig);
+        set(ChannelLine,'Visible','off');
+    end
+set(override(2),'Callback',@forceTrigger)
+    function forceTrigger(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if isempty(dig)
+            return
+        end
+        switch lower(dig(1).RunState)
+            case 'single'
+                dig.forceTrigger();
+                stopMode();
+                drawnow();
+                readDigitizer();
+            case 'run'               
+                dig.forceTrigger();
+                dig.arm('stop');
+                readDigitizer();
+                dig.arm('run');
+        end                
+    end
+
+%%
 channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
 set(channel(1),'Fontweight','bold');
 setappdata(fig.ControlPanel,'ChannelTable',channel(end));
@@ -165,61 +279,18 @@ set(channel(end),'Data',data,...
     'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
     'ColumnEditable',[false true true true true],...
     'CellEditCallback',@changeChannel)
-    function changeChannel(~,EventData)
+    function changeChannel(src,EventData)
         dig=getappdata(fig.Figure,'DigitizerObject');
         index=1:numel(get(digitizer(2),'String'));
         row=EventData.Indices(1);
-        ch=EventData.Indices(2)-1;        
-        attemptChannel(dig(index),row,ch,value);
-    end
-
-arm=addblock(fig,'toggle',{' Run ' ' Single ' ' Stop '});
-set(arm(1),'Callback',@runMode);
-    function runMode(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        set(arm(1),'Value',1);
-        set(arm(2:3),'Value',0);
-        if numel(dig) > 0
-            arm(dig,'run');
-        end
-    end
-set(arm(2),'Callback',@singleMode)
-    function singleMode(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        set(arm(2),'Value',1);
-        set(arm([1 3]),'Value',0);
-        if numel(dig) > 0
-        arm(dig,'single');
-        end
-    end
-set(arm(3),'Callback',@stopMode)
-    function stopMode(varargin) 
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        set(arm(3),'Value',1);
-        set(arm(1:2),'Value',0);
-        if numel(dig) > 0
-            arm(dig,'stop');
-        end
-    end
-stopMode();
-
-override=addblock(fig,'button',{'Clear screens' 'Force trigger'});
-set(override(1),'Callback',@clearScreens)
-    function clearScreens(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        clearScreen(dig);
-        set(ChannelLine,'Visible','off');
-    end
-set(override(2),'Callback',@forceTrigger)
-    function forceTrigger(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        forceTrigger(dig);
-    end
-
-df=addblock(fig,'button','Save all data');
-set(df,'Callback',@saveData)
-    function saveData(varargin)
-        % under construction
+        column=EventData.Indices(2);
+        ch=column-1;
+        value=EventData.EditData;
+        value=attemptChannel(dig(index),row,ch,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
     end
 
 finish(fig);
@@ -290,26 +361,37 @@ end
 
 end
 
-function attemptChannel(dig,row,ch,value) %#ok<INUSL>
+function value=attemptChannel(dig,row,ch,value)
 
 switch row
     case 1
-        command=sprintf('dig.Channel(%d).Scale',ch,value);
+        try
+            dig.Channel(ch).Scale=sscanf(value,'%g',1);
+        catch
+        end
+        value=dig.Channel(ch).Scale;
     case 2
-        command=sprintf('dig.Channel(%d).Offset',ch,value);
+        try
+            dig.Channel(ch).Offset=sscanf(value,'%g',1);
+        catch
+        end
+        value=dig.Channel(ch).Offset;
     case 3
         if strcmpi(value,'on')
-            value='1';
+            value=true;
         elseif strcmpi(value,'off')
-            value='0';
+            value=false;
         end
-        command=sprintf('dig.Channel(%d).Display',ch,value);
-end
-
-try
-    eval(command);
-catch
-    % do nothing
+        try
+            dig.Channel(ch).Display=value;
+        catch
+        end
+        value=dig.Channel(ch).Display;
+        if value
+            value='ON';
+        else
+            value='OFF';
+        end
 end
 
 end
