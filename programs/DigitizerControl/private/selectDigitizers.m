@@ -1,5 +1,5 @@
 
-function selectDigitizers(fig,arg,fontsize)
+function dig=selectDigitizers(fig,arg,fontsize)
 
 % manage input
 if isempty(arg)
@@ -97,6 +97,9 @@ waitfor(box.Handle);
             dig(row).Name=name{row};
         end
         updateControls(fig,dig);
+        %hlock=findobj(fig.Figure,'Tag','LockMenu');
+        %hlock=get(hlock,'Children');
+        %set(hlock,'Checed','off');
         delete(box);
     end
 
