@@ -8,20 +8,20 @@ if ishandle(h)
     return
 end
 
-dig=[];
-
 fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
 fig.Hidden=true;
 fig.Name='Digitizer control';
 fig.Figure.Tag='DigitizerControl';
 
 set(fig.Axes,'FontSize',fontsize);
+color={'y' 'g' 'b' 'r'};
 for k=1:Nchannel
     ChannelLine(k)=line('Parent',fig.Axes,'Visible','off'); %#ok<AGROW>
     if k==1        
         ChannelLine=repmat(ChannelLine,4,1);           
     end
-    set(ChannelLine(k),'Tag',sprintf('Channel%d',k));
+    set(ChannelLine(k),...
+        'Color',color{k},'Tag',sprintf('Channel%d',k));
 end
 xlabel(fig.Axes,'Time (s)');
 ylabel(fig.Axes,'Signal (V)');
@@ -33,7 +33,7 @@ hm=uimenu(fig.Figure,'Label','Program');
 uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
     function menuSelectDigitizers(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
-        dig=selectDigitizers(fig,dig,fontsize);        
+        selectDigitizers(fig,dig,fontsize);        
     end
 
 uimenu(hm,'Label','Save configuration','Separator','on');
@@ -47,9 +47,11 @@ MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...
     'Tag','LockControls','Callback',@lockControls);
     function lockControls(varargin)
         if strcmpi(get(MenuLockControls,'Checked'),'off')
+            dig=getappdata(fig.Figure,'DigitizerObject');
             lock(dig);
             set(MenuLockControls,'Checked','on');
         else
+            dig=getappdata(fig.Figure,'DigitizerObject');
             unlock(dig);
             set(MenuLockControls,'Checked','off');
         end        
@@ -58,9 +60,11 @@ MenuLockScreens=uimenu(hm,'Label','Lock digitizer screens',...
     'Tag','LockScreens','Callback',@lockScreens);
     function lockScreens(varargin)
         if strcmpi(get(MenuLockScreens,'Checked'),'off')
+            dig=getappdata(fig.Figure,'DigitizerObject');
             lock(dig,'gui');
             set(MenuLockScreens,'Checked','on');
         else
+            dig=getappdata(fig.Figure,'DigitizerObject');
             unlock(dig,'gui');
             set(MenuLockScreens,'Checked','off');
         end
@@ -68,6 +72,7 @@ MenuLockScreens=uimenu(hm,'Label','Lock digitizer screens',...
 uimenu(hm,'Label','Unlock digitizers','Separator','on',...
     'Tag','Unlock','Callback',@unlock);
     function unlock(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         set(MenuLockControls,'Checked','off');
         set(MenuLockScreens,'Checked','off');
         unlock(dig);
@@ -83,18 +88,32 @@ set(digitizer(1),'FontWeight','bold');
 setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
 set(digitizer(end),'Callback',@readDigitizer);
     function readDigitizer(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         updateControls(fig);
         index=get(digitizer(2),'Value');
         result=grab(dig(index));
         kk=0;
+        label=cell(size(result));
+        h=nan(size(result));
         for nn=1:Nchannel
-            if dig(index).Channel(nn)
+            if dig(index).Channel(nn).Display
                 kk=kk+1;
+                try
+                    x=result.Grid;
+                    y=result.Data(:,kk);
+                catch
+                    return
+                end
                 set(ChannelLine(nn),'Visible','on',...
-                    'XData',result.Grid,'YData',result.Data(:,kk))
+                    'XData',x,'YData',y)
+                h(kk)=ChannelLine(nn);
+                label{kk}=sprintf('Channel %d',nn);
             else
                 set(ChannelLine(nn),'Visible','off');
             end
+        end
+        if ~isempty(label)
+            legend(h,label,'Location','best');
         end
     end
 
@@ -117,16 +136,22 @@ set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},...
     'ColumnEditable',[false true],...
     'CellEditCallback',@changeSetting)
-    function changeSetting(~,EventData)
+    function changeSetting(src,EventData)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         if get(common,'Value')
             index=1:numel(get(digitizer(2),'String'));          
         else
             index=get(digitizer(2),'Value');
         end
         row=EventData.Indices(1);
-        value=EventData.EditData;
-        attemptSetting(dig(index),row,value);        
-        updateControls(fig);
+        column=EventData.Indices(2);
+        value=EventData.EditData;       
+        value=attemptSetting(dig(index),row,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
+        %updateControls(fig);
     end
 
 channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
@@ -141,6 +166,7 @@ set(channel(end),'Data',data,...
     'ColumnEditable',[false true true true true],...
     'CellEditCallback',@changeChannel)
     function changeChannel(~,EventData)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         index=1:numel(get(digitizer(2),'String'));
         row=EventData.Indices(1);
         ch=EventData.Indices(2)-1;        
@@ -150,6 +176,7 @@ set(channel(end),'Data',data,...
 arm=addblock(fig,'toggle',{' Run ' ' Single ' ' Stop '});
 set(arm(1),'Callback',@runMode);
     function runMode(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         set(arm(1),'Value',1);
         set(arm(2:3),'Value',0);
         if numel(dig) > 0
@@ -158,6 +185,7 @@ set(arm(1),'Callback',@runMode);
     end
 set(arm(2),'Callback',@singleMode)
     function singleMode(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         set(arm(2),'Value',1);
         set(arm([1 3]),'Value',0);
         if numel(dig) > 0
@@ -165,7 +193,8 @@ set(arm(2),'Callback',@singleMode)
         end
     end
 set(arm(3),'Callback',@stopMode)
-    function stopMode(varargin)        
+    function stopMode(varargin) 
+        dig=getappdata(fig.Figure,'DigitizerObject');
         set(arm(3),'Value',1);
         set(arm(1:2),'Value',0);
         if numel(dig) > 0
@@ -177,11 +206,13 @@ stopMode();
 override=addblock(fig,'button',{'Clear screens' 'Force trigger'});
 set(override(1),'Callback',@clearScreens)
     function clearScreens(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         clearScreen(dig);
         set(ChannelLine,'Visible','off');
     end
 set(override(2),'Callback',@forceTrigger)
     function forceTrigger(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
         forceTrigger(dig);
     end
 
@@ -197,7 +228,7 @@ fig.Hidden=false;
 
 end
 
-function attemptSetting(dig,row,value)
+function value=attemptSetting(dig,row,value)
 
 if numel(dig) > 1
     for k=1:numel(dig)
@@ -207,29 +238,55 @@ if numel(dig) > 1
 end
 
 switch row
-    case 1       
-        command=sprintf('dig.Acquisition.SampleRate=%s',value);
+    case 1        
+        try
+            dig.Acquisition.SampleRate=sscanf(value,'%g',1);
+        catch
+        end
+        value=sprintf('%g',dig.Acquisition.SampleRate);
     case 2
-        command=sprintf('dig.Acquisition.NumberSamples=%s',value);        
+        try
+        dig.Acquisition.NumberPoints=sscanf(value,'%g',1);
+        catch
+        end
+        value=sprintf('%g',dig.Acquisition.NumberPoints);
     case 3
-        command=sprintf('dig.Acquisition.NumberAverages=%s',value);              
+        try
+        dig.Acquisition.NumberAverages=sscanf(value,'%g',1);
+        catch
+        end
+        value=sprintf('%g',dig.Acquisition.NumberAverages);
     case 4
-        command=sprintf('dig.Trigger.Source=%s',value);
+        try
+            dig.Trigger.Source=value;
+        catch
+        end
+        value=dig.Trigger.Source;
     case 5
-        command=sprintf('dig.Trigger.Slope=%s',value);
+        try
+            dig.Trigger.Slope=value;
+        catch
+        end
+        value=dig.Trigger.Slope;                
     case 6
-        command=sprintf('dig.Trigger.Level=%s',value);
+        try
+            dig.Trigger.Level=sscanf(value,'%g',1);
+        catch
+        end
+        value=dig.Trigger.Level;
     case 7
-        command=sprintf('dig.Trigger.ReferenceType=%s',value);
+        try
+            dig.Trigger.ReferenceType=value;
+        catch
+        end
+        value=dig.Trigger.ReferenceType;
     case 8
-        command=sprintf('dig.Trigger.ReferencePosition=%s',value);
-end
-
-try
-    eval(command);
-catch
-    % do nothing
-end
+        try
+            dig.Trigger.ReferencePosition=sscanf(value,'%g',1);
+        catch
+        end
+        value=dig.Trigger.ReferencePosition;
+end   
 
 end
 

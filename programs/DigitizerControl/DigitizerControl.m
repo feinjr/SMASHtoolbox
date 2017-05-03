@@ -11,6 +11,9 @@ if (nargin < 2)  || isempty(fontsize)
     fontsize=12;
 end
 
+% 
+SMASH.Z.Digitizer.reset();
+
 % select digitizers
 fig=makeGUI(fontsize);
 if ~isempty(address)

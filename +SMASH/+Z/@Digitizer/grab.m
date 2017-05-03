@@ -34,7 +34,8 @@ for n=1:N
     complete=fscanf(object.VISA,'%g',1);
     if complete == 0
         continue
-    end    
+    end
+    fwrite(object.VISA,'*CLS');
     fwrite(object.VISA,'WAVEFORM:PREAMBLE?');
     preamble=fscanf(object.VISA);
     preamble=readPreamble(preamble);
@@ -61,7 +62,8 @@ for n=1:N
 end
 
 if isempty(data)
-    error('ERROR: no signals to grab');
+    result=[];
+    warning('SMASH:Digitizer','No signals to grab');
 else
     data=data(:,keep);
     label=label(keep);

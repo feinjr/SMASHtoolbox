@@ -24,8 +24,6 @@ else
     error('ERROR: invalid IP request');
 end
 
-
-
 % look for digitizers
 delay=SMASH.System.ping(list);
 list=list(~isnan(delay));
