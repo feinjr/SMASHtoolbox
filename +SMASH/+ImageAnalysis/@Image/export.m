@@ -43,6 +43,8 @@ switch extension
         data.Title=object.Name;
         archive=SMASH.FileAccess.PFFfile(filename);
         write(archive,data,mode);
+    case {'.bmp' '.png' '.jpg' '.jpeg' '.tif' '.tiff'}
+        imwrite(object.Data,filename);
     otherwise       
         x=object.Grid1;
         y=object.Grid2;
