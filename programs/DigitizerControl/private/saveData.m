@@ -1,5 +1,18 @@
 function saveData(fig,mode)
 
+box=SMASH.MUI.Dialog();
+box.Hidden=true;
+switch mode
+    case 'all' 
+        box.Name='Save all';
+    case 'current'
+        box.Name='Save current';
+        
+end
+
+movegui(box.Handle,'center');
+box.Hidden=false;
+
 % base file name
 while true
    name=inputdlg('Base archive name: ','Base name',[1 40]);
