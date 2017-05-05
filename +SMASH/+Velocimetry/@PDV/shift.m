@@ -21,7 +21,9 @@ end
 value=varargin{1};
 
 % preview
-object.PrivatePreview=shift(object.PrivatePreview,'Grid1',value);
+if ~isempty(object.Preview)
+    object.PrivatePreview=shift(object.PrivatePreview,'Grid1',value);
+end
 
 % bounds
 for n=1:numel(object.PrivateBoundary)
