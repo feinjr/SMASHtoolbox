@@ -61,10 +61,7 @@ waitfor(box.Handle);
     end
     function updateDialog(varargin)
         data=get(table(end),'Data');
-        for row=1:maxrows
-            
-        end
-        
+        count=0;
         for row=1:maxrows
             if isempty(data{row,1})
                 data{row,2}='';
@@ -74,11 +71,15 @@ waitfor(box.Handle);
                 dig=SMASH.Z.Digitizer(data{row,1});
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;
+                count=count+1;
                 if isempty(data{row,4})
-                    data{row,4}=dig.Name;
+                    data{row,4}=sprintf('Digitizer%d',count);
                 else
-                    dig(row).Name=data{row,4};
+                    data{row,4}=matlab.lang.makeValidName(data{row,4});
                 end
+                temp=data(1:row,4);
+                temp=matlab.lang.makeUniqueStrings(temp);
+                data{row,4}=temp{end};
             end
         end
         set(table(end),'Data',data);
@@ -101,10 +102,12 @@ waitfor(box.Handle);
             dig(row).Name=name{row};
         end
         updateControls(fig,dig);
-        %hlock=findobj(fig.Figure,'Tag','LockMenu');
-        %hlock=get(hlock,'Children');
-        %set(hlock,'Checed','off');
+        unlock(dig);
+        hlock=findobj(fig.Figure,'Tag','LockMenu');
+        hlock=get(hlock,'Children');
+        set(hlock,'Checked','off');
         delete(box);
+        figure(fig.Figure);
     end
 
 end

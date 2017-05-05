@@ -3,7 +3,8 @@ function fig=makeGUI(fontsize)
 %%
 h=findall(0,'Tag','DigitizerControl');
 if ishandle(h)
-    figure(h);
+    fprintf('Program already running...making active\n');
+    figure(h);    
     return
 end
 
@@ -13,7 +14,7 @@ fig.Hidden=true;
 fig.Name='Digitizer control';
 fig.Figure.Tag='DigitizerControl';
 
-set(fig.Axes,'FontSize',fontsize);
+set(fig.Axes,'FontSize',fontsize,'Color',repmat(0.5,[1 3]));
 color={'y' 'g' 'b' 'r'};
 for k=1:Nchannel
     ChannelLine(k)=line('Parent',fig.Axes,'Visible','off'); %#ok<AGROW>
@@ -91,52 +92,6 @@ uimenu(hm,'Label','Frequency spectrum');
 uimenu(hm,'Label','Time-frequency spectrogram');
 
 %%
-common=addblock(fig,'check',' Global settings');
-set(common,'Callback',@globalSettings)
-    function globalSettings(varargin)
-        if get(common,'Value')
-            set(acquire(1),'String','Global digitizer settings:');
-        else
-            set(acquire(1),'String','Current digitizer settings:');
-        end
-    end
-
-%acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],3);
-acquire=addblock(fig,'table',{'Settings:' ' '},[20 10],8);
-globalSettings();
-set(acquire(1),'FontWeight','bold');
-setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
-data=cell(8,2);
-data{1,1}='Sample rate (1/s) :';
-data{2,1}='Number samples :';
-data{3,1}='Number averages :';
-data{4,1}='Trigger source :';
-data{5,1}='Trigger slope :';
-data{6,1}='Trigger level (V) :';
-data{7,1}='Reference type :';
-data{8,1}='Reference position (s) :';
-set(acquire(end),'Data',data,...
-    'ColumnFormat',{'char' 'char'},...
-    'ColumnEditable',[false true],...
-    'CellEditCallback',@changeSetting)
-    function changeSetting(src,EventData)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        if get(common,'Value')
-            index=1:numel(get(digitizer(2),'String'));          
-        else
-            index=get(digitizer(2),'Value');
-        end
-        row=EventData.Indices(1);
-        column=EventData.Indices(2);
-        value=EventData.EditData;       
-        value=attemptSetting(dig(index),row,value);
-        data=get(src,'Data');
-        data{row,column}=value;
-        set(src,'Data',data);
-        setappdata(fig.Figure,'DigitizerObject',dig);
-        %updateControls(fig);
-    end
-
 digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
     {''},20);
 set(digitizer(1),'FontWeight','bold');
@@ -148,6 +103,10 @@ set(digitizer(2),'Callback',@changeDigitizer)
     end
 set(digitizer(end),'Callback',@readDigitizer);
     function readDigitizer(varargin)
+        previous=get(digitizer(end),'BackgroundColor');
+        CU=onCleanup(@() set(digitizer(end),'BackgroundColor',previous));
+        set(digitizer(end),'BackgroundColor','m');
+        drawnow();
         dig=getappdata(fig.Figure,'DigitizerObject');
         updateControls(fig);
         index=get(digitizer(2),'Value');
@@ -177,6 +136,76 @@ set(digitizer(end),'Callback',@readDigitizer);
         end
     end
 
+    function globalSettings(varargin)
+        if get(common,'Value')
+            set(acquire(1),'String','Global digitizer settings:');
+        else
+            set(acquire(1),'String','Current digitizer settings:');
+        end
+    end
+
+acquire=addblock(fig,'table',{'Settings:' ' Global'},[20 10],8);
+set(acquire(1),'FontWeight','bold');
+set(acquire(2),'Style','checkbox','Callback',@globalSettings)
+common=acquire(2);
+globalSettings();
+setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
+data=cell(8,2);
+data{1,1}='Sample rate (1/s) :';
+data{2,1}='Number samples :';
+data{3,1}='Number averages :';
+data{4,1}='Trigger source :';
+data{5,1}='Trigger slope :';
+data{6,1}='Trigger level (V) :';
+data{7,1}='Reference type :';
+data{8,1}='Reference position (s) :';
+set(acquire(end),'Data',data,...
+    'ColumnFormat',{'char' 'char'},...
+    'ColumnEditable',[false true],...
+    'CellEditCallback',@changeSetting)
+    function changeSetting(src,EventData)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if get(common,'Value')
+            index=1:numel(get(digitizer(2),'String'));          
+        else
+            index=get(digitizer(2),'Value');
+        end
+        row=EventData.Indices(1);
+        column=EventData.Indices(2);
+        value=EventData.EditData;       
+        value=attemptSetting(dig(index),row,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
+    end
+
+%%
+channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
+set(channel(1),'Fontweight','bold');
+setappdata(fig.ControlPanel,'ChannelTable',channel(end));
+data=cell(3,5);
+data{1,1}='Scale (V/div) :';
+data{2,1}='Offset (V) :';
+data{3,1}='Status :';
+set(channel(end),'Data',data,...
+    'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
+    'ColumnEditable',[false true true true true],...
+    'CellEditCallback',@changeChannel)
+    function changeChannel(src,EventData)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        index=get(digitizer(2),'Value');
+        row=EventData.Indices(1);
+        column=EventData.Indices(2);
+        ch=column-1;
+        value=EventData.EditData;
+        value=attemptChannel(dig(index),row,ch,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
+    end
+
 arm=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
 DefaultBackground=get(arm(1),'BackgroundColor');
 set(arm(1),'Callback',@runMode);
@@ -188,8 +217,10 @@ set(arm(1),'Callback',@runMode);
         end
         set(arm(1),'BackgroundColor','g','Fontweight','bold');        
         set(arm(2:3),'BackgroundColor',DefaultBackground,...
-            'Fontweight','normal');        
-        dig.arm('run');
+            'Fontweight','normal');  
+        for n=1:numel(dig)
+            dig(n).arm('run');
+        end
         while true      
             pause(0.2);
             switch lower(dig(1).RunState)
@@ -214,7 +245,9 @@ set(arm(2),'Callback',@singleMode)
         if isempty(dig)
             return
         end
-        dig.arm('single'); % avoid confusion with variable "arm"        
+        for n=1:numel(dig)
+            dig(n).arm('single'); % avoid confusion with variable "arm"
+        end
         while true
            pause(0.2); 
            switch lower(dig(1).RunState)
@@ -236,8 +269,8 @@ set(arm(3),'Callback',@stopMode)
         set(arm(3),'BackgroundColor','r','FontWeight','bold');
         set(arm(1:2),'BackgroundColor',DefaultBackground,...
             'FontWeight','normal');
-        if numel(dig) > 0
-            dig.arm('stop');
+        for n=1:numel(dig)            
+            dig(n).arm('stop');
         end
     end
 stopMode();
@@ -255,48 +288,26 @@ set(override(2),'Callback',@forceTrigger)
         if isempty(dig)
             return
         end
-        switch lower(dig(1).RunState)
-            case 'single'
-                dig.forceTrigger();
-                stopMode();
-                drawnow();
-                readDigitizer();
-            case 'run'               
-                dig.forceTrigger();
-                dig.arm('stop');
-                readDigitizer();
-                dig.arm('run');
-        end                
+        for n=1:numel(dig)
+            switch lower(dig(n).RunState)
+                case 'single'                    
+                    dig(n).forceTrigger();
+                    stopMode();
+                    drawnow();
+                    readDigitizer();
+                case 'run'
+                    dig(n).forceTrigger();
+                    dig(n).arm('stop');
+                    readDigitizer();
+                    dig(n).arm('run');
+            end
+        end
     end
 
 %%
-channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
-set(channel(1),'Fontweight','bold');
-setappdata(fig.ControlPanel,'ChannelTable',channel(end));
-data=cell(3,5);
-data{1,1}='Scale (V/div) :';
-data{2,1}='Offset (V) :';
-data{3,1}='Status :';
-set(channel(end),'Data',data,...
-    'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
-    'ColumnEditable',[false true true true true],...
-    'CellEditCallback',@changeChannel)
-    function changeChannel(src,EventData)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        index=1:numel(get(digitizer(2),'String'));
-        row=EventData.Indices(1);
-        column=EventData.Indices(2);
-        ch=column-1;
-        value=EventData.EditData;
-        value=attemptChannel(dig(index),row,ch,value);
-        data=get(src,'Data');
-        data{row,column}=value;
-        set(src,'Data',data);
-        setappdata(fig.Figure,'DigitizerObject',dig);
-    end
-
 finish(fig);
 movegui(fig.Figure,'center');
+drawnow();
 fig.Hidden=false;
 
 end

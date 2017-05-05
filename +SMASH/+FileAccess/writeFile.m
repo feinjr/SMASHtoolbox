@@ -25,7 +25,7 @@
 % already exist; existing *.sda files are appended if the requested label
 % is unique.  Existing files can be automatically overwritten by passing
 % '-overwrite' at any location after the file name.
-%   >> writeFiel(filename,'-overwrite',...);
+%   >> writeFile(filename,'-overwrite',...);
 % The existing file is deleted before the write operation; previous records
 % in a *.sda file are discarded.
 % 
