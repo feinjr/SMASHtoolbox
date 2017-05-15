@@ -4,52 +4,46 @@ box=SMASH.MUI.Dialog();
 box.Hidden=true;
 switch mode
     case 'all' 
-        box.Name='Save all';
+        box.Name='Save all digitizers';
     case 'current'
-        box.Name='Save current';
+        box.Name='Save current digitizer';
         
 end
+
+%addblock(box,'text','Save format:');
+choices={'Separate archives (*.sda)' 'Combined archive (*.sda)' 'Digitizer files (*.h5)'}; 
+format=addblock(box,'popup','Save format:',choices,20);
+set(format(1),'Fontweight','bold');
+
+name=addblock(box,'edit','Base file name:',40);
+set(name(1),'FontWeight','bold');
+
+location=addblock(box,'edit_button',{'File location:' ' Select '},40);
+set(location(1),'FontWeight','bold');
+set(location(2),'String',pwd);
+set(location(3),'Callback',@selectLocation)
+    function selectLocation(varargin)
+        start=get(location(2),'String');
+        if ~exist(start,'dir')
+            start=pwd;
+        end
+        name=uigetdir(start,'Select directory');
+        if isnumeric(name)
+            return
+        end
+        set(location(2),'String',name);
+    end
+
+values={'0 (none)' '1' '2' '3' '4' '5' '6' '7' '8' '9 (maximum)'};
+deflate=addblock(box,'popup','Compression level:',values,20);
+set(deflate(1),'Fontweight','bold');
+
+button=addblock(box,'button',{' Save ' ' Cancel '});
 
 movegui(box.Handle,'center');
 box.Hidden=false;
 
-% base file name
-while true
-   name=inputdlg('Base archive name: ','Base name',[1 40]);
-    if isempty(name)
-        return
-    end
-    name=name{1};
-    if isempty(name)
-        continue
-    end 
-    name=strtrim(name);
-    temp=fullfile(pwd,[name '.sda']);
-    fid=fopen(temp,'w');
-    if fid < 0
-        errordlg('Invalid archive name','Invalid name');
-        continue
-    end
-    fclose(fid);
-    delete(temp);
-    break
-end
-
-% determine submode and deflate
-deflate=9;
-
-% save data
-dig=getappdata(fig.Figure,'DigitizerObject');
-switch lower(mode)
-    case 'all'
-        dig2file(dig,name,deflate);
-    case 'current'
-        popup=getappdata(fig.ControlPanel,'DigitizerPopup');
-        index=get(popup,'Value');
-        dig2file(dig(index),name,deflate);        
-end
-
-end
+% UNDER CONSTRUCTION
 
 function dig2file(dig,name,deflate)
 
