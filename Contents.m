@@ -20,8 +20,7 @@
 % The tooblbox provides the following utilities.
 %    aboutSMASH - Display toolbox information
 %    loadSMASH  - Add programs to the MATLAB path
-%
+%    packtools  - Package tools
 %
 
-% last updated December 8, 2014
-% updated February 18, 2016
+% updated May 15, 2017
