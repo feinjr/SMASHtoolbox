@@ -12,3 +12,6 @@ sub=packtools.namespace('Main.Sub1.*B*');
 
 sub.Sub1FunctionA();
 sub.Sub1FunctionB();
+
+%%
+ns=Main.Sub1.Sub1FunctionB();

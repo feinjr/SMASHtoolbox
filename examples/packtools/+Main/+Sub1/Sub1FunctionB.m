@@ -1,4 +1,4 @@
-function Sub1FunctionB()
+function varargout=Sub1FunctionB()
 
 disp('This is Sub1FunctionB, which calls several things...');
 
@@ -10,5 +10,11 @@ packtools.call('-.MainFunctionA');
 
 fprintf('\t');
 packtools.call('-.Sub2.Sub2FunctionA');
+
+ns=packtools.namespace('local','-.*');
+
+if nargout > 0
+    varargout{1}=ns;
+end
 
 end
