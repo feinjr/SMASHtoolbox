@@ -135,7 +135,7 @@ switch mode
         object.NoiseCharacterized=true;
         object.NoiseDefined=true;
     case 'reference'
-        index=(P >= (0.50*max(P)));
+        index=(Pk >= (0.50*max(Pk)));
         if sum(index) > 1
             f=fk(index);
             P=Pk(index);
