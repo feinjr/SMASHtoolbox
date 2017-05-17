@@ -18,16 +18,23 @@ if (nargin < 2)  || isempty(fontsize)
     fontsize=14;
 end
 
-% 
+% clear digitizers and verify requests
 SMASH.Z.Digitizer.reset();
+
+if ~isempty(address)
+    dig=SMASH.Z.Digitizer.scan(address);
+    if isempty(dig)
+        error('Invalid IP address(es) specfied');
+    end
+    for n=1:numel(dig)
+        dig(n).Name=sprintf('Digitizer%d',n);
+    end
+end
+
 
 % select digitizers
 fig=makeGUI(fontsize);
 if ~isempty(address)
-    dig=SMASH.Z.Digitizer.scan(address); 
-    for n=1:numel(dig)
-        dig(n).Name=sprintf('Digitizer%d',n);
-    end
     updateControls(fig,dig);
 end
 
