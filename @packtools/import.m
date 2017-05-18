@@ -1,17 +1,30 @@
-% import Import package into a name space
+% import Import package
 %
-% ns=packtools.import(name);
-%
-% The input can be an absolute package name, with or without wild cards
+% This method imports package files and classes.
+%    ns=packtools.import(name);
+% The input "name" can be an absolute package name with or without wild
+% cards.
 %    ns=packtools.import('Main.Sub.Function');
 %    ns=packtools.import('Main.Sub.*');
+% Relative naming is permitted when this method is called from a package
+% function/class.
+%    ns=packtools.import('.Function'); % local package file
+%    ns=packtools.import('.*'); % all local package files
+%    ns=packtools.import('.Sub.*'); % all subpackage files
+%    ns=packtools.import('-.*'); % all parent package files
 %
-% Relative naming within a package is also permitted.
-%    ns=packtools.import('.Function');
-%    ns=packtools.import('.*');
-%    ns=packtools.import('.Sub.*');
-%    ns=packtools.import('-.*');
+% The output "ns" is structure of function handles, which can be used as
+% name space.  Imported features are called by name.
+%    [...]=ns.Function(...); % dots indicate inputs/outputs of the imported function
+%
+% For maximum performance, imported name spaces should be stored in a
+% persistent variable to minimize overhead during repeated function calls.
+%
+% See also packtools, call, search
+%
 
+%
+% created May 18, 2017 by Daniel Dolan (Sandia National Laboratories)
 %
 function result=import(name)
 

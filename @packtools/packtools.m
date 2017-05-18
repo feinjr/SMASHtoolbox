@@ -1,5 +1,9 @@
-% This class provides tools for accessing package functions and classes.
-% To illustrate why the tools are useful, consider the following hierarchy.
+% This class helps users access package functions and classes.  Tools
+% provided by the class include: relative calls, controlled imports, and
+% searching.
+%
+% To illustrate how these tools are useful, consider the following package
+% hierarchy.
 %    +MainPackage/
 %       MainFuncA.m
 %       MainFuncB.m
@@ -9,21 +13,23 @@
 %       +SubPackage2/
 %          SubFuncC.m
 %          SubFuncD.m
-%
-% Package functions may be called explicitly:
+% Explicit function calls:
 %    MainPackage.MainFuncA();
-% or by importing the package into the current workspace.
+% assume a fixed package hierarchy. Problems arise when the package
+% hiearchy is changed or under development. For example, the author of
+% "SubFuncA" may have known that the function would be in a package, but
+% not in a subpackage.  Calls from between functions within the same
+% package and calls to sub-package functions need manual revision whenever
+% the package hierarchy changes.
+%
+% Imported function calls:
 %    import MainPackage.SubPackage1.*
 %    SubFuncA();
-% Both approaches assume a fixed package hierarchy, but this assumption can
-% be problematic.  For example, the author of "SubFuncA" may have known
-% that the function would be in a package, but not in a subpackage.
-% Explicit naming may require a *lot* of manual revisions when packages are
-% moved around or renamed.  Package imports reduce (but do not eliminate)
-% this problem with potential side effects: name clashes with existing
-% functions can lead to unexpected results.
+% can reduce but do not eliminate the need for revisions during package
+% reorganization.  Standard imports also have potential side effects: name
+% clashes with existing functions are *not* reported and can lead to
+% unexpected results.
 %
-
 
 %
 % created May 14, 2017 by Daniel Dolan
@@ -37,7 +43,10 @@ classdef (Abstract) packtools
     %% 
     methods (Static=true)
         varargout=call(varargin)
-        varargout=namespace(varargin)
         varargout=import(varargin)
+        varargout=search(varargin)
+    end
+    methods (Static=true, Hidden=true)
+        varargout=namespace(varargin)
     end
 end

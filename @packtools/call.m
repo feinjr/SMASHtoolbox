@@ -17,7 +17,10 @@
 % References within a package may begin with an optional dot: name='.func'
 % is equivalent to name='func'.
 %
-% See also packtools, import
+% NOTE : repeated calls to the same function with this method will be
+% slower than importing that function into a persistent variable.
+%
+% See also packtools, import, search
 %
 
 %

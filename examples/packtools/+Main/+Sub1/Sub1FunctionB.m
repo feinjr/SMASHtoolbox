@@ -15,6 +15,9 @@ packtools.call('-.Sub2.Sub2FunctionA');
 
 ns=packtools.import('-.*');
 
+packtools.search('.','*');
+packtools.search('-.','*');
+
 if nargout > 0
     varargout{1}=ns;
 end
