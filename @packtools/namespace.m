@@ -39,6 +39,8 @@
 %
 function result=namespace(varargin)
 
+warning('This method is being phased out.  Use the "import" method instead');
+
 % manage input
 switch nargin
     case 0
@@ -74,8 +76,6 @@ if strcmp(mode,'local')
             request=request(3:end);                  
         end
     end
-    %result=packtools.namespace(request);
-    %return
 end
 
 errmsg='ERROR: invalid package request';

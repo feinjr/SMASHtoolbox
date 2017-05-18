@@ -11,7 +11,9 @@ packtools.call('-.MainFunctionA');
 fprintf('\t');
 packtools.call('-.Sub2.Sub2FunctionA');
 
-ns=packtools.namespace('local','-.*');
+%ns=packtools.namespace('local','-.*');
+
+ns=packtools.import('-.*');
 
 if nargout > 0
     varargout{1}=ns;

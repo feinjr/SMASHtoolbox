@@ -14,9 +14,10 @@
 %    - "MainFuncA" references "SubFuncA" by name='SubPackage1.SubFuncA'.
 %    - "SubFuncA" references "MainFuncB" by name='-.MainFuncB'.
 %    - "SubFuncA" references "SubFuncC" by name='-.SubPackage2.SubFuncC'.
+% References within a package may begin with an optional dot: name='.func'
+% is equivalent to name='func'.
 %
-%
-% See also packtools, namespace
+% See also packtools, import
 %
 
 %

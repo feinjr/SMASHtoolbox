@@ -1,5 +1,9 @@
 function FullName=resolveName(package,name)
 
+if name(1)=='.'
+    name=name(2:end);
+end
+
 errmsg='ERROR: invalid package name';
 
 object=meta.package.fromName(package);
@@ -8,7 +12,7 @@ while true
     if isempty(index)
         ShortName=name;
         FullName=sprintf('%s.%s',object.Name,name);
-        break
+        break           
     elseif name(1)=='-'
         object=meta.package.fromName(object.ContainingPackage.Name);
         name=name(3:end);

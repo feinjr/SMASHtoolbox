@@ -38,5 +38,6 @@ classdef (Abstract) packtools
     methods (Static=true)
         varargout=call(varargin)
         varargout=namespace(varargin)
+        varargout=import(varargin)
     end
 end
