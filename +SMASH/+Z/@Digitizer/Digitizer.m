@@ -1,9 +1,14 @@
 classdef Digitizer < handle
+    properties (Dependent=true)
+        Name % Digitizer name
+    end
     properties
-        Name = 'UnnamedDigitizer' % Digitizer name                
+        SaveLocation = 'C:\Users\Sandia\Data' % Location where data is saved *on* the digitizer
+        ShareLocation = 'Data' % Shared directory name *on* the digitizer
     end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
+        DefinedName = '' % Defined digitizer name
     end
     properties (SetAccess=protected)
         System % Digitizer system values (model, serial number, ...)
@@ -62,6 +67,13 @@ classdef Digitizer < handle
         varargout=getCalibration(varargin)       
     end
     methods
+        function value=get.Name(object)
+            value=object.DefinedName;
+            if isempty(value)
+                value=sprintf('%s-%s',...
+                    object.System.ModelNumber,object.System.SerialNumber);
+            end
+        end
         function value=get.Acquisition(object)
             value=getAcquisition(object);
         end       
@@ -88,7 +100,19 @@ classdef Digitizer < handle
     methods
         function set.Name(object,value)
             assert(ischar(value),'ERROR: invalid name');
-            object.Name=value;
+            object.DefinedName=strtrim(value);            
+        end
+        function set.SaveLocation(object,value)
+            assert(ischar(value),'ERROR: invalid save location');
+            index=(value=='/') | (value=='\');
+            value(index)=filesep;            
+            object.SaveLocation=strtrim(value);
+        end
+         function set.ShareLocation(object,value)
+            assert(ischar(value),'ERROR: invalid share location');
+            index=(value=='/') | (value=='\');
+            value(index)=filesep;
+            object.ShareLocation=strtrim(value);
         end
         function set.Acquisition(object,value)
             setAcquisition(object,value);
