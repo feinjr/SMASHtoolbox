@@ -36,9 +36,16 @@ uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
         dig=getappdata(fig.Figure,'DigitizerObject');
         selectDigitizers(fig,dig,fontsize);        
     end
-uimenu(hm,'Label','Save configuration','Separator','on');
-uimenu(hm,'Label','Load configuration');
-uimenu(hm,'Label','Exit','Separator','on');
+uimenu(hm,'Label','Save configuration','Separator','on','Enable','off');
+uimenu(hm,'Label','Load configuration','Enable','off');
+uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
+    function exitProgram(varargin)
+        choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
+        if ~isnumeric(choice) && strcmpi(strtrim(choice),'yes')
+            delete(fig.Figure);            
+        end        
+    end
+set(fig.Figure,'CloseRequestFcn',@exitProgram);
 
 hm=uimenu(fig.Figure,'Label','Data');
 uimenu(hm,'Label','Save all digitizers',...
@@ -92,13 +99,26 @@ uimenu(hm,'Label','Unlock digitizers','Separator','on',...
     end
 
 hm=uimenu(fig.Figure,'Label','Calibration');
-uimenu(hm,'Label','Pull files');
-uimenu(hm,'Label','Push files');
-uimenu(hm,'Label','Check status','Separator','on');
+uimenu(hm,'Label','Pull files','Callback',@pullCalibration);
+    function pullCalibration(varargin)
+        commandwindow;
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        start=pwd;
+        CU=onCleanup(@() cd(start));
+        if exist('calibration','dir')
+            rmdir(fullfile(pwd,'calibration'),'s')
+        end
+        mkdir('calibration');
+        cd calibration;
+        pull(dig);
+        figure(fig.Figure);        
+    end
+uimenu(hm,'Label','Push files','Enable','off');
+uimenu(hm,'Label','Check status','Separator','on','Enable','off');
 
 hm=uimenu(fig.Figure,'Label','Analysis');
-uimenu(hm,'Label','Frequency spectrum');
-uimenu(hm,'Label','Time-frequency spectrogram');
+uimenu(hm,'Label','Frequency spectrum','Enable','off');
+uimenu(hm,'Label','Time-frequency spectrogram','Enable','off');
 
 %%
 digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
