@@ -10,8 +10,7 @@ switch mode
         
 end
 
-%addblock(box,'text','Save format:');
-choices={'Separate archives (*.sda)' 'Combined archive (*.sda)' 'Digitizer files (*.h5)'}; 
+choices={'Digitizer files (*.h5)' 'Digitizer archives (*.sda)'}; 
 format=addblock(box,'popup','Save format:',choices,20);
 set(format(1),'Fontweight','bold');
 
@@ -43,6 +42,7 @@ button=addblock(box,'button',{' Save ' ' Cancel '});
 movegui(box.Handle,'center');
 box.Hidden=false;
 
+end
 % UNDER CONSTRUCTION
 
 function dig2file(dig,name,deflate)
