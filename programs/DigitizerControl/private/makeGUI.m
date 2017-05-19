@@ -42,9 +42,18 @@ uimenu(hm,'Label','Exit','Separator','on');
 
 hm=uimenu(fig.Figure,'Label','Data');
 uimenu(hm,'Label','Save all digitizers',...
-    'Callback',@(~,~) saveData(fig,'all'));
+    'Callback',@saveAll);
+    function saveAll(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        saveData(fig,dig,'Save all digitizers',fontsize);
+    end
 uimenu(hm,'Label','Save current digitizer',...
-    'Callback',@(~,~) saveData(fig,'current'));
+    'Callback',@saveCurrent);
+    function saveCurrent(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        current=get(digitizer(2),'Value');
+        saveData(fig,dig(current),'Save current digitizer',fontsize);
+    end
 
 hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
 MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...
@@ -309,6 +318,7 @@ finish(fig);
 movegui(fig.Figure,'center');
 drawnow();
 fig.Hidden=false;
+set(fig.Figure,'HandleVisibility','callback');
 
 end
 
