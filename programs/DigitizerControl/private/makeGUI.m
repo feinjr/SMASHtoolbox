@@ -122,12 +122,12 @@ uimenu(hm,'Label','Check status','Separator','on','Callback',@checkCalibration);
     end
 
 hm=uimenu(fig.Figure,'Label','Analysis');
-uimenu(hm,'Label','Frequency spectrum','Callback',@runFFT);
+uimenu(hm,'Label','Frequency spectra','Callback',@runFFT);
     function runFFT(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
         FFTanalysis(dig,fontsize);
     end
-uimenu(hm,'Label','Time-frequency spectrogram','Enable','off');
+uimenu(hm,'Label','Time-frequency spectrograms','Enable','off');
 
 %%
 digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
