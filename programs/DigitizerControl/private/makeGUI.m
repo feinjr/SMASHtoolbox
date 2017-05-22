@@ -14,7 +14,8 @@ fig.Hidden=true;
 fig.Name='Digitizer control';
 fig.Figure.Tag='DigitizerControl';
 
-set(fig.Axes,'FontSize',fontsize,'Color',repmat(0.5,[1 3]));
+set(fig.Axes,'FontSize',fontsize,'Color','k',...
+    'GridColor','w','XGrid','on','YGrid','on');
 color={'y' 'g' 'b' 'r'};
 for k=1:Nchannel
     ChannelLine(k)=line('Parent',fig.Axes,'Visible','off'); %#ok<AGROW>
@@ -114,10 +115,18 @@ uimenu(hm,'Label','Pull files','Callback',@pullCalibration);
         figure(fig.Figure);        
     end
 uimenu(hm,'Label','Push files','Enable','off');
-uimenu(hm,'Label','Check status','Separator','on','Enable','off');
+uimenu(hm,'Label','Check status','Separator','on','Callback',@checkCalibration);
+    function checkCalibration(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        showCalibration(dig,fontsize);
+    end
 
 hm=uimenu(fig.Figure,'Label','Analysis');
-uimenu(hm,'Label','Frequency spectrum','Enable','off');
+uimenu(hm,'Label','Frequency spectrum','Callback',@runFFT);
+    function runFFT(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        FFTanalysis(dig,fontsize);
+    end
 uimenu(hm,'Label','Time-frequency spectrogram','Enable','off');
 
 %%
@@ -161,7 +170,7 @@ set(digitizer(end),'Callback',@readDigitizer);
             end
         end
         if ~isempty(label)
-            legend(h,label,'Location','best');
+            legend(h,label,'Location','best','Color',repmat(0.75,[1 3]));
         end
     end
 

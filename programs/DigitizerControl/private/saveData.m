@@ -4,7 +4,7 @@ box=SMASH.MUI.Dialog('FontSize',fontsize);
 box.Hidden=true;
 box.Name=BoxName;
 
-choices={'Digitizer files (*.h5)' 'Digitizer archives (*.sda)'}; 
+choices={'Digitizer file (*.h5)' 'Sandia Data Archive (*.sda)'}; 
 format=addblock(box,'popup','Save format:',choices,20);
 set(format(1),'Fontweight','bold');
 set(format(2),'Callback',@changeFormat);
@@ -80,7 +80,12 @@ set(button(1),'Callback',@saveDig)
                     ext='.h5';
                 case 2
                     ext='.sda';
-                    % UNDER CONSTRUCTION
+                    result=grab(dig(n));
+                    description=sprintf('Digitizer signals recorded %s from %s-%s',...
+                        datestr(now),dig(n).System.ModelNumber,dig(n).System.SerialNumber);
+                    value=get(deflate(2),'Value')-1;
+                    SMASH.FileAccess.writeFile([dig(n).Name ext],dig(n).Name,...
+                        result,description,value,'-overwrite');                   
             end
             old=[dig(n).Name ext];
             new=fullfile(get(location(2),'String'),[get(name(2),'String') old]);
