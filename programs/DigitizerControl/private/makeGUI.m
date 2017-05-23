@@ -39,10 +39,10 @@ uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
     end
 uimenu(hm,'Label','Start over','Callback',@startOver)
     function startOver(varargin)
-        list=findall(0,'Type','figure');
-        tag=get(list,'Tag');
+        list=findall(0,'Type','figure');        
         for n=1:numel(list)
-            if strfind(tag{n},'DigitizerControl')
+            tag=get(list(n),'Tag');
+            if strfind(tag,'DigitizerControl')
                 delete(list(n))
             end
         end
