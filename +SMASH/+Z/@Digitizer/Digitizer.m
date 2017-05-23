@@ -24,27 +24,19 @@ classdef Digitizer < handle
     end    
     %%
     methods (Hidden=true)
-        function object=Digitizer(address)
-            assert(nargin ==1 ,'ERROR: no IP address specified');            
-            delay=SMASH.System.ping(address);
-            assert(~isnan(delay),'ERROR : invalid IP address');      
-            list=instrfind();
-            for k=1:numel(list)
-                if strcmp(list(k).RemoteHost,address)
-                    object.VISA=list(k);
-                    break
-                end
-            end
-            if isempty(object.VISA)
-                object.VISA=visa('AGILENT',...
-                    sprintf('TCPIP0::%s',address));
-            end
-            if strcmp(object.VISA.Status,'closed')
-                fopen(object.VISA);
-            end
-            fwrite(object.VISA,'SYSTEM:LONGFORM ON');
-            fwrite(object.VISA,'*IDN?');                       
-            object.System=setupSystem(strtrim(fscanf(object.VISA)),address);                        
+        function object=Digitizer(varargin)
+            assert(nargin > 0 ,'ERROR: no IP address specified');
+            list=SMASH.Z.Digitizer.scan(varargin{:});
+            object=repmat(object,size(list));
+            for n=1:numel(list)
+                object(n).VISA=visa('AGILENT',...
+                    sprintf('TCPIP0::%s',list{n})); %#ok<TNMLP>
+                fopen(object(n).VISA);
+                fwrite(object(n).VISA,'SYSTEM:LONGFORM ON');
+                fwrite(object(n).VISA,'*IDN?');
+                temp=strtrim(fscanf(object(n).VISA));
+                object.System=setupSystem(temp,address);
+            end                                                                      
         end
         varargout=close(varargin)
         varargout=open(varargin)

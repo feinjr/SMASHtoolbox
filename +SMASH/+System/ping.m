@@ -49,7 +49,7 @@ end
 
 % generate and use system command
 if ispc
-    command=sprintf('ping -n 1 -w %g %s',timeout,address);
+    command=sprintf('powershell "ping -n 1 -w %g %s"',timeout,address);
 else
     command=sprintf('ping -c 1 -W %g %s',timeout,address);
 end

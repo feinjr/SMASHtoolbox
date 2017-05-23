@@ -18,9 +18,7 @@ if (nargin < 2)  || isempty(fontsize)
     fontsize=14;
 end
 
-% clear digitizers and verify requests
-SMASH.Z.Digitizer.reset();
-
+% verify address
 if ~isempty(address)
     dig=SMASH.Z.Digitizer.scan(address);
     if isempty(dig)
@@ -30,7 +28,6 @@ if ~isempty(address)
         dig(n).Name=sprintf('Digitizer%d',n);
     end
 end
-
 
 % select digitizers
 fig=makeGUI(fontsize);

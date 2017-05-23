@@ -1,29 +1,21 @@
 
-function dig=selectDigitizers(fig,arg,fontsize)
+function dig=selectDigitizers(fig,dig,fontsize)
 
 % manage input
-if isempty(arg)
-    address={};
-    dig=[];
-elseif ischar(arg) || iscellstr(arg)
-    [address,dig]=verifyAddress(arg);
-elseif isa(arg,'SMASH.Z.Digitizer')
-    dig=arg;
-    address=cell(size(dig));
-    for n=1:numel(dig)
-        address{n}=dig(n).System.Address;
-    end
-else
-    error('ERROR: invalid input')
+address={};
+name={};
+for n=1:numel(dig)
+    address{end+1}=dig(n).System.Address; %#ok<AGROW>
+    name{end+1}=dig(n).Name; %#ok<AGROW>
 end
-       
+
 % create dialog box
 box=SMASH.MUI.Dialog('FontSize',fontsize);
 box.Name='Select digitizers';
 box.Hidden=true;
 
-scan=addblock(box,'edit_button',{'Address range:' ' Scan '});
-set(scan(end),'Callback',@scanRange);
+Scan=addblock(box,'edit_button',{'Address range:' ' Scan '});
+set(Scan(end),'Callback',@scanRange);
     
 table=addblock(box,'table',{'Address' 'Model' 'Serial number' 'Name'},...
     [15 15 15 15],10);
@@ -31,6 +23,7 @@ maxrows=100;
 data=repmat({''},[maxrows 4]);
 for n=1:numel(address)
     data{n,1}=address{n};
+    data{n,4}=name{n};
 end
 set(table(end),'Data',data);
 updateDialog();
@@ -46,8 +39,9 @@ waitfor(box.Handle);
 
 %% callback functions
     function scanRange(varargin)
+        box.Modal=false;
         commandwindow;
-        [address,~]=verifyAddress(get(scan(2),'String'));
+        [address,~]=verifyAddress(get(Scan(2),'String'));
         figure(box.Handle);
         for row=1:maxrows
             if row <= numel(address)
@@ -58,16 +52,13 @@ waitfor(box.Handle);
         end
         set(table(end),'Data',data);
         updateDialog();
+        box.Modal=true;
     end
     function updateDialog(varargin)
         data=get(table(end),'Data');
         count=0;
         for row=1:maxrows
-            if isempty(data{row,1})
-                data{row,2}='';
-                data{row,3}='';
-                data{row,4}='';
-            else
+            try
                 dig=SMASH.Z.Digitizer(data{row,1});
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;
@@ -80,7 +71,12 @@ waitfor(box.Handle);
                 temp=data(1:row,4);
                 temp=matlab.lang.makeUniqueStrings(temp);
                 data{row,4}=temp{end};
-            end
+            catch
+                data{row,1}='';
+                data{row,2}='';
+                data{row,3}='';
+                data{row,4}='';
+            end                        
         end
         set(table(end),'Data',data);
     end
@@ -97,10 +93,7 @@ waitfor(box.Handle);
         end
         address=address(keep);
         name=name(keep);
-        dig=SMASH.Z.Digitizer.scan(address);
-        for row=1:numel(dig)            
-            dig(row).Name=name{row};
-        end
+        dig=SMASH.Z.Digitizer(address);        
         updateControls(fig,dig);
         unlock(dig);
         hlock=findobj(fig.Figure,'Tag','LockMenu');
@@ -109,32 +102,5 @@ waitfor(box.Handle);
         delete(box);
         figure(fig.Figure);
     end
-
-end
-
-%%
-function [address,dig]=verifyAddress(address)
-
-if ischar(address)
-    address=SMASH.System.listIP4(address);
-end
-
-delay=SMASH.System.ping(address,200); % 200 ms time out
-address=address(~isnan(delay));
-
-dig=SMASH.Z.Digitizer.scan(address);
-address=cell(size(dig));
-for n=1:numel(address)
-    address{n}=dig.System.Address;
-end
-
-end
-
-%%
-function object=table2object(object,table)
-
-end
-
-function object2table(object,table)
 
 end
