@@ -37,6 +37,18 @@ uimenu(hm,'Label','Select digitizers','Callback',@menuSelectDigitizers)
         dig=getappdata(fig.Figure,'DigitizerObject');
         selectDigitizers(fig,dig,fontsize);        
     end
+uimenu(hm,'Label','Start over','Callback',@startOver)
+    function startOver(varargin)
+        list=findall(0,'Type','figure');
+        tag=get(list,'Tag');
+        for n=1:numel(list)
+            if strfind(tag{n},'DigitizerControl')
+                delete(list(n))
+            end
+        end
+        SMASH.Z.Digitizer.reset();
+        makeGUI(fontsize);        
+    end
 uimenu(hm,'Label','Save configuration','Separator','on','Enable','off');
 uimenu(hm,'Label','Load configuration','Enable','off');
 uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);

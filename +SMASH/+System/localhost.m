@@ -15,6 +15,7 @@ function address=localhost()
 if ispc
     [~,result]=system('ipconfig /all');
     start=strfind(result,'IPv4 Address');
+    assert(~isempty(start),'ERROR: no IP4 network found');
     result=result(start:end);
     while ~isempty(result)
         [temp,~,~,next]=sscanf(result,'%s',1);
@@ -24,7 +25,7 @@ if ispc
         else
             break
         end
-    end
+    end    
     address=sprintf('%d.%d.%d.%d',value);
     %[~,result]=system('ping -n 1 localhost');
     %result=sscanf(result,'%*s %s',1);

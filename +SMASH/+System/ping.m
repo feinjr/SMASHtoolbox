@@ -19,7 +19,7 @@
 %
 % created April 20, 2017 by Daniel Dolan (Sandia National Laboratories
 %   
-function varargout=ping(address,timeout)
+function varargout=ping(address,timeout,mode)
 
 % manage input
 if (nargin < 1) || isempty(address)
@@ -33,16 +33,31 @@ end
 assert(isnumeric(timeout) && isscalar(timeout) && (timeout > 0),...
     'ERROR: invalid timeout value')
 
+if (nargin < 3) || isempty(mode)
+    mode='verbose';
+elseif strcmpi(mode,'silent')
+    mode='silent';
+else
+    mode='verbose';
+end
+
+
 % manage multiple IP addresses
 if iscellstr(address)
     delay=nan(size(address));
-    fprintf('Testing IP4 : ');
-    for n=1:numel(address)
-        fprintf('%15s',address{n});
-        delay(n)=SMASH.System.ping(address{n},timeout);
-        fprintf(repmat('\b',[1 15]));
+    if strcmp(mode,'verbose')
+        fprintf('Testing IP4 : ');
     end
-    fprintf('done\n');
+    for n=1:numel(address)
+        delay(n)=SMASH.System.ping(address{n},timeout);
+        if strcmp(mode,'verbose')
+            fprintf('%15s',address{n});
+            fprintf(repmat('\b',[1 15]));
+        end
+    end
+    if strcmp(mode,'verbose')
+        fprintf('done\n');
+    end
     varargout{1}=delay;
     return
 end

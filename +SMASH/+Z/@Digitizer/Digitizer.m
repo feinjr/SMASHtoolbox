@@ -1,3 +1,20 @@
+% This class communicates with Agilent/Keysight digitizers via a TCP/IP
+% (Ethernet) connection.  Digitizer objects are created from a specific
+% address, an address range, or a cell array of addresses.
+%    dig=Digitizer('192.168.0.100'); % specific address
+%    dig=Digitizer('192.168.0.100-150'); % address range
+%    dig=Digitizer({'192.168.0.100' '192.168.0.105'}); % address list
+% The first example returns a scalar Digitizer object, while the third
+% example returns a 2x1 Digitizer object array.  The output size in the
+% second example depends on the number of valid IP addresses found in the
+% specified range.
+%
+% See also Z
+%
+
+%
+% created May 23, 2017 by Daniel Dolan (Sandia National Laboratories)
+%
 classdef Digitizer < handle
     properties (Dependent=true)
         Name % Digitizer name
@@ -24,19 +41,45 @@ classdef Digitizer < handle
     end    
     %%
     methods (Hidden=true)
-        function object=Digitizer(address)
-            assert(nargin == 1 ,'ERROR: invalid number of inputs');
-            list=SMASH.Z.Digitizer.scan(address);
-            object=repmat(object,size(list));
-            for n=1:numel(list)
-                object(n).VISA=visa('AGILENT',...
-                    sprintf('TCPIP0::%s',list{n})); %#ok<TNMLP>
-                fopen(object(n).VISA);
-                fwrite(object(n).VISA,'SYSTEM:LONGFORM ON');
-                fwrite(object(n).VISA,'*IDN?');
-                temp=strtrim(fscanf(object(n).VISA));
-                object(n).System=setupSystem(temp,list{n});
-            end                                                                      
+        function object=Digitizer(address,name)
+            % manage input
+            assert(nargin > 0 ,'ERROR: no address(es) specified');
+            if ischar(address)
+                address={address};
+            end
+            assert(iscellstr(address),'ERROR: invalid address(es)');            
+            address=SMASH.Z.Digitizer.scan(address);
+            assert(~isempty(address),'ERROR: no valid address found');
+            
+            if (nargin < 2) || isempty(name)
+                name=cell(size(address));
+                for n=1:numel(address)
+                    name{n}=sprintf('Digitizer%d',name{n});
+                end
+            elseif ischar(name)
+                name={name};
+            else
+                assert(iscellstr(name),'ERROR: invalid name input');
+            end
+            assert(numel(name) == numel(address),...
+                'ERROR: incompatible address/name inputs');
+            % deal with multiple addresses
+            if numel(address) > 1
+                for n=1:numel(address)
+                    object(n)=SMASH.Z.Digitizer(address{n},name{n}); %#ok<AGROW>
+                end
+                return
+            end
+            % deal with a single address
+            object.VISA=visa('AGILENT',...
+                sprintf('TCPIP::%s',address{1}));
+            fopen(object.VISA); % what if this fails?
+            fwrite(object.VISA,'SYSTEM:LONGFORM ON');
+            fwrite(object.VISA,'*IDN?');
+            temp=strtrim(fscanf(object.VISA));
+            object.System=setupSystem(temp,address{1});
+            object.Name=name{1};
+                                                                                  
         end
         varargout=close(varargin)
         varargout=open(varargin)

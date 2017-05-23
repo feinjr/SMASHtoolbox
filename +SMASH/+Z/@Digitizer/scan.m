@@ -1,9 +1,19 @@
+% scan Scan for active IP addresses
 %
-% list=scan('*');
-% list=scan('0-10');
+% This method scans for active IP addresses.  Addresses can be specified
+% explicitly:
+%    list=scan('192.168.0.100');
+% or with respect to the local host.
+%    list=scan('*');
+%    list=scan('0-10');
+% The output "list" is a cell array of active IP4 addresses.
 % 
-% list=scan('*.*');
+% See also Digitizer
+%
 
+%
+% created May 23, 2017 by Daniel Dolan (Sandia National Laboratories)
+%
 function list=scan(request,timeout)
 
 % manage input
@@ -31,33 +41,7 @@ assert(isnumeric(timeout) && isscalar(timeout),...
     'ERROR: invalid time out value');
 
 % look for digitizers
-delay=SMASH.System.ping(list,timeout);
+delay=SMASH.System.ping(list,timeout,'silent');
 list=list(~isnan(delay));
-
-SMASH.Z.Digitizer.reset();
-keep=false(size(list));
-for k=1:numel(list)
-    try        
-        object=visa('AGILENT',sprintf('TCPIP::%s',list{k})); %#ok<TNMLP>
-        object.Timeout=1;
-        object.TimerPeriod=0.1;
-        fopen(object);
-        fwrite(object,'*IDN?');
-        result=fscanf(object);
-        if strfind(result,'KEYSIGHT')
-            % OK
-        elseif strfind(result,'AGILENT')
-            % OK
-        else
-            error('');
-        end
-        keep(k)=true;
-    catch
-        continue
-    end    
-end
-list=list(keep);
-
-SMASH.Z.Digitizer.reset();
 
 end

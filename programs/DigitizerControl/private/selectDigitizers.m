@@ -13,6 +13,7 @@ end
 box=SMASH.MUI.Dialog('FontSize',fontsize);
 box.Name='Select digitizers';
 box.Hidden=true;
+set(box.Handle,'Tag','DigitizerControl:selectDigitizers');
 
 Scan=addblock(box,'edit_button',{'Address range:' ' Scan '});
 set(Scan(end),'Callback',@scanRange);
@@ -25,7 +26,7 @@ for n=1:numel(address)
     data{n,1}=address{n};
     data{n,4}=name{n};
 end
-set(table(end),'Data',data);
+set(table(end),'Data',data,'ColumnEditable',[true false false true]);
 updateDialog();
 
 buttons=addblock(box,'button',{'Update' 'Done'});
@@ -39,20 +40,24 @@ waitfor(box.Handle);
 
 %% callback functions
     function scanRange(varargin)
-        box.Modal=false;
-        commandwindow;
+        OriginalColor=get(Scan(end),'BackgroundColor');
+        set(Scan(end),'BackgroundColor','m');
+        drawnow();
         address=SMASH.Z.Digitizer.scan(get(Scan(2),'String'));
         figure(box.Handle);
+        data=cell(size(get(table(end),'Data')));
         for row=1:maxrows
             if row <= numel(address)
                 data{row,1}=address{row};
             else
                 data{row,1}='';
             end
+            data{row,2}='';
+            data{row,3}='';
+            data{row,4}='';
         end
         set(table(end),'Data',data);
-        updateDialog();
-        box.Modal=true;
+        set(Scan(end),'BackgroundColor',OriginalColor);
     end
     function updateDialog(varargin)
         data=get(table(end),'Data');
@@ -61,9 +66,7 @@ waitfor(box.Handle);
             try
                 IP=data{row,1};
                 assert(~isempty(IP));
-                temp=SMASH.Z.Digitizer.scan(IP);
-                assert(~isempty(temp));
-                dig=SMASH.Z.Digitizer(temp);
+                dig=SMASH.Z.Digitizer(IP);
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;
                 count=count+1;
@@ -97,10 +100,7 @@ waitfor(box.Handle);
         end
         address=address(keep);
         name=name(keep);
-        dig=SMASH.Z.Digitizer(address);
-        for nn=1:numel(dig)
-            dig(nn).Name=name{nn};
-        end
+        dig=SMASH.Z.Digitizer(address,name);        
         updateControls(fig,dig);
         unlock(dig);
         hlock=findobj(fig.Figure,'Tag','LockMenu');
