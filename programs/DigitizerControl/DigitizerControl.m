@@ -20,13 +20,16 @@ end
 
 % verify address
 if ~isempty(address)
-    dig=SMASH.Z.Digitizer.scan(address);
-    if isempty(dig)
+    try
+        address=SMASH.Z.Digitizer.scan(address);
+        assert(~isempty(address));
+        dig=SMASH.Z.Digitizer(address);
+        for n=1:numel(dig)
+            dig(n).Name=sprintf('Digitizer%d',n);
+        end
+    catch
         error('Invalid IP address(es) specfied');
-    end
-    for n=1:numel(dig)
-        dig(n).Name=sprintf('Digitizer%d',n);
-    end
+    end    
 end
 
 % select digitizers

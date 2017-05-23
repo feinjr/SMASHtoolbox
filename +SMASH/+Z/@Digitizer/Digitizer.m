@@ -24,9 +24,9 @@ classdef Digitizer < handle
     end    
     %%
     methods (Hidden=true)
-        function object=Digitizer(varargin)
-            assert(nargin > 0 ,'ERROR: no IP address specified');
-            list=SMASH.Z.Digitizer.scan(varargin{:});
+        function object=Digitizer(address)
+            assert(nargin == 1 ,'ERROR: invalid number of inputs');
+            list=SMASH.Z.Digitizer.scan(address);
             object=repmat(object,size(list));
             for n=1:numel(list)
                 object(n).VISA=visa('AGILENT',...
@@ -35,7 +35,7 @@ classdef Digitizer < handle
                 fwrite(object(n).VISA,'SYSTEM:LONGFORM ON');
                 fwrite(object(n).VISA,'*IDN?');
                 temp=strtrim(fscanf(object(n).VISA));
-                object.System=setupSystem(temp,address);
+                object(n).System=setupSystem(temp,list{n});
             end                                                                      
         end
         varargout=close(varargin)

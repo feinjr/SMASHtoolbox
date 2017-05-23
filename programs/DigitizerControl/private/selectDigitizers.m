@@ -41,7 +41,7 @@ waitfor(box.Handle);
     function scanRange(varargin)
         box.Modal=false;
         commandwindow;
-        [address,~]=verifyAddress(get(Scan(2),'String'));
+        address=SMASH.Z.Digitizer.scan(get(Scan(2),'String'));
         figure(box.Handle);
         for row=1:maxrows
             if row <= numel(address)
@@ -59,7 +59,11 @@ waitfor(box.Handle);
         count=0;
         for row=1:maxrows
             try
-                dig=SMASH.Z.Digitizer(data{row,1});
+                IP=data{row,1};
+                assert(~isempty(IP));
+                temp=SMASH.Z.Digitizer.scan(IP);
+                assert(~isempty(temp));
+                dig=SMASH.Z.Digitizer(temp);
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;
                 count=count+1;
@@ -93,7 +97,10 @@ waitfor(box.Handle);
         end
         address=address(keep);
         name=name(keep);
-        dig=SMASH.Z.Digitizer(address);        
+        dig=SMASH.Z.Digitizer(address);
+        for nn=1:numel(dig)
+            dig(nn).Name=name{nn};
+        end
         updateControls(fig,dig);
         unlock(dig);
         hlock=findobj(fig.Figure,'Tag','LockMenu');
