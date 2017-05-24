@@ -41,7 +41,7 @@ classdef Digitizer < handle
     end    
     %%
     methods (Hidden=true)
-        function object=Digitizer(address,name)
+        function object=Digitizer(address,name,recursive)
             % manage input
             assert(nargin > 0 ,'ERROR: no address(es) specified');
             if ischar(address)
@@ -49,12 +49,11 @@ classdef Digitizer < handle
             end
             assert(iscellstr(address),'ERROR: invalid address(es)');            
             address=SMASH.Z.Digitizer.scan(address);
-            assert(~isempty(address),'ERROR: no valid address found');
-            
+            assert(~isempty(address),'ERROR: no valid address found');            
             if (nargin < 2) || isempty(name)
                 name=cell(size(address));
                 for n=1:numel(address)
-                    name{n}=sprintf('Digitizer%d',name{n});
+                    name{n}=sprintf('Digitizer%d',n);
                 end
             elseif ischar(name)
                 name={name};
@@ -63,14 +62,24 @@ classdef Digitizer < handle
             end
             assert(numel(name) == numel(address),...
                 'ERROR: incompatible address/name inputs');
+            if (nargin < 3) || isempty(recursive)
+                recursive=false;
+            elseif strcmpi(recursive,'recursive')
+                recursive=true;
+            end
             % deal with multiple addresses
-            if numel(address) > 1
+            if numel(address) > 1 
+                SMASH.Z.Digitizer.reset();
                 for n=1:numel(address)
-                    object(n)=SMASH.Z.Digitizer(address{n},name{n}); %#ok<AGROW>
+                    object(n)=SMASH.Z.Digitizer(address{n},name{n},...
+                        'recursive'); %#ok<AGROW>
                 end
                 return
             end
             % deal with a single address
+            if ~recursive
+                SMASH.Z.Digitizer.reset();
+            end
             object.VISA=visa('AGILENT',...
                 sprintf('TCPIP::%s',address{1}));
             fopen(object.VISA); % what if this fails?
