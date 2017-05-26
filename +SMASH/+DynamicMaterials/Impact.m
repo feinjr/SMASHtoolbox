@@ -154,8 +154,19 @@ while MGdata > 0
     MGarray{count}=MGdata;
 end
 
+j=0;
 for i=1:(length(MGarray)-1)
-    [MGmats(i),MGd(i),MGc(i),MGs(i),MGg(i)]=strread(MGarray{i},'%s %f %f %f %f','delimiter',',');
+    try
+        [tmat,td,tc,ts,tg]=strread(MGarray{i},'%s %f %f %f %f','delimiter',',');
+        if isstr(tmat{1}) && td > 0 && tc > 0 && ts > 0; 
+            j=j+1;
+            MGmats(j) = tmat;
+            MGd(j) = td;
+            MGc(j) = tc;
+            MGs(j) = ts;
+            MGg(j) = tg;
+        end
+    end
 end
 
 
