@@ -93,11 +93,11 @@ end
 % Use fminsearch to find maximum likelihood
 params = fminsearch(@fMAP,I_update);
 
-% Print Results
-fprintf('Maximum a posteriori (MAP) estimate:\n');
-for ii = 1:length(params);
-    fprintf('\t%s\t%10.5g\n',InferredVariables{ii},params(ii));
-end
+% % Print Results
+% fprintf('Maximum a posteriori (MAP) estimate:\n');
+% for ii = 1:length(params);
+%     fprintf('\t%s\t%10.5g\n',InferredVariables{ii},params(ii));
+% end
 
     
 %% fminsearch function    

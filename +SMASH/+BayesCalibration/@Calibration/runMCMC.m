@@ -225,7 +225,9 @@ discrepancy_chain=zeros([chainlength,numel(cell2mat(response_old'))]);
 
 %Update chain with initial values
 I_chain(1,:) = I_update;
+try % Don't know why this throws an error in early (<2014 Matlab) versions
 FC_chain(1,:) = FC_add;
+end
 lik_chain(1,:)=sum(lik_old);
 response_chain(1,:) =cell2mat(response_old')';
 error_chain(1,:) =cell2mat(error_old')';
@@ -318,7 +320,7 @@ for MCMCloop=2:chainlength
         [lik_old(ii),response_old{ii},error_old{ii}] = calculateLogLikelihood(obj{ii},samps{ii},sig2{ii},R_sig2{ii});
         lik_old(ii) = ESS(ii)*lik_old(ii);
     end
-       
+    
     
     if obj{1}.MCMCSettings.JointSampling
         % Apply single metropolis update for all variables with
@@ -365,7 +367,7 @@ for MCMCloop=2:chainlength
     
     %Update waitbar
     if fix(MCMCloop/(chainlength/10)) == MCMCloop/(chainlength/10)
-        update(wb,MCMCloop/obj{1}.MCMCSettings.ChainSize);
+      update(wb,MCMCloop/obj{1}.MCMCSettings.ChainSize);
     end
 
 end %End MCMC loop
@@ -698,7 +700,7 @@ if ~inferdiscrepancy
         end
         a1 = a0(ii) + 0.5*ESS(ii)*length(response_old{ii});
         phi(ii) = InvGamma(a1,b1);   
-
+        
         sig2{ii} = phi(ii) * sig2e{ii};
         R_sig2{ii} = R_sig20{ii}*sqrt(phi(ii));
     end

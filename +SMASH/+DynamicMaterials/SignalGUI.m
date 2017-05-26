@@ -6,7 +6,7 @@
 % In addition to the menu bar, two toolbars are available. The one next to
 % the help toolbar is 'Selected Signals' and is a shortcut to the 'Choose
 % Active Signals' option in the edit menu bar. The next toolbar to the
-% right, 'Clear all Signals' deletes all signal objects for a fresh start.
+% right, 'Clear all Signal0.s' deletes all signal objects for a fresh start.
 %
 %% Signal 
 % Load : Load multiple ascii or *.sda files into signal objects. For
@@ -2287,20 +2287,20 @@ function VelocityResiduals(src,varargin)
     evis = sqrt((0.002.*vexp).^2 + 8.4^2);
     tvis = [];
     
-    %Total variance w/ time:
-    dt = 0.5e-9; ndt = 100; % Time variance settings
-    tvis = evis*0;
-    for i = 1:length(texp)
-        if texp(i)+dt >= max(texp)
-            tlookup = linspace(texp(i)-dt,texp(i),ndt);
-        elseif texp(i)-dt <= max(texp)
-            tlookup = linspace(texp(i),texp(i)+dt,ndt);
-        else
-            tlookup = linspace(texp(i)-dt,texp(i)+dt,ndt);
-        end
-        vel = interp1(texp,vexp,tlookup,'linear',0);
-        tvis(i) = var(vel);
-    end
+%     %Total variance w/ time:
+%     dt = 0.5e-9; ndt = 100; % Time variance settings
+%     tvis = evis*0;
+%     for i = 1:length(texp)
+%         if texp(i)+dt >= max(texp)
+%             tlookup = linspace(texp(i)-dt,texp(i),ndt);
+%         elseif texp(i)-dt <= max(texp)
+%             tlookup = linspace(texp(i),texp(i)+dt,ndt);
+%         else
+%             tlookup = linspace(texp(i)-dt,texp(i)+dt,ndt);
+%         end
+%         vel = interp1(texp,vexp,tlookup,'linear',0);
+%         tvis(i) = var(vel);
+%     end
     
     fh = SMASH.Graphics.AIPfigure(4,'14in'); fh.Color='w'; delete(gca);
     ax1 = axes('Parent',fh,'Units','normalized','Position',[0.125 0.55 0.85 0.4]); box on; hold on;
@@ -2378,12 +2378,12 @@ function AIPFigure1(src,varargin)
     AIPFig = SMASH.Graphics.AIPfigure(1);
     set(AIPFig,'name','AIP Single Column Fig');
     
-    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions,LineWidth=1; end;
+    for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=1; end;
     plotdata(AIPFig,sig,sig_num)
     for i=1:length(sig_num); sig{sig_num(i)}.GraphicOptions.LineWidth=3; end;
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
-    set(gcf,'Color','w');
+    set(gcf,'Color','w'); box on;
     xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
     ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
 
@@ -2400,7 +2400,7 @@ function AIPFigure2(src,varargin)
     
     set(gca,'FontName','times','FontAngle','normal','FontSize',10);
     %box off; 
-    set(gcf,'Color','w');
+    set(gcf,'Color','w'); box on;
     xlabel(sig{sig_num(1)}.GridLabel,'FontName','times','FontAngle','normal','FontSize',12);
     ylabel(sig{sig_num(1)}.DataLabel,'FontName','times','FontAngle','normal','FontSize',12);
 end %AIP double column
@@ -2756,18 +2756,8 @@ end
 function color=DistinguishedLines(number)
 
 map=[];
-% map(end+1,:)=[0.00 0.00 1.00]; % blue
-% map(end+1,:)=[0.00 1.00 0.00]; % green
-% map(end+1,:)=[1.00 0.00 0.00]; % red
-% map(end+1,:)=[0.00 1.00 1.00]; % cyan
-% map(end+1,:)=[1.00 0.00 1.00]; % magenta
-% map(end+1,:)=[0.75 0.75 0.00]; % yellowish
-% map(end+1,:)=[0.00 1.00 0.50];
-% map(end+1,:)=[1.00 0.50 0.00];
-% map(end+1,:)=[0.50 0.00 1.00];
-% map(end+1,:)=[0.00 0.50 1.00];
-% map(end+1,:)=[0.50 1.00 0.00];
-% map(end+1,:)=[1.00 0.00 0.50];
+map = get(groot,'DefaultAxesColorOrder');
+
 map(end+1,:)=[0.00 0.00 1.00]; % blue
 map(end+1,:)=[0.00 0.50 0.00]; % green
 map(end+1,:)=[1.00 0.00 0.00]; % red
