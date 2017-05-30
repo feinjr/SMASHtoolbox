@@ -81,9 +81,10 @@ for n=1:numel(object.ClassList)
     if isempty(regexp(temp,expression, 'once'))
         continue
     end
-    field=temp;
-    target=sprintf('%s.%s',package,temp);
-    result.(field)=str2func(target);
+    start=strfind(temp,'.');
+    start=start(end)+1;
+    field=temp(start:end);
+    result.(field)=temp;
 end
 
 for n=1:numel(object.FunctionList)

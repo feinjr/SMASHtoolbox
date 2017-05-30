@@ -20,7 +20,7 @@
 % wild cards (e.g., '*.txt') may return a multi-dimensional structure
 % array.  Each element of this array corresponds to a single file import.
 %
-% See also SMASH.FileAccess
+% See also SMASH.FileAccess, SupportedFormats
 %
 
 % 
