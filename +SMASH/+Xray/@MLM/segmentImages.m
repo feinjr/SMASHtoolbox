@@ -25,7 +25,7 @@ function [ object ] = segmentImages( object, varargin )
 %%
 
 Nchannels = object.Settings.NumberImages;
-dx =(object.Measurement.Grid1(end)-object.Measurement.Grid1(1))/(numel(object.Measurement.Grid1)-1);
+dx = abs(object.Linearized.Grid1(end)-object.Linearized.Grid1(1))/(numel(object.Linearized.Grid1)-1);
 
 % Set default parameters
 DataLim = [0 2]; % data limits to display image
@@ -95,7 +95,7 @@ end
 grid1 = max(minX):dx:min(maxX);
 grid2 = max(minY):dx:min(maxY);
 I = zeros(length(grid2),length(grid1),Nchannels);
-
+size(I)
 for i = 1:Nchannels
    images{i} = regrid(images{i},grid1,grid2);
    I(:,:,i) = images{i}.Data;

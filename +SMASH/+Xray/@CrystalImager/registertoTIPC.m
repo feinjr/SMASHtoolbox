@@ -24,6 +24,7 @@ refcrop = crop(reference,xLims,yLims);
 
 %% regrid TIPC image onto new finer grid
 objcrop = bin(objcrop, 5);
+objcrop.Grid2
 refcrop = regrid(refcrop, objcrop.Grid1,objcrop.Grid2);
 refcrop = crop(refcrop,xCrop,yCrop);
 

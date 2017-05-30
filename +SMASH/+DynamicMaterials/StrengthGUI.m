@@ -893,11 +893,11 @@ function StrengthIntegration(src,varargin)
     view = 'Cl-u'; PlotFit([]);
 
     % see if dialog already exists
-    dlg=FindOrCreateDlg(src,'ShearStressInegration');
+    dlg=FindOrCreateDlg(src,'ShearStressIntegration');
     if ishandle(dlg)
         return
     end 
-    dlg.Name = 'ShearStressInegration';
+    dlg.Name = 'ShearStressIntegration';
     dlg.Hidden = true;   
     
     h=addblock(dlg,'check','strain space'); 
@@ -1412,18 +1412,8 @@ end
 function color=DistinguishedLines(number)
 
 map=[];
-% map(end+1,:)=[0.00 0.00 1.00]; % blue
-% map(end+1,:)=[0.00 1.00 0.00]; % green
-% map(end+1,:)=[1.00 0.00 0.00]; % red
-% map(end+1,:)=[0.00 1.00 1.00]; % cyan
-% map(end+1,:)=[1.00 0.00 1.00]; % magenta
-% map(end+1,:)=[0.75 0.75 0.00]; % yellowish
-% map(end+1,:)=[0.00 1.00 0.50];
-% map(end+1,:)=[1.00 0.50 0.00];
-% map(end+1,:)=[0.50 0.00 1.00];
-% map(end+1,:)=[0.00 0.50 1.00];
-% map(end+1,:)=[0.50 1.00 0.00];
-% map(end+1,:)=[1.00 0.00 0.50];
+map = get(groot,'DefaultAxesColorOrder');
+
 map(end+1,:)=[0.00 0.00 1.00]; % blue
 map(end+1,:)=[0.00 0.50 0.00]; % green
 map(end+1,:)=[1.00 0.00 0.00]; % red
