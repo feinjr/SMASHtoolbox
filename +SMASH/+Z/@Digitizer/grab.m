@@ -30,11 +30,11 @@ for n=1:N
     end    
     command=sprintf('WAVEFORM:SOURCE CHANNEL%d',n);
     fwrite(object.VISA,command);
-    fwrite(object.VISA,'WAVEFORM:COMPLETE?');
-    complete=fscanf(object.VISA,'%g',1);
-    if complete == 0
-        continue
-    end
+    %fwrite(object.VISA,'WAVEFORM:COMPLETE?');
+    %complete=fscanf(object.VISA,'%g',1);
+    %if complete == 0
+    %    continue
+    %end
     fwrite(object.VISA,'*CLS');
     fwrite(object.VISA,'WAVEFORM:PREAMBLE?');
     preamble=fscanf(object.VISA);
