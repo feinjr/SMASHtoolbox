@@ -10,7 +10,7 @@ communicate(object);
 temp=value.SampleRate;
 assert(isnumeric(temp) && isscalar(temp) && (temp>0),...
     'ERROR: invalid sample rate');
-command=sprintf('ACQUIRE:SRATE:ANALOG %g',temp);
+command=sprintf('ACQUIRE:SRATE %g',temp);
 fwrite(object.VISA,command);
 
 assert(isnumeric(temp) && isscalar(temp) && (temp>=0),...
@@ -19,7 +19,7 @@ assert(isnumeric(temp) && isscalar(temp) && (temp>=0),...
 temp=value.NumberPoints;
 assert(isnumeric(temp) && isscalar(temp) && (temp>0),...
     'ERROR: invalid number of points');
-command=sprintf('ACQUIRE:POINTS:ANALOG %d',temp);
+command=sprintf('ACQUIRE:POINTS %d',temp);
 fwrite(object.VISA,command);
 
 %

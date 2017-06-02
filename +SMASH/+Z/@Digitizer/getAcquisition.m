@@ -4,12 +4,15 @@ function value=getAcquisition(object)
 communicate(object);
 
 %
-fwrite(object.VISA,'ACQUIRE:SRATE:ANALOG?');
+%fwrite(object.VISA,'ACQUIRE:SRATE:ANALOG?');
+fwrite(object.VISA,'ACQUIRE:SRATE?');
 temp=strtrim(fscanf(object.VISA));
 value.SampleRate=sscanf(temp,'%g');
 
 %
-fwrite(object.VISA,'ACQUIRE:POINTS:ANALOG?');
+%fwrite(object.VISA,'ACQUIRE:POINTS:ANALOG?');
+fwrite(object.VISA,'ACQUIRE:POINTS?');
+
 temp=strtrim(fscanf(object.VISA));
 value.NumberPoints=sscanf(temp,'%g');
 

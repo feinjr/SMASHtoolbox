@@ -289,6 +289,7 @@ set(arm(1),'Callback',@runMode);
 set(arm(2),'Callback',@singleMode)
     function singleMode(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
+        
         set(arm(2),'BackgroundColor','g','Fontweight','bold');
         set(arm([1 3]),'BackgroundColor',DefaultBackground,...
             'Fontweight','normal');
@@ -351,6 +352,16 @@ set(override(2),'Callback',@forceTrigger)
                     readDigitizer();
                     dig(n).arm('run');
             end
+        end
+    end
+
+paranoid=addblock(fig,'checkbox','Shot mode');
+set(paranoid,'Callback',@shotMode);
+    function shotMode(varargin)
+        if get(paranoid,'Value')
+            set(arm(1),'Enable','off');
+        else
+            set(arm(1),'Enable','on');
         end
     end
 

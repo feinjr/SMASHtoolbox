@@ -82,6 +82,7 @@ classdef Digitizer < handle
             end
             object.VISA=visa('AGILENT',...
                 sprintf('TCPIP::%s',address{1}));
+            object.VISA.Timeout=1;
             fopen(object.VISA); % what if this fails?
             fwrite(object.VISA,'SYSTEM:LONGFORM ON');
             fwrite(object.VISA,'*IDN?');
