@@ -99,7 +99,7 @@ for n=1:numel(object.ClassList)
     start=start(end)+1;
     ShortName=temp(start:end);
     if testName(ShortName,name)
-        result.(ShortName)=temp;
+        result.(ShortName)=str2func(temp);
     end    
 end
 
