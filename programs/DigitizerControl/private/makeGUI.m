@@ -46,7 +46,7 @@ uimenu(hm,'Label','Start over','Callback',@startOver)
                 delete(list(n))
             end
         end
-        SMASH.Z.Digitizer.reset();
+        SMASH.Instrument.reset('Digitizer');
         makeGUI(fontsize);        
     end
 uimenu(hm,'Label','Save configuration','Separator','on','Enable','off');
@@ -55,6 +55,7 @@ uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
     function exitProgram(varargin)
         choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
         if ~isnumeric(choice) && strcmpi(strtrim(choice),'yes')
+            unlock();
             delete(fig.Figure);            
         end        
     end
@@ -106,9 +107,11 @@ uimenu(hm,'Label','Unlock digitizers','Separator','on',...
     'Tag','Unlock','Callback',@unlock);
     function unlock(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
+        if ~isempty(dig)
+            dig=getappdata(fig.Figure,'DigitizerObject');
+        end
         set(MenuLockControls,'Checked','off');
         set(MenuLockScreens,'Checked','off');
-        dig.unlock;
     end
 
 hm=uimenu(fig.Figure,'Label','Calibration');
@@ -153,10 +156,8 @@ set(digitizer(2),'Callback',@changeDigitizer)
     end
 set(digitizer(end),'Callback',@readDigitizer);
     function readDigitizer(varargin)
-        previous=get(digitizer(end),'BackgroundColor');
-        CU=onCleanup(@() set(digitizer(end),'BackgroundColor',previous));
-        set(digitizer(end),'BackgroundColor','m');
-        drawnow();
+        WorkingButton(digitizer(end));
+        CU=onCleanup(@() WorkingButton(digitizer(end)));
         dig=getappdata(fig.Figure,'DigitizerObject');
         updateControls(fig);
         index=get(digitizer(2),'Value');
@@ -194,21 +195,21 @@ set(digitizer(end),'Callback',@readDigitizer);
         end
     end
 
-acquire=addblock(fig,'table',{'Settings:' ' Global'},[20 10],8);
+acquire=addblock(fig,'table',{'Settings:' ' Global'},[20 10],7);
 set(acquire(1),'FontWeight','bold');
 set(acquire(2),'Style','checkbox','Callback',@globalSettings)
 common=acquire(2);
 globalSettings();
 setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
-data=cell(8,2);
+data=cell(7,2);
 data{1,1}='Sample rate (1/s) :';
 data{2,1}='Number samples :';
 data{3,1}='Number averages :';
 data{4,1}='Trigger source :';
 data{5,1}='Trigger slope :';
 data{6,1}='Trigger level (V) :';
-data{7,1}='Reference type :';
-data{8,1}='Reference position (s) :';
+%data{7,1}='Reference type :';
+data{7,1}='Start time (s) :';
 set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},...
     'ColumnEditable',[false true],...
@@ -231,13 +232,15 @@ set(acquire(end),'Data',data,...
     end
 
 %%
-channel=addblock(fig,'table',{'Channels:' '1' '2' '3' '4'},[10 5 5 5 5],3);
-set(channel(1),'Fontweight','bold');
+channel=addblock(fig,'table',{'' 'CH 1' 'CH 2' 'CH 3' 'CH 4'},[10 5 5 5 5],5);
+set(channel(1:5),'Fontweight','bold');
 setappdata(fig.ControlPanel,'ChannelTable',channel(end));
-data=cell(3,5);
-data{1,1}='Scale (V/div) :';
-data{2,1}='Offset (V) :';
-data{3,1}='Status :';
+data=cell(5,5);
+data{1,1}='Coupling :';
+data{2,1}='Impedance :';
+data{3,1}='Scale (V/div) :';
+data{4,1}='Offset (V) :';
+data{5,1}='Status :';
 set(channel(end),'Data',data,...
     'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
     'ColumnEditable',[false true true true true],...
@@ -419,19 +422,13 @@ switch row
             dig.Trigger.Level=sscanf(value,'%g',1);
         catch
         end
-        value=dig.Trigger.Level;
+        value=dig.Trigger.Level;   
     case 7
         try
-            dig.Trigger.ReferenceType=value;
+            dig.Trigger.Start=sscanf(value,'%g',1);
         catch
         end
-        value=dig.Trigger.ReferenceType;
-    case 8
-        try
-            dig.Trigger.ReferencePosition=sscanf(value,'%g',1);
-        catch
-        end
-        value=dig.Trigger.ReferencePosition;
+        value=dig.Trigger.Start;
 end   
 
 end
@@ -441,17 +438,29 @@ function value=attemptChannel(dig,row,ch,value)
 switch row
     case 1
         try
+            dig.Channel(ch).Coupling=value;
+        catch
+        end
+        value=dig.Channel(ch).Coupling;
+    case 2
+        try
+            dig.Channel(ch).Impedance=value;
+        catch
+        end
+        value=dig.Channel(ch).Impedance;
+    case 3
+        try
             dig.Channel(ch).Scale=sscanf(value,'%g',1);
         catch
         end
         value=dig.Channel(ch).Scale;
-    case 2
+    case 4
         try
             dig.Channel(ch).Offset=sscanf(value,'%g',1);
         catch
         end
         value=dig.Channel(ch).Offset;
-    case 3
+    case 5
         if strcmpi(value,'on')
             value=true;
         elseif strcmpi(value,'off')

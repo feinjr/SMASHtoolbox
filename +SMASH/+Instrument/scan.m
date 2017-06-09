@@ -29,9 +29,10 @@ if ischar(request)
 elseif iscellstr(request)
     list={};
     for n=1:numel(request)
-        temp=SMASH.Z.Digitizer.scan(request{n});
+        temp=SMASH.Instrument.scan(request{n});
         list=[list; temp]; %#ok<AGROW>
     end
+    varargout{1}=list;
     return
 else
     error('ERROR: invalid IP request');

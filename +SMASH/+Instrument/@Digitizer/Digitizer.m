@@ -18,11 +18,7 @@
 classdef Digitizer < handle
     properties (Dependent=true)
         Name % Digitizer name
-    end
-    properties
-        SaveLocation = 'C:\Users\Sandia\Data' % Location where data is saved *on* the digitizer
-        ShareLocation = 'Data' % Shared directory name *on* the digitizer
-    end
+    end   
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
         DefinedName = '' % Defined digitizer name
@@ -38,13 +34,15 @@ classdef Digitizer < handle
     properties (Dependent=true, SetAccess=protected)
         RunState % Run state (single, run, stop)
         Calibration % Calibration info
-    end    
+    end
+     properties
+        RemoteDirectory % Location and share ID where data is saved *on* the digitizer
+    end
     %%
     methods (Hidden=true)
         function object=Digitizer(varargin)
-            object=createDigitizer(varargin);
+            object=createDigitizer(object,varargin{:});
         end
-        varargout=createDigitizer(varargin)
         varargout=close(varargin)
         varargout=open(varargin)
         varargout=communicate(varargin)
@@ -101,18 +99,29 @@ classdef Digitizer < handle
             assert(ischar(value),'ERROR: invalid name');
             object.DefinedName=strtrim(value);            
         end
-        function set.SaveLocation(object,value)
-            assert(ischar(value),'ERROR: invalid save location');
-            index=(value=='/') | (value=='\');
-            value(index)=filesep;            
-            object.SaveLocation=strtrim(value);
-        end
-         function set.ShareLocation(object,value)
-            assert(ischar(value),'ERROR: invalid share location');
-            index=(value=='/') | (value=='\');
-            value(index)=filesep;
-            object.ShareLocation=strtrim(value);
-        end
+        function set.RemoteDirectory(object,value)
+            assert(isstruct(value),'ERROR: invalid remote directory setting');
+            name=fieldnames(value);
+            while numel(name) > 0
+                switch name{1}
+                    case 'Location'
+                        assert(ischar(value.Location),'ERROR: invalid location');
+                        index=(value.Location=='/') | (value.Location=='\');
+                        value.Location(index)=filesep;
+                        value.Location=strtrim(value.Location);
+                        name=name(2:end);
+                    case 'ShareName'
+                        assert(ischar(value.ShareName),'ERROR: invalid shared name');
+                        index=(value.ShareName=='/') | (value.ShareName=='\');
+                        value.ShareName(index)=filesep;
+                        value.ShareName=strtrim(value.ShareName);
+                        name=name(2:end);
+                    otherwise
+                        error('ERROR: invalid remote directory setting');
+                end                
+            end
+            object.RemoteDirectory=value;
+        end        
         function set.Acquisition(object,value)
             setAcquisition(object,value);
         end

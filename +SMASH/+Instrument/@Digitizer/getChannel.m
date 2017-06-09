@@ -11,10 +11,21 @@ for n=1:N
     temp=fscanf(object.VISA);
     local.Display=logical(sscanf(temp,'%g'));
     %
-    command=sprintf('CHANNEL%d:INPUT?',n);
-    fwrite(object.VISA,command);
-    temp=fscanf(object.VISA);
-    local.Input=strtrim(temp);
+    switch object.System.Class
+        case 'Infiniium'
+            command=sprintf('CHANNEL%d:INPUT?',n);
+            fwrite(object.VISA,command);
+            temp=strtrim(fscanf(object.VISA));
+            local.Coupling=temp(1:2);
+            temp=temp(3:end);
+            if isempty(temp)
+                local.Impedance='HIGH';
+            else
+                local.Impedance='50 ohm';
+            end
+        case 'InfiniiScope'
+            % under construction
+    end
     %
     command=sprintf('CHANNEL%d:OFFSET?',n);
     fwrite(object.VISA,command);

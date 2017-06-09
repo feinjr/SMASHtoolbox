@@ -1,7 +1,7 @@
-function object=createDigitizer(address,name)
+function object=createDigitizer(object,address,name)
 
 % manage input
-assert(nargin > 0 ,'ERROR: no address(es) specified');
+assert(nargin >= 2 ,'ERROR: no address(es) specified');
 if ischar(address)
     address={address};
 end
@@ -9,7 +9,7 @@ assert(iscellstr(address),'ERROR: invalid address(es)');
 
 address=SMASH.Instrument.scan(address);
 assert(~isempty(address),'ERROR: no valid address found');
-if (nargin < 2) || isempty(name)
+if (nargin < 3) || isempty(name)
     name=cell(size(address));
     for n=1:numel(address)
         name{n}=sprintf('Digitizer%d',n);
@@ -25,8 +25,7 @@ assert(numel(name) == numel(address),...
 % deal with multiple addresses
 if numel(address) > 1
     for n=1:numel(address)
-        object(n)=SMASH.Z.Digitizer(address{n},name{n},...
-            'recursive'); %#ok<AGROW>
+        object(n)=SMASH.Instrument.Digitizer(object,address{n},name{n}); 
         if n == 1
             object=repmat(object,size(address));
         end
@@ -38,17 +37,19 @@ end
 existing=instrfindall('Tag','Digitizer');
 for n=1:numel(existing)
     if strcmp(existing(n).RemoteHost,address{1})
-        object=existing(n);
-        return
+        object.VISA=existing(n);
+        break
     end
 end
 
-try
-    object.VISA=visa('AGILENT',sprintf('TCPIP::%s',address{1}));
-    object.VISA.Timeout=1;
-    fopen(object.VISA);    
-catch
-    error('ERROR: only Agilent/Keysight digitizers supported at this time');
+if isempty(object.VISA)
+    try
+        object.VISA=visa('AGILENT',sprintf('TCPIP::%s',address{1}));
+        object.VISA.Timeout=1;
+        fopen(object.VISA);
+    catch
+        error('ERROR: only Agilent/Keysight digitizers supported at this time');
+    end
 end
 fwrite(object.VISA,'SYSTEM:LONGFORM ON');
 fwrite(object.VISA,'*IDN?');
@@ -56,9 +57,12 @@ temp=strtrim(fscanf(object.VISA));
 object.System=setupSystem(temp,address{1});
 
 %object=identifySystem(object);
-object.System.Class='Infiniium'; % manual over ride
+object.System.Class='Infiniium'; % manual override
 
 object.Name=name{1};
 object.VISA.Tag='Digitizer';
+
+object.RemoteDirectory=struct(...
+    'Location','C:\Users\Sandia\Data','ShareName','Data');
 
 end

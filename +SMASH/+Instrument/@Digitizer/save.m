@@ -10,17 +10,17 @@ if numel(object) > 1
 end
 
 % single digitizer
-command=sprintf('DISK:CDIRECTORY "%s"',object.SaveLocation);
+command=sprintf('DISK:CDIRECTORY "%s"',object.RemoteDirectory.Location);
 fwrite(object.VISA,command);
 fwrite(object.VISA,'DISK:PWD?');
 current=strtrim(fscanf(object.VISA));
-assert(strcmpi(current,object.SaveLocation),'ERROR: invalid save location');
+assert(strcmpi(current,object.RemoteDirectory.Location),'ERROR: invalid save location');
 
 filename=sprintf('%s.h5',object.Name);
 command=sprintf('DISK:SAVE:WAVEFORM ALL, "%s" ,H5INT, ON',filename);
 fwrite(object.VISA,command);
 
-source=[repmat(filesep,[1 2]) object.System.Address filesep object.ShareLocation filesep filename];
+source=[repmat(filesep,[1 2]) object.System.Address filesep object.RemoteDirectory.ShareName filesep filename];
 
 target=fullfile(pwd,filename);
 % this command waits until copy actually finishes!
