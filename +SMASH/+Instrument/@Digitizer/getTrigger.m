@@ -14,11 +14,12 @@ temp=strtrim(fscanf(object.VISA));
 value.Level=sscanf(temp,'%g');
 
 %
-fwrite(object.VISA,'TIMEBASE:REFERENCE?');
-value.ReferenceType=strtrim(fscanf(object.VISA));
+fwrite(object.VISA,'TIMEBASE:REFERENCE LEFT');
+%fwrite(object.VISA,'TIMEBASE:REFERENCE?');
+%value.ReferenceType=strtrim(fscanf(object.VISA));
 
 fwrite(object.VISA,'TIMEBASE:POSITION?');
 temp=strtrim(fscanf(object.VISA));
-value.ReferencePosition=sscanf(temp,'%g');
+value.Start=sscanf(temp,'%g');
 
 end

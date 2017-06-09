@@ -27,8 +27,8 @@ data{3,2}=sprintf('%g',dig.Acquisition.NumberAverages);
 data{4,2}=dig.Trigger.Source;
 data{5,2}=dig.Trigger.Slope;
 data{6,2}=sprintf('%g',dig.Trigger.Level);
-data{7,2}=dig.Trigger.ReferenceType;
-data{8,2}=dig.Trigger.ReferencePosition;
+%data{7,2}=dig.Trigger.ReferenceType;
+data{7,2}=dig.Trigger.Start;
 
 set(settings,'Data',data);
 
@@ -37,12 +37,14 @@ channel=getappdata(fig.ControlPanel,'ChannelTable');
 data=get(channel,'Data');
 
 for n=1:numel(dig.Channel)
-    data{1,n+1}=sprintf('%g',dig.Channel(n).Scale);
-    data{2,n+1}=sprintf('%g',dig.Channel(n).Offset);
+    data{1,n+1}=dig.Channel(n).Coupling;
+    data{2,n+1}=dig.Channel(n).Impedance;
+    data{3,n+1}=sprintf('%g',dig.Channel(n).Scale);
+    data{4,n+1}=sprintf('%g',dig.Channel(n).Offset);
     if dig.Channel(n).Display
-        data{3,n+1}='ON';
+        data{5,n+1}='ON';
     else
-        data{3,n+1}='OFF';
+        data{5,n+1}='OFF';
     end
 end
 

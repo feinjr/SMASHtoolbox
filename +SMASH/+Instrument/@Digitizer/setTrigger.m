@@ -15,10 +15,10 @@ fwrite(object.VISA,command);
 command=sprintf('TRIGGER:LEVEL %s, %g',value.Source,value.Level);
 fwrite(object.VISA,command);
 
-command=sprintf('TIMEBASE:REFERENCE %s',value.ReferenceType);
-fwrite(object.VISA,command);
+command=sprintf('TIMEBASE:REFERENCE %s','LEFT');
+%fwrite(object.VISA,command);
 
-command=sprintf('TIMEBASE:POSITION %g',value.ReferencePosition);
+command=sprintf('TIMEBASE:POSITION %g',value.Start);
 fwrite(object.VISA,command);
 
 end

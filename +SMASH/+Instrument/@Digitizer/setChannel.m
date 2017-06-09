@@ -13,13 +13,23 @@ for n=1:numel(value)
     command=sprintf('CHANNEL%d:DISPLAY %d',n,temp);
     fwrite(object.VISA,command);
     %
-    switch lower(value(n).Input)
-        case {'dc' 'dc50' 'ac' 'ac50'}
-            % valid choices
-        otherwise
-            error('ERROR: invalid input value');
+    assert(strcmpi(value(n).Coupling,'AC') || strcmpi(value(n).Coupling,'DC'),...
+        'ERROR: invalid coupling type');
+    if strcmp(value(n).Impedance,'50')
+        value(n).Impedance='50 ohm';
     end
-    command=sprintf('CHANNEL%d:INPUT %s',n,value(n).Input);
+    assert(strcmpi(value(n).Impedance,'50 ohm') || strcmpi(value(n).Impedance,'HIGH'),...
+        'ERROR: invalid impedance value');
+    switch object.System.Class
+        case 'Infiniium'
+            temp=upper(value(n).Coupling);
+            if strcmpi(value(n).Impedance,'50 ohm')
+                temp=sprintf('%s50',temp);
+            end
+            command=sprintf('CHANNEL%d:INPUT %s',n,temp);
+        case 'InfiniiScope'
+            % under construction
+    end    
     fwrite(object.VISA,command);
     % 
     temp=value(n).Offset;
@@ -32,15 +42,7 @@ for n=1:numel(value)
     assert(isnumeric(temp) && isscalar(temp) && (temp > 0),...
         'ERROR: invalid scale value');
     command=sprintf('CHANNEL%d:SCALE %g',n,temp);
-    fwrite(object.VISA,command)
-    %
-    %temp=value(n).Label;
-    %assert(ischar(temp),'ERROR: invalid label value');
-    %if temp(1) ~= '"'
-    %    temp=['"' temp '"']; %#ok<AGROW>
-    %end
-    %command=sprintf('CHANNEL%d:LABEL %s',n,temp);
-    %fwrite(object.VISA,command)
+    fwrite(object.VISA,command)    
 end
 
 end

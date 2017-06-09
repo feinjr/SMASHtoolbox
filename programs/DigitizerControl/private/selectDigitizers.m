@@ -27,12 +27,12 @@ for n=1:numel(address)
     data{n,4}=name{n};
 end
 set(table(end),'Data',data,'ColumnEditable',[true false false true]);
-updateDialog();
 
 buttons=addblock(box,'button',{'Update' 'Done'});
 set(buttons(1),'Callback',@updateDialog);
 set(buttons(2),'Callback',@done);
    
+updateDialog();
 movegui(box.Handle,'center');
 box.Hidden=false;
 box.Modal=true;
@@ -40,10 +40,9 @@ waitfor(box.Handle);
 
 %% callback functions
     function scanRange(varargin)
-        OriginalColor=get(Scan(end),'BackgroundColor');
-        set(Scan(end),'BackgroundColor','m');
-        drawnow();
-        address=SMASH.Z.Digitizer.scan(get(Scan(2),'String'));
+        WorkingButton(Scan(end));
+        C=onCleanup(@() WorkingButton(Scan(end)));
+        address=SMASH.Instrument.scan(get(Scan(2),'String'));
         figure(box.Handle);
         data=cell(size(get(table(end),'Data')));
         for row=1:maxrows
@@ -57,16 +56,16 @@ waitfor(box.Handle);
             data{row,4}='';
         end
         set(table(end),'Data',data);
-        set(Scan(end),'BackgroundColor',OriginalColor);
     end
     function updateDialog(varargin)
+        WorkingButton(buttons(1));
         data=get(table(end),'Data');
         count=0;
         for row=1:maxrows
             try
                 IP=data{row,1};
                 assert(~isempty(IP));
-                dig=SMASH.Z.Digitizer(IP);
+                dig=SMASH.Instrument.Digitizer(IP);
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;
                 count=count+1;
@@ -86,6 +85,7 @@ waitfor(box.Handle);
             end                        
         end
         set(table(end),'Data',data);
+        WorkingButton(buttons(1));
     end
     function done(varargin)
         updateDialog();
@@ -100,13 +100,15 @@ waitfor(box.Handle);
         end
         address=address(keep);
         name=name(keep);
-        dig=SMASH.Z.Digitizer(address,name);        
+        dig=SMASH.Instrument.Digitizer(address,name);        
         updateControls(fig,dig);
         unlock(dig);
         hlock=findobj(fig.Figure,'Tag','LockMenu');
         hlock=get(hlock,'Children');
         set(hlock,'Checked','off');
         delete(box);
+        hl=findobj(fig.Figure','Type','line');
+        set(hl,'Visible','off','XData',[],'YData',[]);
         figure(fig.Figure);
     end
 
