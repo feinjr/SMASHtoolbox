@@ -55,7 +55,8 @@ uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
     function exitProgram(varargin)
         choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
         if ~isnumeric(choice) && strcmpi(strtrim(choice),'yes')
-            unlock();
+            dig=getappdata(fig.Figure,'DigitizerObject');
+            unlock(dig);
             delete(fig.Figure);            
         end        
     end
@@ -76,43 +77,30 @@ uimenu(hm,'Label','Save current digitizer',...
         saveData(fig,dig(current),'Save current digitizer',fontsize);
     end
 
-hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
-MenuLockControls=uimenu(hm,'Label','Lock digitizer controls',...
-    'Tag','LockControls','Callback',@lockControls);
-    function lockControls(varargin)
-        if strcmpi(get(MenuLockControls,'Checked'),'off')
-            dig=getappdata(fig.Figure,'DigitizerObject');
-            dig.lock();
-            set(MenuLockControls,'Checked','on');
-        else
-            dig=getappdata(fig.Figure,'DigitizerObject');
-            dig.unlock();
-            set(MenuLockControls,'Checked','off');
-        end        
-    end
-MenuLockScreens=uimenu(hm,'Label','Lock digitizer screens',...
-    'Tag','LockScreens','Callback',@lockScreens);
-    function lockScreens(varargin)
-        if strcmpi(get(MenuLockScreens,'Checked'),'off')
-            dig=getappdata(fig.Figure,'DigitizerObject');
-            dig.lock('gui');
-            set(MenuLockScreens,'Checked','on');
-        else
-            dig=getappdata(fig.Figure,'DigitizerObject');
-            dig.unlock('gui');
-            set(MenuLockScreens,'Checked','off');
-        end
-    end
-uimenu(hm,'Label','Unlock digitizers','Separator','on',...
-    'Tag','Unlock','Callback',@unlock);
-    function unlock(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        if ~isempty(dig)
-            dig=getappdata(fig.Figure,'DigitizerObject');
-        end
-        set(MenuLockControls,'Checked','off');
-        set(MenuLockScreens,'Checked','off');
-    end
+% hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
+% MenuLockControls=uimenu(hm,'Label','Lock digitizers',...
+%     'Tag','LockControls','Callback',@lockControls);
+%     function lockControls(varargin)
+%         if strcmpi(get(MenuLockControls,'Checked'),'off')
+%             dig=getappdata(fig.Figure,'DigitizerObject');
+%             dig.lock();            
+%             set(MenuLockControls,'Checked','on');
+%         else
+%             dig=getappdata(fig.Figure,'DigitizerObject');
+%             dig.unlock();
+%             set(MenuLockControls,'Checked','off');
+%         end        
+%     end
+% uimenu(hm,'Label','Unlock digitizers','Separator','on',...
+%     'Tag','Unlock','Callback',@unlock);
+%     function unlock(varargin)
+%         dig=getappdata(fig.Figure,'DigitizerObject');
+%         if ~isempty(dig)
+%             dig=getappdata(fig.Figure,'DigitizerObject');
+%         end
+%         set(MenuLockControls,'Checked','off');
+%         set(MenuLockScreens,'Checked','off');
+%     end
 
 hm=uimenu(fig.Figure,'Label','Calibration');
 uimenu(hm,'Label','Pull files','Callback',@pullCalibration);
@@ -292,7 +280,10 @@ set(arm(1),'Callback',@runMode);
 set(arm(2),'Callback',@singleMode)
     function singleMode(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
-        
+        if get(paranoid(2),'Value')
+            runParanoid(fig,dig,fontsize);
+            return
+        end        
         set(arm(2),'BackgroundColor','g','Fontweight','bold');
         set(arm([1 3]),'BackgroundColor',DefaultBackground,...
             'Fontweight','normal');
@@ -358,10 +349,19 @@ set(override(2),'Callback',@forceTrigger)
         end
     end
 
-paranoid=addblock(fig,'checkbox','Shot mode');
-set(paranoid,'Callback',@shotMode);
-    function shotMode(varargin)
-        if get(paranoid,'Value')
+paranoid=addblock(fig,'checkbox',{'Lock digitizers' 'Shot mode'});
+set(paranoid(1),'Callback',@lockDigitizers)
+    function lockDigitizers(src,~)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if get(src,'Value')
+            lock(dig);
+        else
+            unlock(dig);
+        end
+    end
+set(paranoid(2),'Callback',@shotMode);
+    function shotMode(src,~)
+        if get(src,'Value')
             set(arm(1),'Enable','off');
         else
             set(arm(1),'Enable','on');
