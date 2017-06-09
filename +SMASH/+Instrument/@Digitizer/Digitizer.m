@@ -1,21 +1,21 @@
-% This class communicates with Agilent/Keysight Infiniium digitizers via a TCP/IP
-% (Ethernet) connection.  Infiniium objects are created from a specific
+% This class communicates with digitizers via a TCP/IP
+% (Ethernet) connection.  Digitizer objects are created from a specific
 % address, an address range, or a cell array of addresses.
-%    dig=Infiniium('192.168.0.100'); % specific address
-%    dig=Infiniium('192.168.0.100-150'); % address range
-%    dig=Infiniium({'192.168.0.100' '192.168.0.105'}); % address list
-% The first example returns a scalar Infiniium object, while the third
-% example returns a 2x1 Infiniium object array.  The output size in the
+%    dig=Digitizer('192.168.0.100'); % specific address
+%    dig=Digitizer('192.168.0.100-150'); % address range
+%    dig=Digitizer({'192.168.0.100' '192.168.0.105'}); % address list
+% The first example returns a scalar Digitizer object, while the third
+% example returns a 2x1 Digitizer object array.  The output size in the
 % second example depends on the number of valid IP addresses found in the
 % specified range.
 %
-% See also Z
+% See also Instrument
 %
 
 %
 % created May 23, 2017 by Daniel Dolan (Sandia National Laboratories)
 %
-classdef Infiniium < handle
+classdef Digitizer < handle
     properties (Dependent=true)
         Name % Digitizer name
     end
@@ -41,56 +41,10 @@ classdef Infiniium < handle
     end    
     %%
     methods (Hidden=true)
-        function object=Digitizer(address,name,recursive)
-            % manage input
-            assert(nargin > 0 ,'ERROR: no address(es) specified');
-            if ischar(address)
-                address={address};
-            end
-            assert(iscellstr(address),'ERROR: invalid address(es)');            
-            address=SMASH.Z.Digitizer.scan(address);
-            assert(~isempty(address),'ERROR: no valid address found');            
-            if (nargin < 2) || isempty(name)
-                name=cell(size(address));
-                for n=1:numel(address)
-                    name{n}=sprintf('Digitizer%d',n);
-                end
-            elseif ischar(name)
-                name={name};
-            else
-                assert(iscellstr(name),'ERROR: invalid name input');
-            end
-            assert(numel(name) == numel(address),...
-                'ERROR: incompatible address/name inputs');
-            if (nargin < 3) || isempty(recursive)
-                recursive=false;
-            elseif strcmpi(recursive,'recursive')
-                recursive=true;
-            end
-            % deal with multiple addresses
-            if numel(address) > 1 
-                SMASH.Z.Digitizer.reset();
-                for n=1:numel(address)
-                    object(n)=SMASH.Z.Digitizer(address{n},name{n},...
-                        'recursive'); %#ok<AGROW>
-                end
-                return
-            end
-            % deal with a single address
-            if ~recursive
-                SMASH.Z.Digitizer.reset();
-            end
-            object.VISA=visa('AGILENT',...
-                sprintf('TCPIP::%s',address{1}));
-            object.VISA.Timeout=1;
-            fopen(object.VISA); % what if this fails?
-            fwrite(object.VISA,'SYSTEM:LONGFORM ON');
-            fwrite(object.VISA,'*IDN?');
-            temp=strtrim(fscanf(object.VISA));
-            object.System=setupSystem(temp,address{1});
-            object.Name=name{1};
-                                                                                  
+        function object=Digitizer(varargin)
+            object=createDigitizer(varargin);
         end
+        varargout=createDigitizer(varargin)
         varargout=close(varargin)
         varargout=open(varargin)
         varargout=communicate(varargin)

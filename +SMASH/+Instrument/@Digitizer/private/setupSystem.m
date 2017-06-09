@@ -13,8 +13,6 @@ result.Company=query(start:stop(1)-1);
 start=stop(1)+1;
 result.ModelNumber=query(start:stop(2)-1);
 
-%result.ModelClass
-
 start=stop(2)+1;
 result.SerialNumber=query(start:stop(3)-1);
 
