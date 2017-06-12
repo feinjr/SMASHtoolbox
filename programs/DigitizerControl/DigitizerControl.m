@@ -36,6 +36,8 @@ end
 % manage output
 if isdeployed
     varargout{1}=0;
+elseif nargout > 0
+    varargout{1}=fig;
 end
 
 end

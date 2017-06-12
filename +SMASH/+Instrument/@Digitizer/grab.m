@@ -39,6 +39,9 @@ for n=1:N
     fwrite(object.VISA,'WAVEFORM:PREAMBLE?');
     preamble=fscanf(object.VISA);
     preamble=readPreamble(preamble);
+    if preamble.Points == 0
+        continue
+    end
     if isempty(time)
         tstop=preamble.XOrigin+preamble.XIncrement*(preamble.Points-1);
         time=preamble.XOrigin:preamble.XIncrement:tstop;
@@ -102,18 +105,18 @@ output=struct();
 [output.YDisplayRange,in]=nibble(in);
 [output.YDisplayOrigin,in]=nibble(in);
 
-[output.Date,in]=nibble(in);
-[output.Date,in]=nibble(in);
-[output.FrameModel,in]=nibble(in);
+%[output.Date,in]=nibble(in);
+%[output.Date,in]=nibble(in);
+%[output.FrameModel,in]=nibble(in);
 
-[output.AcquisitionMode,in]=nibble(in);
-[output.Completion,in]=nibble(in);
+%[output.AcquisitionMode,in]=nibble(in);
+%[output.Completion,in]=nibble(in);
 
-[output.XUnits,in]=nibble(in);
-[output.YUnits,in]=nibble(in);
+%[output.XUnits,in]=nibble(in);
+%[output.YUnits,in]=nibble(in);
 
-[output.MaxBandWidth,in]=nibble(in);
-[output.MinBandWidth,~]=nibble(in);
+%[output.MaxBandWidth,in]=nibble(in);
+%[output.MinBandWidth,~]=nibble(in);
 
 end
 

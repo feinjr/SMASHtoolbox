@@ -18,7 +18,7 @@
 classdef Digitizer < handle
     properties (Dependent=true)
         Name % Digitizer name
-    end   
+    end
     properties (SetAccess=protected, Hidden=true)
         VISA % VISA object
         DefinedName = '' % Defined digitizer name
@@ -27,7 +27,7 @@ classdef Digitizer < handle
         System % Digitizer system values (model, serial number, ...)
     end
     properties (Dependent=true)
-        Acquisition % Acquisition settings (sample rate, points, ...)       
+        Acquisition % Acquisition settings (sample rate, points, ...)
         Trigger % Trigger settings (source, level, ...)
         Channel % Channel settings (scale, offset, ...)
     end
@@ -35,13 +35,17 @@ classdef Digitizer < handle
         RunState % Run state (single, run, stop)
         Calibration % Calibration info
     end
-     properties
+    properties
         RemoteDirectory % Location and share ID where data is saved *on* the digitizer
     end
     %%
     methods (Hidden=true)
         function object=Digitizer(varargin)
-            object=createDigitizer(object,varargin{:});
+            if (nargin == 1) && isstruct(varargin{1})
+                object=importDigitizer(varargin{1});
+            else                
+                object=createDigitizer(object,varargin{:});
+            end
         end
         varargout=close(varargin)
         varargout=open(varargin)
