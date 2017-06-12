@@ -26,7 +26,8 @@ set(interval(2),'String',sprintf('%d',period),'UserData',period,...
         new=max(ceil(new),1); % minimum of one second       
         set(src,'String',sprintf('%d',new),'UserData',new);
         stop(ReadTimer);
-        ReadTimer.Period=new;
+        ReadTimer.Period=new/10;
+        drawTimer(0);
         start(ReadTimer);
     end
 set(interval(3),'Callback',@testNow)
@@ -63,9 +64,11 @@ set(interval(3),'Callback',@testNow)
             set(status,'String','Partially armed','BackgroundColor','y');
         end
         set(problem(end),'Data',message);
+        TimerValue=0;
+        drawTimer(TimerValue);
     end
 
-problem=addblock(box,'table',{'Report:'},30,5);
+problem=addblock(box,'table',{'Warnings:'},30,5);
 set(problem(end),'ColumnEditable',false,'Data',{});
 
 button=addblock(box,'button',' STOP ');
@@ -92,14 +95,39 @@ set(button,'Callback',@stopWaiting,'BackgroundColor','r')
 arm(dig);
 locate(box,'center');
 box.Hidden=false;
-%box.Modal=true;
+box.Modal=true;
 
 set(box.Handle,'CloseRequestFcn','');
     
 %%
-ReadTimer=timer('Period',get(interval(2),'UserData'),...
-    'ExecutionMode','fixedSpacing','TimerFcn',@testNow);
+ReadTimer=timer('Period',get(interval(2),'UserData')/10,...
+    'ExecutionMode','fixedSpacing','TimerFcn',@readTimer);
+TimerValue=0;
+    function readTimer(varargin)
+        TimerValue=TimerValue+0.1;
+        if TimerValue >= 1
+            drawTimer(1);
+            testNow();            
+            TimerValue=0;
+        end
+        drawTimer(TimerValue)
+    end
+
+pos=get(interval(3),'Position');
+TimerBar=ones(round([pos(4) pos(3) 3]));
+drawTimer(0);
+    function drawTimer(value)
+        if value == 0
+            TimerBar(:)=1;
+        elseif value == 1
+            TimerBar(:,:,1)=0;
+        else
+            TimerBar(:,1:round(size(TimerBar,2)*TimerValue),1)=0;
+        end
+        set(interval(3),'CData',TimerBar);
+    end
 start(ReadTimer);
+
 SystemArmed=true;
 while SystemArmed
     pause(0.1);
