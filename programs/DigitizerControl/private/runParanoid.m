@@ -1,6 +1,10 @@
 function runParanoid(master,dig,fontsize)
 
 %%
+clearDisplay(dig);
+lock(dig);
+
+%%
 set(master.Figure,'Visible','off');
 
 box=SMASH.MUI.Dialog('FontSize',fontsize);
@@ -10,24 +14,26 @@ box.Name='Shot mode';
 status=addblock(box,'text','FULLY ARMED',20);
 set(status,'BackgroundColor','g','FontWeight','bold');
 
-interval=addblock(box,'edit_button',{'Interval (sec):' ' Test now '});
+interval=addblock(box,'edit_button',{'Read interval (sec):' ' Read '});
 period=5;
 set(interval(2),'String',sprintf('%d',period),'UserData',period,...
     'Callback',@changeInterval)
-    function changeInterval(src,~)      
-        period=get(src,'UserData');
+    function changeInterval(src,~)       
         new=sscanf(get(src,'String'),'%g',1);
         if isempty(new)
-            period=max(ceil(new),2); % minimum of two seconds
+            new=get(src,'UserData');
         end        
-        stop(ProbeTimer);
-        ProbeTimer.Period=period;
-        start(ProbeTimer);
-        set(src,'String',sprintf('%d',period),'UserData',period);
+        new=max(ceil(new),1); % minimum of one second       
+        set(src,'String',sprintf('%d',new),'UserData',new);
+        stop(ReadTimer);
+        ReadTimer.Period=new;
+        start(ReadTimer);
     end
 set(interval(3),'Callback',@testNow)
     function testNow(varargin)
-        disp('Testing digitizer(s)');
+        WorkingButton(interval(3));
+        C=onCleanup(@() WorkingButton(interval(3)));
+        %disp('Testing digitizer(s)');
         N=numel(dig);
         armed=false(N,1);
         message={};
@@ -45,8 +51,10 @@ set(interval(3),'Callback',@testNow)
         if Narmed == N
             % keep going
         elseif Narmed == 0
-            stop(ProbeTimer);
             set(status,'String','Disarmed','BackgroundColor','r');
+            set(button,'String','Close','BackgroundColor',OriginalColor',...
+                'Callback',@done);
+            SystemArmed=false;
         else           
             index=find(~armed);
             for n=1:numel(index)
@@ -62,8 +70,10 @@ set(problem(end),'ColumnEditable',false,'Data',{});
 
 button=addblock(box,'button',' STOP ');
 OriginalColor=get(button,'BackgroundColor');
-set(button,'Callback',@stop,'BackgroundColor','r')
-    function stop(src,~)
+set(button,'Callback',@stopWaiting,'BackgroundColor','r')
+    function stopWaiting(src,~)
+        stop(ReadTimer);
+        arm(dig,'stop');
         set(src,'BackgroundColor',OriginalColor,...
             'String','Close','Callback',@done);
         set(status,'BackgroundColor','r',...
@@ -71,10 +81,12 @@ set(button,'Callback',@stop,'BackgroundColor','r')
         set(interval(end),'Enable','off');
         data=get(problem(end),'Data');
         data{end+1}='Acquisition stopped';
-        set(problem(end),'Data',data);        
+        set(problem(end),'Data',data); 
+        SystemArmed=false;
+        drawnow();
     end
-    function done(varargin)
-        delete(box);
+    function done(src,~)
+        set(src,'String','');
     end
 
 arm(dig);
@@ -83,18 +95,27 @@ box.Hidden=false;
 %box.Modal=true;
 
 set(box.Handle,'CloseRequestFcn','');
-
-%% set up timer
-ProbeTimer=timer();
-ProbeTimer.StartDelay=0;
-ProbeTimer.Period=period;
-ProbeTimer.TimerFcn=@testNow;
-ProbeTimer.ExecutionMode='fixedSpacing';
-start(ProbeTimer);
     
 %%
+ReadTimer=timer('Period',get(interval(2),'UserData'),...
+    'ExecutionMode','fixedSpacing','TimerFcn',@testNow);
+start(ReadTimer);
+SystemArmed=true;
+while SystemArmed
+    pause(0.1);
+end
+try
+    stop(ReadTimer);
+catch    
+end
 waitfor(button,'String');
+delete(box);
 figure(master.Figure);
-stop(ProbeTimer);
+
+%%
+h=findobj(master.Figure,'Type','uicontrol','String','Lock digitizers');
+if ~get(h,'Value')
+    unlock(dig);
+end
 
 end

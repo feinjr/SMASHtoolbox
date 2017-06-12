@@ -150,6 +150,10 @@ set(digitizer(end),'Callback',@readDigitizer);
         updateControls(fig);
         index=get(digitizer(2),'Value');
         result=grab(dig(index));
+        if isempty(result)
+            set(ChannelLine,'Visible','off');
+            return
+        end
         kk=0;
         label=cell(size(result));
         h=nan(size(result));
@@ -247,6 +251,17 @@ set(channel(end),'Data',data,...
         setappdata(fig.Figure,'DigitizerObject',dig);
     end
 
+ReadInterval=addblock(fig,'edit','Read interval (s):');
+set(ReadInterval(2),'String',2,'UserData',2,'Callback',@changeInterval);
+    function changeInterval(src,~)
+        new=sscanf(get(src,'String'),'%g',1);
+        if isempty(new)
+            new=get(src,'UserData');
+        end
+        new=max(new,1);               
+        set(src,'String',sprintf('%.2g',new),'UserData',new);
+    end
+
 arm=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
 DefaultBackground=get(arm(1),'BackgroundColor');
 set(arm(1),'Callback',@runMode);
@@ -255,20 +270,24 @@ set(arm(1),'Callback',@runMode);
         if isempty(dig)
             stopMode();
             return
-        end
+        end              
         set(arm(1),'BackgroundColor','g','Fontweight','bold');        
         set(arm(2:3),'BackgroundColor',DefaultBackground,...
             'Fontweight','normal');  
         for n=1:numel(dig)
             dig(n).arm('run');
         end
-        while true      
-            pause(0.2);
+        setappdata(fig.Figure,'stopped',false);
+        while true
+            pause(get(ReadInterval(2),'UserData'));
             switch lower(dig(1).RunState)
                 case 'single'
                     singleMode();
-                case 'run'
-                    readDigitizer();
+                case 'run'                    
+                    try
+                        readDigitizer();
+                    catch
+                    end
                     continue
                 case 'stop'
                     stopMode();
@@ -293,20 +312,24 @@ set(arm(2),'Callback',@singleMode)
         for n=1:numel(dig)
             dig(n).arm('single'); % avoid confusion with variable "arm"
         end
+        setappdata(fig.Figure,'Stopped',false);
         while true
-           pause(0.2); 
+           pause(get(ReadInterval(2),'UserData')); 
            switch lower(dig(1).RunState)
                case 'single'
                    continue
                case 'stop'
                    stopMode();
                    drawnow();
-                   readDigitizer();
+                   if ~getappdata(fig.Figure,'Stopped');                  
+                       readDigitizer();                   
+                   end
                    break
                case 'run'
                    runMode();
            end          
         end
+        
     end
 set(arm(3),'Callback',@stopMode)
     function stopMode(varargin) 
@@ -316,6 +339,9 @@ set(arm(3),'Callback',@stopMode)
             'FontWeight','normal');
         for n=1:numel(dig)            
             dig(n).arm('stop');
+        end
+        if nargin == 2
+            setappdata(fig.Figure,'Stopped',true);
         end
     end
 stopMode();
