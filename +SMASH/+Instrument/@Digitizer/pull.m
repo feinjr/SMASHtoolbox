@@ -9,6 +9,15 @@ if numel(object) > 1
     return
 end
 
+% verify digitizer class
+switch object.System.Class
+    case 'Infiniium'
+        % OK
+    otherwise
+        error('ERROR: %s class digitizers do not offer calibraion pull',...
+            object.System.Class);
+end
+
 % single digitizer
 local=sprintf('%s-%s',...
     object.System.ModelNumber,object.System.SerialNumber);

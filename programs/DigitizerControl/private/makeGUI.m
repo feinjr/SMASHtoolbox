@@ -49,8 +49,31 @@ uimenu(hm,'Label','Start over','Callback',@startOver)
         SMASH.Instrument.reset('Digitizer');
         makeGUI(fontsize);        
     end
-uimenu(hm,'Label','Save configuration','Separator','on','Enable','off');
-uimenu(hm,'Label','Load configuration','Enable','off');
+uimenu(hm,'Label','Save configuration','Separator','on',...
+    'Callback',@saveConfiguration);
+    function saveConfiguration(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        warning('off','MATLAB:structOnObject');
+        dig=struct(dig); %#ok<NASGU>
+        warning('on','MATLAB:structOnObject');
+        [name,location]=uiputfile('*.cfg','Save digitizer configuration');
+        if isnumeric(name)
+            return
+        end
+        name=fullfile(location,name);
+        save(name,'dig','-mat');
+    end
+uimenu(hm,'Label','Load configuration','Callback',@loadConfiguration);
+    function loadConfiguration(varargin)
+        [name,location]=uigetfile('*.cfg','Save digitizer configuration');
+        if isnumeric(name)
+            return
+        end
+        name=fullfile(location,name);
+        previous=load(name,'dig','-mat');
+        dig=SMASH.Instrument.Digitizer(previous.dig);
+        updateControls(fig,dig);               
+    end
 uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
     function exitProgram(varargin)
         choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
@@ -77,33 +100,18 @@ uimenu(hm,'Label','Save current digitizer',...
         saveData(fig,dig(current),'Save current digitizer',fontsize);
     end
 
-% hm=uimenu(fig.Figure,'Label','Lock','Tag','LockMenu');
-% MenuLockControls=uimenu(hm,'Label','Lock digitizers',...
-%     'Tag','LockControls','Callback',@lockControls);
-%     function lockControls(varargin)
-%         if strcmpi(get(MenuLockControls,'Checked'),'off')
-%             dig=getappdata(fig.Figure,'DigitizerObject');
-%             dig.lock();            
-%             set(MenuLockControls,'Checked','on');
-%         else
-%             dig=getappdata(fig.Figure,'DigitizerObject');
-%             dig.unlock();
-%             set(MenuLockControls,'Checked','off');
-%         end        
-%     end
-% uimenu(hm,'Label','Unlock digitizers','Separator','on',...
-%     'Tag','Unlock','Callback',@unlock);
-%     function unlock(varargin)
-%         dig=getappdata(fig.Figure,'DigitizerObject');
-%         if ~isempty(dig)
-%             dig=getappdata(fig.Figure,'DigitizerObject');
-%         end
-%         set(MenuLockControls,'Checked','off');
-%         set(MenuLockScreens,'Checked','off');
-%     end
-
 hm=uimenu(fig.Figure,'Label','Calibration');
-uimenu(hm,'Label','Pull files','Callback',@pullCalibration);
+uimenu(hm,'Label','Enable push/pull','Callback',@enablePushPull);
+    function enablePushPull(src,~)
+        temp=[pullCal pushCal];
+        if get(src,'Value')
+            set(temp,'Enable','on');
+        else
+            set(temp,'Enable','off');
+        end
+    end
+pullCal=uimenu(hm,'Label','Pull files','Enable','off',...
+    'Callback',@pullCalibration);
     function pullCalibration(varargin)
         commandwindow;
         dig=getappdata(fig.Figure,'DigitizerObject');
@@ -117,7 +125,24 @@ uimenu(hm,'Label','Pull files','Callback',@pullCalibration);
         pull(dig);
         figure(fig.Figure);        
     end
-uimenu(hm,'Label','Push files','Enable','off');
+pushCal=uimenu(hm,'Label','Push files','Enable','off',...
+    'Callback',@pushCalibration);
+    function pushCalibration(varargin)
+        message{1}='Are you sure?  This may take some time...';
+        message{end+1}='DO NOT INTERRUPT THIS PROCESS ONCE STARTED!!!';
+        choice=questdlg(message,'Push calibration',...
+            ' yes ',' no ',' no ');
+        if ~strcmpi(choice,' yes ')
+            return
+        end
+        commandwindow;
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        start=pwd;
+        CU=onCleanup(@() cd(start));
+        cd calibration;
+        push(dig);
+        figure(fig.Figure); 
+    end
 uimenu(hm,'Label','Check status','Separator','on','Callback',@checkCalibration);
     function checkCalibration(varargin)
         dig=getappdata(fig.Figure,'DigitizerObject');
@@ -251,7 +276,7 @@ set(channel(end),'Data',data,...
         setappdata(fig.Figure,'DigitizerObject',dig);
     end
 
-ReadInterval=addblock(fig,'edit','Read interval (s):');
+ReadInterval=addblock(fig,'edit','Trig query (s):');
 set(ReadInterval(2),'String',2,'UserData',2,'Callback',@changeInterval);
     function changeInterval(src,~)
         new=sscanf(get(src,'String'),'%g',1);

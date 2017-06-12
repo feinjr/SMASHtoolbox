@@ -14,7 +14,7 @@ box.Name='Shot mode';
 status=addblock(box,'text','FULLY ARMED',20);
 set(status,'BackgroundColor','g','FontWeight','bold');
 
-interval=addblock(box,'edit_button',{'Read interval (sec):' ' Read '});
+interval=addblock(box,'edit_button',{'Trigger query (sec):' ' Read '});
 period=5;
 set(interval(2),'String',sprintf('%d',period),'UserData',period,...
     'Callback',@changeInterval)
