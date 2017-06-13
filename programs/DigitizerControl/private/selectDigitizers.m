@@ -65,6 +65,8 @@ waitfor(box.Handle);
             try
                 IP=data{row,1};
                 assert(~isempty(IP));
+                delay=SMASH.System.ping(IP);
+                assert(~isnan(delay),'');
                 dig=SMASH.Instrument.Digitizer(IP);
                 data{row,2}=dig.System.ModelNumber;
                 data{row,3}=dig.System.SerialNumber;

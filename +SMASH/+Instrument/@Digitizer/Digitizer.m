@@ -1,8 +1,7 @@
 % This class communicates with digitizers via a TCP/IP
 % (Ethernet) connection.  Digitizer objects are created from a specific
-% address, an address range, or a cell array of addresses.
+% address or a cell array of addresses.
 %    dig=Digitizer('192.168.0.100'); % specific address
-%    dig=Digitizer('192.168.0.100-150'); % address range
 %    dig=Digitizer({'192.168.0.100' '192.168.0.105'}); % address list
 % The first example returns a scalar Digitizer object, while the third
 % example returns a 2x1 Digitizer object array.  The output size in the
