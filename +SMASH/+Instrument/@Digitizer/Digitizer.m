@@ -41,7 +41,9 @@ classdef Digitizer < handle
     %%
     methods (Hidden=true)
         function object=Digitizer(varargin)
-            if (nargin == 1) && isstruct(varargin{1})
+            if nargin == 0
+                return % return empty object
+            elseif (nargin == 1) && isstruct(varargin{1})
                 object=importDigitizer(varargin{1});
             else                
                 object=createDigitizer(object,varargin{:});

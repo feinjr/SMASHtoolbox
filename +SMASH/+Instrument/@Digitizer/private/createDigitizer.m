@@ -22,47 +22,42 @@ end
 assert(numel(name) == numel(address),...
     'ERROR: incompatible address/name inputs');
 
-% deal with multiple addresses
-if numel(address) > 1
-    for n=1:numel(address)
-        object(n)=SMASH.Instrument.Digitizer(object,address{n},name{n}); 
-        if n == 1
-            object=repmat(object,size(address));
+%%
+%object=repmat(object,size(address));
+for n=1:numel(address)
+    % sort out VISA object
+    existing=instrfindall('Tag','Digitizer');
+    new=true;
+    for m=1:numel(existing)
+        if strcmp(existing(m).RemoteHost,address{n})
+            object(n).VISA=existing(m);
+            new=false;
+            break
         end
     end
-    return
-end
-
-% deal with a single address
-existing=instrfindall('Tag','Digitizer');
-for n=1:numel(existing)
-    if strcmp(existing(n).RemoteHost,address{1})
-        object.VISA=existing(n);
-        break
+    if new
+        object(n).VISA=visa(...
+            'AGILENT',sprintf('TCPIP::%s',address{n})); %#ok<TNMLP>
     end
-end
-
-if isempty(object.VISA)
+    object(n).VISA.Tag='Digitizer';
+    object(n).VISA.Timeout=1; % second
     try
-        object.VISA=visa('AGILENT',sprintf('TCPIP::%s',address{1}));
-        object.VISA.Timeout=1;
-        fopen(object.VISA);
+        if strcmpi(object(n).VISA.Status,'closed')
+            fopen(object(n).VISA);
+        end
     catch
         error('ERROR: only Agilent/Keysight digitizers supported at this time');
     end
+    object(n).Name=name{1};
+    % set up communications
+    fwrite(object(n).VISA,'SYSTEM:LONGFORM ON');
+    fwrite(object(n).VISA,'*IDN?');
+    temp=strtrim(fscanf(object(n).VISA));
+    object(n).System=setupSystem(temp,address{n});
+    % class detection under construction
+    object(n).System.Class='Infiniium'; % manual override
+    object(n).RemoteDirectory=struct(...
+        'Location','C:\Users\Sandia\Data','ShareName','Data');
 end
-fwrite(object.VISA,'SYSTEM:LONGFORM ON');
-fwrite(object.VISA,'*IDN?');
-temp=strtrim(fscanf(object.VISA));
-object.System=setupSystem(temp,address{1});
-
-%object=identifySystem(object);
-object.System.Class='Infiniium'; % manual override
-
-object.Name=name{1};
-object.VISA.Tag='Digitizer';
-
-object.RemoteDirectory=struct(...
-    'Location','C:\Users\Sandia\Data','ShareName','Data');
 
 end

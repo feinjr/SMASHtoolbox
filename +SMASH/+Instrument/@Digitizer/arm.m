@@ -10,7 +10,7 @@ mode=lower(mode);
 % manage multiple digitizers
 if numel(object) > 1
     for n=1:numel(object)
-        arm(object(n));
+        arm(object(n),mode);
     end
     return
 end
