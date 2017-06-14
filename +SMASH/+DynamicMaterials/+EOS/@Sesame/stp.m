@@ -7,7 +7,10 @@
 %   Usage:
 %    >> new=stp(object);
 %    >> new=stp(object, rho guess);
+%
+% You can specify different values of ambient conditions with:
 %    >> new=stp(object, rho guess, T0);
+%    >> new=stp(object, rho guess, T0,P0);
 %
 % See also Sesame, hugoniot, isentrope, isobar, isochor
 %
@@ -30,6 +33,9 @@ if nargin > 1
 end
 if nargin > 2
     t0 = varargin{3};
+end
+if nargin > 3
+    p0 = varargin{4};
 end
 
 conv_check = 0;
