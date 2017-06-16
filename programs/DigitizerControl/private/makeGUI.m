@@ -79,7 +79,10 @@ uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
         choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
         if ~isnumeric(choice) && strcmpi(strtrim(choice),'yes')
             dig=getappdata(fig.Figure,'DigitizerObject');
-            unlock(dig);
+            try
+                unlock(dig);
+            catch
+            end
             delete(fig.Figure);            
         end        
     end
