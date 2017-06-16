@@ -52,14 +52,6 @@ classdef Digitizer < handle
         varargout=open(varargin)
         varargout=communicate(varargin)
     end
-    %%
-    methods (Static=true)      
-        varargout=reset(varargin)
-        varargout=scan(varargin)
-    end
-    methods (Static=true, Hidden=true)
-        varargout=ipconfig(varargin)
-    end
     %% getters 
     methods (Hidden=true)
         varargout=getAcquisition(varargin)       
