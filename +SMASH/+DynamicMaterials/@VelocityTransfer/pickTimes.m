@@ -125,7 +125,8 @@ function PlotVelocities(mode)
     temp=regrid(temp);
     acc=differentiate(temp,[1 3],1,'zero');
     [x y]=limit(acc);
-    y=log10(abs(y)); temp = y<0; y(temp) = 0; y=y./max(y).*maxw;
+    %y=log10(abs(y)); temp = y<0; y(temp) = 0; y=y./max(y).*maxw;
+    y=y./max(y).*maxw;
     h=line(x,y);
     set(h,'Color',[.6 .6 .6]);
     
@@ -148,7 +149,8 @@ function PlotVelocities(mode)
     temp=regrid(temp);
     acc=differentiate(temp,[1 3],1,'zero');
     [x y]=limit(acc);
-    y=log10(abs(y)+eps); temp = y<0; y(temp) = 0; y=y./max(y).*maxi;
+    %y=log10(abs(y)+eps); temp = y<0; y(temp) = 0; y=y./max(y).*maxi;
+    y=y./max(y).*maxw;
     h=line(x,y);
     set(h,'Color',[.6 .6 .6]);
     
