@@ -107,9 +107,11 @@ hm=uimenu(fig.Figure,'Label','Calibration');
 uimenu(hm,'Label','Enable push/pull','Callback',@enablePushPull);
     function enablePushPull(src,~)
         temp=[pullCal pushCal];
-        if get(src,'Value')
+        if strcmpi(get(src,'Checked'),'off');
+            set(src,'Checked','on');
             set(temp,'Enable','on');
         else
+            set(src,'Checked','off');
             set(temp,'Enable','off');
         end
     end
@@ -158,7 +160,11 @@ uimenu(hm,'Label','Frequency spectra','Callback',@runFFT);
         dig=getappdata(fig.Figure,'DigitizerObject');
         FFTanalysis(dig,fontsize);
     end
-uimenu(hm,'Label','Time-frequency spectrograms','Enable','off');
+uimenu(hm,'Label','Time-frequency spectrograms','Callback',@runSpectrogram);
+    function runSpectrogram(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        SpectrogramAnalysis(dig,fontsize);
+    end
 
 %%
 digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...

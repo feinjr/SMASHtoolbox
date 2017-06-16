@@ -31,17 +31,16 @@ set(interval(2),'String',sprintf('%d',period),'UserData',period,...
         start(ReadTimer);
     end
 set(interval(3),'Callback',@testNow)
+testMessage={};
     function testNow(varargin)
         WorkingButton(interval(3));
         C=onCleanup(@() WorkingButton(interval(3)));
-        %disp('Testing digitizer(s)');
         N=numel(dig);
-        armed=false(N,1);
-        message={};
+        armed=false(N,1);        
         for n=1:N
             delay=SMASH.System.ping(dig(n).System.Address);
             if isnan(delay)
-                message{end+1}=sprintf('%s is not responding',dig(n).Name); %#ok<AGROW>
+                testMessage{end+1}=sprintf('%s is not responding',dig(n).Name); %#ok<AGROW>
                 continue
             end
             if strcmpi(dig(n).RunState,'single')
@@ -59,11 +58,11 @@ set(interval(3),'Callback',@testNow)
         else           
             index=find(~armed);
             for n=1:numel(index)
-                message{end+1}=sprintf('%s triggered',dig(n).Name); %#ok<AGROW>
+                testMessage{end+1}=sprintf('%s disarmed',dig(n).Name); %#ok<AGROW>
             end
             set(status,'String','Partially armed','BackgroundColor','y');
         end
-        set(problem(end),'Data',message);
+        set(problem(end),'Data',testMessage);
         TimerValue=0;
         drawTimer(TimerValue);
     end
@@ -82,9 +81,9 @@ set(button,'Callback',@stopWaiting,'BackgroundColor','r')
         set(status,'BackgroundColor','r',...
             'String','DISARMED');
         set(interval(end),'Enable','off');
-        data=get(problem(end),'Data');
-        data{end+1}='Acquisition stopped';
-        set(problem(end),'Data',data); 
+        message=get(problem(end),'Data');
+        message{end+1}='Acquisition stopped';
+        set(problem(end),'Data',message); 
         SystemArmed=false;
         drawnow();
     end
