@@ -1,10 +1,15 @@
-function result=grab(object)
+function result=grab(object,channel)
+
+% manage input
+if nargin < 2
+    channel=1:4;
+end
 
 % manage multiple digitizers
 if numel(object) > 1
     result=cell(size(object));
     for n=1:numel(object)
-        result{n}=grab(object(n));
+        result{n}=grab(object(n),channel);
     end
     return
 end
@@ -19,16 +24,16 @@ fwrite(object.VISA,':WAVEFORM:FORMAT WORD');
 fwrite(object.VISA,'WAVEFORM:STREAMING 1');
 
 % read data
-N=4;
+N=numel(channel);
 keep=false(1,N);
 label=cell(1,N);
 data=[];
 time=[];
 for n=1:N
-    if ~object.Channel(n).Display
+    if ~object.Channel(channel(n)).Display
         continue        
     end    
-    command=sprintf('WAVEFORM:SOURCE CHANNEL%d',n);
+    command=sprintf('WAVEFORM:SOURCE CHANNEL%d',channel(n));
     fwrite(object.VISA,command);
     %fwrite(object.VISA,'WAVEFORM:COMPLETE?');
     %complete=fscanf(object.VISA,'%g',1);

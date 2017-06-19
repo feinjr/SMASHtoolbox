@@ -55,11 +55,12 @@ TempObject=SMASH.SignalAnalysis.STFT([],1:100);
         channel=get(Channel(2),'Value');
         if ~dig(current).Channel(channel).Display
             set(SpectrogramImage,'Visible','off');
+            errordlg('This channel is not active','Inactive channel');
             return
         end
-        data=grab(dig(current));
+        data=grab(dig(current),channel);
         t=data.Grid;        
-        s=data.Data(:,channel);
+        s=data.Data(:,1);
         TempObject.Measurement=reset(TempObject.Measurement,t,s);
         TempObject.Measurement=crop(TempObject.Measurement,...
             get(TimeRange(2),'UserData'));
