@@ -18,7 +18,8 @@ set(fig.Axes,'FontSize',fontsize,'Color','k',...
     'GridColor','w','XGrid','on','YGrid','on');
 color={'y' 'g' 'b' 'r'};
 for k=1:Nchannel
-    ChannelLine(k)=line('Parent',fig.Axes,'Visible','off'); %#ok<AGROW>
+    ChannelLine(k)=line('Parent',fig.Axes,'Tag','ChannelLine',...
+        'Visible','off'); %#ok<AGROW>
     if k==1        
         ChannelLine=repmat(ChannelLine,4,1);           
     end
@@ -52,9 +53,16 @@ uimenu(hm,'Label','Start over','Callback',@startOver)
 uimenu(hm,'Label','Save configuration','Separator','on',...
     'Callback',@saveConfiguration);
     function saveConfiguration(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
+        previous=getappdata(fig.Figure,'DigitizerObject');
         warning('off','MATLAB:structOnObject');
-        dig=struct(dig); %#ok<NASGU>
+        for n=1:numel(previous)
+            temp=struct(previous(n));
+            if n==1
+                dig=repmat(temp,size(previous));
+            else
+                dig(n)=temp;
+            end
+        end        
         warning('on','MATLAB:structOnObject');
         [name,location]=uiputfile('*.cfg','Save digitizer configuration');
         if isnumeric(name)

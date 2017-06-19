@@ -1,6 +1,34 @@
 function runParanoid(master,dig,fontsize)
 
 %%
+box=SMASH.MUI.Dialog('FontSize',fontsize);
+box.Hidden=true;
+box.Name='Arm?';
+
+addblock(box,'text','Arming clears unsaved data');
+addblock(box,'text','Do you want to proceed?');
+button=addblock(box,'button',{' Yes ' ' No '});
+set(button,'Callback',@proceedButton);
+    function proceedButton(src,~)
+        name=strtrim(get(src,'String'));
+        if strcmpi(name,'yes')
+            proceed=true;
+        end
+        delete(box.Handle);
+    end
+proceed=false;
+
+locate(box,'center');
+box.Hidden=false;
+box.Modal=true;
+waitfor(box.Handle);
+if ~proceed
+    return
+end
+
+%%
+ChannelLine=findobj(master.Axes,'Type','line');
+set(ChannelLine,'Visible','off');
 clearDisplay(dig);
 lock(dig);
 
