@@ -82,6 +82,12 @@ uimenu(hm,'Label','Load configuration','Callback',@loadConfiguration);
         dig=SMASH.Instrument.Digitizer(previous.dig);
         updateControls(fig,dig);               
     end
+uimenu(hm,'Label','Report configuration','Callback',@reportConfiguration)
+    function reportConfiguration(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        generateConfigurationReport(dig);
+    end
+
 uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
     function exitProgram(varargin)
         choice=questdlg('Exit Digitizer control?','Exit',' Yes ',' No ',' No ');
