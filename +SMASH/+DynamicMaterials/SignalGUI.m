@@ -6,7 +6,7 @@
 % In addition to the menu bar, two toolbars are available. The one next to
 % the help toolbar is 'Selected Signals' and is a shortcut to the 'Choose
 % Active Signals' option in the edit menu bar. The next toolbar to the
-% right, 'Clear all Signal0.s' deletes all signal objects for a fresh start.
+% right, 'Clear all Signal0.s'5 deletes all signal objects for a fresh start.
 %
 %% Signal 
 % Load : Load multiple ascii or *.sda files into signal objects. For
@@ -245,6 +245,7 @@ uimenu(hm,'Label','Double column AIP Figure','Callback',@AIPFigure2);
 uimenu(hm,'Label','Dual Axes','Callback',@DualAxes);
 uimenu(hm,'Label','Axes Inset','Callback',@AIPAxesInset);
 uimenu(hm,'Label','Axis Limits','Callback',@SetAxis);
+uimenu(hm,'Label','Print Plot','Callback',@PrintPlot);
 
 fig.Hidden = false;
 
@@ -2478,6 +2479,18 @@ AxisMod(0,@changeaxis);
 end %Limits
 
 
+%% Print current plot
+function PrintPlot(src,varargin)
+    x = inputdlg({'Plot Name','Resolution (dpi)','Extension (eg. png, bmp, tiff, pdf, epsc)'},'Print Plot', [1 40;1 20;1 20],{'Plot','300','png'}); 
+    
+    fighandles = findobj('type','figure');
+    
+    print(fighandles(2),x{1},['-d' x{3}],['-r' x{2}],'-painters');
+end %Limits
+
+
+
+%%
 function Template(src,varargin)
     
 % see if dialog already exists
