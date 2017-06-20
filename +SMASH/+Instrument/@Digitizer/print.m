@@ -6,32 +6,32 @@ if (nargin < 2) || isempty(fid)
 end
 
 % multiple digitizers
-if numel(object > 1)
+if numel(object) > 1
     for m=1:numel(object)
-        print(object(m),dig);
+        print(object(m),fid);
     end
     return
 end
 
 % single digitizers
-fprintf(fid,'Digitizer name : %s\n',dig.Name);
+fprintf(fid,'\nDigitizer name : %s\n',object.Name);
 
 name={'System' 'Acquisition' 'Trigger'};
 for k=1:numel(name)
-    fprintf('%s settings:\n',name{k});
+    fprintf(fid,'%s settings:\n',name{k});
     temp=object.(name{k});
     local=fieldnames(temp);
     for m=1:numel(local)
-        printSmart(local,temp.(local),fid);
+        printSmart(local{m},temp.(local{m}),fid);
     end
 end
 
 for k=1:4
-    fprintf('Channel %d settings:\n',k);    
-    temp=dig.Channel(k);
+    fprintf(fid,'Channel %d settings:\n',k);    
+    temp=object.Channel(k);
     local=fieldnames(temp);
     for m=1:numel(local)
-        printSmart(local,temp.(local),fid);
+        printSmart(local{m},temp.(local{m}),fid);
     end
 end
 
@@ -39,7 +39,7 @@ end
 
 function printSmart(label,value,fid)
 
-fprintf('\t%s : ',label);
+fprintf(fid,'\t%s : ',label);
 
 if ischar(value)
     fprintf(fid,'%s',value);
@@ -49,6 +49,6 @@ else
     error('ERROR: invalid value type');
 end
 
-fprintf('\n');
+fprintf(fid,'\n');
 
 end

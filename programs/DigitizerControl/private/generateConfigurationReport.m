@@ -1,6 +1,6 @@
 function generateConfigurationReport(dig)
 
-name=sprintf('DigitizerConfiguration_%.6g.txt',now);
+name=sprintf('DigitizerConfigurationReport.txt');
 fid=fopen(name,'w');
 CU=onCleanup(@() fclose(fid));
 fprintf(fid,'Configuration report generated %s\n',datestr(now));
