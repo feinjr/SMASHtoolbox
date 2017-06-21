@@ -436,9 +436,13 @@ set(paranoid(1),'Callback',@lockDigitizers)
 set(paranoid(2),'Callback',@shotMode);
     function shotMode(src,~)
         if get(src,'Value')
-            set(arm(1),'Enable','off');
+            set(arm([1 3]),'Enable','off');
+            set(arm(2),'String','Arm');
+            set(override,'Enable','off');
         else
-            set(arm(1),'Enable','on');
+            set(arm([1 3]),'Enable','on');
+            set(arm(2),'String','Single');
+            set(override,'Enable','on');
         end
     end
 
