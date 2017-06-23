@@ -184,7 +184,7 @@ for ii=1:numsignals
     set(hl(ii),'XData',record.RawSignalTime{ii},'YData',record.RawSignal{ii});
 end
 %axis tight;
-legend(hl,record.SignalLabels,0);
+legend(hl,record.SignalLabels,'Location','Best');
 
 % update processed signal plot
 h=findobj(fig,'Tag','ProcessedSignals');
