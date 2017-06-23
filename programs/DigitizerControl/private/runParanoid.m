@@ -49,23 +49,9 @@ box.Name='Shot mode';
 status=addblock(box,'text','FULLY ARMED',20);
 set(status,'BackgroundColor','g','FontWeight','bold');
 
-interval=addblock(box,'edit_button',{'Trigger query (sec):' ' Read '});
-period=5;
-set(interval(2),'String',sprintf('%d',period),'UserData',period,...
-    'Callback',@changeInterval)
-    function changeInterval(src,~)       
-        new=sscanf(get(src,'String'),'%g',1);
-        if isempty(new)
-            new=get(src,'UserData');
-        end        
-        new=max(ceil(new),1); % minimum of one second       
-        set(src,'String',sprintf('%d',new),'UserData',new);
-        stop(ReadTimer);
-        ReadTimer.Period=new/10;
-        drawTimer(0);
-        start(ReadTimer);
-    end
-set(interval(3),'Callback',@testNow)
+period=getappdata(master,'QueryInterval');
+interval=addblock(box,'button',' Check status ');
+set(interval(1),'Callback',@testNow)
 testMessage={};
     function testNow(varargin)
         WorkingButton(interval(3));
@@ -144,7 +130,7 @@ box.Modal=true;
 set(box.Handle,'CloseRequestFcn','');
     
 %%
-ReadTimer=timer('Period',get(interval(2),'UserData')/10,...
+ReadTimer=timer('Period',period/10,...
     'ExecutionMode','fixedSpacing','TimerFcn',@readTimer);
 TimerValue=0;
     function readTimer(varargin)
@@ -174,7 +160,7 @@ start(ReadTimer);
 
 SystemArmed=true;
 while SystemArmed
-    pause(0.1);
+    pause(0.01);
 end
 try
     stop(ReadTimer);

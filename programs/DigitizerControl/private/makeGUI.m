@@ -102,6 +102,54 @@ uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
     end
 set(fig.Figure,'CloseRequestFcn',@exitProgram);
 
+hm=uimenu(fig.Figure,'Label','System');
+uimenu(hm,'Label','Clear status/error registers');
+uimenu(hm,'Label','Clear displays','Callback',@clearDisplays);
+    function clearDisplays(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        clearDisplay(dig);
+        set(ChannelLine,'Visible','off');
+    end
+uimenu(hm,'Label','Force trigger','Callback',@forceTrigger,'Separator','on');
+    function forceTrigger(varargin)
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if isempty(dig)
+            return
+        end
+        for n=1:numel(dig)
+            switch lower(dig(n).RunState)
+                case 'single'                    
+                    dig(n).forceTrigger();
+                    stopMode();
+                    drawnow();
+                    readDigitizer();
+                case 'run'
+                    dig(n).forceTrigger();
+                    dig(n).arm('stop');
+                    readDigitizer();
+                    dig(n).arm('run');
+            end
+        end
+    end
+setappdata(fig.Figure,'QueryInterval',2);
+hsub=uimenu(hm,'Label','Trigger query');
+query(1)=uimenu(hsub,'Label','2 seconds','Checked','on');
+query(2)=uimenu(hsub,'Label','5 seconds');
+query(3)=uimenu(hsub,'Label','10 seconds');
+set(query,'Callback',@setQueryInterval);
+    function setQueryInterval(src,varargin)
+        switch get(src,'Label')
+            case '2 seconds'
+                setappdata(fig.Figure,'QueryInterval',2);
+            case '5 seconds'
+                setappdata(fig.Figure,'QueryInterval',5);
+            case '10 seconds'
+                setappdata(fig.Figure,'QueryInterval',10);
+        end
+        set(query,'Checked','off');
+        set(src,'Checked','on');
+    end
+
 hm=uimenu(fig.Figure,'Label','Data');
 uimenu(hm,'Label','Save all digitizers',...
     'Callback',@saveAll);
@@ -181,7 +229,7 @@ uimenu(hm,'Label','Time-frequency spectrograms','Callback',@runSpectrogram);
     end
 
 %%
-digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Read '},...
+digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Grab data '},...
     {''},20);
 set(digitizer(1),'FontWeight','bold');
 setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
@@ -248,7 +296,6 @@ data{3,1}='Number averages :';
 data{4,1}='Trigger source :';
 data{5,1}='Trigger slope :';
 data{6,1}='Trigger level (V) :';
-%data{7,1}='Reference type :';
 data{7,1}='Start time (s) :';
 set(acquire(end),'Data',data,...
     'ColumnFormat',{'char' 'char'},...
@@ -272,7 +319,8 @@ set(acquire(end),'Data',data,...
     end
 
 %%
-channel=addblock(fig,'table',{'' 'CH 1' 'CH 2' 'CH 3' 'CH 4'},[10 5 5 5 5],5);
+channel=addblock(fig,'table',{'' 'CH 1:' 'CH 2:' 'CH 3:' 'CH 4:'},...
+    [10 5 5 5 5],5);
 set(channel(1:5),'Fontweight','bold');
 setappdata(fig.ControlPanel,'ChannelTable',channel(end));
 data=cell(5,5);
@@ -299,16 +347,7 @@ set(channel(end),'Data',data,...
         setappdata(fig.Figure,'DigitizerObject',dig);
     end
 
-ReadInterval=addblock(fig,'edit','Trig query (s):');
-set(ReadInterval(2),'String',2,'UserData',2,'Callback',@changeInterval);
-    function changeInterval(src,~)
-        new=sscanf(get(src,'String'),'%g',1);
-        if isempty(new)
-            new=get(src,'UserData');
-        end
-        new=max(new,1);               
-        set(src,'String',sprintf('%.2g',new),'UserData',new);
-    end
+addblock(fig,'button',{'Read settings' 'Write settings'});
 
 arm=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
 DefaultBackground=get(arm(1),'BackgroundColor');
@@ -327,7 +366,7 @@ set(arm(1),'Callback',@runMode);
         end
         setappdata(fig.Figure,'stopped',false);
         while true
-            pause(get(ReadInterval(2),'UserData'));
+            pause(getappdata(fig.Figure,'QueryInterval'));
             switch lower(dig(1).RunState)
                 case 'single'
                     singleMode();
@@ -362,8 +401,8 @@ set(arm(2),'Callback',@singleMode)
         end
         setappdata(fig.Figure,'Stopped',false);
         while true
-           pause(get(ReadInterval(2),'UserData')); 
-           switch lower(dig(1).RunState)
+            pause(getappdata(fig.Figure,'QueryInterval'));
+            switch lower(dig(1).RunState)
                case 'single'
                    continue
                case 'stop'
@@ -394,34 +433,7 @@ set(arm(3),'Callback',@stopMode)
     end
 stopMode();
 
-override=addblock(fig,'button',{'Clear display' 'Force trigger'});
-set(override(1),'Callback',@clearDisplays)
-    function clearDisplays(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        clearDisplay(dig);
-        set(ChannelLine,'Visible','off');
-    end
-set(override(2),'Callback',@forceTrigger)
-    function forceTrigger(varargin)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        if isempty(dig)
-            return
-        end
-        for n=1:numel(dig)
-            switch lower(dig(n).RunState)
-                case 'single'                    
-                    dig(n).forceTrigger();
-                    stopMode();
-                    drawnow();
-                    readDigitizer();
-                case 'run'
-                    dig(n).forceTrigger();
-                    dig(n).arm('stop');
-                    readDigitizer();
-                    dig(n).arm('run');
-            end
-        end
-    end
+%override=addblock(fig,'button',{'Clear display' 'Force trigger'});
 
 paranoid=addblock(fig,'checkbox',{'Lock digitizers' 'Shot mode'});
 set(paranoid(1),'Callback',@lockDigitizers)
