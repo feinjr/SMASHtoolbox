@@ -27,6 +27,13 @@ if ~proceed
 end
 
 %%
+default='C:\Users\Public\Documents\Infiniium';
+command=sprintf('DISK:CDIRECTORY "%s"',default);
+for k=1:numel(object)
+    fwrite(object(k).VISA,command);
+end
+
+%%
 ChannelLine=findobj(master.Axes,'Type','line');
 set(ChannelLine,'Visible','off');
 clearDisplay(dig);
@@ -83,6 +90,13 @@ testMessage={};
             set(button,'String','Close','BackgroundColor',OriginalColor',...
                 'Callback',@done);
             SystemArmed=false;
+            command=sprintf(...
+                'DISK:SAVE:WAVEFORM ALL, "AUTOSAVE.h5" ,H5INT, ON');
+            for m=1:numel(dig)
+                fwrite(dig(m).VISA,command);
+            end
+            set(autosave(1),'String','Data automatically saved to:');
+            set(autosave(2),'String',sprintf('\t%s',default));
         else           
             index=find(~armed);
             for n=1:numel(index)
@@ -118,6 +132,9 @@ set(button,'Callback',@stopWaiting,'BackgroundColor','r')
     function done(src,~)
         set(src,'String','');
     end
+
+autosave(1)=addblock(box,'text','',40);
+autosave(2)=addblock(box,'text','',40);
 
 arm(dig);
 locate(box,'center');
