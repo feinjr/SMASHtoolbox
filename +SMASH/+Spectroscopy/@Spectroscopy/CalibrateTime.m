@@ -10,5 +10,5 @@ function obj=CalibrateTime(obj,ImpulseT,CombFreq,TimeDir)
 obj.CombFrequency=CombFreq;
 obj.ImpulseTime=ImpulseT;
 obj.TimeDirection=TimeDir;
-obj.TimePolyFitCoeff=CalibrateTimeGUI(obj.TimeImage,obj.ImpulseTime,obj.CombFrequency,obj.TimeDirection);
+obj.TimePolyFitCoeff=CalibrateTimeGUI(obj,obj.TimeImage,obj.ImpulseTime,obj.CombFrequency,obj.TimeDirection);
 end
