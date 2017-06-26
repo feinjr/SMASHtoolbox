@@ -8,6 +8,20 @@ if ishandle(h)
     return
 end
 
+createMode=true;
+    function checkList()
+        if createMode
+            return
+        end
+        temp=get(digitizer(2),'String');
+        if (numel(temp) > 1) || ~isempty(temp{1})
+            return
+        end
+        message='No digitizers have been selected';
+        errordlg(message,'No digitizers');
+        error(message);
+    end
+
 Nchannel=4;
 fig=SMASH.MUI.DialogPlot('FontSize',fontsize);
 fig.Hidden=true;
@@ -53,6 +67,7 @@ uimenu(hm,'Label','Start over','Callback',@startOver)
 uimenu(hm,'Label','Save configuration','Separator','on',...
     'Callback',@saveConfiguration);
     function saveConfiguration(varargin)
+        checkList();
         previous=getappdata(fig.Figure,'DigitizerObject');
         warning('off','MATLAB:structOnObject');
         for n=1:numel(previous)
@@ -84,6 +99,7 @@ uimenu(hm,'Label','Load configuration','Callback',@loadConfiguration);
     end
 uimenu(hm,'Label','Report configuration','Callback',@reportConfiguration)
     function reportConfiguration(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         generateConfigurationReport(dig);
     end
@@ -104,14 +120,17 @@ set(fig.Figure,'CloseRequestFcn',@exitProgram);
 
 hm=uimenu(fig.Figure,'Label','System');
 uimenu(hm,'Label','Clear status/error registers');
+
 uimenu(hm,'Label','Clear displays','Callback',@clearDisplays);
     function clearDisplays(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         clearDisplay(dig);
         set(ChannelLine,'Visible','off');
     end
 uimenu(hm,'Label','Force trigger','Callback',@forceTrigger,'Separator','on');
     function forceTrigger(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         if isempty(dig)
             return
@@ -154,12 +173,14 @@ hm=uimenu(fig.Figure,'Label','Data');
 uimenu(hm,'Label','Save all digitizers',...
     'Callback',@saveAll);
     function saveAll(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         saveData(fig,dig,'Save all digitizers',fontsize);
     end
 uimenu(hm,'Label','Save current digitizer',...
     'Callback',@saveCurrent);
     function saveCurrent(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         current=get(digitizer(2),'Value');
         saveData(fig,dig(current),'Save current digitizer',fontsize);
@@ -180,6 +201,7 @@ uimenu(hm,'Label','Enable push/pull','Callback',@enablePushPull);
 pullCal=uimenu(hm,'Label','Pull files','Enable','off',...
     'Callback',@pullCalibration);
     function pullCalibration(varargin)
+        checkList();
         commandwindow;
         dig=getappdata(fig.Figure,'DigitizerObject');
         start=pwd;
@@ -195,6 +217,7 @@ pullCal=uimenu(hm,'Label','Pull files','Enable','off',...
 pushCal=uimenu(hm,'Label','Push files','Enable','off',...
     'Callback',@pushCalibration);
     function pushCalibration(varargin)
+        checkList();
         message{1}='Are you sure?  This may take some time...';
         message{end+1}='DO NOT INTERRUPT THIS PROCESS ONCE STARTED!!!';
         choice=questdlg(message,'Push calibration',...
@@ -212,6 +235,7 @@ pushCal=uimenu(hm,'Label','Push files','Enable','off',...
     end
 uimenu(hm,'Label','Check status','Separator','on','Callback',@checkCalibration);
     function checkCalibration(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         showCalibration(dig,fontsize);
     end
@@ -219,27 +243,123 @@ uimenu(hm,'Label','Check status','Separator','on','Callback',@checkCalibration);
 hm=uimenu(fig.Figure,'Label','Analysis');
 uimenu(hm,'Label','Frequency spectra','Callback',@runFFT);
     function runFFT(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         FFTanalysis(dig,fontsize);
     end
 uimenu(hm,'Label','Time-frequency spectrograms','Callback',@runSpectrogram);
     function runSpectrogram(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         SpectrogramAnalysis(dig,fontsize);
     end
 
-%%
-digitizer=addblock(fig,'popup_button',{'Current digitizer:' ' Grab data '},...
-    {''},20);
+%%   
+digitizer=addblock(fig,'popup','Current digitizer:',{''},30);
 set(digitizer(1),'FontWeight','bold');
 setappdata(fig.ControlPanel,'DigitizerPopup',digitizer(2));
 set(digitizer(2),'Callback',@changeDigitizer)
     function changeDigitizer(varargin)
+        checkList();
         updateControls(fig);
         set(ChannelLine,'Visible','off');
     end
-set(digitizer(end),'Callback',@readDigitizer);
-    function readDigitizer(varargin)
+
+    function globalSettings(varargin)
+        checkList();
+        if get(common,'Value')
+            set(acquire(1),'String','Global digitizer settings:');
+            dig=getappdata(fig.Figure,'DigitizerObject');
+            index=get(digitizer(2),'Value');
+            for n=1:numel(dig)
+                if (n == index)
+                    continue
+                end
+                dig(n).Acquisition=dig(index).Acquisition;
+                dig(n).Trigger=dig(index).Trigger;
+            end
+        else
+            set(acquire(1),'String','Current digitizer settings:');
+        end
+    end
+
+acquire=addblock(fig,'table',{'Settings:' ' Global'},[20 10],7);
+set(acquire(1),'FontWeight','bold');
+set(acquire(2),'Style','checkbox','Callback',@globalSettings)
+common=acquire(2);
+%globalSettings();
+setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
+data=cell(7,2);
+data{1,1}='Sample rate (1/s) :';
+data{2,1}='Number samples :';
+data{3,1}='Number averages :';
+data{4,1}='Trigger source :';
+data{5,1}='Trigger slope :';
+data{6,1}='Trigger level (V) :';
+data{7,1}='Start time (s) :';
+set(acquire(end),'Data',data,...
+    'ColumnFormat',{'char' 'char'},...
+    'ColumnEditable',[false true],...
+    'CellEditCallback',@changeSetting)
+    function changeSetting(src,EventData)
+        checkList();
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        if get(common,'Value')
+            index=1:numel(get(digitizer(2),'String'));          
+        else
+            index=get(digitizer(2),'Value');
+        end
+        row=EventData.Indices(1);
+        column=EventData.Indices(2);
+        value=EventData.EditData;       
+        value=attemptSetting(dig(index),row,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
+    end
+
+%%
+channel=addblock(fig,'table',{'' 'CH 1:' 'CH 2:' 'CH 3:' 'CH 4:'},...
+    [10 5 5 5 5],5);
+set(channel(1:5),'Fontweight','bold');
+setappdata(fig.ControlPanel,'ChannelTable',channel(end));
+data=cell(5,5);
+data{1,1}='Coupling :';
+data{2,1}='Impedance :';
+data{3,1}='Scale (V/div) :';
+data{4,1}='Offset (V) :';
+data{5,1}='Status :';
+set(channel(end),'Data',data,...
+    'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
+    'ColumnEditable',[false true true true true],...
+    'CellEditCallback',@changeChannel)
+    function changeChannel(src,EventData)
+        checkList();
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        index=get(digitizer(2),'Value');
+        row=EventData.Indices(1);
+        column=EventData.Indices(2);
+        ch=column-1;
+        value=EventData.EditData;
+        value=attemptChannel(dig(index),row,ch,value);
+        data=get(src,'Data');
+        data{row,column}=value;
+        set(src,'Data',data);
+        setappdata(fig.Figure,'DigitizerObject',dig);
+    end
+
+h=addblock(fig,'button',{'Read settings' 'Grab data'});
+set(h(1),'Callback',@readSettings);
+    function readSettings(varargin)
+        checkList();
+        WorkingButton(digitizer(end));
+        CU=onCleanup(@() WorkingButton(digitizer(end)));
+        updateControls(fig);
+    end
+set(h(2),'Callback',@readDigitizer);
+ function readDigitizer(varargin)
+        checkList();
         WorkingButton(digitizer(end));
         CU=onCleanup(@() WorkingButton(digitizer(end)));
         dig=getappdata(fig.Figure,'DigitizerObject');
@@ -275,84 +395,12 @@ set(digitizer(end),'Callback',@readDigitizer);
         end
     end
 
-    function globalSettings(varargin)
-        if get(common,'Value')
-            set(acquire(1),'String','Global digitizer settings:');
-        else
-            set(acquire(1),'String','Current digitizer settings:');
-        end
-    end
-
-acquire=addblock(fig,'table',{'Settings:' ' Global'},[20 10],7);
-set(acquire(1),'FontWeight','bold');
-set(acquire(2),'Style','checkbox','Callback',@globalSettings)
-common=acquire(2);
-globalSettings();
-setappdata(fig.ControlPanel,'SettingsTable',acquire(end));
-data=cell(7,2);
-data{1,1}='Sample rate (1/s) :';
-data{2,1}='Number samples :';
-data{3,1}='Number averages :';
-data{4,1}='Trigger source :';
-data{5,1}='Trigger slope :';
-data{6,1}='Trigger level (V) :';
-data{7,1}='Start time (s) :';
-set(acquire(end),'Data',data,...
-    'ColumnFormat',{'char' 'char'},...
-    'ColumnEditable',[false true],...
-    'CellEditCallback',@changeSetting)
-    function changeSetting(src,EventData)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        if get(common,'Value')
-            index=1:numel(get(digitizer(2),'String'));          
-        else
-            index=get(digitizer(2),'Value');
-        end
-        row=EventData.Indices(1);
-        column=EventData.Indices(2);
-        value=EventData.EditData;       
-        value=attemptSetting(dig(index),row,value);
-        data=get(src,'Data');
-        data{row,column}=value;
-        set(src,'Data',data);
-        setappdata(fig.Figure,'DigitizerObject',dig);
-    end
-
-%%
-channel=addblock(fig,'table',{'' 'CH 1:' 'CH 2:' 'CH 3:' 'CH 4:'},...
-    [10 5 5 5 5],5);
-set(channel(1:5),'Fontweight','bold');
-setappdata(fig.ControlPanel,'ChannelTable',channel(end));
-data=cell(5,5);
-data{1,1}='Coupling :';
-data{2,1}='Impedance :';
-data{3,1}='Scale (V/div) :';
-data{4,1}='Offset (V) :';
-data{5,1}='Status :';
-set(channel(end),'Data',data,...
-    'ColumnFormat',{'char' 'char' 'char' 'char' 'char'},...
-    'ColumnEditable',[false true true true true],...
-    'CellEditCallback',@changeChannel)
-    function changeChannel(src,EventData)
-        dig=getappdata(fig.Figure,'DigitizerObject');
-        index=get(digitizer(2),'Value');
-        row=EventData.Indices(1);
-        column=EventData.Indices(2);
-        ch=column-1;
-        value=EventData.EditData;
-        value=attemptChannel(dig(index),row,ch,value);
-        data=get(src,'Data');
-        data{row,column}=value;
-        set(src,'Data',data);
-        setappdata(fig.Figure,'DigitizerObject',dig);
-    end
-
-addblock(fig,'button',{'Read settings' 'Write settings'});
 
 arm=addblock(fig,'button',{' Run ' ' Single ' ' Stop '});
 DefaultBackground=get(arm(1),'BackgroundColor');
 set(arm(1),'Callback',@runMode);
     function runMode(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         if isempty(dig)
             stopMode();
@@ -385,6 +433,7 @@ set(arm(1),'Callback',@runMode);
     end
 set(arm(2),'Callback',@singleMode)
     function singleMode(varargin)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         if get(paranoid(2),'Value')
             runParanoid(fig,dig,fontsize);
@@ -420,6 +469,7 @@ set(arm(2),'Callback',@singleMode)
     end
 set(arm(3),'Callback',@stopMode)
     function stopMode(varargin) 
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         set(arm(3),'BackgroundColor','r','FontWeight','bold');
         set(arm(1:2),'BackgroundColor',DefaultBackground,...
@@ -433,11 +483,10 @@ set(arm(3),'Callback',@stopMode)
     end
 stopMode();
 
-%override=addblock(fig,'button',{'Clear display' 'Force trigger'});
-
 paranoid=addblock(fig,'checkbox',{'Lock digitizers' 'Shot mode'});
 set(paranoid(1),'Callback',@lockDigitizers)
     function lockDigitizers(src,~)
+        checkList();
         dig=getappdata(fig.Figure,'DigitizerObject');
         if get(src,'Value')
             lock(dig);
@@ -447,14 +496,15 @@ set(paranoid(1),'Callback',@lockDigitizers)
     end
 set(paranoid(2),'Callback',@shotMode);
     function shotMode(src,~)
+        checkList();        
         if get(src,'Value')
             set(arm([1 3]),'Enable','off');
             set(arm(2),'String','Arm');
-            set(override,'Enable','off');
+            %set(override,'Enable','off');
         else
             set(arm([1 3]),'Enable','on');
             set(arm(2),'String','Single');
-            set(override,'Enable','on');
+            %set(override,'Enable','on');
         end
     end
 
@@ -464,6 +514,8 @@ movegui(fig.Figure,'center');
 drawnow();
 fig.Hidden=false;
 set(fig.Figure,'HandleVisibility','callback');
+
+createMode=false;
 
 end
 

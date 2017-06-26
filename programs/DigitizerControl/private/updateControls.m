@@ -27,7 +27,6 @@ data{3,2}=sprintf('%g',dig.Acquisition.NumberAverages);
 data{4,2}=dig.Trigger.Source;
 data{5,2}=dig.Trigger.Slope;
 data{6,2}=sprintf('%g',dig.Trigger.Level);
-%data{7,2}=dig.Trigger.ReferenceType;
 data{7,2}=dig.Trigger.Start;
 
 set(settings,'Data',data);
