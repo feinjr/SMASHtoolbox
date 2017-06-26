@@ -26,7 +26,7 @@ end
 assert(ischar(output),'ERROR: invalid output');
 output=lower(output);
 
-[~,angle]=RotateSpectraGUI(ref);
+[~,angle]=obj.RotateSpectraGUI(ref);
 %RotatedData(isnan(RotatedData))=0;
 
 switch output
@@ -34,17 +34,17 @@ switch output
         obj.WavelengthImage=Rotate(obj.WavelengthImage,angle);
         obj.TimeImage=Rotate(obj.TimeImage,angle);
         obj.DataImage=Rotate(obj.DataImage,angle);        
+    case 'wavelength'
+        obj.WavelengthImage=Rotate(obj.WavelengthImage,angle);
+    case 'time'
+        obj.TimeImage=Rotate(obj.TimeImage,angle);
+    case 'data'
+        obj.DataImage=Rotate(obj.DataImage,angle);
+    otherwise
+        error('ERROR: invalid output');
+end
         obj.DataImage(isnan(obj.DataImage))=0;
         obj.TimeImage(isnan(obj.TimeImage))=0;
-        obj.WavelengthImage(isnan(obj.WavelengthImage))=0;
-    case 'wavelength'
-        
-    case 'time'
-        
-    case 'data'
-        
-    otherwise
-            
+        obj.WavelengthImage(isnan(obj.WavelengthImage))=0;            
 end
 
-end

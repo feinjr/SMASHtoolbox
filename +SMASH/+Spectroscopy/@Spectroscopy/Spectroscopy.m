@@ -11,7 +11,7 @@
 
 %created May 12, 2017 by Sonal Patel (Sandia National Laboratories)
 
-classdef Spectroscopy 
+classdef Spectroscopy
     %% properties
     properties     
         DataImage=[];
@@ -29,12 +29,22 @@ classdef Spectroscopy
         TimePolyFitCoeff=[];
 
     end
+    
+    methods (Static)
+        [coordinates,hRectangle]=DrawRectangle(varargin);
+        [x,y]=Lineout(ImageData,y1,y2,x1,x2,direction);
+        InterpolatedBackground=BackgroundSubtract(pixel,lineout,varargin);
+        [RotatedData,angle]=RotateSpectraGUI(image);
+        [FinalFit,PeakLocations,PeakIndexGuess,PeakWidths,Amplitude]=TryFit(x,y,defaultNPeaks,defaultThreshold,defaultProminence,varargin);
+        [WavePolyFitCoeff,wavelength]=CalibrateWavelengthLine(x,KnownLines,PeakLocations);
+    end
+    
     methods 
         function obj=Spectroscopy(data,wave,time)
             obj.DataImage=data;
             obj.WavelengthImage=wave;
             obj.TimeImage=time;           
-        end              
-        
+        end       
+ 
     end
 end

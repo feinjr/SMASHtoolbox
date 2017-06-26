@@ -1,6 +1,13 @@
 function [PeakLocations,PeakWidths]=GetResolution(obj,x,y)
-%The GetResolution method returns the width and wavelengths of
-%the wavelength calibration lines in order to determine the
-%resolution as a function of wavelength.
-[PeakLocations,PeakWidths]=Resolution(x,y,obj.KnownWavelengthLines);
+% [~,InterpolatedBackground,~]=BackgroundSubtractPlot(obj,x,y);
+% y=y-InterpolatedBackground;
+[~,PeakLocations,~,PeakWidths,~]=obj.TryFit(x,y,length(obj.KnownWavelengthLines),0,20,'FitSpeed','Slow');
+figure
+u=plot(PeakLocations,PeakWidths,'k');
+u.Marker='o';
+u.MarkerFaceColor='k';
+u.MarkerSize=3;
+xlabel('Wavelength (nm)');
+ylabel('Resolution (nm)');
+title('Spectral Resolution');
 end

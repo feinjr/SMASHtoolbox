@@ -7,7 +7,6 @@
 %created May 12, 2017 by Sonal Patel (Sandia National Laboratories)
 
 function [RotatedData,angle]=RotateSpectraGUI(image)
-
 fh=figure;
 %f=figure;
 ax=axes;
