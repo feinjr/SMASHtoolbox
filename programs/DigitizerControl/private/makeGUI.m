@@ -89,7 +89,7 @@ uimenu(hm,'Label','Save configuration','Separator','on',...
     end
 uimenu(hm,'Label','Load configuration','Callback',@loadConfiguration);
     function loadConfiguration(varargin)
-        [name,location]=uigetfile('*.cfg','Save digitizer configuration');
+        [name,location]=uigetfile('*.cfg','Load digitizer configuration');
         if isnumeric(name)
             return
         end
@@ -120,7 +120,12 @@ uimenu(hm,'Label','Exit','Separator','on','Callback',@exitProgram);
 set(fig.Figure,'CloseRequestFcn',@exitProgram);
 
 hm=uimenu(fig.Figure,'Label','System');
-uimenu(hm,'Label','Clear status/error registers');
+uimenu(hm,'Label','Clear status/error registers','Callback',@clearStatus);
+    function clearStatus(varargin)
+        checkList();
+        dig=getappdata(fig.Figure,'DigitizerObject');
+        clearStatus(dig);
+    end
 
 uimenu(hm,'Label','Clear displays','Callback',@clearDisplays);
     function clearDisplays(varargin)
