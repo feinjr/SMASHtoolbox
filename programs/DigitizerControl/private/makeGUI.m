@@ -28,6 +28,7 @@ fig.Hidden=true;
 fig.Name='Digitizer control';
 fig.Figure.Tag='DigitizerControl';
 
+
 set(fig.Axes,'FontSize',fontsize,'Color','k',...
     'GridColor','w','XGrid','on','YGrid','on');
 color={'y' 'g' 'b' 'r'};
@@ -43,7 +44,7 @@ end
 xlabel(fig.Axes,'Time (s)');
 ylabel(fig.Axes,'Signal (V)');
 
-h=findobj(gcf,'Type','uitoggletool','Tag','standard');
+h=findobj(fig.Figure,'Type','uitoggletool','Tag','standard');
 set(h,'Enable','off');
 
 hm=uimenu(fig.Figure,'Label','Program');
