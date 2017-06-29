@@ -183,7 +183,7 @@ uimenu(hm,'Label','Save all digitizers',...
         dig=getappdata(fig.Figure,'DigitizerObject');
         saveData(fig,dig,'Save all digitizers',fontsize);
     end
-uimenu(hm,'Label','Save current digitizer',...
+SaveCurrent=uimenu(hm,'Label','Save current digitizer',...
     'Callback',@saveCurrent);
     function saveCurrent(varargin)
         checkList();
@@ -506,11 +506,11 @@ set(paranoid(2),'Callback',@shotMode);
         if get(src,'Value')
             set(arm([1 3]),'Enable','off');
             set(arm(2),'String','Arm');
-            %set(override,'Enable','off');
+            set(SaveCurrent,'Enable','off');
         else
             set(arm([1 3]),'Enable','on');
             set(arm(2),'String','Single');
-            %set(override,'Enable','on');
+            set(SaveCurrent,'Enable','on');
         end
     end
 
@@ -570,13 +570,13 @@ switch row
             dig.Trigger.Level=sscanf(value,'%g',1);
         catch
         end
-        value=dig.Trigger.Level;   
+        value=sprintf('%g',dig.Trigger.Level);   
     case 7
         try
             dig.Trigger.Start=sscanf(value,'%g',1);
         catch
         end
-        value=dig.Trigger.Start;
+        value=sprintf('%g',dig.Trigger.Start);
 end   
 
 end

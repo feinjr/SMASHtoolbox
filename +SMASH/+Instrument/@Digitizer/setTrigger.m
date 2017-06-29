@@ -27,9 +27,7 @@ fwrite(object.VISA,command);
 command=sprintf('TRIGGER:EDGE:SLOPE %s',value.Slope);
 fwrite(object.VISA,command);
 
-%command=sprintf('TRIGGER:LEVEL %s, %g',value.Source,value.Level);
-%command=sprintf('TRIGGER:LEVEL %g, %s',value.Level,value.Source);
-command=sprintf('TRIGGER:LEVEL %g, %s',value.Level,value.Source);
+command=sprintf('TRIGGER:LEVEL %s, %g',value.Source,value.Level);
 fwrite(object.VISA,command);
 
 command=sprintf('TIMEBASE:REFERENCE %s','LEFT');
