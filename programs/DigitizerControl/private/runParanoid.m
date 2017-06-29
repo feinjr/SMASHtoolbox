@@ -29,8 +29,8 @@ end
 %%
 default='C:\Users\Public\Documents\Infiniium';
 command=sprintf('DISK:CDIRECTORY "%s"',default);
-for k=1:numel(object)
-    fwrite(object(k).VISA,command);
+for k=1:numel(dig)
+    fwrite(dig(k).VISA,command);
 end
 
 %%
@@ -49,19 +49,20 @@ box.Name='Shot mode';
 status=addblock(box,'text','FULLY ARMED',20);
 set(status,'BackgroundColor','g','FontWeight','bold');
 
-period=getappdata(master,'QueryInterval');
+period=getappdata(master.Figure,'QueryInterval');
 interval=addblock(box,'button',' Check status ');
 set(interval(1),'Callback',@testNow)
-testMessage={};
     function testNow(varargin)
-        WorkingButton(interval(3));
-        C=onCleanup(@() WorkingButton(interval(3)));
+        WorkingButton(interval(1));
+        C=onCleanup(@() WorkingButton(interval(1)));
         N=numel(dig);
-        armed=false(N,1);        
+        armed=false(N,1);
+        testMessage={};
         for n=1:N
             delay=SMASH.System.ping(dig(n).System.Address);
             if isnan(delay)
-                testMessage{end+1}=sprintf('%s is not responding',dig(n).Name); %#ok<AGROW>
+                testMessage{end+1}=sprintf(...
+                    '%s is not responding',dig(n).Name); %#ok<AGROW>
                 continue
             end
             if strcmpi(dig(n).RunState,'single')
@@ -82,15 +83,17 @@ testMessage={};
                 fwrite(dig(m).VISA,command);
             end
             set(autosave(1),'String','Data automatically saved to:');
-            set(autosave(2),'String',sprintf('\t%s',default));
+            set(autosave(2),'String',...
+                fullfile(sprintf('\t%s',default),'AUTOSAVE.h5'));
         else           
             index=find(~armed);
             for n=1:numel(index)
-                testMessage{end+1}=sprintf('%s disarmed',dig(n).Name); %#ok<AGROW>
+                testMessage{end+1}=sprintf('%s disarmed',...
+                    dig(index(n)).Name); %#ok<AGROW>
             end
             set(status,'String','Partially armed','BackgroundColor','y');
         end
-        set(problem(end),'Data',testMessage);
+        set(problem(end),'Data',testMessage(:));
         TimerValue=0;
         drawTimer(TimerValue);
     end
@@ -143,7 +146,7 @@ TimerValue=0;
         drawTimer(TimerValue)
     end
 
-pos=get(interval(3),'Position');
+pos=get(interval(1),'Position');
 TimerBar=ones(round([pos(4) pos(3) 3]));
 drawTimer(0);
     function drawTimer(value)
@@ -154,7 +157,7 @@ drawTimer(0);
         else
             TimerBar(:,1:round(size(TimerBar,2)*TimerValue),1)=0;
         end
-        set(interval(3),'CData',TimerBar);
+        set(interval(1),'CData',TimerBar);
     end
 start(ReadTimer);
 
