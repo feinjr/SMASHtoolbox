@@ -355,19 +355,19 @@ set(channel(end),'Data',data,...
         setappdata(fig.Figure,'DigitizerObject',dig);
     end
 
-h=addblock(fig,'button',{'Read settings' 'Grab data'});
-set(h(1),'Callback',@readSettings);
+readDig=addblock(fig,'button',{'Read settings' 'Grab data'});
+set(readDig(1),'Callback',@readSettings);
     function readSettings(varargin)
         checkList();
-        WorkingButton(digitizer(end));
-        CU=onCleanup(@() WorkingButton(digitizer(end)));
+        WorkingButton(readDig(1));
+        CU=onCleanup(@() WorkingButton(readDig(1)));
         updateControls(fig);
     end
-set(h(2),'Callback',@readDigitizer);
+set(readDig(2),'Callback',@readDigitizer);
  function readDigitizer(varargin)
         checkList();
-        WorkingButton(digitizer(end));
-        CU=onCleanup(@() WorkingButton(digitizer(end)));
+        WorkingButton(readDig(2));
+        CU=onCleanup(@() WorkingButton(readDig(2)));
         dig=getappdata(fig.Figure,'DigitizerObject');
         updateControls(fig);
         index=get(digitizer(2),'Value');
@@ -529,7 +529,7 @@ function value=attemptSetting(dig,row,value)
 
 if numel(dig) > 1
     for k=1:numel(dig)
-        attemptSetting(dig(k),row,value);
+        value=attemptSetting(dig(k),row,value);
     end
     return
 end
