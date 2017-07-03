@@ -88,7 +88,7 @@ objectB=SignalAnalysis();
 ```
 Note that imports are specfific to a particular workspace, e.g. packages imported in the command window aren't automatially availble inside a function.  The command `clear all` removes all package imports.
 
-Programs are more specific collections of MATLAB code.  For example, the SIRHEN program was designed to analyze PDV data, making it poorly suited to general-purpose signal analysis.  SIRHEN sits inside the "programs" directly, which is not on the MATLAB path by default.  The utility "loadSMASH" manages this for you.
+Programs are more specific collections of MATLAB code.  For example, the SIRHEN program was designed to analyze PDV data, making it poorly suited to general-purpose signal analysis.  SIRHEN sits inside the "programs" directory, which is not on the MATLAB path by default.  The utility "loadSMASH" manages this for you.
 ```matlab
 loadSMASH -program SIRHEN % add SIRHEN to the path
 SIRHEN % launch the program
