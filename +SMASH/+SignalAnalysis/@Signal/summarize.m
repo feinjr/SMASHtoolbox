@@ -67,13 +67,13 @@ report.Data.Median=median(Data);
 
 % sinusoid analysis
 nyquist=1/(2*dt);
-fmax=nyquist/4;
+%fmax=nyquist/4;
 if isempty(FrequencyBound)
-    FrequencyBound=[0 fmax];
+    FrequencyBound=[0 nyquist];
 end    
 if sinusoid
     left=max(0,FrequencyBound(1));
-    right=min(FrequencyBound(2),fmax);  
+    right=min(FrequencyBound(2),nyquist);  
     % characterize peak
     options.RemoveDC=true;
     options.NumberFrequencies=1e6;

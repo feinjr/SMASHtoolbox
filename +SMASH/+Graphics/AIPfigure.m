@@ -2,7 +2,7 @@
 %
 % This function creates 1-2 column figures for American Institute of
 % Physics journals (J. Appl. Phys, Rev. Sci. Instrum., etc.).  By default,
-% single column, 10 cm tall figures are generatred.
+% single column, 10 cm tall figures are generated.
 %    >> AIPfigure;
 % The number of columns can be specified with an input argument.
 %    >> AIPfigure(2);  % two column figure
